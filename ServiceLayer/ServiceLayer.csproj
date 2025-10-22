@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
@@ -8,6 +8,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\BizLogic\BizLogic.csproj" />
+    <ProjectReference Include="..\DataLayer\DataLayer.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -17,6 +18,7 @@
       <Folder Include="EntryService\" />
       <Folder Include="EventService\" />
       <Folder Include="SwimStyleService\" />
+    <Folder Include="Crud\" />
     </ItemGroup>
 
 </Project>
