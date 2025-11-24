@@ -3,11 +3,11 @@ using BizLogic.GenericInterfaces;
 using BizLogic.Helpers;
 using DataLayer.EfClasses;
 
-namespace BizLogic.HeatLogic;
+namespace BizLogic.HeatLogic.Concrete;
 
 public class HeatAllocationAction :
     BizActionErrors,
-    IBizAction<HeatAllocationInDto, HeatAllocationOutDto>
+    IHeatAllocationAction
 {
     private readonly IHeatAllocationDbAccess _dbAccess;
 
@@ -16,36 +16,36 @@ public class HeatAllocationAction :
         _dbAccess = dbAccess;
     }
 
-    public HeatAllocationOutDto Action(HeatAllocationInDto dataIn)
+    public HeatAllocationOutDto Action(HeatAllocationInDto filePath)
     {
-        var isHeatsAlreadyExists = _dbAccess.IsHeatsExists(dataIn.SwimEventId);
+        var isHeatsAlreadyExists = _dbAccess.IsHeatsExists(filePath.SwimEventId);
         if (isHeatsAlreadyExists)
         {
-            AddError($"Heats for event with id {dataIn.SwimEventId} already exists");
+            AddError($"Heats for event with id {filePath.SwimEventId} already exists");
             return null;
         }
 
-        var entries = new BufferedCollection<Entry>(_dbAccess.GetOrderedEntriesByEventId(dataIn.SwimEventId));
+        var entries = new BufferedCollection<Entry>(_dbAccess.GetOrderedEntriesByEventId(filePath.SwimEventId));
         if (entries.Count == 0)
         {
-            AddError($"There is no entries for event with id {dataIn.SwimEventId}");
+            AddError($"There is no entries for event with id {filePath.SwimEventId}");
             return null;
         }
 
-        var heatNumbers = OrderHeatNumbers(entries.Count, dataIn.LaneCount, dataIn.HeatOrder);
-        var laneNumbers = OrderLaneNumbers(dataIn.LaneMin, dataIn.LaneMax);
+        var heatNumbers = OrderHeatNumbers(entries.Count, filePath.LaneCount, filePath.HeatOrder);
+        var laneNumbers = OrderLaneNumbers(filePath.LaneMin, filePath.LaneMax);
         var heats = new List<Heat>();
 
-        if (!IsWeakHeatFull(entries.Count, dataIn.LaneCount))
+        if (!IsWeakHeatFull(entries.Count, filePath.LaneCount))
         {
-            var heatSize = Math.Max(dataIn.MinHeatSize, entries.Count % dataIn.LaneCount);
-            var weakHeat = CreateHeat(entries.TakeLast(heatSize), laneNumbers, heatNumbers.TakeLast(), dataIn.SwimEventId);
+            var heatSize = Math.Max(filePath.MinHeatSize, entries.Count % filePath.LaneCount);
+            var weakHeat = CreateHeat(entries.TakeLast(heatSize), laneNumbers, heatNumbers.TakeLast(), filePath.SwimEventId);
             heats.Add(weakHeat);
         }
 
         while (!entries.IsEmpty)
         {
-            var heat = CreateHeat(entries.TakeFirst(dataIn.LaneCount), laneNumbers, heatNumbers.TakeFirst(), dataIn.SwimEventId);
+            var heat = CreateHeat(entries.TakeFirst(filePath.LaneCount), laneNumbers, heatNumbers.TakeFirst(), filePath.SwimEventId);
             heats.Add(heat);
         }
 

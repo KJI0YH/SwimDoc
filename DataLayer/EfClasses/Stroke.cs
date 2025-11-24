@@ -1,10 +1,12 @@
-﻿namespace DataLayer.EfClasses;
+﻿using System.ComponentModel;
+
+namespace DataLayer.EfClasses;
 
 public enum Stroke
 {
-    Fly,
-    Back,
-    Breast,
-    Free,
-    Medley
+    [Description("Баттерфляй")]Fly,
+    [Description("На спине")]Back,
+    [Description("Брасс")]Breast,
+    [Description("Вольный стиль")]Free,
+    [Description("Комплексное плавание")]Medley
 }

@@ -9,18 +9,25 @@ public class EntryConfiguration : IEntityTypeConfiguration<Entry>
     public void Configure(EntityTypeBuilder<Entry> builder)
     {
         builder
+            .HasOne(entry => entry.SwimStyle)
+            .WithMany(swimStyle => swimStyle.Entries)
+            .HasForeignKey(entry => entry.SwimStyleId);
+        builder
             .HasOne(entry => entry.SwimEvent)
             .WithMany(swimEvent => swimEvent.Entries)
-            .HasForeignKey(entry => entry.SwimEventId);
+            .HasForeignKey(entry => entry.SwimEventId)
+            .IsRequired(false);
         builder
             .HasOne(entry => entry.HeatPosition)
             .WithOne(heatPosition => heatPosition.Entry)
             .HasForeignKey<Entry>(entry => entry.HeatPositionId)
             .IsRequired(false);
-        builder.HasOne(entry => entry.Athlete)
+        builder
+            .HasOne(entry => entry.Athlete)
             .WithMany(athlete => athlete.Entries)
             .HasForeignKey(entry => entry.AthleteId);
-        builder.HasOne(entry => entry.Relay)
+        builder
+            .HasOne(entry => entry.Relay)
             .WithOne(relay => relay.Entry)
             .HasForeignKey<Entry>(entry => entry.RelayId);
     }

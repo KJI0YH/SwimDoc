@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DataLayer.EfCore;
 
-public class EfCoreContext : DbContext
+public sealed class EfCoreContext : DbContext
 {
     public DbSet<AgeGroup> AgeGroups { get; set; }
     public DbSet<Athlete> Athletes { get; set; }
@@ -12,6 +12,7 @@ public class EfCoreContext : DbContext
     public DbSet<Entry> Entries { get; set; }
     public DbSet<SwimEvent> SwimEvents { get; set; }
     public DbSet<Heat> Heats { get; set; }
+    public DbSet<HeatPosition> HeatPositions { get; set; }
     public DbSet<Relay> Relays { get; set; }
     public DbSet<RelayPosition> RelayPositions { get; set; }
     public DbSet<SwimStyle> SwimStyles { get; set; }

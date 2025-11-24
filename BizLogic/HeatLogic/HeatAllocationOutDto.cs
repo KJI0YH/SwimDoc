@@ -2,12 +2,7 @@
 
 namespace BizLogic.HeatLogic;
 
-public class HeatAllocationOutDto
+public class HeatAllocationOutDto(List<Heat> heats)
 {
-    public List<Heat> Heats { get; }
-
-    public HeatAllocationOutDto(List<Heat> heats)
-    {
-        Heats = heats;
-    }
+    public List<Heat> Heats { get; } = heats;
 }

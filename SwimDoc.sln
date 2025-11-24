@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceLayer", "ServiceLaye
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BizDbAccess", "BizDbAccess\BizDbAccess.csproj", "{4BF145BF-AF78-4391-B1CC-FAEDA722CF13}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{75EF7C76-FBA0-429C-B56A-C4CCD7BE8E52}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{4BF145BF-AF78-4391-B1CC-FAEDA722CF13}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4BF145BF-AF78-4391-B1CC-FAEDA722CF13}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4BF145BF-AF78-4391-B1CC-FAEDA722CF13}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75EF7C76-FBA0-429C-B56A-C4CCD7BE8E52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{75EF7C76-FBA0-429C-B56A-C4CCD7BE8E52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{75EF7C76-FBA0-429C-B56A-C4CCD7BE8E52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{75EF7C76-FBA0-429C-B56A-C4CCD7BE8E52}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

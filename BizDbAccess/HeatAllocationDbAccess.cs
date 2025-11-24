@@ -11,18 +11,11 @@ public interface IHeatAllocationDbAccess
     void AddHeats(IEnumerable<Heat> heats);
 }
 
-public class HeatAllocationDbAccess : IHeatAllocationDbAccess
+public class HeatAllocationDbAccess(EfCoreContext context) : IHeatAllocationDbAccess
 {
-    private readonly EfCoreContext _context;
-
-    public HeatAllocationDbAccess(EfCoreContext context)
-    {
-        _context = context;
-    }
-
     public ICollection<Entry> GetOrderedEntriesByEventId(int swimEventId)
     {
-        return _context.Entries
+        return context.Entries
             .AsNoTracking()
             .Where(entry => entry.SwimEventId == swimEventId)
             .OrderBy(entry => entry.EntryTime == null ? 1 : 0)
@@ -32,11 +25,11 @@ public class HeatAllocationDbAccess : IHeatAllocationDbAccess
 
     public bool IsHeatsExists(int swimEventId)
     {
-        return _context.Heats.Any(heat => heat.SwimEventId == swimEventId);
+        return context.Heats.Any(heat => heat.SwimEventId == swimEventId);
     }
 
     public void AddHeats(IEnumerable<Heat> heats)
     {
-        _context.Heats.AddRange(heats);
+        context.Heats.AddRange(heats);
     }
 }

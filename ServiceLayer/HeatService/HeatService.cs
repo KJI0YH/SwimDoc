@@ -2,8 +2,10 @@
 using System.ComponentModel.DataAnnotations;
 using BizDbAccess;
 using BizLogic.HeatLogic;
+using BizLogic.HeatLogic.Concrete;
 using DataLayer.EfCore;
 using ServiceLayer.BizRunners;
+using ServiceLayer.HeatService.Exceptions;
 
 namespace ServiceLayer.HeatService;
 
@@ -21,12 +23,18 @@ public class HeatService
             context);
     }
 
-    public void AllocateEntriesToHeats(HeatAllocationParameters parameters)
+    public HeatAllocationOutDto AllocateEntriesToHeats(HeatAllocationParameters parameters)
     {
         var swimEvent = _context.SwimEvents.FirstOrDefault(swimEvent => swimEvent.Id == parameters.SwimEventId);
-        if (swimEvent == null) return;
+        if (swimEvent == null) return new HeatAllocationOutDto([]);
         var dataIn = new HeatAllocationInDto(parameters, swimEvent.LaneMin, swimEvent.LaneMax);
         var result = _runner.RunAction(dataIn);
-        if (_runner.HasErrors) throw new Exception();
+        return _runner.HasErrors ? throw new HeatAllocationException(Errors) : result;
+    }
+
+    public async Task DeleteSwimEventHeatsAsync(int swimEventId)
+    {
+        _context.Heats.RemoveRange(_context.Heats.Where(heat => heat.SwimEventId == swimEventId));
+        await _context.SaveChangesAsync();
     }
 }

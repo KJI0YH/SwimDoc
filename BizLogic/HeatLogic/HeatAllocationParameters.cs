@@ -1,8 +1,8 @@
 ﻿namespace BizLogic.HeatLogic;
 
-public class HeatAllocationParameters
+public class HeatAllocationParameters(int swimEventId, HeatOrder heatOrder, int minHeatSize)
 {
-    public int SwimEventId { get; }
-    public HeatOrder HeatOrder { get; }
-    public int MinHeatSize { get; }
+    public int SwimEventId { get; } = swimEventId;
+    public HeatOrder HeatOrder { get; } = heatOrder;
+    public int MinHeatSize { get; } = minHeatSize;
 }
