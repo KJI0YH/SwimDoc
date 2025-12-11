@@ -10,7 +10,7 @@ using ServiceLayer.EntryDocumentReaderService.Exceptions;
 
 namespace ServiceLayer.EntryDocumentReaderService;
 
-public class EntryDocumentReaderService
+public class EntryDocumentReaderService : IEntryDocumentReaderService
 {
     private readonly EfCoreContext _context;
     private readonly RunnerWriteDbWithValidation<string, IReadOnlyList<EntryDocument>> _runner;

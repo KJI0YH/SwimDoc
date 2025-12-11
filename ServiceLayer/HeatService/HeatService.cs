@@ -3,19 +3,20 @@ using System.ComponentModel.DataAnnotations;
 using BizDbAccess;
 using BizLogic.HeatLogic;
 using BizLogic.HeatLogic.Concrete;
+using DataLayer.EfClasses;
 using DataLayer.EfCore;
 using ServiceLayer.BizRunners;
+using ServiceLayer.Crud;
 using ServiceLayer.HeatService.Exceptions;
 
 namespace ServiceLayer.HeatService;
 
-public class HeatService
+public class HeatService : CrudService<Heat, int>, IHeatService
 {
     private readonly EfCoreContext _context;
     private readonly RunnerWriteDb<HeatAllocationInDto, HeatAllocationOutDto> _runner;
-    public IImmutableList<ValidationResult> Errors => _runner.Errors;
 
-    public HeatService(EfCoreContext context)
+    public HeatService(EfCoreContext context) : base(context)
     {
         _context = context;
         _runner = new RunnerWriteDb<HeatAllocationInDto, HeatAllocationOutDto>(
@@ -29,7 +30,7 @@ public class HeatService
         if (swimEvent == null) return new HeatAllocationOutDto([]);
         var dataIn = new HeatAllocationInDto(parameters, swimEvent.LaneMin, swimEvent.LaneMax);
         var result = _runner.RunAction(dataIn);
-        return _runner.HasErrors ? throw new HeatAllocationException(Errors) : result;
+        return _runner.HasErrors ? throw new HeatAllocationException(_runner.Errors) : result;
     }
 
     public async Task DeleteSwimEventHeatsAsync(int swimEventId)

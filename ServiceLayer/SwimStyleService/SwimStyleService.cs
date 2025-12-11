@@ -4,4 +4,4 @@ using ServiceLayer.Crud;
 
 namespace ServiceLayer.SwimStyleService;
 
-public class SwimStyleService(EfCoreContext dbContext) : CrudService<SwimStyle, int>(dbContext);
+public class SwimStyleService(EfCoreContext dbContext) : CrudService<SwimStyle, int>(dbContext), ISwimStyleService;

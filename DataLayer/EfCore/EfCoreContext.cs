@@ -17,8 +17,9 @@ public sealed class EfCoreContext : DbContext
     public DbSet<RelayPosition> RelayPositions { get; set; }
     public DbSet<SwimStyle> SwimStyles { get; set; }
 
-    public EfCoreContext(DbContextOptions<EfCoreContext> options) : base(options)
+    public EfCoreContext(DbContextOptions<EfCoreContext> options, IDatabaseConnection databaseConnection) : base(options)
     {
+        Database.SetConnectionString(databaseConnection?.CurrentConnection());
         Database.EnsureCreated();
     }
 

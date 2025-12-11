@@ -4,4 +4,4 @@ using ServiceLayer.Crud;
 
 namespace ServiceLayer.EventService;
 
-public class EventService(EfCoreContext dbContext) : CrudService<SwimEvent, int>(dbContext);
+public class EventService(EfCoreContext dbContext) : CrudService<SwimEvent, int>(dbContext), IEventService;

@@ -4,4 +4,4 @@ using ServiceLayer.Crud;
 
 namespace ServiceLayer.ClubService;
 
-public class ClubService(EfCoreContext dbContext) : CrudService<Club, int>(dbContext);
+public class ClubService(EfCoreContext dbContext) : CrudService<Club, int>(dbContext), IClubService;
