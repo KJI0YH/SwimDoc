@@ -1,0 +1,116 @@
+<UserControl x:Class="UI.Views.GenericTableView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" 
+                    Orientation="Horizontal" 
+                    Margin="0,0,0,10">
+            <Button Content="Создать" 
+                    Command="{Binding CreateItemCommand}" 
+                    Width="100" 
+                    Height="30" 
+                    Margin="0,0,5,0"/>
+            <Button Content="Редактировать" 
+                    Command="{Binding EditItemCommand}" 
+                    Width="100" 
+                    Height="30" 
+                    Margin="0,0,5,0"/>
+            <Button Content="Удалить" 
+                    Command="{Binding DeleteItemCommand}" 
+                    Width="100" 
+                    Height="30" 
+                    Margin="0,0,5,0"/>
+            <Button Content="Обновить" 
+                    Command="{Binding LoadDataCommand}" 
+                    Width="100" 
+                    Height="30"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" 
+                    Orientation="Horizontal" 
+                    Margin="0,0,0,10">
+            <TextBlock Text="Поиск:" 
+                       VerticalAlignment="Center" 
+                       Margin="0,0,5,0"/>
+            <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" 
+                     Width="200" 
+                     Height="25"/>
+            <TextBlock Text="Размер страницы:" 
+                       VerticalAlignment="Center" 
+                       Margin="20,0,5,0"/>
+            <ComboBox SelectedValue="{Binding PageSize}" 
+                      SelectedValuePath="Tag"
+                      Width="80" 
+                      Height="25">
+                <ComboBoxItem Content="10" Tag="10"/>
+                <ComboBoxItem Content="20" Tag="20"/>
+                <ComboBoxItem Content="50" Tag="50"/>
+                <ComboBoxItem Content="100" Tag="100"/>
+            </ComboBox>
+        </StackPanel>
+
+        <DataGrid Grid.Row="2" 
+                  x:Name="DataGrid"
+                  ItemsSource="{Binding Items}" 
+                  SelectedItem="{Binding SelectedItem}"
+                  AutoGenerateColumns="{Binding AutoGenerateColumns}"
+                  CanUserAddRows="False"
+                  CanUserDeleteRows="False"
+                  IsReadOnly="True"
+                  SelectionMode="Single"
+                  GridLinesVisibility="All"
+                  HeadersVisibility="Column"
+                  AlternatingRowBackground="LightGray"
+                  Loaded="DataGrid_Loaded">
+            <DataGrid.ColumnHeaderStyle>
+                <Style TargetType="DataGridColumnHeader">
+                    <EventSetter Event="Click" Handler="ColumnHeader_Click"/>
+                </Style>
+            </DataGrid.ColumnHeaderStyle>
+        </DataGrid>
+
+        <TextBlock Grid.Row="3" 
+                   Text="{Binding PageInfo}" 
+                   Margin="0,10,0,5"
+                   HorizontalAlignment="Center"/>
+
+        <StackPanel Grid.Row="4" 
+                    Orientation="Horizontal" 
+                    HorizontalAlignment="Center"
+                    Margin="0,5,0,0">
+            <Button Content="&lt;&lt;" 
+                    Command="{Binding GoToFirstPageCommand}" 
+                    Width="40" 
+                    Height="30" 
+                    Margin="2"/>
+            <Button Content="&lt;" 
+                    Command="{Binding GoToPreviousPageCommand}" 
+                    Width="40" 
+                    Height="30" 
+                    Margin="2"/>
+            <Button Content="&gt;" 
+                    Command="{Binding GoToNextPageCommand}" 
+                    Width="40" 
+                    Height="30" 
+                    Margin="2"/>
+            <Button Content="&gt;&gt;" 
+                    Command="{Binding GoToLastPageCommand}" 
+                    Width="40" 
+                    Height="30" 
+                    Margin="2"/>
+        </StackPanel>
+    </Grid>
+</UserControl>
+

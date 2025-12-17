@@ -1,17 +1,23 @@
 ﻿using System.Windows.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
 using UI.Services;
 
 namespace UI.ViewModels;
 
-public class MainViewModel : ViewModelBase
+public partial class MainViewModel : ViewModelBase
 {
     private readonly INavigationService _navigationService;
+
+    [ObservableProperty]
     private bool _isCompetitionSelected;
+
+    [ObservableProperty]
+    private ViewModelBase? _currentViewModel;
 
     public MainViewModel(INavigationService navigationService, CompetitionSelectionViewModel competitionSelectionViewModel)
     {
         _navigationService = navigationService;
-        _navigationService.CurrentViewModelChanged += OnCurrentViewModelChanged;
+        _navigationService.CurrentViewModelChanged += HandleNavigationViewModelChanged;
 
         CompetitionSelectionViewModel = competitionSelectionViewModel;
         CompetitionSelectionViewModel.CompetitionSelected += OnCompetitionSelected;
@@ -28,34 +34,20 @@ public class MainViewModel : ViewModelBase
 
     public CompetitionSelectionViewModel CompetitionSelectionViewModel { get; }
 
-    private ViewModelBase? _currentViewModel;
-    public ViewModelBase? CurrentViewModel
+    partial void OnIsCompetitionSelectedChanged(bool value)
     {
-        get => _currentViewModel;
-        set => SetField(ref _currentViewModel, value);
+        ((NavigationCommand<EventsViewModel>)NavigateToEventsCommand).RaiseCanExecuteChanged();
+        ((NavigationCommand<HeatsViewModel>)NavigateToHeatsCommand).RaiseCanExecuteChanged();
+        ((NavigationCommand<EntriesViewModel>)NavigateToEntriesCommand).RaiseCanExecuteChanged();
+        ((NavigationCommand<AthletesViewModel>)NavigateToAthletesCommand).RaiseCanExecuteChanged();
+        ((NavigationCommand<ClubsViewModel>)NavigateToClubsCommand).RaiseCanExecuteChanged();
+        ((NavigationCommand<AgeGroupsViewModel>)NavigateToAgeGroupsCommand).RaiseCanExecuteChanged();
+        ((NavigationCommand<SwimStylesViewModel>)NavigateToSwimStylesCommand).RaiseCanExecuteChanged();
     }
 
-    private void OnCurrentViewModelChanged(ViewModelBase? viewModel)
+    private void HandleNavigationViewModelChanged(ViewModelBase? viewModel)
     {
         CurrentViewModel = viewModel;
-    }
-
-    public bool IsCompetitionSelected
-    {
-        get => _isCompetitionSelected;
-        private set
-        {
-            if (SetField(ref _isCompetitionSelected, value))
-            {
-                ((NavigationCommand<EventsViewModel>)NavigateToEventsCommand).RaiseCanExecuteChanged();
-                ((NavigationCommand<HeatsViewModel>)NavigateToHeatsCommand).RaiseCanExecuteChanged();
-                ((NavigationCommand<EntriesViewModel>)NavigateToEntriesCommand).RaiseCanExecuteChanged();
-                ((NavigationCommand<AthletesViewModel>)NavigateToAthletesCommand).RaiseCanExecuteChanged();
-                ((NavigationCommand<ClubsViewModel>)NavigateToClubsCommand).RaiseCanExecuteChanged();
-                ((NavigationCommand<AgeGroupsViewModel>)NavigateToAgeGroupsCommand).RaiseCanExecuteChanged();
-                ((NavigationCommand<SwimStylesViewModel>)NavigateToSwimStylesCommand).RaiseCanExecuteChanged();
-            }
-        }
     }
 
     private void OnCompetitionSelected(string filePath)

@@ -1,16 +1,14 @@
+using DataLayer.EfClasses;
 using ServiceLayer.AgeGroupService;
 
 namespace UI.ViewModels;
 
-public class AgeGroupsViewModel : ViewModelBase
+public class AgeGroupsViewModel : GenericTableViewModel<AgeGroup, int>
 {
-    private readonly IAgeGroupService _ageGroupService;
-
-    public AgeGroupsViewModel(IAgeGroupService ageGroupService)
+    public AgeGroupsViewModel(IAgeGroupService ageGroupService) : base(ageGroupService)
     {
-        _ageGroupService = ageGroupService;
     }
 
-    public string Title => "Age Groups Page";
+    public string Title => "Возрастные группы";
 }
 

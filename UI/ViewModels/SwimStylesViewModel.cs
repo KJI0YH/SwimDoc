@@ -1,16 +1,23 @@
+using DataLayer.EfClasses;
 using ServiceLayer.SwimStyleService;
 
 namespace UI.ViewModels;
 
-public class SwimStylesViewModel : ViewModelBase
+public class SwimStylesViewModel : GenericTableViewModel<SwimStyle, int>
 {
-    private readonly ISwimStyleService _swimStyleService;
-
-    public SwimStylesViewModel(ISwimStyleService swimStyleService)
+    public SwimStylesViewModel(ISwimStyleService swimStyleService) : base(swimStyleService)
     {
-        _swimStyleService = swimStyleService;
     }
 
-    public string Title => "Swim Styles Page";
-}
+    public string Title => "Стили плавания";
 
+    protected override void InitializeColumns()
+    {
+        base.InitializeColumns();
+        AutoGenerateColumns = false;
+        ColumnConfigurations.Clear();
+
+        ColumnConfigurations.Add(ColumnConfiguration.Create("Stroke", "Стиль", 150));
+        ColumnConfigurations.Add(ColumnConfiguration.Create("Distance", "Дистанция", 150));
+    }
+}

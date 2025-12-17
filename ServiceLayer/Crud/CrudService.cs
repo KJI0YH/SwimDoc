@@ -29,10 +29,46 @@ public class CrudService<TEntity, TKey>(EfCoreContext dbContext) : ICrudService<
 
     public async Task<(TEntity? entity, ImmutableList<ValidationResult> errors)> UpdateAsync(TEntity entity, CancellationToken cancellationToken = default)
     {
-        dbContext.Set<TEntity>().Attach(entity);
-        dbContext.Entry(entity).State = EntityState.Modified;
+        var entry = dbContext.Entry(entity);
+        
+        // Если сущность уже отслеживается, это ошибка - не должно быть такого
+        if (entry.State != EntityState.Detached)
+        {
+            throw new InvalidOperationException(
+                $"Entity of type {typeof(TEntity).Name} is already being tracked. " +
+                "Make sure to load entities with AsNoTracking() when displaying them in the UI.");
+        }
+        
+        // Получаем Id сущности
+        var idProperty = typeof(TEntity).GetProperty("Id");
+        if (idProperty == null)
+        {
+            throw new InvalidOperationException($"Entity type {typeof(TEntity).Name} does not have an Id property.");
+        }
+        
+        var id = idProperty.GetValue(entity);
+        if (id == null)
+        {
+            throw new InvalidOperationException("Cannot update entity with null Id.");
+        }
+        
+        // Загружаем отслеживаемую сущность из БД
+        var trackedEntity = await dbContext.FindAsync<TEntity>([id], cancellationToken);
+        
+        if (trackedEntity == null)
+        {
+            throw new InvalidOperationException($"Entity with Id {id} was not found in the database.");
+        }
+        
+        // Копируем значения свойств из переданной сущности в отслеживаемую
+        // SetValues автоматически игнорирует навигационные свойства и копирует только скалярные
+        dbContext.Entry(trackedEntity).CurrentValues.SetValues(entity);
+        
+        // Помечаем как изменённую
+        dbContext.Entry(trackedEntity).State = EntityState.Modified;
+        
         var errors = await dbContext.SaveChangesWithValidationAsync();
-        return (entity, errors);
+        return (trackedEntity, errors);
     }
 
     public async Task DeleteAsync(TKey id, CancellationToken cancellationToken = default)

@@ -1,16 +1,14 @@
+using DataLayer.EfClasses;
 using ServiceLayer.ClubService;
 
 namespace UI.ViewModels;
 
-public class ClubsViewModel : ViewModelBase
+public class ClubsViewModel : GenericTableViewModel<Club, int>
 {
-    private readonly IClubService _clubService;
-
-    public ClubsViewModel(IClubService clubService)
+    public ClubsViewModel(IClubService clubService) : base(clubService)
     {
-        _clubService = clubService;
     }
 
-    public string Title => "Clubs Page";
+    public string Title => "Клубы";
 }
 
