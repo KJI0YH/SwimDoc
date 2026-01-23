@@ -13,10 +13,12 @@ public class RelayPositionConfiguration : IEntityTypeConfiguration<RelayPosition
         builder
             .HasOne(relayPosition => relayPosition.Athlete)
             .WithMany(athlete => athlete.RelayPositions)
-            .HasForeignKey(relayPosition => relayPosition.AthleteId);
+            .HasForeignKey(relayPosition => relayPosition.AthleteId)
+            .OnDelete(DeleteBehavior.Cascade);
         builder
             .HasOne(relayPosition => relayPosition.Relay)
             .WithMany(relay => relay.Positions)
-            .HasForeignKey(relayPosition => relayPosition.RelayId);
+            .HasForeignKey(relayPosition => relayPosition.RelayId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

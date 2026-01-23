@@ -11,6 +11,7 @@ public class RelayConfiguration : IEntityTypeConfiguration<Relay>
         builder
             .HasOne(relay => relay.Club)
             .WithMany(club => club.Relays)
-            .HasForeignKey(relay => relay.ClubId);
+            .HasForeignKey(relay => relay.ClubId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

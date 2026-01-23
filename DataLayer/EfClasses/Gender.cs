@@ -4,7 +4,7 @@ namespace DataLayer.EfClasses;
 
 public enum Gender
 {
-    [Description("Муж.")] Male,
-    [Description("Жен.")] Female,
-    [Description("Комб.")] Mixed
+    [Description("Мужчины")] Male,
+    [Description("Женщины")] Female,
+    [Description("Смешанная")] Mixed
 }

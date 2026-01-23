@@ -3,7 +3,7 @@ using ServiceLayer.Crud;
 
 namespace ServiceLayer.AgeGroupService;
 
-public interface IAgeGroupService : ICrudService<AgeGroup, int>
+public interface IAgeGroupService : ICrudService<AgeGroup, int?>
 {
     
 }

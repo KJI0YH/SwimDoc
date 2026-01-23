@@ -1,0 +1,6 @@
+<Page x:Class="UI.Views.Pages.HeatsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:table="clr-namespace:UI.Views.Table">
+    <table:HeatsView />
+</Page>

@@ -1,6 +1,7 @@
-﻿using System.Windows.Input;
+using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using UI.Services;
+using UI.ViewModels.Table;
 
 namespace UI.ViewModels;
 
@@ -14,7 +15,16 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty]
     private ViewModelBase? _currentViewModel;
 
-    public MainViewModel(INavigationService navigationService, CompetitionSelectionViewModel competitionSelectionViewModel)
+    public MainViewModel(
+        INavigationService navigationService,
+        CompetitionSelectionViewModel competitionSelectionViewModel,
+        EventsViewModel eventsViewModel,
+        HeatsViewModel heatsViewModel,
+        EntriesViewModel entriesViewModel,
+        AthletesViewModel athletesViewModel,
+        ClubsViewModel clubsViewModel,
+        AgeGroupsViewModel ageGroupsViewModel,
+        SwimStylesViewModel swimStylesViewModel)
     {
         _navigationService = navigationService;
         _navigationService.CurrentViewModelChanged += HandleNavigationViewModelChanged;
@@ -22,7 +32,15 @@ public partial class MainViewModel : ViewModelBase
         CompetitionSelectionViewModel = competitionSelectionViewModel;
         CompetitionSelectionViewModel.CompetitionSelected += OnCompetitionSelected;
         CurrentViewModel = CompetitionSelectionViewModel;
-        
+
+        EventsViewModel = eventsViewModel;
+        HeatsViewModel = heatsViewModel;
+        EntriesViewModel = entriesViewModel;
+        AthletesViewModel = athletesViewModel;
+        ClubsViewModel = clubsViewModel;
+        AgeGroupsViewModel = ageGroupsViewModel;
+        SwimStylesViewModel = swimStylesViewModel;
+
         NavigateToEventsCommand = new NavigationCommand<EventsViewModel>(_navigationService, () => _isCompetitionSelected);
         NavigateToHeatsCommand = new NavigationCommand<HeatsViewModel>(_navigationService, () => _isCompetitionSelected);
         NavigateToEntriesCommand = new NavigationCommand<EntriesViewModel>(_navigationService, () => _isCompetitionSelected);
@@ -33,6 +51,14 @@ public partial class MainViewModel : ViewModelBase
     }
 
     public CompetitionSelectionViewModel CompetitionSelectionViewModel { get; }
+
+    public EventsViewModel EventsViewModel { get; }
+    public HeatsViewModel HeatsViewModel { get; }
+    public EntriesViewModel EntriesViewModel { get; }
+    public AthletesViewModel AthletesViewModel { get; }
+    public ClubsViewModel ClubsViewModel { get; }
+    public AgeGroupsViewModel AgeGroupsViewModel { get; }
+    public SwimStylesViewModel SwimStylesViewModel { get; }
 
     partial void OnIsCompetitionSelectedChanged(bool value)
     {
@@ -49,7 +75,7 @@ public partial class MainViewModel : ViewModelBase
     {
         CurrentViewModel = viewModel;
     }
-
+    
     private void OnCompetitionSelected(string filePath)
     {
         IsCompetitionSelected = true;

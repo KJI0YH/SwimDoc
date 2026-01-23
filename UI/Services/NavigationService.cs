@@ -1,12 +1,25 @@
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using UI.ViewModels;
+using UI.ViewModels.Table;
+using UI.Views.Pages;
 
 namespace UI.Services;
 
 public class NavigationService(IServiceProvider serviceProvider) : INavigationService
 {
     private readonly Dictionary<Type, Type> _viewModelToViewMapping = new();
+    private readonly Dictionary<Type, Type> _viewModelToPageMapping = new()
+    {
+        [typeof(EventsViewModel)] = typeof(EventsPage),
+        [typeof(HeatsViewModel)] = typeof(HeatsPage),
+        [typeof(EntriesViewModel)] = typeof(EntriesPage),
+        [typeof(AthletesViewModel)] = typeof(AthletesPage),
+        [typeof(ClubsViewModel)] = typeof(ClubsPage),
+        [typeof(AgeGroupsViewModel)] = typeof(AgeGroupsPage),
+        [typeof(SwimStylesViewModel)] = typeof(SwimStylesPage)
+    };
+
     private readonly Stack<ViewModelBase> _navigationHistory = new();
     private ViewModelBase? _currentViewModel;
 
@@ -22,6 +35,7 @@ public class NavigationService(IServiceProvider serviceProvider) : INavigationSe
     }
 
     public event Action<ViewModelBase?>? CurrentViewModelChanged;
+    public event Action<Type>? PageNavigationRequested;
 
     public bool CanGoBack => _navigationHistory.Count > 0;
 
@@ -41,12 +55,17 @@ public class NavigationService(IServiceProvider serviceProvider) : INavigationSe
     {
         var viewModel = serviceProvider.GetRequiredService<TViewModel>();
 
-        if (_currentViewModel != null)
+        if (ReferenceEquals(_currentViewModel, viewModel))
         {
-            _navigationHistory.Push(_currentViewModel);
+            RequestPageForViewModel<TViewModel>();
+            return;
         }
 
+        if (_currentViewModel != null)
+            _navigationHistory.Push(_currentViewModel);
+
         CurrentViewModel = viewModel;
+        RequestPageForViewModel<TViewModel>();
     }
 
     public void GoBack()
@@ -56,6 +75,9 @@ public class NavigationService(IServiceProvider serviceProvider) : INavigationSe
 
         var previousViewModel = _navigationHistory.Pop();
         CurrentViewModel = previousViewModel;
+        if (previousViewModel != null &&
+            _viewModelToPageMapping.TryGetValue(previousViewModel.GetType(), out var pageType))
+            PageNavigationRequested?.Invoke(pageType);
     }
 
     public Type? GetViewType<TViewModel>() where TViewModel : ViewModelBase
@@ -64,6 +86,12 @@ public class NavigationService(IServiceProvider serviceProvider) : INavigationSe
         return _viewModelToViewMapping.TryGetValue(viewModelType, out var viewType) 
             ? viewType 
             : null;
+    }
+
+    private void RequestPageForViewModel<TViewModel>() where TViewModel : ViewModelBase
+    {
+        if (_viewModelToPageMapping.TryGetValue(typeof(TViewModel), out var pageType))
+            PageNavigationRequested?.Invoke(pageType);
     }
 }
 

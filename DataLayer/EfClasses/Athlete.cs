@@ -16,14 +16,18 @@ public class Athlete : IValidatableObject
     public ICollection<Entry> Entries { get; set; }
     public ICollection<RelayPosition> RelayPositions { get; set; }
 
+    public string DisplayName => $"{FirstName} {LastName}";
+    
+    public string DisplayClubName => $"{Club?.Name ?? "(Лично)"}";
+
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-        if (FirstName is null or "")
+        if (string.IsNullOrWhiteSpace(FirstName))
         {
             yield return new ValidationResult("First name cannot be empty", [nameof(FirstName)]);
         }
 
-        if (LastName is null or "")
+        if (string.IsNullOrWhiteSpace(LastName))
         {
             yield return new ValidationResult("Last name cannot be empty", [nameof(LastName)]);
         }
@@ -33,7 +37,7 @@ public class Athlete : IValidatableObject
             yield return new ValidationResult("Gender cannot be mixed", [nameof(Gender)]);
         }
 
-        if (YearOfBirth <= 0)
+        if (YearOfBirth <= 1900)
         {
             yield return new ValidationResult("Year of birth is invalid", [nameof(YearOfBirth)]);
         }

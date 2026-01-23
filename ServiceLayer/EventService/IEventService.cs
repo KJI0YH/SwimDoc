@@ -3,7 +3,7 @@ using ServiceLayer.Crud;
 
 namespace ServiceLayer.EventService;
 
-public interface IEventService : ICrudService<SwimEvent, int>
+public interface IEventService : ICrudService<SwimEvent, int?>
 {
-    
+    int GetNextOrderNumber();
 }

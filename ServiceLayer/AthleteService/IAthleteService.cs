@@ -3,7 +3,7 @@ using ServiceLayer.Crud;
 
 namespace ServiceLayer.AthleteService;
 
-public interface IAthleteService : ICrudService<Athlete, int>
+public interface IAthleteService : ICrudService<Athlete, int?>
 {
     
 }

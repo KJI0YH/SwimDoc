@@ -1,9 +1,11 @@
-﻿namespace DataLayer.EfClasses;
+﻿using System.ComponentModel;
+
+namespace DataLayer.EfClasses;
 
 public enum ClubType
 {
-    Club,
-    NationalTeam,
-    RegionalTeam,
-    Unattached
+    [Description("Команда")] Club,
+    [Description("Национальная команда")] NationalTeam,
+    [Description("Областная команда")] RegionalTeam,
+    [Description("Неопределено")] Unattached
 }

@@ -3,7 +3,7 @@ using ServiceLayer.Crud;
 
 namespace ServiceLayer.SwimStyleService;
 
-public interface ISwimStyleService : ICrudService<SwimStyle, int>
+public interface ISwimStyleService : ICrudService<SwimStyle, int?>
 {
     
 }

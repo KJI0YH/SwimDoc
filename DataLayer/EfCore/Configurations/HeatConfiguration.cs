@@ -11,6 +11,7 @@ public class HeatConfiguration : IEntityTypeConfiguration<Heat>
         builder
             .HasOne(heat => heat.SwimEvent)
             .WithMany(e => e.Heats)
-            .HasForeignKey(heat => heat.SwimEventId);
+            .HasForeignKey(heat => heat.SwimEventId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

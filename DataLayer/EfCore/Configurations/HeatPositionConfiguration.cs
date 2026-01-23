@@ -13,10 +13,12 @@ public class HeatPositionConfiguration : IEntityTypeConfiguration<HeatPosition>
         builder
             .HasOne(heatPosition => heatPosition.Entry)
             .WithOne(entry => entry.HeatPosition)
-            .HasForeignKey<HeatPosition>(heatPosition => heatPosition.EntryId);
+            .HasForeignKey<HeatPosition>(heatPosition => heatPosition.EntryId)
+            .OnDelete(DeleteBehavior.Cascade);
         builder
             .HasOne(heatPosition => heatPosition.Heat)
             .WithMany(heat => heat.Positions)
-            .HasForeignKey(position => position.HeatId);
+            .HasForeignKey(position => position.HeatId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

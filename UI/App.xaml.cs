@@ -1,7 +1,5 @@
-﻿using System.ComponentModel.Design;
-using System.Configuration;
-using System.Data;
 using System.Windows;
+using System.Windows.Threading;
 using DataLayer.EfCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,7 +14,10 @@ using ServiceLayer.HeatService;
 using ServiceLayer.SwimStyleService;
 using UI.Services;
 using UI.ViewModels;
+using UI.ViewModels.Table;
 using UI.Views;
+using UI.Views.Pages;
+using UI.Views.Table;
 
 namespace UI;
 
@@ -82,6 +83,7 @@ public partial class App : Application
     {
         services.AddSingleton<IDatabaseConnection, DatabaseConnectionService>();
         services.AddSingleton<INavigationService, NavigationService>();
+        services.AddSingleton<IAddEditWindowFactory, AddEditWindowFactory>();
 
         services.AddSingleton<IAgeGroupService, AgeGroupService>();
         services.AddSingleton<IAthleteService, AthleteService>();
@@ -96,7 +98,7 @@ public partial class App : Application
 
     private static void ConfigureViewModels(IServiceCollection services)
     {
-        services.AddTransient<CompetitionSelectionViewModel>();
+        services.AddSingleton<CompetitionSelectionViewModel>();
         services.AddTransient<MainViewModel>();
         services.AddTransient<EventsViewModel>();
         services.AddTransient<HeatsViewModel>();
@@ -105,5 +107,14 @@ public partial class App : Application
         services.AddTransient<ClubsViewModel>();
         services.AddTransient<AgeGroupsViewModel>();
         services.AddTransient<SwimStylesViewModel>();
+
+        services.AddTransient<CompetitionSelectionPage>();
+        services.AddTransient<EventsPage>();
+        services.AddTransient<HeatsPage>();
+        services.AddTransient<EntriesPage>();
+        services.AddTransient<AthletesPage>();
+        services.AddTransient<ClubsPage>();
+        services.AddTransient<AgeGroupsPage>();
+        services.AddTransient<SwimStylesPage>();
     }
 }

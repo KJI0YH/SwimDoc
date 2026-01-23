@@ -3,7 +3,7 @@ using ServiceLayer.Crud;
 
 namespace ServiceLayer.EntryService;
 
-public interface IEntryService : ICrudService<Entry, int>
+public interface IEntryService : ICrudService<Entry, int?>
 {
     
 }

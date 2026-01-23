@@ -11,24 +11,29 @@ public class EntryConfiguration : IEntityTypeConfiguration<Entry>
         builder
             .HasOne(entry => entry.SwimStyle)
             .WithMany(swimStyle => swimStyle.Entries)
-            .HasForeignKey(entry => entry.SwimStyleId);
+            .HasForeignKey(entry => entry.SwimStyleId)
+            .OnDelete(DeleteBehavior.Cascade);
         builder
             .HasOne(entry => entry.SwimEvent)
             .WithMany(swimEvent => swimEvent.Entries)
             .HasForeignKey(entry => entry.SwimEventId)
-            .IsRequired(false);
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.Cascade);
         builder
             .HasOne(entry => entry.HeatPosition)
             .WithOne(heatPosition => heatPosition.Entry)
             .HasForeignKey<Entry>(entry => entry.HeatPositionId)
-            .IsRequired(false);
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.Cascade);
         builder
             .HasOne(entry => entry.Athlete)
             .WithMany(athlete => athlete.Entries)
-            .HasForeignKey(entry => entry.AthleteId);
+            .HasForeignKey(entry => entry.AthleteId)
+            .OnDelete(DeleteBehavior.Cascade);
         builder
             .HasOne(entry => entry.Relay)
             .WithOne(relay => relay.Entry)
-            .HasForeignKey<Entry>(entry => entry.RelayId);
+            .HasForeignKey<Entry>(entry => entry.RelayId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

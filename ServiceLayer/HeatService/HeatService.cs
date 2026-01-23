@@ -11,7 +11,7 @@ using ServiceLayer.HeatService.Exceptions;
 
 namespace ServiceLayer.HeatService;
 
-public class HeatService : CrudService<Heat, int>, IHeatService
+public class HeatService : CrudService<Heat, int?>, IHeatService
 {
     private readonly EfCoreContext _context;
     private readonly RunnerWriteDb<HeatAllocationInDto, HeatAllocationOutDto> _runner;

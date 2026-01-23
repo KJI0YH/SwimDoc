@@ -3,7 +3,7 @@ using ServiceLayer.Crud;
 
 namespace ServiceLayer.ClubService;
 
-public interface IClubService : ICrudService<Club, int>
+public interface IClubService : ICrudService<Club, int?>
 {
     
 }

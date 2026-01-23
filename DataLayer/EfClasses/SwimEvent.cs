@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
+using DataLayer;
 using DataLayer.EfCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -29,17 +30,37 @@ public class SwimEvent : IValidatableObject
     public SwimEvent? PreviousSwimEvent { get; set; }
     public SwimEvent? NextSwimEvent { get; set; }
 
+    public string DisplayName =>
+        $"#{Order} {EnumDisplay.GetDescription(Round)} {SwimStyle.DisplayName} {AgeGroup.DisplayName}";
+
+    public string DisplayLanes => $"{LaneMin}-{LaneMax}";
+
+    public string DisplayDate => Date.ToShortDateString();
+
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
         var currContext = validationContext.GetService(typeof(DbContext)) as EfCoreContext;
-        var existed = currContext.SwimEvents.FirstOrDefault(swimEvent => swimEvent.Order == Order && swimEvent.Date == Date);
-        if (existed is not null)
-            yield return new ValidationResult($"Swim event with order: {Order} on date: {Date} already exists", [nameof(Order)]);
+        var existedOrderDate =
+            currContext.SwimEvents.FirstOrDefault(swimEvent => swimEvent.Order == Order && swimEvent.Date == Date);
+        var existedEvent = currContext.SwimEvents.FirstOrDefault(swimEvent =>
+            swimEvent.SwimStyleId == SwimStyleId && swimEvent.AgeGroupId == AgeGroupId && swimEvent.Round == Round);
+        if (existedOrderDate is not null && currContext.Entry(this).State == EntityState.Added)
+            yield return new ValidationResult($"Swim event with order {Order} on date {Date} already exists");
+        if (existedEvent is not null && currContext.Entry(this).State == EntityState.Added &&
+            existedEvent.SwimStyleId == SwimStyleId &&
+            existedEvent.AgeGroupId == AgeGroupId &&
+            existedEvent.Round == Round)
+            yield return new ValidationResult($"Swim event with this swim style, age group, round already exists");
+        if (SwimStyleId is 0)
+            yield return new ValidationResult($"Swim style is not selected");
+        if (AgeGroupId is 0)
+            yield return new ValidationResult($"Age group is not selected");
         if (RoundParticipantsCount is <= 0)
-            yield return new ValidationResult("Round participants count must be greater than zero", [nameof(RoundParticipantsCount)]);
+            yield return new ValidationResult("Round participants count must be greater than zero",
+                [nameof(RoundParticipantsCount)]);
         if (LaneMin > LaneMax)
-            yield return new ValidationResult("Invalid lane range", [nameof(LaneMin), nameof(LaneMax)]);
+            yield return new ValidationResult("Invalid lane range");
         if (PreviousSwimEvent is not null && Round <= PreviousSwimEvent.Round)
-            yield return new ValidationResult("Invalid round order", [nameof(Round)]);
+            yield return new ValidationResult("Invalid round order");
     }
 }

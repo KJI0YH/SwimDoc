@@ -4,4 +4,4 @@ using ServiceLayer.Crud;
 
 namespace ServiceLayer.EntryService;
 
-public class EntryService(EfCoreContext dbContext) : CrudService<Entry, int>(dbContext), IEntryService;
+public class EntryService(EfCoreContext dbContext) : CrudService<Entry, int?>(dbContext), IEntryService;

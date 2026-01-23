@@ -7,7 +7,7 @@ public class Club : IValidatableObject
     public int Id { get; set; }
     public string Name { get; set; }
     public string? ShortName { get; set; }
-    public ClubType Type { get; set; } = ClubType.Unattached;
+    public ClubType Type { get; set; } = ClubType.Club;
 
     public ICollection<Athlete> Athletes { get; set; }
     public ICollection<Relay> Relays { get; set; }

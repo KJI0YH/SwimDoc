@@ -14,6 +14,7 @@ public class AthleteConfiguration : IEntityTypeConfiguration<Athlete>
         builder
             .HasOne(athlete => athlete.Club)
             .WithMany(club => club.Athletes)
-            .HasForeignKey(athlete => athlete.ClubId);
+            .HasForeignKey(athlete => athlete.ClubId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

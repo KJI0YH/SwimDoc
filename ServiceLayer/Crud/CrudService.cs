@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using DataLayer.EfCore;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +16,7 @@ public class CrudService<TEntity, TKey>(EfCoreContext dbContext) : ICrudService<
 
     public async Task<TEntity?> FindAsync(TKey id, CancellationToken cancellationToken = default)
     {
+        if (id == null) return null;
         var entity = await dbContext.FindAsync<TEntity>([id], cancellationToken);
         return entity;
     }
@@ -24,20 +25,14 @@ public class CrudService<TEntity, TKey>(EfCoreContext dbContext) : ICrudService<
     {
         await dbContext.Set<TEntity>().AddAsync(entity, cancellationToken);
         var errors = await dbContext.SaveChangesWithValidationAsync();
+        if (errors.Count > 0)
+            dbContext.Entry(entity).State = EntityState.Detached;
         return (entity, errors);
     }
 
     public async Task<(TEntity? entity, ImmutableList<ValidationResult> errors)> UpdateAsync(TEntity entity, CancellationToken cancellationToken = default)
     {
         var entry = dbContext.Entry(entity);
-        
-        // Если сущность уже отслеживается, это ошибка - не должно быть такого
-        if (entry.State != EntityState.Detached)
-        {
-            throw new InvalidOperationException(
-                $"Entity of type {typeof(TEntity).Name} is already being tracked. " +
-                "Make sure to load entities with AsNoTracking() when displaying them in the UI.");
-        }
         
         // Получаем Id сущности
         var idProperty = typeof(TEntity).GetProperty("Id");
@@ -68,6 +63,8 @@ public class CrudService<TEntity, TKey>(EfCoreContext dbContext) : ICrudService<
         dbContext.Entry(trackedEntity).State = EntityState.Modified;
         
         var errors = await dbContext.SaveChangesWithValidationAsync();
+        if (errors.Count > 0)
+            await dbContext.Entry(trackedEntity).ReloadAsync(cancellationToken).ConfigureAwait(false);
         return (trackedEntity, errors);
     }
 

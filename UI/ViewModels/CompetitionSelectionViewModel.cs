@@ -20,6 +20,7 @@ public partial class CompetitionSelectionViewModel : ViewModelBase
 
         if (saveFileDialog.ShowDialog() == true)
         {
+            File.Create(saveFileDialog.FileName).Close();
             InitializeDatabase(saveFileDialog.FileName);
         }
     }
