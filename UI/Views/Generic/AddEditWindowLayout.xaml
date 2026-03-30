@@ -5,7 +5,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              mc:Ignorable="d"
-             Width="800">
+             Width="500">
     <Border Background="White" CornerRadius="12">
         <Grid Margin="15">
             <Grid.RowDefinitions>

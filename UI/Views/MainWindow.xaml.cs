@@ -16,6 +16,9 @@ public partial class MainWindow : FluentWindow
         InitializeComponent();
         _viewModel = App.Current.Services.GetRequiredService<MainViewModel>();
         DataContext = _viewModel;
+
+        StateChanged += (_, _) => UpdateRestoreButtonIcon();
+        Loaded += (_, _) => UpdateRestoreButtonIcon();
     }
 
     private void NavigationView_OnLoaded(object sender, RoutedEventArgs e)
@@ -40,11 +43,21 @@ public partial class MainWindow : FluentWindow
     private void RestoreButton_Click(object sender, RoutedEventArgs e)
     {
         WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
+        UpdateRestoreButtonIcon();
     }
 
     private void CloseButton_Click(object sender, RoutedEventArgs e)
     {
         Close();
+    }
+
+    private void UpdateRestoreButtonIcon()
+    {
+        if (RestoreButton == null) return;
+
+        RestoreButton.Content = WindowState == WindowState.Maximized
+            ? new SymbolIcon { Symbol = SymbolRegular.SquareMultiple24 }
+            : new SymbolIcon { Symbol = SymbolRegular.Square24 };
     }
     
     public void ShowModalOverlay()

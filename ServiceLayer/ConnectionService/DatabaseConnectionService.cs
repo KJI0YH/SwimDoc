@@ -1,4 +1,4 @@
-﻿using DataLayer.EfCore;
+using DataLayer.EfCore;
 
 namespace ServiceLayer.ConnectionService;
 

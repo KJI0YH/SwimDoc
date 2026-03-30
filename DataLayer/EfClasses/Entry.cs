@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using DataLayer.EfCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,9 +24,9 @@ public class Entry : IValidatableObject
 
     public int? SwimEventId { get; set; }
     public SwimEvent? SwimEvent { get; set; }
-
-    public int? HeatPositionId { get; set; }
     public HeatPosition? HeatPosition { get; set; }
+
+    public string DisplaySwimName => SwimEvent is not null ? SwimEvent.DisplayName : SwimStyle.DisplayName;
 
     public string DisplayEntryTime => EntryTime == null
         ? "N.T."
@@ -43,27 +43,26 @@ public class Entry : IValidatableObject
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
         var currContext = validationContext.GetService(typeof(DbContext)) as EfCoreContext;
-        var existed = currContext.Entries.FirstOrDefault(e =>
+
+        var existed = currContext.Entries.AsNoTracking().FirstOrDefault(e =>
             e.AthleteId == AthleteId &&
             e.RelayId == RelayId &&
             e.SwimEventId == SwimEventId &&
             e.SwimStyleId == SwimStyleId);
-        var athlete = currContext.Athletes.FirstOrDefault(a => a.Id == AthleteId);
-        var relay = currContext.Relays.FirstOrDefault(r => r.Id == RelayId);
-        var swimEvent = currContext.SwimEvents.Include(swimEvent => swimEvent.AgeGroup).FirstOrDefault(s => s.Id == SwimEventId);
-        if (swimEvent is not null && SwimStyleId is 0)
-        {
-            SwimStyleId = swimEvent?.SwimStyleId ?? 0;
-        }
-        var swimStyle =  currContext.SwimStyles.FirstOrDefault(s => s.Id == SwimStyleId);
+        var athlete = Athlete ?? currContext.Athletes.AsNoTracking().FirstOrDefault(a => a.Id == AthleteId);
+        var relay = Relay ?? currContext.Relays.AsNoTracking().FirstOrDefault(r => r.Id == RelayId);
+        var swimEvent = SwimEvent ?? currContext.SwimEvents.AsNoTracking()
+            .Include(swimEvent => swimEvent.AgeGroup)
+            .FirstOrDefault(s => s.Id == SwimEventId);
+        var swimStyle = SwimStyle ?? currContext.SwimStyles.AsNoTracking().FirstOrDefault(s => s.Id == SwimStyleId);
         
-        if (AthleteId is null or 0 && RelayId is null or 0)
+        if (athlete is null && relay is null)
             yield return new ValidationResult("Participant must be provided");
-        if (SwimStyleId is 0)
+        if (swimStyle is null)
             yield return new ValidationResult("Swim style must be provided");
         if (existed is not null && currContext.Entry(this).State == EntityState.Added)
             yield return new ValidationResult($"Entry already exists");
-        if (AthleteId is not null && RelayId is not null)
+        if (athlete is not null && relay is not null)
             yield return new ValidationResult("Invalid participant");
         if (athlete is not null && swimEvent is not null &&
             !swimEvent.AgeGroup.Contains(athlete.YearOfBirth, athlete.Gender))
@@ -72,9 +71,5 @@ public class Entry : IValidatableObject
             yield return new ValidationResult("Swim event must be individual");
         if (swimStyle is not null && swimStyle.IsIndividual && relay is not null)
             yield return new ValidationResult("Swim event must be relay");
-        if (Status == EntryStatus.FIN && FinishTime == null)
-            yield return new ValidationResult("Finish time is required");
-        if (Status == EntryStatus.FIN && Points == null)
-            yield return new ValidationResult("Points is required");
     }
 }

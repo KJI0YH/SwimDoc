@@ -17,8 +17,6 @@ public class EventsViewModel : GenericTableViewModel<SwimEvent, int?>
         _windowFactory = App.Current.Services.GetRequiredService<IAddEditWindowFactory>();
     }
 
-    public string Title => "События";
-
     protected override void InitializeColumns()
     {
         AutoGenerateColumns = false;

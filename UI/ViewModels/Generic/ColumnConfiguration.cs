@@ -12,7 +12,8 @@ public class ColumnConfiguration
     public string? DisplayMemberPath { get; set; }
     public object? Converter { get; set; }
     public string? ConverterParameter { get; set; }
-
+    public string? TrueSymbolIcon { get; set; }
+    public string? FalseSymbolIcon { get; set; }
     public static ColumnConfiguration Create(string propertyPath, string? header = null, double? width = null)
     {
         return new ColumnConfiguration

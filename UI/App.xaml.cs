@@ -3,6 +3,7 @@ using System.Windows.Threading;
 using DataLayer.EfCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using OfficeOpenXml;
 using ServiceLayer.AgeGroupService;
 using ServiceLayer.AthleteService;
 using ServiceLayer.ClubService;
@@ -38,6 +39,8 @@ public partial class App : Application
 
     public App()
     {
+        ExcelPackage.License.SetNonCommercialPersonal("Aliaksei Kryzhanouski");
+
         _serviceProvider = ConfigureServiceProvider();
         RegisterViewModelMappings();
     }

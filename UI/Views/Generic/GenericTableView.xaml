@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:generic="clr-namespace:UI.Views.Generic"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
@@ -12,26 +13,39 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0"
-                    Orientation="Horizontal"
-                    Margin="5">
-            <Button Content="{ui:SymbolIcon Add24}"
-                    Command="{Binding CreateItemCommand}"
-                    Margin="5"
-                    Padding="9" />
-            <Button Content="{ui:SymbolIcon Edit24}"
-                    Command="{Binding EditItemCommand}"
-                    Margin="5"
-                    Padding="9" />
-            <Button Content="{ui:SymbolIcon Delete24}"
-                    Command="{Binding DeleteItemCommand}"
-                    Margin="5"
-                    Padding="9" />
-            <Button Content="{ui:SymbolIcon ArrowClockwise24}"
-                    Command="{Binding LoadDataCommand}"
-                    Margin="5"
-                    Padding="9" />
-        </StackPanel>
+        <ContentPresenter Grid.Row="0"
+                          Content="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=Toolbar}"
+                          Margin="5">
+            <ContentPresenter.Style>
+                <Style TargetType="ContentPresenter">
+                    <Setter Property="Visibility" Value="Visible" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=Toolbar}" Value="{x:Null}">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ContentPresenter.Style>
+        </ContentPresenter>
+
+        <DockPanel Grid.Row="0" Margin="5">
+            <DockPanel.Style>
+                <Style TargetType="DockPanel">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=Toolbar}" Value="{x:Null}">
+                            <Setter Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </DockPanel.Style>
+
+            <ContentPresenter DockPanel.Dock="Right"
+                              Content="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=ToolbarContent}"
+                              HorizontalAlignment="Right" />
+
+            <generic:GenericTableDefaultToolbar />
+        </DockPanel>
 
         <DataGrid Grid.Row="1"
                   Margin="5"
@@ -45,7 +59,6 @@
                   SelectionMode="Single"
                   GridLinesVisibility="All"
                   HeadersVisibility="Column"
-                  AlternatingRowBackground="LightGray"
                   Loaded="DataGrid_Loaded"
                   AutoGeneratingColumn="DataGrid_AutoGeneratingColumn">
             <DataGrid.ColumnHeaderStyle>

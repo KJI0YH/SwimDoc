@@ -20,12 +20,6 @@ public class EntryConfiguration : IEntityTypeConfiguration<Entry>
             .IsRequired(false)
             .OnDelete(DeleteBehavior.Cascade);
         builder
-            .HasOne(entry => entry.HeatPosition)
-            .WithOne(heatPosition => heatPosition.Entry)
-            .HasForeignKey<Entry>(entry => entry.HeatPositionId)
-            .IsRequired(false)
-            .OnDelete(DeleteBehavior.Cascade);
-        builder
             .HasOne(entry => entry.Athlete)
             .WithMany(athlete => athlete.Entries)
             .HasForeignKey(entry => entry.AthleteId)

@@ -19,8 +19,6 @@ public class ClubsViewModel : GenericTableViewModel<Club, int?>
         _windowFactory = App.Current.Services.GetRequiredService<IAddEditWindowFactory>();
     }
 
-    public string Title => "Клубы";
-    
     protected override void InitializeColumns()
     {
         AutoGenerateColumns = false;

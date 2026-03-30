@@ -34,7 +34,7 @@
                                Margin="0,0,10,0"/>
                     <controls:SearchableComboBox Grid.Column="1"
                                                  ItemsSource="{Binding Athletes}"
-                                                 SelectedItem="{Binding SelectedAthlete, Mode=TwoWay}"
+                                                 SelectedItem="{Binding SelectedAthlete, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                  Margin="0,2,0,2"/>
                     <Button Grid.Column="2"
                             Content="{ui:SymbolIcon Add24}"
@@ -55,7 +55,7 @@
                                Margin="0,0,10,0"/>
                     <controls:SearchableComboBox Grid.Column="1"
                                                  ItemsSource="{Binding SwimEvents}"
-                                                 SelectedItem="{Binding SelectedSwimEvent, Mode=TwoWay}"
+                                                 SelectedItem="{Binding SelectedSwimEvent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                  Margin="0,2,0,2"/>
                     <Button Grid.Column="2"
                             Content="{ui:SymbolIcon Add24}"

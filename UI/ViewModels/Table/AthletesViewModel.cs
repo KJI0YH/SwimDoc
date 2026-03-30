@@ -19,8 +19,6 @@ public class AthletesViewModel : GenericTableViewModel<Athlete, int?>
         _windowFactory = App.Current.Services.GetRequiredService<IAddEditWindowFactory>();
     }
 
-    public string Title => "Спортсмены";
-
     protected override void InitializeColumns()
     {
         AutoGenerateColumns = false;

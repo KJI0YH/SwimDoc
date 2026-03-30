@@ -16,8 +16,6 @@ public class AgeGroupsViewModel : GenericTableViewModel<AgeGroup, int?>
         _windowFactory = App.Current.Services.GetRequiredService<IAddEditWindowFactory>();
     }
 
-    public string Title => "Возрастные группы";
-
     protected override void InitializeColumns()
     {
         AutoGenerateColumns = false;

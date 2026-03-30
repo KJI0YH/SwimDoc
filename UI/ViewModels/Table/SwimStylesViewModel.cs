@@ -16,8 +16,6 @@ public class SwimStylesViewModel : GenericTableViewModel<SwimStyle, int?>
         _windowFactory = App.Current.Services.GetRequiredService<IAddEditWindowFactory>();
     }
 
-    public string Title => "Стили плавания";
-
     protected override void InitializeColumns()
     {
         base.InitializeColumns();

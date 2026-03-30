@@ -46,23 +46,18 @@ namespace DataLayer.EfCore
                 return result;
             }
 
-            private ImmutableList<ValidationResult>
-                ExecuteValidation()
+            private ImmutableList<ValidationResult> ExecuteValidation()
             {
                 var result = new List<ValidationResult>();
                 foreach (var entry in
                          context.ChangeTracker.Entries()
-                             .Where(e =>
-                                 e.State is EntityState.Added or EntityState.Modified))
+                             .Where(e => e.State is EntityState.Added or EntityState.Modified))
                 {
                     var entity = entry.Entity;
-                    var valProvider = new
-                        ValidationDbContextServiceProvider(context);
-                    var valContext = new
-                        ValidationContext(entity, valProvider, null);
+                    var valProvider = new ValidationDbContextServiceProvider(context);
+                    var valContext = new ValidationContext(entity, valProvider, null);
                     var entityErrors = new List<ValidationResult>();
-                    if (!Validator.TryValidateObject(
-                            entity, valContext, entityErrors, true))
+                    if (!Validator.TryValidateObject(entity, valContext, entityErrors, true))
                     {
                         result.AddRange(entityErrors);
                     }

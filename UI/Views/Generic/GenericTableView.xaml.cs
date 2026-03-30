@@ -7,11 +7,36 @@ using System.Windows.Data;
 using UI.Helpers;
 using UI.ViewModels;
 using UI.ViewModels.Generic;
+using Wpf.Ui.Controls;
 
 namespace UI.Views.Generic;
 
 public partial class GenericTableView : UserControl
 {
+    public static readonly DependencyProperty ToolbarProperty = DependencyProperty.Register(
+        nameof(Toolbar),
+        typeof(object),
+        typeof(GenericTableView),
+        new PropertyMetadata(null));
+
+    public static readonly DependencyProperty ToolbarContentProperty = DependencyProperty.Register(
+        nameof(ToolbarContent),
+        typeof(object),
+        typeof(GenericTableView),
+        new PropertyMetadata(null));
+
+    public object? Toolbar
+    {
+        get => GetValue(ToolbarProperty);
+        set => SetValue(ToolbarProperty, value);
+    }
+
+    public object? ToolbarContent
+    {
+        get => GetValue(ToolbarContentProperty);
+        set => SetValue(ToolbarContentProperty, value);
+    }
+
     public GenericTableView()
     {
         InitializeComponent();
@@ -30,7 +55,6 @@ public partial class GenericTableView : UserControl
 
     private void DataGrid_AutoGeneratingColumn(object? sender, DataGridAutoGeneratingColumnEventArgs e)
     {
-        // Применяем конвертер для enum колонок при автогенерации
         if (DataContext is not GenericTableViewModelBase viewModel) return;
         
         var propertyType = GetPropertyType(e.PropertyName, viewModel);
@@ -68,7 +92,6 @@ public partial class GenericTableView : UserControl
         {
             var binding = new Binding(config.PropertyPath);
             
-            // Если конвертер не указан явно, проверяем, является ли свойство enum
             if (config.Converter == null)
             {
                 var propertyType = GetPropertyType(config.PropertyPath, viewModel);
@@ -87,13 +110,68 @@ public partial class GenericTableView : UserControl
                 binding.ConverterParameter = config.ConverterParameter;
             }
 
-            var column = new DataGridTextColumn
+            DataGridColumn column;
+
+            if (!string.IsNullOrWhiteSpace(config.TrueSymbolIcon) || !string.IsNullOrWhiteSpace(config.FalseSymbolIcon))
             {
-                Binding = binding,
-                Header = config.Header ?? config.PropertyPath,
-                IsReadOnly = config.IsReadOnly,
-                SortMemberPath = config.PropertyPath
-            };
+                var root = new FrameworkElementFactory(typeof(Grid));
+
+                // true icon
+                if (!string.IsNullOrWhiteSpace(config.TrueSymbolIcon))
+                {
+                    var trueIcon = new FrameworkElementFactory(typeof(SymbolIcon));
+                    trueIcon.SetValue(HorizontalAlignmentProperty, HorizontalAlignment.Center);
+                    trueIcon.SetValue(VerticalAlignmentProperty, VerticalAlignment.Center);
+                    var trueSymbolValue = Enum.Parse(typeof(SymbolRegular), config.TrueSymbolIcon!, ignoreCase: true);
+                    trueIcon.SetValue(SymbolIcon.SymbolProperty, trueSymbolValue);
+
+                    var trueVisibilityBinding = new Binding(config.PropertyPath)
+                    {
+                        Converter = new BoolToVisibilityConverter()
+                    };
+                    trueIcon.SetBinding(VisibilityProperty, trueVisibilityBinding);
+                    root.AppendChild(trueIcon);
+                }
+
+                // false icon
+                if (!string.IsNullOrWhiteSpace(config.FalseSymbolIcon))
+                {
+                    var falseIcon = new FrameworkElementFactory(typeof(SymbolIcon));
+                    falseIcon.SetValue(HorizontalAlignmentProperty, HorizontalAlignment.Center);
+                    falseIcon.SetValue(VerticalAlignmentProperty, VerticalAlignment.Center);
+                    falseIcon.SetValue(ForegroundProperty, System.Windows.Media.Brushes.Gray);
+                    var falseSymbolValue = Enum.Parse(typeof(SymbolRegular), config.FalseSymbolIcon!, ignoreCase: true);
+                    falseIcon.SetValue(SymbolIcon.SymbolProperty, falseSymbolValue);
+
+                    var falseVisibilityBinding = new Binding(config.PropertyPath)
+                    {
+                        Converter = new BoolToVisibilityConverter(),
+                        ConverterParameter = "Invert"
+                    };
+                    falseIcon.SetBinding(VisibilityProperty, falseVisibilityBinding);
+                    root.AppendChild(falseIcon);
+                }
+
+                var template = new DataTemplate { VisualTree = root };
+
+                column = new DataGridTemplateColumn
+                {
+                    CellTemplate = template,
+                    Header = config.Header ?? config.PropertyPath,
+                    IsReadOnly = config.IsReadOnly,
+                    SortMemberPath = config.PropertyPath
+                };
+            }
+            else
+            {
+                column = new DataGridTextColumn
+                {
+                    Binding = binding,
+                    Header = config.Header ?? config.PropertyPath,
+                    IsReadOnly = config.IsReadOnly,
+                    SortMemberPath = config.PropertyPath
+                };
+            }
 
             if (config.Width.HasValue)
             {

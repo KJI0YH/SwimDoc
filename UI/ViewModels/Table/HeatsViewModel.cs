@@ -10,7 +10,5 @@ public class HeatsViewModel : ViewModelBase
     {
         _heatService = heatService;
     }
-
-    public string Title => "Heats Page";
 }
 

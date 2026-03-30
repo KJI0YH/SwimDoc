@@ -1,4 +1,4 @@
-﻿using System.Runtime.InteropServices;
+using System.Runtime.InteropServices;
 using DataLayer.EfClasses;
 using DataLayer.EfCore;
 using Microsoft.EntityFrameworkCore;
@@ -31,7 +31,9 @@ public class EntryDocumentReaderServiceTest
             .LogTo(Console.WriteLine, LogLevel.Information)
             .Options;
         var connectionService = new DatabaseConnectionService();
-        connectionService.SetConnection(Path.Combine(Directory.GetCurrentDirectory(), "Test.sqlite"));
+        var path = Path.Combine(Directory.GetCurrentDirectory(), "Test.db");
+        connectionService.SetConnection($"DataSource={path}");
+        File.Create(path).Close();
         _context = new EfCoreContext(options, connectionService);
 
         _context.Database.OpenConnection();
