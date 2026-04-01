@@ -1,7 +1,6 @@
-﻿using BizDbAccess.Helpers;
+using BizDbAccess.Helpers;
 using DataLayer.EfClasses;
 using DataLayer.EfCore;
-using Microsoft.EntityFrameworkCore;
 
 namespace BizDbAccess;
 
@@ -49,6 +48,9 @@ public class EntryDocumentReaderDbAccess(EfCoreContext context) : IEntryDocument
         entry.SwimEvent = swimEvent;
         entry.Scoring = scoring;
         entry.EntryTime = entryTime;
+
+        context.NormalizeEntry(entry);
+
         return entry;
     }
 

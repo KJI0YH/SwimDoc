@@ -93,7 +93,7 @@ public partial class EntriesViewModel(
 
         ColumnConfigurations.Add(ColumnConfiguration.Create("DisplaySwimName", "Дистанция", 500));
         ColumnConfigurations.Add(ColumnConfiguration.Create("Athlete.DisplayName", "Участник", 300));
-        ColumnConfigurations.Add(ColumnConfiguration.Create("Status", "Статус", 100));
+        ColumnConfigurations.Add(ColumnConfiguration.Create("Status", "Статус", 150));
         ColumnConfigurations.Add(new ColumnConfiguration
         {
             PropertyPath = "Scoring",

@@ -55,6 +55,9 @@ public class Entry : IValidatableObject
             .Include(swimEvent => swimEvent.AgeGroup)
             .FirstOrDefault(s => s.Id == SwimEventId);
         var swimStyle = SwimStyle ?? currContext.SwimStyles.AsNoTracking().FirstOrDefault(s => s.Id == SwimStyleId);
+        var ageGroup = swimEvent?.AgeGroup ?? (swimEvent is null ? null : currContext.AgeGroups.AsNoTracking()
+            .FirstOrDefault(ag => ag.Id == swimEvent.AgeGroupId));
+        
         
         if (athlete is null && relay is null)
             yield return new ValidationResult("Participant must be provided");
@@ -65,7 +68,7 @@ public class Entry : IValidatableObject
         if (athlete is not null && relay is not null)
             yield return new ValidationResult("Invalid participant");
         if (athlete is not null && swimEvent is not null &&
-            !swimEvent.AgeGroup.Contains(athlete.YearOfBirth, athlete.Gender))
+            !ageGroup.Contains(athlete.YearOfBirth, athlete.Gender))
             yield return new ValidationResult($"Athlete can not to be added to this age group");
         if (swimStyle is not null && swimStyle.IsRelay && athlete is not null)
             yield return new ValidationResult("Swim event must be individual");

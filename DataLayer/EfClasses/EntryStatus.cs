@@ -4,8 +4,8 @@ namespace DataLayer.EfClasses;
 
 public enum EntryStatus
 {
-    [Description("В заявке")] INS,
-    [Description("В программе")] EVENT,
+    [Description("Вне программы")] INS,
+    [Description("В заявке")] EVENT,
     [Description("В заплыве")] HEAT,
     [Description("Дисквалифицирован")] DSQ,
     [Description("Не стартовал")] DNS,
