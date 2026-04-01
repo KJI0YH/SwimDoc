@@ -86,35 +86,67 @@
                     MaxHeight="{Binding Source={x:Static SystemParameters.WorkArea}, Converter={StaticResource RectHeight}, ConverterParameter=0.55}"
                     ClipToBounds="True">
                 <StackPanel>
-                    <ScrollViewer VerticalScrollBarVisibility="Auto"
-                                  HorizontalScrollBarVisibility="Disabled">
-                        <DataGrid ItemsSource="{Binding ImportFiles}"
-                                  AutoGenerateColumns="False"
-                                  CanUserAddRows="False"
-                                  CanUserDeleteRows="False"
-                                  IsReadOnly="True"
-                                  HeadersVisibility="Column"
-                                  GridLinesVisibility="All"
-                                  RowDetailsVisibilityMode="VisibleWhenSelected"
-                                  x:Name="FilesGrid">
-                        <DataGrid.RowStyle>
-                            <Style TargetType="DataGridRow">
-                                <Setter Property="Background" Value="Transparent" />
-                                <Setter Property="BorderThickness" Value="1" />
-                                <Setter Property="BorderBrush" Value="Transparent" />
-                                <EventSetter Event="PreviewMouseLeftButtonDown" Handler="DataGridRow_PreviewMouseLeftButtonDown" />
-                                <Style.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Background" Value="#140EA5E9" />
-                                        <Setter Property="BorderBrush" Value="#660EA5E9" />
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </DataGrid.RowStyle>
+                    <DockPanel>
+                        <ScrollViewer DockPanel.Dock="Top"
+                                      VerticalScrollBarVisibility="Auto"
+                                      HorizontalScrollBarVisibility="Disabled">
+                            <DataGrid ItemsSource="{Binding ImportFiles}"
+                                      AutoGenerateColumns="False"
+                                      CanUserAddRows="False"
+                                      CanUserDeleteRows="False"
+                                      IsReadOnly="True"
+                                      HeadersVisibility="Column"
+                                      GridLinesVisibility="All"
+                                      SelectionMode="Single"
+                                      RowDetailsVisibilityMode="Visible"
+                                      PreviewMouseLeftButtonDown="FilesGrid_PreviewMouseLeftButtonDown"
+                                      LoadingRow="FilesGrid_LoadingRow"
+                                      x:Name="FilesGrid">
+                                <DataGrid.RowStyle>
+                                    <Style TargetType="DataGridRow"
+                                           BasedOn="{StaticResource {x:Type DataGridRow}}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsSummaryRow}" Value="True">
+                                                <Setter Property="FontWeight" Value="SemiBold" />
+                                                <Setter Property="Background" Value="#140EA5E9" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGrid.RowStyle>
                         <DataGrid.RowDetailsTemplate>
                             <DataTemplate>
                                 <StackPanel Margin="10">
+                                    <StackPanel.Style>
+                                        <Style TargetType="StackPanel">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsSummaryRow}" Value="True">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                </DataTrigger>
+                                                <!-- Show details content if there is at least one warning OR error -->
+                                                <DataTrigger Binding="{Binding WarningsCount, Converter={StaticResource IntGt0}}"
+                                                             Value="True">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding ErrorsCount, Converter={StaticResource IntGt0}}"
+                                                             Value="True">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </StackPanel.Style>
+
                                     <GroupBox Margin="0,0,0,8">
+                                        <GroupBox.Style>
+                                            <Style TargetType="GroupBox">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding WarningsCount}" Value="0">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </GroupBox.Style>
                                         <GroupBox.Header>
                                             <StackPanel Orientation="Horizontal">
                                                 <ContentControl Content="{ui:SymbolIcon Warning24}"
@@ -136,6 +168,16 @@
                                     </GroupBox>
 
                                     <GroupBox>
+                                        <GroupBox.Style>
+                                            <Style TargetType="GroupBox">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ErrorsCount}" Value="0">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </GroupBox.Style>
                                         <GroupBox.Header>
                                             <StackPanel Orientation="Horizontal">
                                                 <ContentControl Content="{ui:SymbolIcon ErrorCircle24}"
@@ -166,7 +208,7 @@
                             <DataGridTemplateColumn Header="Команды" Width="100">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <TextBlock>
+                                        <TextBlock HorizontalAlignment="Center" TextAlignment="Center">
                                             <Run Text="{Binding ClubsAdded}" />
                                             <Run Text="/" />
                                             <Run Text="{Binding ClubsUpdated}" />
@@ -178,7 +220,7 @@
                             <DataGridTemplateColumn Header="Спортсмены" Width="130">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <TextBlock>
+                                        <TextBlock HorizontalAlignment="Center" TextAlignment="Center">
                                             <Run Text="{Binding AthletesAdded}" />
                                             <Run Text="/" />
                                             <Run Text="{Binding AthletesUpdated}" />
@@ -190,7 +232,7 @@
                             <DataGridTemplateColumn Header="Заявки" Width="90">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <TextBlock>
+                                        <TextBlock HorizontalAlignment="Center" TextAlignment="Center">
                                             <Run Text="{Binding EntriesAdded}" />
                                             <Run Text="/" />
                                             <Run Text="{Binding EntriesUpdated}" />
@@ -198,12 +240,30 @@
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-
-                            <DataGridTextColumn Header="Предупреждения" Binding="{Binding WarningsCount}" Width="170" />
-                            <DataGridTextColumn Header="Ошибки" Binding="{Binding ErrorsCount}" Width="100" />
+                            
+                            <DataGridTemplateColumn Header="Предупреждения" Width="170">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock HorizontalAlignment="Center" TextAlignment="Center">
+                                            <Run Text="{Binding WarningsCount}" />
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            
+                            <DataGridTemplateColumn Header="Ошибки" Width="100">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock HorizontalAlignment="Center" TextAlignment="Center">
+                                            <Run Text="{Binding ErrorsCount}" />
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                         </DataGrid.Columns>
-                        </DataGrid>
-                    </ScrollViewer>
+                            </DataGrid>
+                        </ScrollViewer>
+                    </DockPanel>
                 </StackPanel>
             </Border>
         </StackPanel>

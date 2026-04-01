@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using BizLogic.EntryDocumentReaderLogic;
 using DataLayer.EfClasses;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -39,6 +38,53 @@ public partial class EntriesViewModel(
     [ObservableProperty] private string _importHeader = string.Empty;
     [ObservableProperty] private string _importMessage = string.Empty;
     [ObservableProperty] private ObservableCollection<EntriesFile> _importFiles = new();
+
+    [ObservableProperty] private int _importSummaryClubsAdded;
+    [ObservableProperty] private int _importSummaryClubsUpdated;
+    [ObservableProperty] private int _importSummaryAthletesAdded;
+    [ObservableProperty] private int _importSummaryAthletesUpdated;
+    [ObservableProperty] private int _importSummaryEntriesAdded;
+    [ObservableProperty] private int _importSummaryEntriesUpdated;
+    [ObservableProperty] private int _importSummaryFilesCount;
+    [ObservableProperty] private int _importSummaryWarningsCount;
+    [ObservableProperty] private int _importSummaryErrorsCount;
+
+    private EntriesFile? _summaryRow;
+
+    private void RecalculateImportSummary()
+    {
+        var files = ImportFiles;
+        var dataFiles = files.Where(f => !f.IsSummaryRow).ToList();
+
+        ImportSummaryFilesCount = dataFiles.Count;
+        ImportSummaryClubsAdded = dataFiles.Sum(f => f.ClubsAdded);
+        ImportSummaryClubsUpdated = dataFiles.Sum(f => f.ClubsUpdated);
+        ImportSummaryAthletesAdded = dataFiles.Sum(f => f.AthletesAdded);
+        ImportSummaryAthletesUpdated = dataFiles.Sum(f => f.AthletesUpdated);
+        ImportSummaryEntriesAdded = dataFiles.Sum(f => f.EntriesAdded);
+        ImportSummaryEntriesUpdated = dataFiles.Sum(f => f.EntriesUpdated);
+        ImportSummaryWarningsCount = dataFiles.Sum(f => f.WarningsCount);
+        ImportSummaryErrorsCount = dataFiles.Sum(f => f.ErrorsCount);
+
+        _summaryRow ??= new EntriesFile("Итого", string.Empty) { IsSummaryRow = true };
+        if (!files.Contains(_summaryRow))
+            files.Add(_summaryRow);
+
+        _summaryRow.FileName = "Итого";
+        _summaryRow.FullPath = $"Файлов: {ImportSummaryFilesCount}";
+        _summaryRow.ClubsAdded = ImportSummaryClubsAdded;
+        _summaryRow.ClubsUpdated = ImportSummaryClubsUpdated;
+        _summaryRow.AthletesAdded = ImportSummaryAthletesAdded;
+        _summaryRow.AthletesUpdated = ImportSummaryAthletesUpdated;
+        _summaryRow.EntriesAdded = ImportSummaryEntriesAdded;
+        _summaryRow.EntriesUpdated = ImportSummaryEntriesUpdated;
+        _summaryRow.WarningsCount = ImportSummaryWarningsCount;
+        _summaryRow.ErrorsCount = ImportSummaryErrorsCount;
+        _summaryRow.Warnings = Array.Empty<string>();
+        _summaryRow.Errors = Array.Empty<string>();
+        _summaryRow.IsDetailsOpen = false;
+        _summaryRow.Status = ImportFileStatus.Summary;
+    }
 
     protected override void InitializeColumns()
     {
@@ -128,8 +174,9 @@ public partial class EntriesViewModel(
         _importCts?.Cancel();
         _importCts = new CancellationTokenSource();
 
-        ImportFiles = new ObservableCollection<EntriesFile>(
-            files.Select(f => new EntriesFile(Path.GetFileName(f), f)));
+        var filesToImport = files.Select(f => new EntriesFile(Path.GetFileName(f), f)).ToList();
+        ImportFiles = new ObservableCollection<EntriesFile>(filesToImport);
+        RecalculateImportSummary();
 
         ImportTotalFiles = files.Length;
         ImportProcessedFiles = 0;
@@ -141,7 +188,7 @@ public partial class EntriesViewModel(
 
         try
         {
-            foreach (var file in ImportFiles)
+            foreach (var file in filesToImport)
             {
                 _importCts.Token.ThrowIfCancellationRequested();
 
@@ -172,6 +219,8 @@ public partial class EntriesViewModel(
                         : hasWarnings
                             ? ImportFileStatus.CompletedWithWarnings
                             : ImportFileStatus.Completed;
+
+                    RecalculateImportSummary();
                 }
                 catch (OperationCanceledException)
                 {
@@ -198,6 +247,7 @@ public partial class EntriesViewModel(
             ImportMessage = $"Загружено {ImportProcessedFiles}/{ImportTotalFiles} файлов";
             IsImportRunning = false;
             CancelImportCommand.NotifyCanExecuteChanged();
+            RecalculateImportSummary();
         }
 
         await LoadDataAsync();
@@ -211,10 +261,8 @@ public partial class EntriesViewModel(
             FullPath = fullPath;
         }
 
-        public string FileName { get; }
-        public string FullPath { get; }
-
-        public IReadOnlyList<EntryDocument> EntryDocuments { get; set; }
+        [ObservableProperty] private string _fileName;
+        [ObservableProperty] private string _fullPath;
 
         [ObservableProperty] private int _clubsAdded;
         [ObservableProperty] private int _clubsUpdated;
@@ -226,12 +274,16 @@ public partial class EntriesViewModel(
         [ObservableProperty] private int _errorsCount;
         [ObservableProperty] private IReadOnlyList<string> _warnings = Array.Empty<string>();
         [ObservableProperty] private IReadOnlyList<string> _errors = Array.Empty<string>();
+
+        [ObservableProperty] private bool _isDetailsOpen;
+        [ObservableProperty] private bool _isSummaryRow;
         
         [ObservableProperty] private ImportFileStatus _status = ImportFileStatus.Pending;
     }
 
     public enum ImportFileStatus
     {
+        [Description(" ")]Summary,
         [Description("В очереди")]Pending,
         [Description("В обработке")]Processing,
         [Description("Обработан")]Completed,
