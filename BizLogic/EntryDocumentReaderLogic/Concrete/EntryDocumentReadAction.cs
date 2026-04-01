@@ -239,6 +239,8 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
         var shortName = clubHeaders.TryGetValue(CLUB_SHORT_NAME_HEADER, out var cell)
             ? workSheet.Cells[fromRowClub, cell!.Column].Text
             : clubName;
+        if (string.IsNullOrWhiteSpace(shortName))
+            shortName = clubName;
         var club = dbAccess.GetOrAddClub(clubName, shortName);
         return club;
     }

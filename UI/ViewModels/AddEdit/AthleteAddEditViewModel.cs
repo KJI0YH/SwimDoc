@@ -94,13 +94,20 @@ public partial class AthleteAddAddEditViewModel(int? id, IAthleteService athlete
         }
         else
         {
+            YearOfBirth = DateTime.Now.Year;
             SelectedClub = Clubs.FirstOrDefault(item => item.Value == null);
         }
     }
 
-    partial void OnSelectedClubChanged(SearchableItem? value)
+    partial void OnSelectedClubChanged(SearchableItem? item)
     {
-        if (value?.Value is not Club club) return;
+        if (item?.Value is null)
+        {
+            Entity.ClubId = null;
+            return;
+        }
+
+        if (item?.Value is not Club club) return;
         Entity.ClubId = club.Id;
     }
 

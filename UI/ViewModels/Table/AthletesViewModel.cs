@@ -26,7 +26,7 @@ public class AthletesViewModel : GenericTableViewModel<Athlete, int?>
 
         ColumnConfigurations.Add(ColumnConfiguration.Create("FirstName", "Имя", 200));
         ColumnConfigurations.Add(ColumnConfiguration.Create("LastName", "Фамилия", 200));
-        ColumnConfigurations.Add(ColumnConfiguration.Create("Gender", "Пол", 80));
+        ColumnConfigurations.Add(ColumnConfiguration.Create("Gender", "Пол", 85));
         ColumnConfigurations.Add(ColumnConfiguration.Create("YearOfBirth", "Год рождения", 120));
         ColumnConfigurations.Add(ColumnConfiguration.Create("Category", "Разряд", 100));
         ColumnConfigurations.Add(ColumnConfiguration.Create("DisplayClubName", "Команда", 300));
