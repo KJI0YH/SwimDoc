@@ -55,9 +55,10 @@ public partial class App : Application
     private IServiceProvider ConfigureServiceProvider()
     {
         var serviceCollection = new ServiceCollection();
-
-        serviceCollection.AddDbContext<EfCoreContext>(options =>
-            options.UseSqlite());
+        serviceCollection.AddDbContext<EfCoreContext>(
+            options => options.UseSqlite(),
+            contextLifetime: ServiceLifetime.Transient,
+            optionsLifetime: ServiceLifetime.Singleton);
 
         ConfigureServices(serviceCollection);
         ConfigureViewModels(serviceCollection);
@@ -88,14 +89,14 @@ public partial class App : Application
         services.AddSingleton<INavigationService, NavigationService>();
         services.AddSingleton<IAddEditWindowFactory, AddEditWindowFactory>();
 
-        services.AddSingleton<IAgeGroupService, AgeGroupService>();
-        services.AddSingleton<IAthleteService, AthleteService>();
-        services.AddSingleton<IClubService, ClubService>();
-        services.AddSingleton<IEntryDocumentReaderService, EntryDocumentReaderService>();
-        services.AddSingleton<IEntryService, EntryService>();
-        services.AddSingleton<IEventService, EventService>();
-        services.AddSingleton<IHeatService, HeatService>();
-        services.AddSingleton<ISwimStyleService, SwimStyleService>();
+        services.AddTransient<IAgeGroupService, AgeGroupService>();
+        services.AddTransient<IAthleteService, AthleteService>();
+        services.AddTransient<IClubService, ClubService>();
+        services.AddTransient<IEntryDocumentReaderService, EntryDocumentReaderService>();
+        services.AddTransient<IEntryService, EntryService>();
+        services.AddTransient<IEventService, EventService>();
+        services.AddTransient<IHeatService, HeatService>();
+        services.AddTransient<ISwimStyleService, SwimStyleService>();
 
     }
 
