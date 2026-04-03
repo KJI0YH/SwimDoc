@@ -1,14 +1,15 @@
+using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using DataLayer.QueryObjects;
 using ServiceLayer.Crud;
 using UI.Views;
 using UI.Views.Generic;
-using Expression = System.Linq.Expressions.Expression;
 
 namespace UI.ViewModels.Generic;
 
@@ -25,13 +26,9 @@ public partial class GenericTableViewModel<TEntity, TKey> : GenericTableViewMode
 
     [ObservableProperty] private TEntity? _selectedItem;
 
-    [ObservableProperty] private int _currentPage = 0;
-
-    [ObservableProperty] private int _pageSize = 20;
+    [ObservableProperty] private ObservableCollection<TEntity> _selectedItems = new();
 
     [ObservableProperty] private int _totalItems;
-
-    [ObservableProperty] private int _totalPages;
 
     [ObservableProperty] private string _sortColumn = string.Empty;
 
@@ -57,25 +54,32 @@ public partial class GenericTableViewModel<TEntity, TKey> : GenericTableViewMode
         AutoGenerateColumns = true;
     }
 
-    partial void OnSelectedItemChanged(TEntity? value)
+    partial void OnSelectedItemsChanged(ObservableCollection<TEntity> value)
     {
         EditItemCommand.NotifyCanExecuteChanged();
         DeleteItemCommand.NotifyCanExecuteChanged();
     }
 
-    partial void OnPageSizeChanged(int value)
+    public override void SyncSelectedItemsFromGrid(IList? gridSelection)
     {
-        CurrentPage = 0;
-        LoadDataCommand.Execute(null);
+        var list = new List<TEntity>();
+        if (gridSelection != null)
+        {
+            foreach (var item in gridSelection)
+            {
+                if (item is TEntity e)
+                    list.Add(e);
+            }
+        }
+
+        SelectedItems = new ObservableCollection<TEntity>(list);
+        SelectedItem = list.Count == 1 ? list[0] : null;
     }
 
     partial void OnSearchTextChanged(string value)
     {
-        CurrentPage = 0;
         LoadDataCommand.Execute(null);
     }
-
-    public string PageInfo => $"Страница {CurrentPage + 1} из {TotalPages} (Всего: {TotalItems})";
 
     [RelayCommand]
     protected async Task LoadDataAsync()
@@ -88,17 +92,9 @@ public partial class GenericTableViewModel<TEntity, TKey> : GenericTableViewMode
             query = ApplySearch(query);
             query = ApplySorting(query);
 
-            TotalItems = query.Count();
-            TotalPages = (int)Math.Ceiling(TotalItems / (double)PageSize);
-
-            if (CurrentPage >= TotalPages && TotalPages > 0)
-                CurrentPage = TotalPages - 1;
-
-            var pagedQuery = query.Page(CurrentPage, PageSize);
-            var items = pagedQuery.ToList();
+            var items = query.ToList();
 
             Items = new ObservableCollection<TEntity>(items);
-            OnPropertyChanged(nameof(PageInfo));
         }
         finally
         {
@@ -112,23 +108,24 @@ public partial class GenericTableViewModel<TEntity, TKey> : GenericTableViewMode
         ShowAddEditDialog();
     }
 
-    [RelayCommand(CanExecute = nameof(CanEditOrDelete))]
+    [RelayCommand(CanExecute = nameof(CanEdit))]
     private void EditItem()
     {
-        if (SelectedItem == null) return;
-        var id = GetEntityId(SelectedItem);
+        if (SelectedItems.Count != 1) return;
+        var id = GetEntityId(SelectedItems[0]);
         ShowAddEditDialog(id);
     }
 
-    [RelayCommand(CanExecute = nameof(CanEditOrDelete))]
+    [RelayCommand(CanExecute = nameof(CanDelete))]
     private async Task DeleteItem()
     {
-        if (SelectedItem == null) return;
+        if (SelectedItems.Count == 0) return;
 
         try
         {
-            var id = GetEntityId(SelectedItem);
-            await _crudService.DeleteAsync(id);
+            var ids = SelectedItems.Select(GetEntityId).ToList();
+            foreach (var id in ids)
+                await _crudService.DeleteAsync(id);
             await LoadDataAsync();
         }
         catch (Exception ex)
@@ -136,15 +133,17 @@ public partial class GenericTableViewModel<TEntity, TKey> : GenericTableViewMode
             // ignored
         }
     }
-    
-    private bool CanEditOrDelete() => SelectedItem != null;
+
+    private bool CanEdit() => SelectedItems.Count == 1;
+
+    private bool CanDelete() => SelectedItems.Count > 0;
 
     [RelayCommand]
     private void SortByColumn(string? column)
     {
         if (string.IsNullOrEmpty(column)) return;
 
-        if (SortColumn == column)
+        if (string.Equals(SortColumn, column, StringComparison.Ordinal))
         {
             SortDirection = SortDirection == ListSortDirection.Ascending
                 ? ListSortDirection.Descending
@@ -156,7 +155,6 @@ public partial class GenericTableViewModel<TEntity, TKey> : GenericTableViewMode
             SortDirection = ListSortDirection.Ascending;
         }
 
-        CurrentPage = 0;
         LoadDataCommand.Execute(null);
     }
 
@@ -175,26 +173,19 @@ public partial class GenericTableViewModel<TEntity, TKey> : GenericTableViewMode
         if (string.IsNullOrEmpty(SortColumn))
             return query;
 
-        try
+        foreach (var col in ColumnConfigurations)
         {
-            var parameter = Expression.Parameter(typeof(TEntity), "x");
-            var property = Expression.Property((Expression)parameter, (string)SortColumn);
-            var lambda = Expression.Lambda(property, parameter);
+            if (col is not ColumnConfiguration<TEntity> typed)
+                continue;
 
-            var methodName = SortDirection == ListSortDirection.Ascending ? "OrderBy" : "OrderByDescending";
-            var resultExpression = Expression.Call(
-                typeof(Queryable),
-                methodName,
-                [typeof(TEntity), property.Type],
-                query.Expression,
-                Expression.Quote(lambda));
+            var sortKey = typed.GetSortKey();
+            if (!string.Equals(sortKey, SortColumn, StringComparison.Ordinal))
+                continue;
 
-            return query.Provider.CreateQuery<TEntity>(resultExpression);
+            return typed.SortQuery(query, SortDirection);
         }
-        catch
-        {
-            return query;
-        }
+
+        return query;
     }
 
     protected virtual void ShowAddEditDialog(TKey? id = default)

@@ -1,4 +1,6 @@
 using System;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
@@ -53,7 +55,13 @@ public partial class GenericTableView : UserControl
         UpdateColumns();
     }
 
-    private void DataGrid_AutoGeneratingColumn(object? sender, DataGridAutoGeneratingColumnEventArgs e)
+    private void DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (DataContext is GenericTableViewModelBase vm)
+            vm.SyncSelectedItemsFromGrid(DgTableView.SelectedItems);
+    }
+
+    private void  DataGrid_AutoGeneratingColumn(object? sender, DataGridAutoGeneratingColumnEventArgs e)
     {
         if (DataContext is not GenericTableViewModelBase viewModel) return;
         
@@ -79,17 +87,18 @@ public partial class GenericTableView : UserControl
 
         if (autoGenerate || columnConfigurations.Count == 0)
         {
-            DataGrid.AutoGenerateColumns = true;
+            DgTableView.AutoGenerateColumns = true;
             return;
         }
 
-        DataGrid.AutoGenerateColumns = false;
-        DataGrid.Columns.Clear();
+        DgTableView.AutoGenerateColumns = false;
+        DgTableView.Columns.Clear();
 
         var enumConverter = new EnumDescriptionConverter();
         
         foreach (var config in columnConfigurations)
         {
+            var sortId = config.SortMemberPath ?? config.PropertyPath;
             var binding = new Binding(config.PropertyPath);
             
             if (config.Converter == null)
@@ -159,7 +168,7 @@ public partial class GenericTableView : UserControl
                     CellTemplate = template,
                     Header = config.Header ?? config.PropertyPath,
                     IsReadOnly = config.IsReadOnly,
-                    SortMemberPath = config.PropertyPath
+                    SortMemberPath = sortId,
                 };
             }
             else
@@ -169,7 +178,7 @@ public partial class GenericTableView : UserControl
                     Binding = binding,
                     Header = config.Header ?? config.PropertyPath,
                     IsReadOnly = config.IsReadOnly,
-                    SortMemberPath = config.PropertyPath
+                    SortMemberPath = sortId,
                 };
             }
 
@@ -180,8 +189,10 @@ public partial class GenericTableView : UserControl
                     : new DataGridLength(config.Width.Value);
             }
 
-            DataGrid.Columns.Add(column);
+            DgTableView.Columns.Add(column);
         }
+
+        SyncDataGridSortGlyphs(viewModel);
     }
 
     private Type? GetPropertyType(string propertyPath, GenericTableViewModelBase viewModel)
@@ -223,7 +234,7 @@ public partial class GenericTableView : UserControl
             var columnName = header.Column.SortMemberPath;
             if (string.IsNullOrEmpty(columnName))
             {
-                if (header.Column is DataGridBoundColumn boundColumn && 
+                if (header.Column is DataGridBoundColumn boundColumn &&
                     boundColumn.Binding is Binding binding)
                 {
                     columnName = binding.Path?.Path ?? header.Column.Header?.ToString() ?? string.Empty;
@@ -240,15 +251,34 @@ public partial class GenericTableView : UserControl
                 if (sortCommand is System.Windows.Input.ICommand command && command.CanExecute(columnName))
                 {
                     command.Execute(columnName);
+                    SyncDataGridSortGlyphs(viewModel);
                 }
             }
         }
-    }
-}
 
-public abstract class GenericTableViewModelBase : ViewModelBase
-{
-    public abstract System.Collections.ObjectModel.ObservableCollection<ColumnConfiguration> GetColumnConfigurations();
-    public abstract bool GetAutoGenerateColumns();
+        e.Handled = true;
+    }
+    
+    private void SyncDataGridSortGlyphs(ViewModelBase viewModel)
+    {
+        var type = viewModel.GetType();
+        var sortColumn = type.GetProperty("SortColumn")?.GetValue(viewModel) as string;
+        var dirObj = type.GetProperty("SortDirection")?.GetValue(viewModel);
+
+        foreach (var col in DgTableView.Columns)
+            col.SortDirection = null;
+
+        if (string.IsNullOrEmpty(sortColumn) || dirObj is not ListSortDirection dir)
+            return;
+
+        foreach (var col in DgTableView.Columns)
+        {
+            if (string.Equals(col.SortMemberPath, sortColumn, StringComparison.Ordinal))
+            {
+                col.SortDirection = dir;
+                return;
+            }
+        }
+    }
 }
 

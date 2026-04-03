@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              mc:Ignorable="d"
-             d:DesignHeight="40" d:DesignWidth="250">
+             d:DesignHeight="40" d:DesignWidth="550">
     <StackPanel Orientation="Horizontal">
         <Button Content="{ui:SymbolIcon Add24}"
                 Command="{Binding CreateItemCommand}"
@@ -27,5 +27,10 @@
                 ToolTip="Обновить"
                 Margin="5"
                 Padding="9" />
+        <ui:TextBox
+            Icon="{ui:SymbolIcon Search24}"
+            Margin="5"
+            MinWidth="300"
+            Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"/>
     </StackPanel>
 </UserControl>

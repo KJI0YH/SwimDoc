@@ -1,4 +1,7 @@
+using System.ComponentModel;
+using BizLogic.Helpers;
 using DataLayer.EfClasses;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.AgeGroupService;
 using UI.Services;
@@ -21,10 +24,48 @@ public class AgeGroupsViewModel : GenericTableViewModel<AgeGroup, int?>
         AutoGenerateColumns = false;
         ColumnConfigurations.Clear();
 
-        ColumnConfigurations.Add(ColumnConfiguration.Create("DisplayName", "Название", 400));
-        ColumnConfigurations.Add(ColumnConfiguration.Create("Gender", "Пол", 100));
-        ColumnConfigurations.Add(ColumnConfiguration.Create("DisplayBirthYearMax", "Год рождения от", 150));
-        ColumnConfigurations.Add(ColumnConfiguration.Create("DisplayBirthYearMin", "Год рождения до", 150));
+        ColumnConfigurations.Add(new ColumnConfiguration<AgeGroup>("DisplayName", "Название", 400,
+            ((query, direction) =>
+            {
+                return direction == ListSortDirection.Ascending
+                    ? query.OrderBy(ag => ag.Name)
+                    : query.OrderByDescending(ag => ag.Name);
+            })));
+        ColumnConfigurations.Add(new ColumnConfiguration<AgeGroup>("Gender", "Пол", 100));
+        ColumnConfigurations.Add(new ColumnConfiguration<AgeGroup>("DisplayBirthYearMax", "Год рождения от", 150,
+            (query, direction) =>
+            {
+                return direction == ListSortDirection.Ascending
+                    ? query.OrderBy(ag => ag.BirthYearMax)
+                    : query.OrderByDescending(ag => ag.BirthYearMax);
+            }));
+        ColumnConfigurations.Add(new ColumnConfiguration<AgeGroup>("DisplayBirthYearMin", "Год рождения до", 150,
+            (query, direction) =>
+            {
+                return direction == ListSortDirection.Ascending
+                    ? query.OrderBy(ag => ag.BirthYearMin)
+                    : query.OrderByDescending(ag => ag.BirthYearMin);
+            }));
+    }
+
+    protected override IQueryable<AgeGroup> ApplySearch(IQueryable<AgeGroup> query)
+    {
+        if (string.IsNullOrWhiteSpace(SearchText))
+            return query;
+        if (EnumHelper.TryGetEnumByDescriptionContains<Gender>(SearchText, out Gender gender))
+        {
+            return query.Where(ag => ag.Gender == gender);
+        }
+
+        if (int.TryParse(SearchText, out int year))
+        {
+            return query.Where(ag =>
+                EF.Functions.Like(ag.BirthYearMin.ToString(), $"%{SearchText}%") ||
+                EF.Functions.Like(ag.BirthYearMax.ToString(), $"%{SearchText}%"));
+        }
+
+        return query.Where(ag =>
+            EF.Functions.Like(ag.Name, $"%{SearchText}%"));
     }
 
     protected override void ShowAddEditDialog(int? id = default)

@@ -1,4 +1,5 @@
 using DataLayer.EfClasses;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.AthleteService;
 using ServiceLayer.ClubService;
@@ -24,9 +25,19 @@ public class ClubsViewModel : GenericTableViewModel<Club, int?>
         AutoGenerateColumns = false;
         ColumnConfigurations.Clear();
 
-        ColumnConfigurations.Add(ColumnConfiguration.Create("Name", "Полное название", 300));
-        ColumnConfigurations.Add(ColumnConfiguration.Create("ShortName", "Короткое название", 150));
-        ColumnConfigurations.Add(ColumnConfiguration.Create("Type", "Тип", 100));
+        ColumnConfigurations.Add(new ColumnConfiguration<Club>("Name", "Полное название", 300));
+        ColumnConfigurations.Add(new ColumnConfiguration<Club>("ShortName", "Короткое название", 150));
+        ColumnConfigurations.Add(new ColumnConfiguration<Club>("Type", "Тип", 100));
+    }
+
+    protected override IQueryable<Club> ApplySearch(IQueryable<Club> query)
+    {
+        if (string.IsNullOrWhiteSpace(SearchText)) 
+            return query;
+        
+        return query.Where(club => 
+            EF.Functions.Like(club.Name, $"%{SearchText}%") ||
+            EF.Functions.Like(club.ShortName, $"%{SearchText}%"));
     }
 
     protected override void ShowAddEditDialog(int? id = default)

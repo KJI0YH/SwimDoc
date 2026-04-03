@@ -1,27 +1,91 @@
+using System.ComponentModel;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Windows.Controls;
+using Expression = System.Linq.Expressions.Expression;
 
 namespace UI.ViewModels.Generic;
+
+/// <summary>
+/// Сортировка колонки таблицы (EF <see cref="IQueryable{T}"/>).
+/// </summary>
+/// <remarks>
+/// <para><b>Отображение и сортировка</b></para>
+/// <list type="bullet">
+/// <item><b>Простое поле</b> — один <see cref="ColumnConfiguration.PropertyPath"/>, сортировка по тому же пути (дефолтный <see cref="ColumnConfiguration{TEntity}.ColumnConfiguration(string, string?, double?, string?)"/>).</item>
+/// <item><b>Display-строка + значение в БД</b> — привязка к <c>Display*</c>, в конструкторе передать <see cref="ColumnConfiguration.SortMemberPath"/> = имя поля для OrderBy (<c>EntryTime</c>, <c>FinishTime</c>).</item>
+/// <item><b>Сложная сортировка</b> — конструктор с <see cref="ColumnConfiguration{TEntity}.ColumnConfiguration(string, string?, double, ColumnSortQuery{TEntity}, string?)"/>: внутри <c>OrderBy…ThenBy</c> или <see cref="QueryableSortByDirection.Sort{T}"/>.</item>
+/// </list>
+/// </remarks>
+public delegate IQueryable<TEntity> ColumnSortQuery<TEntity>(IQueryable<TEntity> query, ListSortDirection direction)
+    where TEntity : class;
 
 public class ColumnConfiguration
 {
     public string PropertyPath { get; set; } = string.Empty;
+    public string? SortMemberPath { get; set; }
     public string? Header { get; set; }
     public double? Width { get; set; }
     public DataGridLengthUnitType? WidthUnitType { get; set; }
     public bool IsReadOnly { get; set; } = true;
-    public string? DisplayMemberPath { get; set; }
     public object? Converter { get; set; }
     public string? ConverterParameter { get; set; }
     public string? TrueSymbolIcon { get; set; }
     public string? FalseSymbolIcon { get; set; }
-    public static ColumnConfiguration Create(string propertyPath, string? header = null, double? width = null)
-    {
-        return new ColumnConfiguration
-        {
-            PropertyPath = propertyPath,
-            Header = header,
-            Width = width
-        };
-    }
+    
+    internal string GetSortKey() => SortMemberPath ?? PropertyPath;
 }
 
+public class ColumnConfiguration<TEntity> : ColumnConfiguration where TEntity : class
+{
+    public ColumnSortQuery<TEntity> SortQuery { get; set; }
+
+    public ColumnConfiguration(string propertyPath, string? header, double? width, string? sortMemberPath = null)
+    {
+        PropertyPath = propertyPath;
+        SortMemberPath = sortMemberPath;
+        Header = header;
+        Width = width;
+
+        var pathForSort = sortMemberPath ?? propertyPath;
+
+        SortQuery = (query, direction) =>
+        {
+            var parameter = Expression.Parameter(typeof(TEntity), "x");
+            var body = BuildPropertyAccess(parameter, pathForSort);
+            var lambda = Expression.Lambda(body, parameter);
+            var methodName = direction == ListSortDirection.Ascending ? "OrderBy" : "OrderByDescending";
+            var resultExpression = Expression.Call(
+                typeof(Queryable),
+                methodName,
+                [typeof(TEntity), body.Type],
+                query.Expression,
+                Expression.Quote(lambda));
+            return query.Provider.CreateQuery<TEntity>(resultExpression);
+        };
+    }
+
+    public ColumnConfiguration(string propertyPath, string? header, double width, ColumnSortQuery<TEntity> sortQuery, string? sortMemberPath = null)
+    {
+        PropertyPath = propertyPath;
+        SortMemberPath = sortMemberPath;
+        Header = header;
+        Width = width;
+        SortQuery = sortQuery;
+    }
+
+    private static Expression BuildPropertyAccess(Expression parameter, string propertyPath)
+    {
+        var expr = parameter;
+        foreach (var part in propertyPath.Split('.', StringSplitOptions.RemoveEmptyEntries))
+        {
+            var prop = expr.Type.GetProperty(part.Trim(), BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+            if (prop == null)
+                throw new InvalidOperationException($"Property '{part}' not found on type '{expr.Type.Name}'.");
+
+            expr = Expression.Property(expr, prop);
+        }
+
+        return expr;
+    }
+}

@@ -47,25 +47,26 @@
             <generic:GenericTableDefaultToolbar />
         </DockPanel>
 
-        <DataGrid Grid.Row="1"
+        <ui:DataGrid Grid.Row="1"
                   Margin="5"
-                  x:Name="DataGrid"
+                  x:Name="DgTableView"
                   ItemsSource="{Binding Items}"
-                  SelectedItem="{Binding SelectedItem}"
+                  SelectionMode="Extended"
+                  SelectionUnit="FullRow"
                   AutoGenerateColumns="{Binding AutoGenerateColumns}"
                   CanUserAddRows="False"
                   CanUserDeleteRows="False"
                   IsReadOnly="True"
-                  SelectionMode="Single"
                   GridLinesVisibility="All"
                   HeadersVisibility="Column"
                   Loaded="DataGrid_Loaded"
+                  SelectionChanged="DataGrid_SelectionChanged"
                   AutoGeneratingColumn="DataGrid_AutoGeneratingColumn">
             <DataGrid.ColumnHeaderStyle>
                 <Style TargetType="DataGridColumnHeader">
                     <EventSetter Event="Click" Handler="ColumnHeader_Click" />
                 </Style>
             </DataGrid.ColumnHeaderStyle>
-        </DataGrid>
+        </ui:DataGrid>
     </Grid>
 </UserControl>

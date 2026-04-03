@@ -1,11 +1,7 @@
-using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
+using BizLogic.Helpers;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DataLayer.EfClasses;
@@ -91,21 +87,29 @@ public partial class EntriesViewModel(
         AutoGenerateColumns = false;
         ColumnConfigurations.Clear();
 
-        ColumnConfigurations.Add(ColumnConfiguration.Create("DisplaySwimName", "Дистанция", 500));
-        ColumnConfigurations.Add(ColumnConfiguration.Create("Athlete.DisplayName", "Участник", 300));
-        ColumnConfigurations.Add(ColumnConfiguration.Create("Status", "Статус", 150));
-        ColumnConfigurations.Add(new ColumnConfiguration
-        {
-            PropertyPath = "Scoring",
-            Header = "В зачёт",
-            Width = 60,
-            TrueSymbolIcon = "Checkmark24",
-            FalseSymbolIcon = "Dismiss24"
-        });
-        ColumnConfigurations.Add(ColumnConfiguration.Create("DisplayEntryTime", "Заявочное время", 130));
-        ColumnConfigurations.Add(ColumnConfiguration.Create("DisplayFinishTime", "Финишное время", 130));
-        ColumnConfigurations.Add(ColumnConfiguration.Create("Points", "Очки", 100));
-        ColumnConfigurations.Add(ColumnConfiguration.Create("Comment", "Примечание", 100));
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("DisplaySwimName", "Дистанция", 500,
+            (query, direction) =>
+            {
+                return direction == ListSortDirection.Ascending
+                    ? query.OrderBy(e => e.SwimEvent.Order)
+                    : query.OrderByDescending(e => e.SwimEvent.Order);
+            }));
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("Athlete.DisplayName", "Участник", 300,
+            (query, direction) => query.Sort(direction,
+                q => q
+                    .OrderBy(e => e.Athlete != null ? e.Athlete.LastName : null)
+                    .ThenBy(e => e.Athlete != null ? e.Athlete.FirstName : null),
+                q => q
+                    .OrderByDescending(e => e.Athlete != null ? e.Athlete.LastName : null)
+                    .ThenByDescending(e => e.Athlete != null ? e.Athlete.FirstName : null))));
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("Status", "Статус", 150));
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("Scoring", "В зачёт", 60));
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("DisplayEntryTime", "Заявочное время", 130,
+            sortMemberPath: nameof(Entry.EntryTime)));
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("DisplayFinishTime", "Финишное время", 130,
+            sortMemberPath: nameof(Entry.FinishTime)));
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("Points", "Очки", 100));
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("Comment", "Примечание", 100));
     }
 
     protected override IQueryable<Entry> ApplyQuery(IQueryable<Entry> query)
@@ -118,6 +122,31 @@ public partial class EntriesViewModel(
             .ThenInclude(se => se.AgeGroup)
             .Include(entry => entry.HeatPosition)
             .ThenInclude(heatPosition => heatPosition.Heat);
+    }
+
+    protected override IQueryable<Entry> ApplySearch(IQueryable<Entry> query)
+    {
+        if (string.IsNullOrWhiteSpace(SearchText))
+            return query;
+
+        if (EnumHelper.TryGetEnumByDescriptionContains<EntryStatus>(SearchText, out var status))
+        {
+            return query.Where(e => e.Status == status);
+        }
+
+        if (EnumHelper.TryGetEnumByDescriptionContains<Gender>(SearchText, out var gender))
+        {
+            return query.Where(e => e.SwimEvent.AgeGroup.Gender == gender);
+        }
+
+        if (EnumHelper.TryGetEnumByDescriptionContains<Stroke>(SearchText, out var stroke))
+        {
+            return query.Where(e => e.SwimStyle.Stroke == stroke);
+        }
+
+        return query.Where(e =>
+            EF.Functions.Like(e.Athlete.FirstName, $"%{SearchText}%") ||
+            EF.Functions.Like(e.Athlete.LastName, $"%{SearchText}%"));
     }
 
     protected override void ShowAddEditDialog(int? id = default)
@@ -200,7 +229,7 @@ public partial class EntriesViewModel(
                     var (documents, stats) = await Task.Run(
                         () => entryDocumentReaderService.ReadWithStats(file.FullPath),
                         _importCts.Token);
-                    
+
                     file.ClubsAdded = stats.ClubsAdded;
                     file.ClubsUpdated = stats.ClubsUpdated;
                     file.AthletesAdded = stats.AthletesAdded;
@@ -277,18 +306,20 @@ public partial class EntriesViewModel(
 
         [ObservableProperty] private bool _isDetailsOpen;
         [ObservableProperty] private bool _isSummaryRow;
-        
+
         [ObservableProperty] private ImportFileStatus _status = ImportFileStatus.Pending;
     }
 
     public enum ImportFileStatus
     {
-        [Description(" ")]Summary,
-        [Description("В очереди")]Pending,
-        [Description("В обработке")]Processing,
-        [Description("Обработан")]Completed,
-        [Description("Обработан с предупреждениями")]CompletedWithWarnings,
-        [Description("Сбой")]Failed,
-        [Description("Отменён")]Canceled
+        [Description(" ")] Summary,
+        [Description("В очереди")] Pending,
+        [Description("В обработке")] Processing,
+        [Description("Обработан")] Completed,
+
+        [Description("Обработан с предупреждениями")]
+        CompletedWithWarnings,
+        [Description("Сбой")] Failed,
+        [Description("Отменён")] Canceled
     }
 }
