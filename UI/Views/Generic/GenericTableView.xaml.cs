@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
+using System.Windows.Input;
 using UI.Helpers;
 using UI.ViewModels;
 using UI.ViewModels.Generic;
@@ -53,6 +54,8 @@ public partial class GenericTableView : UserControl
     private void DataGrid_Loaded(object sender, RoutedEventArgs e)
     {
         UpdateColumns();
+        DgTableView.Focus();
+        Keyboard.Focus(DgTableView);
     }
 
     private void DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)

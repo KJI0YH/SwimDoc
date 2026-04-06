@@ -62,6 +62,11 @@
                   Loaded="DataGrid_Loaded"
                   SelectionChanged="DataGrid_SelectionChanged"
                   AutoGeneratingColumn="DataGrid_AutoGeneratingColumn">
+            <ui:DataGrid.InputBindings>
+                <KeyBinding Key="Delete" Command="{Binding DeleteItemCommand}" />
+                <KeyBinding Key="E" Modifiers="Control" Command="{Binding EditItemCommand}" />
+                <KeyBinding Key="N" Modifiers="Control" Command="{Binding CreateItemCommand}" />
+            </ui:DataGrid.InputBindings>
             <DataGrid.ColumnHeaderStyle>
                 <Style TargetType="DataGridColumnHeader">
                     <EventSetter Event="Click" Handler="ColumnHeader_Click" />
