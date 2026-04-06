@@ -11,6 +11,7 @@ public interface INavigationService
 
     void NavigateTo<TViewModel>() where TViewModel : ViewModelBase;
     void NavigateTo<TViewModel>(object? parameter) where TViewModel : ViewModelBase;
+    object? GetNavigationParameter<TViewModel>() where TViewModel : ViewModelBase;
     bool CanGoBack { get; }
     void GoBack();
 }

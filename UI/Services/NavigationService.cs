@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using UI.ViewModels;
+using UI.ViewModels.Details;
+using UI.ViewModels.Generic;
 using UI.ViewModels.Table;
 using UI.Views.Pages;
 
@@ -17,10 +19,17 @@ public class NavigationService(IServiceProvider serviceProvider) : INavigationSe
         [typeof(AthletesViewModel)] = typeof(AthletesPage),
         [typeof(ClubsViewModel)] = typeof(ClubsPage),
         [typeof(AgeGroupsViewModel)] = typeof(AgeGroupsPage),
-        [typeof(SwimStylesViewModel)] = typeof(SwimStylesPage)
+        [typeof(SwimStylesViewModel)] = typeof(SwimStylesPage),
+        [typeof(AthleteDetailsViewModel)] = typeof(AthleteDetailsPage),
+        [typeof(ClubDetailsViewModel)] = typeof(ClubDetailsPage),
+        [typeof(EntryDetailsViewModel)] = typeof(EntryDetailsPage),
+        [typeof(EventDetailsViewModel)] = typeof(EventDetailsPage),
+        [typeof(AgeGroupDetailsViewModel)] = typeof(AgeGroupDetailsPage),
+        [typeof(SwimStyleDetailsViewModel)] = typeof(SwimStyleDetailsPage)
     };
 
     private readonly Stack<ViewModelBase> _navigationHistory = new();
+    private readonly Dictionary<Type, object?> _navigationParameters = new();
     private ViewModelBase? _currentViewModel;
 
     public ViewModelBase? CurrentViewModel
@@ -54,6 +63,10 @@ public class NavigationService(IServiceProvider serviceProvider) : INavigationSe
     public void NavigateTo<TViewModel>(object? parameter) where TViewModel : ViewModelBase
     {
         var viewModel = serviceProvider.GetRequiredService<TViewModel>();
+        _navigationParameters[typeof(TViewModel)] = parameter;
+
+        if (viewModel is INavigationAware navigationAware)
+            navigationAware.OnNavigatedTo(parameter);
 
         if (ReferenceEquals(_currentViewModel, viewModel))
         {
@@ -66,6 +79,11 @@ public class NavigationService(IServiceProvider serviceProvider) : INavigationSe
 
         CurrentViewModel = viewModel;
         RequestPageForViewModel<TViewModel>();
+    }
+
+    public object? GetNavigationParameter<TViewModel>() where TViewModel : ViewModelBase
+    {
+        return _navigationParameters.TryGetValue(typeof(TViewModel), out var parameter) ? parameter : null;
     }
 
     public void GoBack()

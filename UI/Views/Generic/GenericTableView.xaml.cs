@@ -64,6 +64,22 @@ public partial class GenericTableView : UserControl
             vm.SyncSelectedItemsFromGrid(DgTableView.SelectedItems);
     }
 
+    private void DataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+    {
+        if (sender is not System.Windows.Controls.DataGrid dataGrid || dataGrid.SelectedItems.Count == 0)
+            return;
+
+        if (DataContext is not ViewModelBase viewModel)
+            return;
+
+        var openDetailsCommand = viewModel.GetType().GetProperty("OpenDetailsCommand")?.GetValue(viewModel);
+        if (openDetailsCommand is ICommand command && command.CanExecute(null))
+        {
+            command.Execute(null);
+            e.Handled = true;
+        }
+    }
+
     private void  DataGrid_AutoGeneratingColumn(object? sender, DataGridAutoGeneratingColumnEventArgs e)
     {
         if (DataContext is not GenericTableViewModelBase viewModel) return;

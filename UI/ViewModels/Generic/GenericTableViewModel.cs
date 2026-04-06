@@ -7,9 +7,13 @@ using System.Windows;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DataLayer.EfClasses;
 using ServiceLayer.Crud;
+using Microsoft.Extensions.DependencyInjection;
+using UI.Services;
 using UI.Views;
 using UI.Views.Generic;
+using UI.ViewModels.Details;
 
 namespace UI.ViewModels.Generic;
 
@@ -17,6 +21,7 @@ public partial class GenericTableViewModel<TEntity, TKey> : GenericTableViewMode
     where TEntity : class
 {
     protected readonly ICrudService<TEntity, TKey> _crudService;
+    private readonly INavigationService _navigationService;
 
     public override ObservableCollection<ColumnConfiguration> GetColumnConfigurations() => ColumnConfigurations;
 
@@ -45,6 +50,7 @@ public partial class GenericTableViewModel<TEntity, TKey> : GenericTableViewMode
     public GenericTableViewModel(ICrudService<TEntity, TKey> crudService)
     {
         _crudService = crudService;
+        _navigationService = App.Current.Services.GetRequiredService<INavigationService>();
         InitializeColumns();
         LoadDataCommand.Execute(null);
     }
@@ -58,6 +64,7 @@ public partial class GenericTableViewModel<TEntity, TKey> : GenericTableViewMode
     {
         EditItemCommand.NotifyCanExecuteChanged();
         DeleteItemCommand.NotifyCanExecuteChanged();
+        OpenDetailsCommand.NotifyCanExecuteChanged();
     }
 
     public override void SyncSelectedItemsFromGrid(IList? gridSelection)
@@ -137,6 +144,45 @@ public partial class GenericTableViewModel<TEntity, TKey> : GenericTableViewMode
     private bool CanEdit() => SelectedItems.Count == 1;
 
     private bool CanDelete() => SelectedItems.Count > 0;
+
+    [RelayCommand(CanExecute = nameof(CanOpenDetails))]
+    private void OpenDetails()
+    {
+        if (SelectedItems.Count != 1)
+            return;
+
+        var id = GetEntityId(SelectedItems[0]);
+        if (id == null)
+            return;
+
+        var entityName = typeof(TEntity).Name;
+        if (!int.TryParse(id.ToString(), out var entityId))
+            return;
+
+        switch (entityName)
+        {
+            case nameof(Athlete):
+                _navigationService.NavigateTo<AthleteDetailsViewModel>(entityId);
+                break;
+            case nameof(Club):
+                _navigationService.NavigateTo<ClubDetailsViewModel>(entityId);
+                break;
+            case nameof(Entry):
+                _navigationService.NavigateTo<EntryDetailsViewModel>(entityId);
+                break;
+            case nameof(SwimEvent):
+                _navigationService.NavigateTo<EventDetailsViewModel>(entityId);
+                break;
+            case nameof(AgeGroup):
+                _navigationService.NavigateTo<AgeGroupDetailsViewModel>(entityId);
+                break;
+            case nameof(SwimStyle):
+                _navigationService.NavigateTo<SwimStyleDetailsViewModel>(entityId);
+                break;
+        }
+    }
+
+    private bool CanOpenDetails() => SelectedItems.Count == 1;
 
     [RelayCommand]
     private void SortByColumn(string? column)

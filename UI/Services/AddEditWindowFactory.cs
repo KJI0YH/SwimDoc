@@ -45,6 +45,11 @@ public class AddEditWindowFactory : IAddEditWindowFactory
 
     public bool? CreateAndShow<TWindow>(int? id = null) where TWindow : Window
     {
+        return CreateAndShow<TWindow>(id, null);
+    }
+
+    public bool? CreateAndShow<TWindow>(int? id, AddEditContext? context) where TWindow : Window
+    {
         var windowType = typeof(TWindow);
         var nullableIntType = typeof(int?);
         
@@ -75,6 +80,7 @@ public class AddEditWindowFactory : IAddEditWindowFactory
         // Создаем экземпляр окна
         var window = (TWindow)constructor.Invoke([id])
             ?? throw new InvalidOperationException($"Failed to create instance of {windowType.Name}.");
+        ApplyContextIfNeeded(window, context);
         var owner = GetActiveWindow() ?? Application.Current.MainWindow;
         if (owner != null)
         {
@@ -105,6 +111,11 @@ public class AddEditWindowFactory : IAddEditWindowFactory
 
     public TWindow CreateAndShowAndReturn<TWindow>(int? id = null) where TWindow : Window
     {
+        return CreateAndShowAndReturn<TWindow>(id, null);
+    }
+
+    public TWindow CreateAndShowAndReturn<TWindow>(int? id, AddEditContext? context) where TWindow : Window
+    {
         var windowType = typeof(TWindow);
         var nullableIntType = typeof(int?);
 
@@ -132,6 +143,7 @@ public class AddEditWindowFactory : IAddEditWindowFactory
 
         var window = (TWindow)constructor.Invoke([id])
             ?? throw new InvalidOperationException($"Failed to create instance of {windowType.Name}.");
+        ApplyContextIfNeeded(window, context);
         var owner = GetActiveWindow() ?? Application.Current.MainWindow;
         if (owner != null)
         {
@@ -159,5 +171,23 @@ public class AddEditWindowFactory : IAddEditWindowFactory
                 PopDim(owner);
         }
         return window;
+    }
+
+    private static void ApplyContextIfNeeded(Window window, AddEditContext? context)
+    {
+        var dataContext = window.DataContext;
+        if (dataContext == null)
+            return;
+
+        if (context == null)
+            return;
+
+        if (dataContext is IAddEditContextAware aware)
+            aware.ApplyContext(context);
+
+        // Some add/edit windows initialize view models in constructor.
+        // Re-run initialization after context application to apply filtered lists/defaults.
+        var initializeAsyncMethod = dataContext.GetType().GetMethod("InitializeAsync", Type.EmptyTypes);
+        _ = initializeAsyncMethod?.Invoke(dataContext, null);
     }
 }

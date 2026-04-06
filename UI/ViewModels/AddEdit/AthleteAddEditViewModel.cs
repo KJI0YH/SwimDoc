@@ -15,8 +15,10 @@ using UI.Views.Controls;
 namespace UI.ViewModels.AddEdit;
 
 public partial class AthleteAddAddEditViewModel(int? id, IAthleteService athleteService, IClubService clubService)
-    : GenericAddEditViewModel<Athlete, int?>(id, athleteService)
+    : GenericAddEditViewModel<Athlete, int?>(id, athleteService), IAddEditContextAware
 {
+    private int? _contextClubId;
+
     [ObservableProperty] private ObservableCollection<SearchableItem> _clubs = new();
 
     [ObservableProperty] private SearchableItem? _selectedClub;
@@ -95,8 +97,20 @@ public partial class AthleteAddAddEditViewModel(int? id, IAthleteService athlete
         else
         {
             YearOfBirth = DateTime.Now.Year;
-            SelectedClub = Clubs.FirstOrDefault(item => item.Value == null);
+            if (_contextClubId.HasValue)
+            {
+                SelectedClub = Clubs.FirstOrDefault(item => item.Value is Club c && c.Id == _contextClubId.Value);
+            }
+            else
+            {
+                SelectedClub = Clubs.FirstOrDefault(item => item.Value == null);
+            }
         }
+    }
+
+    public void ApplyContext(AddEditContext context)
+    {
+        _contextClubId = context.ClubId;
     }
 
     partial void OnSelectedClubChanged(SearchableItem? item)
@@ -113,9 +127,15 @@ public partial class AthleteAddAddEditViewModel(int? id, IAthleteService athlete
 
     private void LoadClubs()
     {
-        var clubs = clubService.Query().ToList();
+        var clubsQuery = clubService.Query();
+        if (_contextClubId.HasValue)
+            clubsQuery = clubsQuery.Where(c => c.Id == _contextClubId.Value);
+
+        var clubs = clubsQuery.ToList();
         Clubs.Clear();
-        Clubs.Add(new SearchableItem { Value = null, DisplayText = "(Лично)" });
+
+        if (!_contextClubId.HasValue)
+            Clubs.Add(new SearchableItem { Value = null, DisplayText = "(Лично)" });
 
         foreach (var club in clubs)
             Clubs.Add(new SearchableItem

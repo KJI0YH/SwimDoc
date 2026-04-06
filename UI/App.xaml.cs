@@ -14,7 +14,9 @@ using ServiceLayer.EventService;
 using ServiceLayer.HeatService;
 using ServiceLayer.SwimStyleService;
 using UI.Services;
+using UI.ViewModels.Details;
 using UI.ViewModels;
+using UI.ViewModels.Generic;
 using UI.ViewModels.Table;
 using UI.Views;
 using UI.Views.Pages;
@@ -111,6 +113,12 @@ public partial class App : Application
         services.AddTransient<ClubsViewModel>();
         services.AddTransient<AgeGroupsViewModel>();
         services.AddTransient<SwimStylesViewModel>();
+        services.AddTransient<AthleteDetailsViewModel>();
+        services.AddTransient<ClubDetailsViewModel>();
+        services.AddTransient<EntryDetailsViewModel>();
+        services.AddTransient<EventDetailsViewModel>();
+        services.AddTransient<AgeGroupDetailsViewModel>();
+        services.AddTransient<SwimStyleDetailsViewModel>();
 
         services.AddTransient<CompetitionSelectionPage>();
         services.AddTransient<EventsPage>();
@@ -120,5 +128,11 @@ public partial class App : Application
         services.AddTransient<ClubsPage>();
         services.AddTransient<AgeGroupsPage>();
         services.AddTransient<SwimStylesPage>();
+        services.AddTransient<AthleteDetailsPage>();
+        services.AddTransient<ClubDetailsPage>();
+        services.AddTransient<EntryDetailsPage>();
+        services.AddTransient<EventDetailsPage>();
+        services.AddTransient<AgeGroupDetailsPage>();
+        services.AddTransient<SwimStyleDetailsPage>();
     }
 }

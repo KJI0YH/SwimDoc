@@ -61,7 +61,8 @@
                   HeadersVisibility="Column"
                   Loaded="DataGrid_Loaded"
                   SelectionChanged="DataGrid_SelectionChanged"
-                  AutoGeneratingColumn="DataGrid_AutoGeneratingColumn">
+                  AutoGeneratingColumn="DataGrid_AutoGeneratingColumn"
+                  MouseDoubleClick="DataGrid_MouseDoubleClick">
             <ui:DataGrid.InputBindings>
                 <KeyBinding Key="Delete" Command="{Binding DeleteItemCommand}" />
                 <KeyBinding Key="E" Modifiers="Control" Command="{Binding EditItemCommand}" />

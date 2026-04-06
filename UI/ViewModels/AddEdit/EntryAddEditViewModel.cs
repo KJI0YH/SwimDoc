@@ -20,8 +20,12 @@ public partial class EntryAddEditViewModel(
     IEntryService entryService,
     IAthleteService athleteService,
     IEventService eventService)
-    : GenericAddEditViewModel<Entry, int?>(id, entryService)
+    : GenericAddEditViewModel<Entry, int?>(id, entryService), IAddEditContextAware
 {
+    private int? _contextAthleteId;
+    private int? _contextEventId;
+    private int? _contextClubId;
+    private int? _contextSwimStyleId;
     private string _entryTimeText = string.Empty;
 
     [ObservableProperty] private ObservableCollection<SearchableItem> _athletes = new();
@@ -143,6 +147,23 @@ public partial class EntryAddEditViewModel(
         SelectedSwimEvent = Entity.SwimEventId == null
             ? SwimEvents.FirstOrDefault(item => item.Value == null)
             : SwimEvents.FirstOrDefault(item => item.Value is SwimEvent se && se.Id == Entity.SwimEventId);
+
+        if (IsAdd)
+        {
+            if (_contextAthleteId.HasValue)
+                SelectedAthlete = Athletes.FirstOrDefault(item => item.Value is Athlete a && a.Id == _contextAthleteId.Value);
+
+            if (_contextEventId.HasValue)
+                SelectedSwimEvent = SwimEvents.FirstOrDefault(item => item.Value is SwimEvent se && se.Id == _contextEventId.Value);
+        }
+    }
+
+    public void ApplyContext(AddEditContext context)
+    {
+        _contextAthleteId = context.AthleteId;
+        _contextEventId = context.EventId;
+        _contextClubId = context.ClubId;
+        _contextSwimStyleId = context.SwimStyleId;
     }
 
     private static string FormatEntryTime(int? value)
@@ -192,7 +213,13 @@ public partial class EntryAddEditViewModel(
 
     private void LoadAthletes()
     {
-        var athletes = athleteService.Query().ToList();
+        var query = athleteService.Query();
+        if (_contextAthleteId.HasValue)
+            query = query.Where(a => a.Id == _contextAthleteId.Value);
+        else if (_contextClubId.HasValue)
+            query = query.Where(a => a.ClubId == _contextClubId.Value);
+
+        var athletes = query.ToList();
         Athletes.Clear();
         foreach (var athlete in athletes)
             Athletes.Add(new SearchableItem { Value = athlete, DisplayText = athlete.DisplayName });
@@ -200,10 +227,16 @@ public partial class EntryAddEditViewModel(
 
     private void LoadEvents()
     {
-        var swimEvents = eventService.Query()
+        IQueryable<SwimEvent> query = eventService.Query()
             .Include(se => se.AgeGroup)
-            .Include(se => se.SwimStyle)
-            .ToList();
+            .Include(se => se.SwimStyle);
+
+        if (_contextEventId.HasValue)
+            query = query.Where(se => se.Id == _contextEventId.Value);
+        else if (_contextSwimStyleId.HasValue)
+            query = query.Where(se => se.SwimStyleId == _contextSwimStyleId.Value);
+
+        var swimEvents = query.ToList();
         SwimEvents.Clear();
         foreach (var swimEvent in swimEvents)
             SwimEvents.Add(new SearchableItem { Value = swimEvent, DisplayText = swimEvent.DisplayName });

@@ -19,8 +19,10 @@ public partial class EventAddAddEditViewModel(
     IEventService eventService,
     IAgeGroupService ageGroupService,
     ISwimStyleService swimStyleService)
-    : GenericAddEditViewModel<SwimEvent, int?>(id, eventService)
+    : GenericAddEditViewModel<SwimEvent, int?>(id, eventService), IAddEditContextAware
 {
+    private int? _contextAgeGroupId;
+    private int? _contextSwimStyleId;
     [ObservableProperty] private ObservableCollection<SearchableItem> _ageGroups = new();
 
     [ObservableProperty] private ObservableCollection<SearchableItem> _previousSwimEvents = new();
@@ -173,7 +175,17 @@ public partial class EventAddAddEditViewModel(
             Date = DateOnly.FromDateTime(DateTime.Today);
             Order = eventService.GetNextOrderNumber();
             SelectedPreviousSwimEvent = PreviousSwimEvents.FirstOrDefault(item => item.Value == null);
+            if (_contextAgeGroupId.HasValue)
+                SelectedAgeGroup = AgeGroups.FirstOrDefault(item => item.Value is AgeGroup ag && ag.Id == _contextAgeGroupId.Value);
+            if (_contextSwimStyleId.HasValue)
+                SelectedSwimStyle = SwimStyles.FirstOrDefault(item => item.Value is SwimStyle ss && ss.Id == _contextSwimStyleId.Value);
         }
+    }
+
+    public void ApplyContext(AddEditContext context)
+    {
+        _contextAgeGroupId = context.AgeGroupId;
+        _contextSwimStyleId = context.SwimStyleId;
     }
 
     partial void OnSelectedAgeGroupChanged(SearchableItem? value)
@@ -196,7 +208,11 @@ public partial class EventAddAddEditViewModel(
 
     private void LoadAgeGroups()
     {
-        var ageGroups = ageGroupService.Query().ToList();
+        var query = ageGroupService.Query();
+        if (_contextAgeGroupId.HasValue)
+            query = query.Where(ag => ag.Id == _contextAgeGroupId.Value);
+
+        var ageGroups = query.ToList();
         AgeGroups.Clear();
 
         foreach (var ageGroup in ageGroups)
@@ -209,7 +225,11 @@ public partial class EventAddAddEditViewModel(
 
     private void LoadSwimStyles()
     {
-        var swimStyles = swimStyleService.Query().ToList();
+        var query = swimStyleService.Query();
+        if (_contextSwimStyleId.HasValue)
+            query = query.Where(ss => ss.Id == _contextSwimStyleId.Value);
+
+        var swimStyles = query.ToList();
         SwimStyles.Clear();
 
         foreach (var swimStyle in swimStyles)
