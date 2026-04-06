@@ -174,6 +174,7 @@ public partial class EventAddAddEditViewModel(
         {
             Date = DateOnly.FromDateTime(DateTime.Today);
             Order = eventService.GetNextOrderNumber();
+            (LaneMin, LaneMax) = eventService.GetPreviousLanes();
             SelectedPreviousSwimEvent = PreviousSwimEvents.FirstOrDefault(item => item.Value == null);
             if (_contextAgeGroupId.HasValue)
                 SelectedAgeGroup = AgeGroups.FirstOrDefault(item => item.Value is AgeGroup ag && ag.Id == _contextAgeGroupId.Value);

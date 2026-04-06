@@ -6,11 +6,11 @@ public enum EventRound
 {
     [Description("Предварительный")]
     PRE,
-    [Description("Отборочный")]
+    [Description("Переплыв предварительный")]
     SOP,
     [Description("Полуфинал")]
     SEM,
-    [Description("Доп. отбор")]
+    [Description("Переплыв полуфинал")]
     SOS,
     [Description("Финал")]
     FIN

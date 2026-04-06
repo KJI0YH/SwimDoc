@@ -15,6 +15,12 @@ public class EventService(EfCoreContext dbContext) : CrudService<SwimEvent, int?
         return Math.Max(total, max) + 1;
     }
 
+    public (int min, int max) GetPreviousLanes()
+    {
+        var swimEvent = dbContext.SwimEvents.OrderByDescending(se => se.Order).FirstOrDefault();
+        return swimEvent is null ? (0, 0) : (swimEvent.LaneMin, swimEvent.LaneMax);
+    }
+
     public override async Task<(SwimEvent? entity, ImmutableList<ValidationResult> errors)> CreateAsync(
         SwimEvent entity, CancellationToken cancellationToken = default)
     {
