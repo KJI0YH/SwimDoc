@@ -15,7 +15,7 @@ public static class EntryNormalizationHelper
 
         var state = dbContext.Entry(entry).State;
         if (state is EntityState.Added or EntityState.Detached)
-            entry.Status = swimEvent is null ? EntryStatus.INS : EntryStatus.EVENT;
+            entry.Status = swimEvent is null ? EntryStatus.ENTRY : EntryStatus.EVENT;
 
         return entry;
     }

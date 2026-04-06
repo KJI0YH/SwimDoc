@@ -9,7 +9,7 @@ public class Entry : IValidatableObject
     public int Id { get; set; }
     public int? EntryTime { get; set; }
     public bool Scoring { get; set; } = true;
-    public EntryStatus Status { get; set; } = EntryStatus.INS;
+    public EntryStatus Status { get; set; } = EntryStatus.ENTRY;
     public int SwimStyleId { get; set; }
     public SwimStyle SwimStyle { get; set; }
     public string? Comment { get; set; }

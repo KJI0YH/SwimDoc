@@ -6,17 +6,6 @@ using Expression = System.Linq.Expressions.Expression;
 
 namespace UI.ViewModels.Generic;
 
-/// <summary>
-/// Сортировка колонки таблицы (EF <see cref="IQueryable{T}"/>).
-/// </summary>
-/// <remarks>
-/// <para><b>Отображение и сортировка</b></para>
-/// <list type="bullet">
-/// <item><b>Простое поле</b> — один <see cref="ColumnConfiguration.PropertyPath"/>, сортировка по тому же пути (дефолтный <see cref="ColumnConfiguration{TEntity}.ColumnConfiguration(string, string?, double?, string?)"/>).</item>
-/// <item><b>Display-строка + значение в БД</b> — привязка к <c>Display*</c>, в конструкторе передать <see cref="ColumnConfiguration.SortMemberPath"/> = имя поля для OrderBy (<c>EntryTime</c>, <c>FinishTime</c>).</item>
-/// <item><b>Сложная сортировка</b> — конструктор с <see cref="ColumnConfiguration{TEntity}.ColumnConfiguration(string, string?, double, ColumnSortQuery{TEntity}, string?)"/>: внутри <c>OrderBy…ThenBy</c> или <see cref="QueryableSortByDirection.Sort{T}"/>.</item>
-/// </list>
-/// </remarks>
 public delegate IQueryable<TEntity> ColumnSortQuery<TEntity>(IQueryable<TEntity> query, ListSortDirection direction)
     where TEntity : class;
 

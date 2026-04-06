@@ -29,7 +29,7 @@ public class AthletesViewModel : GenericTableViewModel<Athlete, int?>
 
         ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("FirstName", "Имя", 200));
         ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("LastName", "Фамилия", 200));
-        ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("Gender", "Пол", 85));
+        ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("Gender", "Пол", 90));
         ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("YearOfBirth", "Год рождения", 120));
         ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("Category", "Разряд", 100));
         ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("DisplayClubName", "Команда", 300,
