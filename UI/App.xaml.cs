@@ -1,5 +1,4 @@
 using System.Windows;
-using System.Windows.Threading;
 using DataLayer.EfCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,21 +13,38 @@ using ServiceLayer.EventService;
 using ServiceLayer.HeatService;
 using ServiceLayer.SwimStyleService;
 using UI.Services;
-using UI.ViewModels.Details;
-using UI.ViewModels;
-using UI.ViewModels.Generic;
-using UI.ViewModels.Table;
-using UI.Views;
+using UI.ViewModels.Pages;
+using UI.Views.Controls.DataGridView;
 using UI.Views.Pages;
-using UI.Views.Table;
+using UI.Views.Windows;
+using AgeGroupDetailsViewModel = UI.ViewModels.Pages.AgeGroupDetailsViewModel;
+using AthleteDetailsViewModel = UI.ViewModels.Pages.AthleteDetailsViewModel;
+using ClubDetailsViewModel = UI.ViewModels.Pages.ClubDetailsViewModel;
+using CompetitionSelectionViewModel = UI.ViewModels.Pages.CompetitionSelectionViewModel;
+using EntriesViewModel = UI.ViewModels.Pages.EntriesViewModel;
+using EventDetailsViewModel = UI.ViewModels.Pages.EventDetailsViewModel;
+using EventsViewModel = UI.ViewModels.Pages.EventsViewModel;
+using HeatsViewModel = UI.ViewModels.Pages.HeatsViewModel;
+using HeatsResultsViewModel = UI.ViewModels.Pages.HeatsResultsViewModel;
+using ResultsViewModel = UI.ViewModels.Pages.ResultsViewModel;
+using MainViewModel = UI.ViewModels.Windows.MainViewModel;
+using SwimStyleDetailsViewModel = UI.ViewModels.Pages.SwimStyleDetailsViewModel;
 
 namespace UI;
 
 public partial class App : Application
 {
-    public new static App Current => (App)Application.Current;
-
     private readonly IServiceProvider? _serviceProvider;
+
+    public App()
+    {
+        ExcelPackage.License.SetNonCommercialPersonal("Aliaksei Kryzhanouski");
+
+        _serviceProvider = ConfigureServiceProvider();
+        RegisterViewModelMappings();
+    }
+
+    public new static App Current => (App)Application.Current;
 
     public IServiceProvider Services
     {
@@ -37,14 +53,6 @@ public partial class App : Application
             var serviceProvider = Current._serviceProvider;
             return serviceProvider ?? throw new InvalidOperationException("The service provider is not initialized");
         }
-    }
-
-    public App()
-    {
-        ExcelPackage.License.SetNonCommercialPersonal("Aliaksei Kryzhanouski");
-
-        _serviceProvider = ConfigureServiceProvider();
-        RegisterViewModelMappings();
     }
 
     protected override void OnStartup(StartupEventArgs e)
@@ -59,8 +67,8 @@ public partial class App : Application
         var serviceCollection = new ServiceCollection();
         serviceCollection.AddDbContext<EfCoreContext>(
             options => options.UseSqlite(),
-            contextLifetime: ServiceLifetime.Transient,
-            optionsLifetime: ServiceLifetime.Singleton);
+            ServiceLifetime.Transient,
+            ServiceLifetime.Singleton);
 
         ConfigureServices(serviceCollection);
         ConfigureViewModels(serviceCollection);
@@ -99,7 +107,6 @@ public partial class App : Application
         services.AddTransient<IEventService, EventService>();
         services.AddTransient<IHeatService, HeatService>();
         services.AddTransient<ISwimStyleService, SwimStyleService>();
-
     }
 
     private static void ConfigureViewModels(IServiceCollection services)
@@ -108,6 +115,8 @@ public partial class App : Application
         services.AddTransient<MainViewModel>();
         services.AddTransient<EventsViewModel>();
         services.AddTransient<HeatsViewModel>();
+        services.AddTransient<HeatsResultsViewModel>();
+        services.AddTransient<ResultsViewModel>();
         services.AddTransient<EntriesViewModel>();
         services.AddTransient<AthletesViewModel>();
         services.AddTransient<ClubsViewModel>();
@@ -123,6 +132,8 @@ public partial class App : Application
         services.AddTransient<CompetitionSelectionPage>();
         services.AddTransient<EventsPage>();
         services.AddTransient<HeatsPage>();
+        services.AddTransient<HeatsResultsPage>();
+        services.AddTransient<ResultsPage>();
         services.AddTransient<EntriesPage>();
         services.AddTransient<AthletesPage>();
         services.AddTransient<ClubsPage>();

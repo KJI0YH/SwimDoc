@@ -4,4 +4,3 @@ public interface IAddEditContextAware
 {
     void ApplyContext(AddEditContext context);
 }
-

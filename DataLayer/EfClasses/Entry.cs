@@ -34,11 +34,14 @@ public class Entry : IValidatableObject
           + $"{((EntryTime % 6000) / 100):D2}."
           + $"{(EntryTime % 100):D2}";
 
-    public string DisplayFinishTime => FinishTime == null
-        ? "N.T."
-        : (FinishTime / 6000 == 0 ? "" : $"{FinishTime / 6000}:")
-          + $"{((FinishTime % 6000) / 100):D2}."
-          + $"{(FinishTime % 100):D2}";
+    public string DisplayFinishTime => Status switch
+    {
+        EntryStatus.FINISH => (FinishTime / 6000 == 0 ? "" : $"{FinishTime / 6000}:")
+                              + $"{((FinishTime % 6000) / 100):D2}."
+                              + $"{(FinishTime % 100):D2}",
+        EntryStatus.DNF or EntryStatus.DNS or EntryStatus.DSQ => Status.ToString(),
+        _ => ""
+    };
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
@@ -55,10 +58,12 @@ public class Entry : IValidatableObject
             .Include(swimEvent => swimEvent.AgeGroup)
             .FirstOrDefault(s => s.Id == SwimEventId);
         var swimStyle = SwimStyle ?? currContext.SwimStyles.AsNoTracking().FirstOrDefault(s => s.Id == SwimStyleId);
-        var ageGroup = swimEvent?.AgeGroup ?? (swimEvent is null ? null : currContext.AgeGroups.AsNoTracking()
-            .FirstOrDefault(ag => ag.Id == swimEvent.AgeGroupId));
-        
-        
+        var ageGroup = swimEvent?.AgeGroup ?? (swimEvent is null
+            ? null
+            : currContext.AgeGroups.AsNoTracking()
+                .FirstOrDefault(ag => ag.Id == swimEvent.AgeGroupId));
+
+
         if (athlete is null && relay is null)
             yield return new ValidationResult("Participant must be provided");
         if (swimStyle is null)

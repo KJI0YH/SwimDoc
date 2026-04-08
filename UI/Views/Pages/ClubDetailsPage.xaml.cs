@@ -1,6 +1,6 @@
 using System.Windows.Controls;
 using UI.Services;
-using UI.ViewModels.Details;
+using ClubDetailsViewModel = UI.ViewModels.Pages.ClubDetailsViewModel;
 
 namespace UI.Views.Pages;
 
@@ -13,4 +13,3 @@ public partial class ClubDetailsPage : Page
         DataContext = viewModel;
     }
 }
-

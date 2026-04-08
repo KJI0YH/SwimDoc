@@ -4,10 +4,7 @@ namespace DataLayer.EfClasses;
 
 public enum HeatStatus
 {
-    [Description("Рассев")]
-    SEEDED,
-    [Description("Неофициальный")]
-    INOFFICIAL,
-    [Description("Официальный")]
+    NOT_STARTED,
+    UNOFFICIAL,
     OFFICIAL
 }

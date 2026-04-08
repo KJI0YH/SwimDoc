@@ -1,5 +1,5 @@
 using System.Windows.Controls;
-using UI.ViewModels.Table;
+using EntriesViewModel = UI.ViewModels.Pages.EntriesViewModel;
 
 namespace UI.Views.Pages;
 

@@ -6,8 +6,8 @@ namespace UI.Services;
 public class NavigationCommand<TViewModel> : ICommand
     where TViewModel : ViewModelBase
 {
-    private readonly INavigationService _navigationService;
     private readonly Func<bool>? _canExecute;
+    private readonly INavigationService _navigationService;
 
     public NavigationCommand(INavigationService navigationService, Func<bool>? canExecute = null)
     {
@@ -22,10 +22,7 @@ public class NavigationCommand<TViewModel> : ICommand
 
     public void Execute(object? parameter)
     {
-        if (CanExecute(parameter))
-        {
-            _navigationService.NavigateTo<TViewModel>(parameter);
-        }
+        if (CanExecute(parameter)) _navigationService.NavigateTo<TViewModel>(parameter);
     }
 
     public event EventHandler? CanExecuteChanged;
@@ -35,4 +32,3 @@ public class NavigationCommand<TViewModel> : ICommand
         CanExecuteChanged?.Invoke(this, EventArgs.Empty);
     }
 }
-

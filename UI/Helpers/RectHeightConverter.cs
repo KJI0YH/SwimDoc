@@ -1,4 +1,3 @@
-using System;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
@@ -19,6 +18,7 @@ public sealed class RectHeightConverter : IValueConverter
     }
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
-        => Binding.DoNothing;
+    {
+        return Binding.DoNothing;
+    }
 }
-

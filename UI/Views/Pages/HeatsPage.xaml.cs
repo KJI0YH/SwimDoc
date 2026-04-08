@@ -1,5 +1,5 @@
 using System.Windows.Controls;
-using UI.ViewModels.Table;
+using HeatsViewModel = UI.ViewModels.Pages.HeatsViewModel;
 
 namespace UI.Views.Pages;
 

@@ -1,0 +1,97 @@
+<Window x:Class="UI.Views.Windows.AddEdit.EntryAddEditWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:helpers="clr-namespace:UI.Helpers"
+        xmlns:controls="clr-namespace:UI.Views.Controls"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        xmlns:addEditView="clr-namespace:UI.Views.Controls.AddEditView"
+        xmlns:searchableComboBox="clr-namespace:UI.Views.Controls.SearchableComboBox"
+        mc:Ignorable="d"
+        Title="{Binding WindowTitle}"
+        SizeToContent="WidthAndHeight"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent">
+    <Window.Resources>
+    </Window.Resources>
+    <addEditView:AddEditWindowView>
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,0,0,15">
+            <StackPanel>
+                <Grid Margin="0,5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="180" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0"
+                               Text="Участник"
+                               VerticalAlignment="Center"
+                               Margin="0,0,10,0" />
+                    <searchableComboBox:SearchableComboBox Grid.Column="1"
+                                                 ItemsSource="{Binding Athletes}"
+                                                 SelectedItem="{Binding SelectedAthlete, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                 Margin="0,2,0,2" />
+                    <Button Grid.Column="2"
+                            Content="{ui:SymbolIcon Add24}"
+                            Command="{Binding CreateAthleteCommand}"
+                            Margin="5,2,0,2"
+                            Padding="9" />
+                </Grid>
+
+                <Grid Margin="0,5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="180" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0"
+                               Text="Событие"
+                               VerticalAlignment="Center"
+                               Margin="0,0,10,0" />
+                    <searchableComboBox:SearchableComboBox Grid.Column="1"
+                                                 ItemsSource="{Binding SwimEvents}"
+                                                 SelectedItem="{Binding SelectedSwimEvent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                 Margin="0,2,0,2" />
+                    <Button Grid.Column="2"
+                            Content="{ui:SymbolIcon Add24}"
+                            Command="{Binding CreateSwimEventCommand}"
+                            Margin="5,2,0,2"
+                            Padding="9" />
+                </Grid>
+
+                <Grid Margin="0,5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="180" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0"
+                               Text="Заявочное время"
+                               VerticalAlignment="Center"
+                               Margin="0,0,10,0" />
+                    <ui:TextBox Grid.Column="1"
+                                Text="{Binding EntryTimeText, UpdateSourceTrigger=PropertyChanged}"
+                                Margin="0,2,0,2"
+                                PlaceholderText="N.T." />
+                </Grid>
+
+                <Grid Margin="0,5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="180" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0"
+                               Text="В зачёт"
+                               VerticalAlignment="Center"
+                               Margin="0,0,10,0" />
+                    <CheckBox Grid.Column="1"
+                              IsChecked="{Binding Scoring, UpdateSourceTrigger=PropertyChanged}"
+                              VerticalAlignment="Center" />
+                </Grid>
+            </StackPanel>
+        </ScrollViewer>
+    </addEditView:AddEditWindowView>
+</Window>

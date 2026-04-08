@@ -35,10 +35,10 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
     [GeneratedRegex(@"(?:\d{1,}\D)?[0-5]\d\D\d{2}")]
     private static partial Regex EntryTimeRegex();
 
-    public IReadOnlyList<EntryDocument> Action(string filePath)
+    public IReadOnlyList<EntryDocument> Action(string dataIn)
     {
-        if (!File.Exists(filePath)) throw new FileNotFoundException($"File not found: {filePath}");
-        using var package = new ExcelPackage(filePath);
+        if (!File.Exists(dataIn)) throw new FileNotFoundException($"File not found: {dataIn}");
+        using var package = new ExcelPackage(dataIn);
         var workBook = package.Workbook;
         return workBook.Worksheets
             .Where(worksheet =>

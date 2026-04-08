@@ -1,5 +1,5 @@
 using System.Windows.Controls;
-using UI.ViewModels.Table;
+using EventsViewModel = UI.ViewModels.Pages.EventsViewModel;
 
 namespace UI.Views.Pages;
 

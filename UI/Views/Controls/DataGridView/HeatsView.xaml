@@ -1,0 +1,37 @@
+﻿<UserControl x:Class="UI.Views.Controls.DataGridView.HeatsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:dataView="clr-namespace:UI.Views.Controls.DataView"
+             xmlns:treeView="clr-namespace:UI.Views.Controls.TreeView"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             mc:Ignorable="d"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <dataView:DefaultDataView>
+        <dataView:DefaultDataView.Toolbar>
+            <DockPanel>
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                    <Button Content="{ui:SymbolIcon Delete24}"
+                            Command="{Binding DeleteItemCommand}"
+                            ToolTip="Удалить"
+                            Margin="5"
+                            Padding="9" />
+                    <Button Content="{ui:SymbolIcon ArrowClockwise24}"
+                            Command="{Binding LoadDataCommand}"
+                            ToolTip="Обновить"
+                            Margin="5"
+                            Padding="9" />
+                </StackPanel>
+                <ui:TextBox DockPanel.Dock="Right"
+                            Icon="{ui:SymbolIcon Search24}"
+                            Margin="5"
+                            MinWidth="320"
+                            Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+            </DockPanel>
+        </dataView:DefaultDataView.Toolbar>
+        <dataView:DefaultDataView.MainContent>
+            <treeView:HeatsTreeView />
+        </dataView:DefaultDataView.MainContent>
+    </dataView:DefaultDataView>
+</UserControl>

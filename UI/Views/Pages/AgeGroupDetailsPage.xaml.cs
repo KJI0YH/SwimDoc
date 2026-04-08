@@ -1,6 +1,6 @@
 using System.Windows.Controls;
 using UI.Services;
-using UI.ViewModels.Details;
+using AgeGroupDetailsViewModel = UI.ViewModels.Pages.AgeGroupDetailsViewModel;
 
 namespace UI.Views.Pages;
 
@@ -13,4 +13,3 @@ public partial class AgeGroupDetailsPage : Page
         DataContext = viewModel;
     }
 }
-

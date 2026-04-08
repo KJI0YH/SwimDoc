@@ -1,18 +1,18 @@
 <Page x:Class="UI.Views.Pages.AgeGroupDetailsPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:generic="clr-namespace:UI.Views.Generic">
+      ScrollViewer.CanContentScroll="False"
+      xmlns:dataView="clr-namespace:UI.Views.Controls.DataView"
+      xmlns:dataGridView="clr-namespace:UI.Views.Controls.DataGridView">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"></RowDefinition>
-            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <TextBlock Text="{Binding Title}" Grid.Row="0" Margin="5"/>
         <TabControl Margin="5" Grid.Row="1">
             <TabItem Header="События">
-                <generic:GenericTableView DataContext="{Binding EventsTable}"/>
+                <dataGridView:EventsView DataContext="{Binding EventsTable}"/>
             </TabItem>
         </TabControl>
     </Grid>
 </Page>
-

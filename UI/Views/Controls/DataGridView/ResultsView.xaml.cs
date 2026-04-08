@@ -1,0 +1,11 @@
+﻿using System.Windows.Controls;
+
+namespace UI.Views.Controls.DataGridView;
+
+public partial class ResultsView : UserControl
+{
+    public ResultsView()
+    {
+        InitializeComponent();
+    }
+}

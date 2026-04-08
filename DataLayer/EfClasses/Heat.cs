@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataLayer.EfClasses;
@@ -15,6 +16,9 @@ public class Heat : IValidatableObject
     public SwimEvent SwimEvent { get; set; }
 
     public ICollection<HeatPosition> Positions { get; set; }
+
+    [NotMapped]
+    public int TotalHeatsInEvent { get; set; }
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {

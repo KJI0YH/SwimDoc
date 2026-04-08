@@ -8,4 +8,3 @@ public sealed class AddEditContext
     public int? AgeGroupId { get; init; }
     public int? SwimStyleId { get; init; }
 }
-

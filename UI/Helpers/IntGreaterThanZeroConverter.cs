@@ -1,4 +1,3 @@
-using System;
 using System.Globalization;
 using System.Windows.Data;
 
@@ -15,6 +14,7 @@ public sealed class IntGreaterThanZeroConverter : IValueConverter
     }
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
-        => Binding.DoNothing;
+    {
+        return Binding.DoNothing;
+    }
 }
-

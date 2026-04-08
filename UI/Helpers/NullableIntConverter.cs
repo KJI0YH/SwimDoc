@@ -1,4 +1,3 @@
-using System;
 using System.Globalization;
 using System.Windows.Data;
 
@@ -10,10 +9,10 @@ public class NullableIntConverter : IValueConverter
     {
         if (value == null)
             return string.Empty;
-        
+
         if (value is int intValue)
             return intValue.ToString();
-        
+
         return string.Empty;
     }
 
@@ -21,10 +20,10 @@ public class NullableIntConverter : IValueConverter
     {
         if (value == null || string.IsNullOrWhiteSpace(value.ToString()))
             return null;
-        
-        if (int.TryParse(value.ToString(), out int result))
+
+        if (int.TryParse(value.ToString(), out var result))
             return result;
-        
+
         return null;
     }
 }

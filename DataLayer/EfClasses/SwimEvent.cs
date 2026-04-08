@@ -37,6 +37,11 @@ public class SwimEvent : IValidatableObject
 
     public string DisplayDate => Date.ToShortDateString();
 
+    public string DisplayTime => Time?.ToShortTimeString() ?? "Не назначено";
+
+    public string DisplayStatus => Heats.Any(heat => heat.Status != HeatStatus.NOT_STARTED) ? "UNOFFICIAL" :
+        Heats.All(heat => heat.Status == HeatStatus.OFFICIAL) ? "OFFICIAL" : "NOT STARTED";
+
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
         var currContext = validationContext.GetService(typeof(DbContext)) as EfCoreContext;

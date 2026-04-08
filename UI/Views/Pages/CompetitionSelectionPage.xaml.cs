@@ -1,5 +1,6 @@
 using System.Windows.Controls;
 using UI.ViewModels;
+using CompetitionSelectionViewModel = UI.ViewModels.Pages.CompetitionSelectionViewModel;
 
 namespace UI.Views.Pages;
 

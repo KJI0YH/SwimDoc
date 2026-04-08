@@ -5,52 +5,55 @@ using DataLayer.EfClasses;
 
 namespace BizLogic.HeatLogic.Concrete;
 
-public class HeatAllocationAction :
+public class HeatAllocationAction(IHeatAllocationDbAccess dbAccess) :
     BizActionErrors,
     IHeatAllocationAction
 {
-    private readonly IHeatAllocationDbAccess _dbAccess;
+    private List<string> _errors = [];
+    private List<string> _warnings = [];
 
-    public HeatAllocationAction(IHeatAllocationDbAccess dbAccess)
+    public HeatAllocationOutDto Action(HeatAllocationInDto dataIn)
     {
-        _dbAccess = dbAccess;
-    }
-
-    public HeatAllocationOutDto Action(HeatAllocationInDto filePath)
-    {
-        var isHeatsAlreadyExists = _dbAccess.IsHeatsExists(filePath.SwimEventId);
-        if (isHeatsAlreadyExists)
+        if (dbAccess.IsEventStarted(dataIn.SwimEventId))
         {
-            AddError($"Heats for event with id {filePath.SwimEventId} already exists");
-            return null;
+            _errors.Add($"Can not create heats for started or finished event");
+            return new HeatAllocationOutDto([], _warnings, _errors);
         }
 
-        var entries = new BufferedCollection<Entry>(_dbAccess.GetOrderedEntriesByEventId(filePath.SwimEventId));
+        if (dbAccess.IsHeatsAllocated(dataIn.SwimEventId))
+        {
+            _warnings.Add($"Heats were reallocated");
+            dbAccess.DeleteExistedHeats(dataIn.SwimEventId);
+        }
+
+        var entries = new BufferedCollection<Entry>(dbAccess.GetOrderedEntriesByEventId(dataIn.SwimEventId));
         if (entries.Count == 0)
         {
-            AddError($"There is no entries for event with id {filePath.SwimEventId}");
-            return null;
+            _warnings.Add($"There are no entries for this swim event");
+            return new HeatAllocationOutDto([], _warnings, _errors);
         }
 
-        var heatNumbers = OrderHeatNumbers(entries.Count, filePath.LaneCount, filePath.HeatOrder);
-        var laneNumbers = OrderLaneNumbers(filePath.LaneMin, filePath.LaneMax);
+        var heatNumbers = OrderHeatNumbers(entries.Count, dataIn.LaneCount, dataIn.HeatOrder);
+        var laneNumbers = OrderLaneNumbers(dataIn.LaneMin, dataIn.LaneMax);
         var heats = new List<Heat>();
 
-        if (!IsWeakHeatFull(entries.Count, filePath.LaneCount))
+        if (!IsWeakHeatFull(entries.Count, dataIn.LaneCount))
         {
-            var heatSize = Math.Max(filePath.MinHeatSize, entries.Count % filePath.LaneCount);
-            var weakHeat = CreateHeat(entries.TakeLast(heatSize), laneNumbers, heatNumbers.TakeLast(), filePath.SwimEventId);
+            var heatSize = Math.Max(dataIn.MinHeatSize, entries.Count % dataIn.LaneCount);
+            var weakHeat = CreateHeat(entries.TakeLast(heatSize), laneNumbers, heatNumbers.TakeLast(),
+                dataIn.SwimEventId);
             heats.Add(weakHeat);
         }
 
         while (!entries.IsEmpty)
         {
-            var heat = CreateHeat(entries.TakeFirst(filePath.LaneCount), laneNumbers, heatNumbers.TakeFirst(), filePath.SwimEventId);
+            var heat = CreateHeat(entries.TakeFirst(dataIn.LaneCount), laneNumbers, heatNumbers.TakeFirst(),
+                dataIn.SwimEventId);
             heats.Add(heat);
         }
 
-        _dbAccess.AddHeats(heats);
-        return new HeatAllocationOutDto(heats);
+        dbAccess.AddHeats(heats);
+        return new HeatAllocationOutDto(heats, _warnings, _errors);
     }
 
     private Heat CreateHeat(IEnumerable<Entry> entries, int[] laneNumbers, int heatNumber, int swimEventId)
@@ -59,7 +62,8 @@ public class HeatAllocationAction :
         {
             Number = heatNumber,
             SwimEventId = swimEventId,
-            Status = HeatStatus.SEEDED
+            Status = HeatStatus.NOT_STARTED,
+            Positions = []
         };
         var laneIndex = 0;
         foreach (var entry in entries)
@@ -89,7 +93,7 @@ public class HeatAllocationAction :
     {
         List<int> laneNumbers = [];
         var laneCount = laneMax - laneMin + 1;
-        var laneCenter = laneCount / 2 + laneCount % 2;
+        var laneCenter = laneCount / 2 + laneCount % 2 + laneMin - 1;
         laneNumbers.Add(laneCenter);
         var sign = 1;
         var shift = 0;

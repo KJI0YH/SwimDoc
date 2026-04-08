@@ -1,20 +1,32 @@
-using System.Collections.Generic;
+using System.Windows.Controls;
 using Microsoft.Extensions.DependencyInjection;
 using UI.ViewModels;
-using UI.ViewModels.Details;
-using UI.ViewModels.Generic;
-using UI.ViewModels.Table;
+using UI.ViewModels.Pages;
 using UI.Views.Pages;
+using AgeGroupDetailsViewModel = UI.ViewModels.Pages.AgeGroupDetailsViewModel;
+using AthleteDetailsViewModel = UI.ViewModels.Pages.AthleteDetailsViewModel;
+using ClubDetailsViewModel = UI.ViewModels.Pages.ClubDetailsViewModel;
+using EntriesViewModel = UI.ViewModels.Pages.EntriesViewModel;
+using EventDetailsViewModel = UI.ViewModels.Pages.EventDetailsViewModel;
+using EventsViewModel = UI.ViewModels.Pages.EventsViewModel;
+using HeatsViewModel = UI.ViewModels.Pages.HeatsViewModel;
+using HeatsResultsViewModel = UI.ViewModels.Pages.HeatsResultsViewModel;
+using ResultsViewModel = UI.ViewModels.Pages.ResultsViewModel;
+using SwimStyleDetailsViewModel = UI.ViewModels.Pages.SwimStyleDetailsViewModel;
 
 namespace UI.Services;
 
 public class NavigationService(IServiceProvider serviceProvider) : INavigationService
 {
-    private readonly Dictionary<Type, Type> _viewModelToViewMapping = new();
+    private readonly Stack<ViewModelBase> _navigationHistory = new();
+    private readonly Dictionary<Type, object?> _navigationParameters = new();
+
     private readonly Dictionary<Type, Type> _viewModelToPageMapping = new()
     {
         [typeof(EventsViewModel)] = typeof(EventsPage),
         [typeof(HeatsViewModel)] = typeof(HeatsPage),
+        [typeof(HeatsResultsViewModel)] = typeof(HeatsResultsPage),
+        [typeof(ResultsViewModel)] = typeof(ResultsPage),
         [typeof(EntriesViewModel)] = typeof(EntriesPage),
         [typeof(AthletesViewModel)] = typeof(AthletesPage),
         [typeof(ClubsViewModel)] = typeof(ClubsPage),
@@ -28,8 +40,7 @@ public class NavigationService(IServiceProvider serviceProvider) : INavigationSe
         [typeof(SwimStyleDetailsViewModel)] = typeof(SwimStyleDetailsPage)
     };
 
-    private readonly Stack<ViewModelBase> _navigationHistory = new();
-    private readonly Dictionary<Type, object?> _navigationParameters = new();
+    private readonly Dictionary<Type, Type> _viewModelToViewMapping = new();
     private ViewModelBase? _currentViewModel;
 
     public ViewModelBase? CurrentViewModel
@@ -47,13 +58,6 @@ public class NavigationService(IServiceProvider serviceProvider) : INavigationSe
     public event Action<Type>? PageNavigationRequested;
 
     public bool CanGoBack => _navigationHistory.Count > 0;
-
-    public void RegisterMapping<TViewModel, TView>() 
-        where TViewModel : ViewModelBase
-        where TView : System.Windows.Controls.UserControl
-    {
-        _viewModelToViewMapping[typeof(TViewModel)] = typeof(TView);
-    }
 
     public void NavigateTo<TViewModel>() where TViewModel : ViewModelBase
     {
@@ -98,11 +102,18 @@ public class NavigationService(IServiceProvider serviceProvider) : INavigationSe
             PageNavigationRequested?.Invoke(pageType);
     }
 
+    public void RegisterMapping<TViewModel, TView>()
+        where TViewModel : ViewModelBase
+        where TView : UserControl
+    {
+        _viewModelToViewMapping[typeof(TViewModel)] = typeof(TView);
+    }
+
     public Type? GetViewType<TViewModel>() where TViewModel : ViewModelBase
     {
         var viewModelType = typeof(TViewModel);
-        return _viewModelToViewMapping.TryGetValue(viewModelType, out var viewType) 
-            ? viewType 
+        return _viewModelToViewMapping.TryGetValue(viewModelType, out var viewType)
+            ? viewType
             : null;
     }
 
@@ -112,4 +123,3 @@ public class NavigationService(IServiceProvider serviceProvider) : INavigationSe
             PageNavigationRequested?.Invoke(pageType);
     }
 }
-
