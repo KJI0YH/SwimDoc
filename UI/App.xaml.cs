@@ -11,6 +11,7 @@ using ServiceLayer.EntryDocumentReaderService;
 using ServiceLayer.EntryService;
 using ServiceLayer.EventService;
 using ServiceLayer.HeatService;
+using ServiceLayer.ReportGeneratorService;
 using ServiceLayer.SwimStyleService;
 using UI.Services;
 using UI.ViewModels.Pages;
@@ -106,6 +107,7 @@ public partial class App : Application
         services.AddTransient<IEntryService, EntryService>();
         services.AddTransient<IEventService, EventService>();
         services.AddTransient<IHeatService, HeatService>();
+        services.AddTransient<IReportExportService, ReportExportService>();
         services.AddTransient<ISwimStyleService, SwimStyleService>();
     }
 

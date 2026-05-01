@@ -7,11 +7,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.EventService;
 using ServiceLayer.HeatService;
+using ServiceLayer.ReportGeneratorService;
 using UI.Services;
 using UI.ViewModels.Pages.Data;
 using UI.ViewModels.Windows.HeatAllocationParameters;
+using UI.ViewModels.Windows.ReportGeneration;
 using UI.Views.Windows.AddEdit;
 using HeatAllocationParametersWindow = UI.Views.Windows.HeatAllocationParameters.HeatAllocationParametersWindow;
+using ReportGenerationWindow = UI.Views.Windows.ReportGeneration.ReportGenerationWindow;
 
 namespace UI.ViewModels.Pages;
 
@@ -19,6 +22,7 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, int?>
 {
     private readonly IHeatService _heatService;
     private readonly IAddEditWindowFactory _windowFactory;
+    private readonly IReportExportService _reportExportService;
 
     public EventsViewModel(IEventService eventService)
         : this(eventService, App.Current.Services.GetRequiredService<IHeatService>())
@@ -29,13 +33,17 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, int?>
     {
         _windowFactory = App.Current.Services.GetRequiredService<IAddEditWindowFactory>();
         _heatService = heatService;
+        _reportExportService = App.Current.Services.GetRequiredService<IReportExportService>();
         PropertyChanged += OnViewModelPropertyChanged;
     }
 
     private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(SelectedItems))
+        {
             HeatAllocationCommand.NotifyCanExecuteChanged();
+            GenerateReportsCommand.NotifyCanExecuteChanged();
+        }
     }
 
     protected override void InitializeColumns()
@@ -131,6 +139,33 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, int?>
     }
 
     private bool CanAllocateHeats()
+    {
+        return SelectedItems.Count > 0;
+    }
+
+    [RelayCommand(CanExecute = nameof(CanGenerateReports))]
+    private void GenerateReports()
+    {
+        if (SelectedItems.Count == 0)
+            return;
+
+        var window = _windowFactory.CreateAndShowAndReturn<ReportGenerationWindow>();
+        if (window.DataContext is not IWindowResult { Result: ReportGenerationResult result })
+            return;
+
+        var options = new ReportExportOptions
+        {
+            SwimEventIds = SelectedItems.Select(se => se.Id).ToList(),
+            OutputFilePath = result.OutputFilePath,
+            IncludeEntryList = result.IncludeEntryList,
+            IncludeStartList = result.IncludeStartList,
+            IncludeFinishList = result.IncludeFinishList
+        };
+
+        _reportExportService.ExportToExcel(options);
+    }
+
+    private bool CanGenerateReports()
     {
         return SelectedItems.Count > 0;
     }

@@ -21,6 +21,13 @@
                 <Button
                     Content="{ui:SymbolIcon Print24}"
                     ToolTip="Сгенерировать отчёт"
+                    Command="{Binding GenerateReportsCommand}"
+                    Margin="5"
+                    Padding="9" />
+                <Button
+                    Content="{ui:SymbolIcon Clock24}"
+                    ToolTip="Подсчитать время старта"
+                    Command="{Binding GenerateReportsCommand}"
                     Margin="5"
                     Padding="9" />
                 <toolbar:DefaultToolbar />

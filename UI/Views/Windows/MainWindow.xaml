@@ -197,6 +197,10 @@
                     Content="Настройки"
                     Tag="Settings"
                     Icon="{ui:SymbolIcon Settings24}" />
+                <ui:NavigationViewItem
+                    Content="О программе"
+                    Tag="Settings"
+                    Icon="{ui:SymbolIcon Info24}" />
             </ui:NavigationView.FooterMenuItems>
         </ui:NavigationView>
         <Border x:Name="ModalOverlay"
