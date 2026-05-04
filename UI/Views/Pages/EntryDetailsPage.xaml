@@ -11,7 +11,8 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <TabControl Grid.Row="1" Margin="5">
-            <TabItem Header="Заплыв">
+            <TabItem Header="Заплыв"
+                     Style="{StaticResource SwimTabItemSelectedGrayStyle}">
                 <dataGridView:HeatsView DataContext="{Binding HeatTable}"/>
             </TabItem>
         </TabControl>

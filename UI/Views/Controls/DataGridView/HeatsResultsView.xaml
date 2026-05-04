@@ -88,7 +88,8 @@
                           IsReadOnly="False"
                           HeadersVisibility="Column"
                           GridLinesVisibility="Horizontal"
-                          SelectionUnit="FullRow">
+                          SelectionUnit="FullRow"
+                          RowStyle="{StaticResource DataGridRowLightBlueWhenSelectedStyle}">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Дорожка" Binding="{Binding Lane}" IsReadOnly="True" Width="80" />
                         <DataGridTextColumn Header="Участник" Binding="{Binding ParticipantName}" IsReadOnly="True"

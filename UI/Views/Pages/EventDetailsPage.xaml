@@ -14,13 +14,16 @@
             <TabItem Header="Заявки">
                 <dataGridView:EntriesView DataContext="{Binding EntriesTable}" />
             </TabItem>
-            <TabItem Header="Заплывы">
+            <TabItem Header="Заплывы"
+                     Style="{StaticResource SwimTabItemSelectedGrayStyle}">
                 <dataGridView:HeatsView DataContext="{Binding HeatsTable}" />
             </TabItem>
-            <TabItem Header="Фиксация">
+            <TabItem Header="Фиксация"
+                     Style="{StaticResource SwimTabItemSelectedGrayStyle}">
                 <dataGridView:HeatsResultsView DataContext="{Binding FixationTable}" />
             </TabItem>
-            <TabItem Header="Результаты">
+            <TabItem Header="Результаты"
+                     Style="{StaticResource SwimTabItemSelectedGrayStyle}">
                 <dataGridView:ResultsView DataContext="{Binding ResultsTable}" />
             </TabItem>
         </TabControl>

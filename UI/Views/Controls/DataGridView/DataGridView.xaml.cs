@@ -6,6 +6,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
+using DataLayer.EfClasses;
 using UI.Helpers;
 using UI.ViewModels;
 using UI.ViewModels.Pages.Data;
@@ -16,6 +17,16 @@ namespace UI.Views.Controls.DataGridView;
 
 public partial class DataGridView : UserControl
 {
+    /// <summary>Light blue fill for selected entry rows (readable with default text color).</summary>
+    private static readonly SolidColorBrush EntrySelectedRowBackground = CreateEntrySelectedRowBackground();
+
+    private static SolidColorBrush CreateEntrySelectedRowBackground()
+    {
+        var brush = new SolidColorBrush(Color.FromRgb(0xE3, 0xF2, 0xFD));
+        brush.Freeze();
+        return brush;
+    }
+
     public DataGridView()
     {
         InitializeComponent();
@@ -71,7 +82,10 @@ public partial class DataGridView : UserControl
     private void UpdateColumns()
     {
         if (DataContext is not DataViewModelBase viewModel)
+        {
+            DgTableView.RowStyle = null;
             return;
+        }
 
         var columnConfigurations = viewModel.GetColumnConfigurations();
         var autoGenerate = viewModel.GetAutoGenerateColumns();
@@ -79,6 +93,8 @@ public partial class DataGridView : UserControl
         if (autoGenerate || columnConfigurations.Count == 0)
         {
             DgTableView.AutoGenerateColumns = true;
+            viewModel.ConfigureDataGrid(DgTableView);
+            ApplyDataGridRowStyle(DgTableView, viewModel);
             return;
         }
 
@@ -176,6 +192,82 @@ public partial class DataGridView : UserControl
         }
 
         SyncDataGridSortGlyphs(viewModel);
+        viewModel.ConfigureDataGrid(DgTableView);
+        ApplyDataGridRowStyle(DgTableView, viewModel);
+    }
+
+    private static Type? ItemsEntityType(DataViewModelBase viewModel)
+    {
+        var itemsProp = viewModel.GetType().GetProperty("Items");
+        if (itemsProp?.PropertyType is not { IsGenericType: true } t)
+            return null;
+        return t.GetGenericArguments()[0];
+    }
+
+    private static void ApplyDataGridRowStyle(DataGrid dataGrid, DataViewModelBase viewModel)
+    {
+        dataGrid.RowStyle = ItemsEntityType(viewModel) == typeof(Entry)
+            ? CreateEntryRowStyle(dataGrid)
+            : CreateGenericSelectionRowStyle(dataGrid);
+    }
+
+    private static Style CreateGenericSelectionRowStyle(FrameworkElement lookup)
+    {
+        var rowStyle = new Style(typeof(DataGridRow));
+        if (lookup.TryFindResource(typeof(DataGridRow)) is Style baseRowStyle)
+            rowStyle.BasedOn = baseRowStyle;
+        else if (Application.Current?.TryFindResource(typeof(DataGridRow)) is Style appRowStyle)
+            rowStyle.BasedOn = appRowStyle;
+
+        var selected = new Trigger
+        {
+            Property = DataGridRow.IsSelectedProperty,
+            Value = true
+        };
+        selected.Setters.Add(new Setter(Control.BackgroundProperty, EntrySelectedRowBackground));
+        rowStyle.Triggers.Add(selected);
+        return rowStyle;
+    }
+
+    /// <summary>
+    /// <see cref="Entry"/> without scoring: gray when idle/hover; selected uses the same light blue as other grids.
+    /// </summary>
+    private static Style CreateEntryRowStyle(FrameworkElement lookup)
+    {
+        var rowStyle = new Style(typeof(DataGridRow));
+        if (lookup.TryFindResource(typeof(DataGridRow)) is Style baseRowStyle)
+            rowStyle.BasedOn = baseRowStyle;
+        else if (Application.Current?.TryFindResource(typeof(DataGridRow)) is Style appRowStyle)
+            rowStyle.BasedOn = appRowStyle;
+
+        var self = RelativeSource.Self;
+
+        // Entry, not in scoring: idle
+        var idle = new MultiDataTrigger();
+        idle.Conditions.Add(new Condition(new Binding(nameof(Entry.Scoring)), false));
+        idle.Conditions.Add(new Condition(new Binding(nameof(DataGridRow.IsSelected)) { RelativeSource = self }, false));
+        idle.Conditions.Add(new Condition(new Binding(nameof(DataGridRow.IsMouseOver)) { RelativeSource = self }, false));
+        idle.Setters.Add(new Setter(Control.BackgroundProperty, Brushes.LightGray));
+        rowStyle.Triggers.Add(idle);
+
+        // Same row, hover (not selected)
+        var hover = new MultiDataTrigger();
+        hover.Conditions.Add(new Condition(new Binding(nameof(Entry.Scoring)), false));
+        hover.Conditions.Add(new Condition(new Binding(nameof(DataGridRow.IsSelected)) { RelativeSource = self }, false));
+        hover.Conditions.Add(new Condition(new Binding(nameof(DataGridRow.IsMouseOver)) { RelativeSource = self }, true));
+        hover.Setters.Add(new Setter(Control.BackgroundProperty, new SolidColorBrush(Color.FromRgb(0xC8, 0xC8, 0xC8))));
+        rowStyle.Triggers.Add(hover);
+
+        // Selected (any Entry): same light blue as other entity grids
+        var selected = new Trigger
+        {
+            Property = DataGridRow.IsSelectedProperty,
+            Value = true
+        };
+        selected.Setters.Add(new Setter(Control.BackgroundProperty, EntrySelectedRowBackground));
+        rowStyle.Triggers.Add(selected);
+
+        return rowStyle;
     }
 
     private static Type? GetPropertyType(string propertyPath, DataViewModelBase viewModel)

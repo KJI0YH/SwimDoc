@@ -118,7 +118,6 @@ public partial class EntriesViewModel(
                     .OrderByDescending<Entry, string>(q, e => e.Athlete != null ? e.Athlete.LastName : null)
                     .ThenByDescending(e => e.Athlete != null ? e.Athlete.FirstName : null))));
         ColumnConfigurations.Add(new ColumnConfiguration<Entry>("Status", "Статус", 150));
-        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("Scoring", "В зачёт", 60));
         ColumnConfigurations.Add(new ColumnConfiguration<Entry>("DisplayEntryTime", "Заявочное время", 130,
             nameof(Entry.EntryTime)));
         ColumnConfigurations.Add(new ColumnConfiguration<Entry>("DisplayFinishTime", "Финишное время", 130,

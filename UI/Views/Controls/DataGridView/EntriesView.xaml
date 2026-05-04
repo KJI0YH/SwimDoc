@@ -23,7 +23,7 @@
                 </DockPanel>
             </dataView:DefaultDataView.Toolbar>
             <dataView:DefaultDataView.MainContent>
-                <dataGridView:DataGridView />
+                <dataGridView:DataGridView/>
             </dataView:DefaultDataView.MainContent>
         </dataView:DefaultDataView>
 

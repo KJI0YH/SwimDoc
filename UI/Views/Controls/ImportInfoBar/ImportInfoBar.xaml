@@ -110,6 +110,10 @@
                                                 <Setter Property="FontWeight" Value="SemiBold" />
                                                 <Setter Property="Background" Value="#140EA5E9" />
                                             </DataTrigger>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter Property="Background"
+                                                        Value="{StaticResource DataGridSelectedRowBackgroundBrush}" />
+                                            </Trigger>
                                         </Style.Triggers>
                                     </Style>
                                 </DataGrid.RowStyle>

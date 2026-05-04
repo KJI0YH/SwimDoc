@@ -18,7 +18,8 @@
                     </dataView:DefaultDataView.MainContent>
                 </dataView:DefaultDataView>
             </TabItem>
-            <TabItem Header="Заплывы">
+            <TabItem Header="Заплывы"
+                     Style="{StaticResource SwimTabItemSelectedGrayStyle}">
                 <dataGridView:HeatsView DataContext="{Binding HeatsTable}"/>
             </TabItem>
         </TabControl>
