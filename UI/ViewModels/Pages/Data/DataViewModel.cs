@@ -1,11 +1,15 @@
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
+using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DataLayer.EfClasses;
+using DataLayer.QueryObjects;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.Crud;
 using UI.Services;
@@ -19,6 +23,8 @@ public partial class DataViewModel<TEntity, TKey> : DataViewModelBase
 {
     protected readonly ICrudService<TEntity, TKey> _crudService;
     private readonly INavigationService _navigationService;
+    private readonly SemaphoreSlim _loadGate = new(1, 1);
+    private bool _suppressPageLoad;
 
     [ObservableProperty] private bool _autoGenerateColumns = true;
 
@@ -36,9 +42,38 @@ public partial class DataViewModel<TEntity, TKey> : DataViewModelBase
 
     [ObservableProperty] private string _sortColumn = string.Empty;
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ItemsInfo))]
+    private int _currentPage = 0;
+
+    [ObservableProperty] private ObservableCollection<int> _pageOptions = new();
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ItemsInfo))]
+    private int _pageSize = 20;
+
+    public string ItemsInfo
+    {
+        get
+        {
+            if (TotalItems <= 0) return $"0-0 из {TotalItems}";
+            var from = CurrentPage * PageSize + 1;
+            var to = Math.Min(TotalItems, CurrentPage * PageSize + PageSize);
+            return $"{from}-{to} из {TotalItems}";
+        }
+    }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsPagingEnabled))]
+    private int _totalPages;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ItemsInfo))]
+    private int _totalItems;
+
     [ObservableProperty] private ListSortDirection _sortDirection = ListSortDirection.Ascending;
 
-    [ObservableProperty] private int _totalItems;
+    public bool IsPagingEnabled => TotalPages > 0;
 
     public DataViewModel(ICrudService<TEntity, TKey> crudService)
     {
@@ -84,12 +119,48 @@ public partial class DataViewModel<TEntity, TKey> : DataViewModelBase
 
     partial void OnSearchTextChanged(string value)
     {
-        LoadDataCommand.Execute(null);
+        if (CurrentPage == 0)
+            LoadDataCommand.Execute(null);
+        else
+            CurrentPage = 0;
+    }
+    
+    partial void OnCurrentPageChanged(int value)
+    {
+        GoToFirstPageCommand.NotifyCanExecuteChanged();
+        GoToPreviousPageCommand.NotifyCanExecuteChanged();
+        GoToNextPageCommand.NotifyCanExecuteChanged();
+        GoToLastPageCommand.NotifyCanExecuteChanged();
+
+        OnPropertyChanged(nameof(ItemsInfo));
+
+        if (!_suppressPageLoad)
+            LoadDataCommand.Execute(null);
     }
 
-    [RelayCommand]
+    partial void OnTotalPagesChanged(int value)
+    {
+        GoToFirstPageCommand.NotifyCanExecuteChanged();
+        GoToPreviousPageCommand.NotifyCanExecuteChanged();
+        GoToNextPageCommand.NotifyCanExecuteChanged();
+        GoToLastPageCommand.NotifyCanExecuteChanged();
+
+        PageOptions = value > 0
+            ? new ObservableCollection<int>(Enumerable.Range(1, value))
+            : new ObservableCollection<int>();
+    }
+
+    private bool CanLoadData() => !IsLoading;
+
+    partial void OnIsLoadingChanged(bool value)
+    {
+        LoadDataCommand.NotifyCanExecuteChanged();
+    }
+
+    [RelayCommand(CanExecute = nameof(CanLoadData))]
     protected async Task LoadDataAsync()
     {
+        await _loadGate.WaitAsync();
         IsLoading = true;
         try
         {
@@ -98,14 +169,27 @@ public partial class DataViewModel<TEntity, TKey> : DataViewModelBase
             query = ApplySearch(query);
             query = ApplySorting(query);
 
-            var items = query.ToList();
+            TotalItems = await query.CountAsync();
 
+            _suppressPageLoad = true;
+            TotalPages = (int)Math.Ceiling(TotalItems / (double)PageSize);
+
+            if (CurrentPage >= TotalPages && TotalPages > 0)
+                CurrentPage = TotalPages - 1;
+            if (TotalPages <= 0)
+                CurrentPage = 0;
+            _suppressPageLoad = false;
+
+            query = query.Page(CurrentPage, PageSize);
+            var items = await query.ToListAsync();
             Items = new ObservableCollection<TEntity>(items);
+            OnPropertyChanged(nameof(ItemsInfo));
             OnItemsLoaded(items);
         }
         finally
         {
             IsLoading = false;
+            _loadGate.Release();
         }
     }
 
@@ -144,6 +228,44 @@ public partial class DataViewModel<TEntity, TKey> : DataViewModelBase
             // ignored
         }
     }
+
+    [RelayCommand(CanExecute = nameof(CanGoToFirstPage))]
+    private void GoToFirstPage()
+    {
+        CurrentPage = 0;
+        LoadDataCommand.Execute(null);
+    }
+
+    private bool CanGoToFirstPage() => CurrentPage > 0;
+
+    [RelayCommand(CanExecute = nameof(CanGoToPreviousPage))]
+    private void GoToPreviousPage()
+    {
+        if (CurrentPage <= 0) return;
+        CurrentPage--;
+        LoadDataCommand.Execute(null);
+    }
+
+    private bool CanGoToPreviousPage() => CurrentPage > 0;
+
+    [RelayCommand(CanExecute = nameof(CanGoToNextPage))]
+    private void GoToNextPage()
+    {
+        if (CurrentPage >= TotalPages - 1) return;
+        CurrentPage++;
+        LoadDataCommand.Execute(null);
+    }
+
+    private bool CanGoToNextPage() => TotalPages > 0 && CurrentPage < TotalPages - 1;
+
+    [RelayCommand(CanExecute = nameof(CanGoToLastPage))]
+    private void GoToLastPage()
+    {
+        CurrentPage = TotalPages - 1;
+        LoadDataCommand.Execute(null);
+    }
+
+    private bool CanGoToLastPage() => TotalPages > 0 && CurrentPage < TotalPages - 1;
 
     protected virtual bool CanEdit()
     {
