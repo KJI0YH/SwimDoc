@@ -103,8 +103,6 @@ public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbCo
         foreach (var pos in heat.Positions)
         {
             var entry = pos.Entry;
-            if (entry is null)
-                continue;
 
             var ok = entry.Status switch
             {
