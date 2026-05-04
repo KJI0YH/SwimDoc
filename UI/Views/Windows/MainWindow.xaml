@@ -84,7 +84,7 @@
             <dataGridView:EventsView />
         </DataTemplate>
         <DataTemplate DataType="{x:Type vm1:HeatsViewModel}">
-            <dataGridView:HeatsView />
+            <dataGridView:HeatPositionsGroupedView />
         </DataTemplate>
         <DataTemplate DataType="{x:Type vm1:EntriesViewModel}">
             <dataGridView:EntriesView />

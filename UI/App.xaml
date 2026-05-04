@@ -10,20 +10,6 @@
             </ResourceDictionary.MergedDictionaries>
 
             <SolidColorBrush x:Key="DataGridSelectedRowBackgroundBrush" Color="#FFE3F2FD" />
-            <SolidColorBrush x:Key="SwimTabSelectedGrayBrush" Color="#FFE6E6E6" />
-            <SolidColorBrush x:Key="SwimNavSelectedBackgroundBrush" Color="#FFE6E6E6" />
-
-            <Style x:Key="SwimTabItemSelectedGrayStyle"
-                   TargetType="TabItem"
-                   BasedOn="{StaticResource {x:Type TabItem}}">
-                <Setter Property="Background" Value="Transparent" />
-                <Setter Property="BorderBrush" Value="#FFBDBDBD" />
-                <Style.Triggers>
-                    <Trigger Property="IsSelected" Value="True">
-                        <Setter Property="Background" Value="{StaticResource SwimTabSelectedGrayBrush}" />
-                    </Trigger>
-                </Style.Triggers>
-            </Style>
 
             <Style x:Key="DataGridRowLightBlueWhenSelectedStyle"
                    TargetType="DataGridRow"

@@ -1,3 +1,6 @@
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Windows.Data;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DataLayer.EfClasses;
@@ -8,9 +11,27 @@ using UI.ViewModels.Pages.Data;
 
 namespace UI.ViewModels.Pages;
 
+public sealed class HeatPositionGridRow
+{
+    public int HeatGroupOrder { get; init; }
+
+    public string HeatGroupTitle { get; init; } = string.Empty;
+
+    public int Lane { get; init; }
+    public string Participant { get; init; } = string.Empty;
+    public string YearOfBirth { get; init; } = string.Empty;
+    public string Club { get; init; } = string.Empty;
+    public string EntryTime { get; init; } = string.Empty;
+    public string FinishTime { get; init; } = string.Empty;
+}
+
 public partial class HeatsViewModel(IEventService eventService, IHeatService heatService)
     : DataViewModel<SwimEvent, int?>(eventService)
 {
+    private readonly ObservableCollection<HeatPositionGridRow> _rows = new();
+    private ICollectionView? _rowsView;
+    private bool _rowsViewConfigured;
+
     protected bool SuppressSwimEventHeatAutoPick;
 
     [ObservableProperty] private int _selectedTabIndex;
@@ -21,21 +42,49 @@ public partial class HeatsViewModel(IEventService eventService, IHeatService hea
 
     public int TotalHeats => heatService.GetTotalHeats();
 
+    public ICollectionView RowsView => EnsureRowsView();
+
+    private ICollectionView EnsureRowsView()
+    {
+        if (_rowsView is not null)
+            return _rowsView;
+
+        _rowsView = CollectionViewSource.GetDefaultView(_rows);
+        if (!_rowsViewConfigured)
+        {
+            _rowsView.GroupDescriptions.Add(new PropertyGroupDescription(nameof(HeatPositionGridRow.HeatGroupOrder)));
+            _rowsView.SortDescriptions.Add(new SortDescription(nameof(HeatPositionGridRow.HeatGroupOrder),
+                ListSortDirection.Ascending));
+            _rowsView.SortDescriptions.Add(new SortDescription(nameof(HeatPositionGridRow.Lane),
+                ListSortDirection.Ascending));
+            _rowsViewConfigured = true;
+        }
+
+        return _rowsView;
+    }
+
     protected override IQueryable<SwimEvent> ApplyQuery(IQueryable<SwimEvent> query)
     {
         return query
             .OrderBy(se => se.Order)
             .Include(e => e.AgeGroup)
             .Include(e => e.SwimStyle)
-            .Include(e => e.Heats.OrderBy(h => h.Number))
+            .Include(e => e.Heats.OrderBy(h => h.Order).ThenBy(h => h.Number))
             .ThenInclude(h => h.Positions.OrderBy(p => p.Lane))
             .ThenInclude(hp => hp.Entry)
             .ThenInclude(ent => ent.Athlete!)
-            .ThenInclude(a => a.Club);
+            .ThenInclude(a => a.Club)
+            .Include(e => e.Heats.OrderBy(h => h.Order).ThenBy(h => h.Number))
+            .ThenInclude(h => h.Positions.OrderBy(p => p.Lane))
+            .ThenInclude(hp => hp.Entry)
+            .ThenInclude(ent => ent.Relay!)
+            .ThenInclude(r => r.Club);
     }
 
     protected override void OnItemsLoaded(IReadOnlyList<SwimEvent> items)
     {
+        EnsureRowsView();
+
         foreach (var swimEvent in items)
         {
             var totalHeatsInEvent = heatService.GetTotalHeatsInEvent(swimEvent.Id);
@@ -44,14 +93,73 @@ public partial class HeatsViewModel(IEventService eventService, IHeatService hea
         }
 
         if (AfterItemsLoaded(items))
+        {
+            RebuildRows();
             return;
+        }
 
         EnsureDefaultSelection();
+        RebuildRows();
     }
 
     protected virtual bool AfterItemsLoaded(IReadOnlyList<SwimEvent> items) => false;
 
+    protected virtual bool UseFixationStyleDefaultSwimEventSelection => false;
+
+    protected static IOrderedEnumerable<Heat> HeatsInProgramOrder(IEnumerable<Heat> heats) =>
+        heats.OrderBy(h => h.Order).ThenBy(h => h.Number);
+
     private void EnsureDefaultSelection()
+    {
+        if (UseFixationStyleDefaultSwimEventSelection)
+            EnsureFixationStyleDefaultSelection();
+        else
+            EnsureHeatsPageProgramDefaultSelection();
+    }
+
+    private void EnsureHeatsPageProgramDefaultSelection()
+    {
+        if (Items.Count == 0)
+        {
+            SelectedSwimEvent = null;
+            SelectedHeat = null;
+            return;
+        }
+
+        if (SelectedHeat is not null)
+        {
+            var matchEvent = Items.FirstOrDefault(se => se.Heats.Any(h => h.Id == SelectedHeat.Id));
+            if (matchEvent is not null)
+            {
+                SuppressSwimEventHeatAutoPick = true;
+                try
+                {
+                    SelectedSwimEvent = matchEvent;
+                    SelectedHeat = HeatsInProgramOrder(matchEvent.Heats).FirstOrDefault(h => h.Id == SelectedHeat.Id);
+                }
+                finally
+                {
+                    SuppressSwimEventHeatAutoPick = false;
+                }
+
+                return;
+            }
+        }
+
+        var firstEvent = Items.OrderBy(se => se.Order).FirstOrDefault();
+        SuppressSwimEventHeatAutoPick = true;
+        try
+        {
+            SelectedSwimEvent = firstEvent;
+            SelectedHeat = firstEvent is null ? null : PickDefaultHeatForSelectedSwimEvent(firstEvent);
+        }
+        finally
+        {
+            SuppressSwimEventHeatAutoPick = false;
+        }
+    }
+
+    private void EnsureFixationStyleDefaultSelection()
     {
         if (Items.Count == 0)
         {
@@ -62,7 +170,7 @@ public partial class HeatsViewModel(IEventService eventService, IHeatService hea
 
         var ordered = Items
             .OrderBy(se => se.Order)
-            .SelectMany(se => se.Heats.OrderBy(h => h.Number).Select(h => (eventRef: se, heatRef: h)))
+            .SelectMany(se => HeatsInProgramOrder(se.Heats).Select(h => (eventRef: se, heatRef: h)))
             .ToList();
 
         if (ordered.Count == 0)
@@ -107,10 +215,13 @@ public partial class HeatsViewModel(IEventService eventService, IHeatService hea
         }
     }
 
+    protected virtual Heat? PickDefaultHeatForSelectedSwimEvent(SwimEvent swimEvent) =>
+        HeatsInProgramOrder(swimEvent.Heats).FirstOrDefault();
+
     protected override bool CanDelete()
     {
-        return SelectedSwimEvent is not null || 
-               SelectedHeat is not null || 
+        return SelectedSwimEvent is not null ||
+               SelectedHeat is not null ||
                SelectedHeatPosition is not null;
     }
 
@@ -162,21 +273,20 @@ public partial class HeatsViewModel(IEventService eventService, IHeatService hea
         DeleteItemCommand.NotifyCanExecuteChanged();
 
         if (SuppressSwimEventHeatAutoPick)
+        {
+            RebuildRows();
             return;
+        }
 
         if (value is null)
         {
             SelectedHeat = null;
+            RebuildRows();
             return;
         }
 
-        // When selecting event (distance) from UI, default to earliest NOT_STARTED heat.
-        var pick = value.Heats
-            .OrderBy(h => h.Number)
-            .FirstOrDefault(h => h.Status == HeatStatus.NOT_STARTED)
-            ?? value.Heats.OrderBy(h => h.Number).FirstOrDefault();
-
-        SelectedHeat = pick;
+        SelectedHeat = PickDefaultHeatForSelectedSwimEvent(value);
+        RebuildRows();
     }
 
     partial void OnSelectedHeatChanged(Heat? value)
@@ -194,6 +304,57 @@ public partial class HeatsViewModel(IEventService eventService, IHeatService hea
     protected virtual void OnSelectedHeatChangedCore(Heat? value) { }
     protected virtual void OnSelectedHeatPositionChangedCore(HeatPosition? value) { }
 
+    private void RebuildRows()
+    {
+        EnsureRowsView();
+        _rows.Clear();
+
+        if (SelectedSwimEvent is null)
+        {
+            _rowsView!.Refresh();
+            return;
+        }
+
+        var groupIndex = 0;
+        foreach (var heat in HeatsInProgramOrder(SelectedSwimEvent.Heats))
+        {
+            groupIndex++;
+            var totalInEvent = heat.TotalHeatsInEvent > 0
+                ? heat.TotalHeatsInEvent
+                : SelectedSwimEvent.Heats.Count;
+
+            var heatTitle =
+                $"Заплыв {heat.Number} из {totalInEvent} ({heat.Order} из {TotalHeats}) | {heat.Status}";
+
+            foreach (var pos in heat.Positions.OrderBy(p => p.Lane))
+            {
+                var entry = pos.Entry;
+
+                var athlete = entry.Athlete;
+                var relay = entry.Relay;
+                var participant = relay is not null
+                    ? $"{relay.Club?.Name} {(relay.Number.HasValue ? relay.Number.Value : string.Empty)}"
+                    : athlete?.DisplayName ?? string.Empty;
+                var yob = athlete?.YearOfBirth.ToString() ?? string.Empty;
+                var club = athlete?.DisplayClubName ?? relay?.Club?.Name ?? string.Empty;
+
+                _rows.Add(new HeatPositionGridRow
+                {
+                    HeatGroupOrder = groupIndex,
+                    HeatGroupTitle = heatTitle,
+                    Lane = pos.Lane,
+                    Participant = participant,
+                    YearOfBirth = yob,
+                    Club = club,
+                    EntryTime = entry.DisplayEntryTime,
+                    FinishTime = entry.DisplayFinishTime
+                });
+            }
+        }
+
+        _rowsView!.Refresh();
+    }
+
     [RelayCommand]
     private void GoToNextHeat()
     {
@@ -202,7 +363,7 @@ public partial class HeatsViewModel(IEventService eventService, IHeatService hea
 
         var ordered = Items
             .OrderBy(se => se.Order)
-            .SelectMany(se => se.Heats.OrderBy(h => h.Number).Select(h => (eventRef: se, heatRef: h)))
+            .SelectMany(se => HeatsInProgramOrder(se.Heats).Select(h => (eventRef: se, heatRef: h)))
             .ToList();
 
         if (ordered.Count == 0)
@@ -232,7 +393,7 @@ public partial class HeatsViewModel(IEventService eventService, IHeatService hea
 
         var ordered = Items
             .OrderBy(se => se.Order)
-            .SelectMany(se => se.Heats.OrderBy(h => h.Number).Select(h => (eventRef: se, heatRef: h)))
+            .SelectMany(se => HeatsInProgramOrder(se.Heats).Select(h => (eventRef: se, heatRef: h)))
             .ToList();
 
         if (ordered.Count == 0)
@@ -270,10 +431,7 @@ public partial class HeatsViewModel(IEventService eventService, IHeatService hea
         try
         {
             SelectedSwimEvent = nextEvent;
-            SelectedHeat = nextEvent.Heats
-                .OrderBy(h => h.Number)
-                .FirstOrDefault(h => h.Status == HeatStatus.NOT_STARTED)
-                ?? nextEvent.Heats.OrderBy(h => h.Number).FirstOrDefault();
+            SelectedHeat = PickDefaultHeatForSelectedSwimEvent(nextEvent);
         }
         finally
         {
@@ -297,10 +455,7 @@ public partial class HeatsViewModel(IEventService eventService, IHeatService hea
         try
         {
             SelectedSwimEvent = prevEvent;
-            SelectedHeat = prevEvent.Heats
-                .OrderBy(h => h.Number)
-                .FirstOrDefault(h => h.Status == HeatStatus.NOT_STARTED)
-                ?? prevEvent.Heats.OrderBy(h => h.Number).FirstOrDefault();
+            SelectedHeat = PickDefaultHeatForSelectedSwimEvent(prevEvent);
         }
         finally
         {

@@ -10,6 +10,12 @@ namespace UI.ViewModels.Pages;
 public partial class HeatsResultsViewModel(IEventService eventService, IHeatService heatService)
     : HeatsViewModel(eventService, heatService)
 {
+    protected override bool UseFixationStyleDefaultSwimEventSelection => true;
+
+    protected override Heat? PickDefaultHeatForSelectedSwimEvent(SwimEvent swimEvent) =>
+        HeatsInProgramOrder(swimEvent.Heats).FirstOrDefault(h => h.Status == HeatStatus.NOT_STARTED)
+        ?? HeatsInProgramOrder(swimEvent.Heats).FirstOrDefault();
+
     private int? _pendingSelectHeatId;
 
     [ObservableProperty] private ObservableCollection<HeatManualResultRowViewModel> _manualResultRows = new();
@@ -60,7 +66,7 @@ public partial class HeatsResultsViewModel(IEventService eventService, IHeatServ
 
         var ordered = Items
             .OrderBy(se => se.Order)
-            .SelectMany(se => se.Heats.OrderBy(h => h.Number).Select(h => (eventRef: se, heatRef: h)))
+            .SelectMany(se => HeatsInProgramOrder(se.Heats).Select(h => (eventRef: se, heatRef: h)))
             .ToList();
 
         var match = ordered.FirstOrDefault(x => x.heatRef.Id == _pendingSelectHeatId.Value);

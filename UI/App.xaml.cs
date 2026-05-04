@@ -86,7 +86,7 @@ public partial class App : Application
     {
         if (Services.GetRequiredService<INavigationService>() is not NavigationService navigationService) return;
         navigationService.RegisterMapping<EventsViewModel, EventsView>();
-        navigationService.RegisterMapping<HeatsViewModel, HeatsView>();
+        navigationService.RegisterMapping<HeatsViewModel, HeatPositionsGroupedView>();
         navigationService.RegisterMapping<EntriesViewModel, EntriesView>();
         navigationService.RegisterMapping<AthletesViewModel, AthletesView>();
         navigationService.RegisterMapping<ClubsViewModel, ClubsView>();

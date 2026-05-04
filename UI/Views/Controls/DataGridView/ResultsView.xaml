@@ -49,14 +49,12 @@
                         <Style TargetType="DataGridRow"
                                BasedOn="{StaticResource {x:Type DataGridRow}}">
                             <Style.Triggers>
-                                <!-- Row not in scoring: gray when idle/hover; selected uses the same light blue as other grids -->
                                 <MultiDataTrigger>
                                     <MultiDataTrigger.Conditions>
                                         <Condition Binding="{Binding Entry.Scoring}" Value="False" />
                                         <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}" Value="False" />
                                         <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="False" />
                                     </MultiDataTrigger.Conditions>
-                                    <Setter Property="Background" Value="{StaticResource SwimTabSelectedGrayBrush}" />
                                 </MultiDataTrigger>
                                 <MultiDataTrigger>
                                     <MultiDataTrigger.Conditions>

@@ -3,8 +3,7 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       ScrollViewer.CanContentScroll="False"
       xmlns:dataView="clr-namespace:UI.Views.Controls.DataView"
-      xmlns:dataGridView="clr-namespace:UI.Views.Controls.DataGridView"
-      xmlns:treeView="clr-namespace:UI.Views.Controls.TreeView">
+      xmlns:dataGridView="clr-namespace:UI.Views.Controls.DataGridView">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -14,16 +13,13 @@
             <TabItem Header="Заявки">
                 <dataGridView:EntriesView DataContext="{Binding EntriesTable}" />
             </TabItem>
-            <TabItem Header="Заплывы"
-                     Style="{StaticResource SwimTabItemSelectedGrayStyle}">
-                <dataGridView:HeatsView DataContext="{Binding HeatsTable}" />
+            <TabItem Header="Заплывы">
+                <dataGridView:HeatPositionsGroupedView DataContext="{Binding HeatsTable}" />
             </TabItem>
-            <TabItem Header="Фиксация"
-                     Style="{StaticResource SwimTabItemSelectedGrayStyle}">
+            <TabItem Header="Фиксация">
                 <dataGridView:HeatsResultsView DataContext="{Binding FixationTable}" />
             </TabItem>
-            <TabItem Header="Результаты"
-                     Style="{StaticResource SwimTabItemSelectedGrayStyle}">
+            <TabItem Header="Результаты">
                 <dataGridView:ResultsView DataContext="{Binding ResultsTable}" />
             </TabItem>
         </TabControl>

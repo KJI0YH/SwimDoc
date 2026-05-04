@@ -3,17 +3,15 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       ScrollViewer.CanContentScroll="False"
       xmlns:dataView="clr-namespace:UI.Views.Controls.DataView"
-      xmlns:dataGridView="clr-namespace:UI.Views.Controls.DataGridView"
-      xmlns:treeView="clr-namespace:UI.Views.Controls.TreeView">
+      xmlns:dataGridView="clr-namespace:UI.Views.Controls.DataGridView">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <TabControl Grid.Row="1" Margin="5">
-            <TabItem Header="Заплыв"
-                     Style="{StaticResource SwimTabItemSelectedGrayStyle}">
-                <dataGridView:HeatsView DataContext="{Binding HeatTable}"/>
+            <TabItem Header="Заплыв">
+                <dataGridView:HeatPositionsGroupedView DataContext="{Binding HeatTable}"/>
             </TabItem>
         </TabControl>
     </Grid>
