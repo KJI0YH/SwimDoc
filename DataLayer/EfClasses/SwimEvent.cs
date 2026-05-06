@@ -13,6 +13,8 @@ public class SwimEvent : IValidatableObject
     public TimeOnly? Time { get; set; }
     public EventRound Round { get; set; } = EventRound.FIN;
 
+    public SwimEventStatus Status { get; set; } = SwimEventStatus.EMPTY;
+
     public Course Course { get; set; } = Course.LCM;
     public int? RoundParticipantsCount { get; set; }
     public required int LaneMin { get; set; }
@@ -41,8 +43,7 @@ public class SwimEvent : IValidatableObject
 
     public string DisplayTime => Time?.ToShortTimeString() ?? "Не назначено";
 
-    public string DisplayStatus => Heats.Any(heat => heat.Status != HeatStatus.NOT_STARTED) ? "UNOFFICIAL" :
-        Heats.All(heat => heat.Status == HeatStatus.OFFICIAL) ? "OFFICIAL" : "NOT STARTED";
+    public string DisplayStatus => Status.ToString();
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {

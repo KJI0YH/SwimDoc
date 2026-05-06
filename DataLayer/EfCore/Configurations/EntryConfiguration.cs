@@ -18,7 +18,7 @@ public class EntryConfiguration : IEntityTypeConfiguration<Entry>
             .WithMany(swimEvent => swimEvent.Entries)
             .HasForeignKey(entry => entry.SwimEventId)
             .IsRequired(false)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.SetNull);
         builder
             .HasOne(entry => entry.Athlete)
             .WithMany(athlete => athlete.Entries)

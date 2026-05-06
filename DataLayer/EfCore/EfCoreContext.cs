@@ -38,6 +38,181 @@ public sealed class EfCoreContext : DbContext
 
     private void EnsureTriggersCreated()
     {
+        // When EF sets SwimEventId=NULL (e.g., DeleteBehavior.SetNull), ensure entry status returns to ENTRY.
+        // Recreate to apply to already created DBs.
+        Database.ExecuteSqlRaw("DROP TRIGGER IF EXISTS trg_entries_after_update_set_entry_status_when_unlinked;");
+        Database.ExecuteSqlRaw("""
+            CREATE TRIGGER trg_entries_after_update_set_entry_status_when_unlinked
+            AFTER UPDATE OF SwimEventId ON Entries
+            WHEN NEW.SwimEventId IS NULL AND OLD.SwimEventId IS NOT NULL
+            BEGIN
+                UPDATE Entries
+                SET Status = 0 -- ENTRY
+                WHERE Id = NEW.Id;
+            END;
+            """);
+
+        Database.ExecuteSqlRaw("""
+            CREATE TRIGGER IF NOT EXISTS trg_entries_after_insert_update_swim_event_status
+            AFTER INSERT ON Entries
+            WHEN NEW.SwimEventId IS NOT NULL
+            BEGIN
+                UPDATE SwimEvents
+                SET Status =
+                    CASE
+                        WHEN (SELECT COUNT(*) FROM Entries e WHERE e.SwimEventId = SwimEvents.Id) = 0
+                             AND (SELECT COUNT(*) FROM Heats h WHERE h.SwimEventId = SwimEvents.Id) = 0
+                            THEN 0 -- EMPTY
+                        WHEN (SELECT COUNT(*) FROM Heats h WHERE h.SwimEventId = SwimEvents.Id) = 0
+                             AND (SELECT COUNT(*) FROM Entries e WHERE e.SwimEventId = SwimEvents.Id) > 0
+                            THEN 1 -- ENTRY
+                        WHEN (SELECT COUNT(*) FROM Heats h WHERE h.SwimEventId = SwimEvents.Id) > 0
+                             AND (SELECT COUNT(*) FROM Heats h WHERE h.SwimEventId = SwimEvents.Id AND h.Status != 0) = 0
+                            THEN 2 -- NOT_STARTED
+                        WHEN (SELECT COUNT(*) FROM Heats h WHERE h.SwimEventId = SwimEvents.Id) > 0
+                             AND (SELECT COUNT(*) FROM Heats h WHERE h.SwimEventId = SwimEvents.Id AND h.Status != 2) = 0
+                            THEN 4 -- OFFICIAL
+                        ELSE 3 -- RUNNING
+                    END
+                WHERE Id = NEW.SwimEventId;
+            END;
+            """);
+
+        Database.ExecuteSqlRaw("""
+            CREATE TRIGGER IF NOT EXISTS trg_entries_after_update_update_swim_event_status
+            AFTER UPDATE ON Entries
+            WHEN NEW.SwimEventId IS NOT OLD.SwimEventId
+                 OR (NEW.SwimEventId IS NULL AND OLD.SwimEventId IS NOT NULL)
+                 OR (NEW.SwimEventId IS NOT NULL AND OLD.SwimEventId IS NULL)
+            BEGIN
+                UPDATE SwimEvents
+                SET Status =
+                    CASE
+                        WHEN (SELECT COUNT(*) FROM Entries e WHERE e.SwimEventId = SwimEvents.Id) = 0
+                             AND (SELECT COUNT(*) FROM Heats h WHERE h.SwimEventId = SwimEvents.Id) = 0
+                            THEN 0 -- EMPTY
+                        WHEN (SELECT COUNT(*) FROM Heats h WHERE h.SwimEventId = SwimEvents.Id) = 0
+                             AND (SELECT COUNT(*) FROM Entries e WHERE e.SwimEventId = SwimEvents.Id) > 0
+                            THEN 1 -- ENTRY
+                        WHEN (SELECT COUNT(*) FROM Heats h WHERE h.SwimEventId = SwimEvents.Id) > 0
+                             AND (SELECT COUNT(*) FROM Heats h WHERE h.SwimEventId = SwimEvents.Id AND h.Status != 0) = 0
+                            THEN 2 -- NOT_STARTED
+                        WHEN (SELECT COUNT(*) FROM Heats h WHERE h.SwimEventId = SwimEvents.Id) > 0
+                             AND (SELECT COUNT(*) FROM Heats h WHERE h.SwimEventId = SwimEvents.Id AND h.Status != 2) = 0
+                            THEN 4 -- OFFICIAL
+                        ELSE 3 -- RUNNING
+                    END
+                WHERE Id IN (NEW.SwimEventId, OLD.SwimEventId);
+            END;
+            """);
+
+        Database.ExecuteSqlRaw("""
+            CREATE TRIGGER IF NOT EXISTS trg_entries_after_delete_update_swim_event_status
+            AFTER DELETE ON Entries
+            WHEN OLD.SwimEventId IS NOT NULL
+            BEGIN
+                UPDATE SwimEvents
+                SET Status =
+                    CASE
+                        WHEN (SELECT COUNT(*) FROM Entries e WHERE e.SwimEventId = SwimEvents.Id) = 0
+                             AND (SELECT COUNT(*) FROM Heats h WHERE h.SwimEventId = SwimEvents.Id) = 0
+                            THEN 0 -- EMPTY
+                        WHEN (SELECT COUNT(*) FROM Heats h WHERE h.SwimEventId = SwimEvents.Id) = 0
+                             AND (SELECT COUNT(*) FROM Entries e WHERE e.SwimEventId = SwimEvents.Id) > 0
+                            THEN 1 -- ENTRY
+                        WHEN (SELECT COUNT(*) FROM Heats h WHERE h.SwimEventId = SwimEvents.Id) > 0
+                             AND (SELECT COUNT(*) FROM Heats h WHERE h.SwimEventId = SwimEvents.Id AND h.Status != 0) = 0
+                            THEN 2 -- NOT_STARTED
+                        WHEN (SELECT COUNT(*) FROM Heats h WHERE h.SwimEventId = SwimEvents.Id) > 0
+                             AND (SELECT COUNT(*) FROM Heats h WHERE h.SwimEventId = SwimEvents.Id AND h.Status != 2) = 0
+                            THEN 4 -- OFFICIAL
+                        ELSE 3 -- RUNNING
+                    END
+                WHERE Id = OLD.SwimEventId;
+            END;
+            """);
+
+        Database.ExecuteSqlRaw("""
+            CREATE TRIGGER IF NOT EXISTS trg_heats_after_insert_update_swim_event_status
+            AFTER INSERT ON Heats
+            WHEN NEW.SwimEventId IS NOT NULL
+            BEGIN
+                UPDATE SwimEvents
+                SET Status =
+                    CASE
+                        WHEN (SELECT COUNT(*) FROM Entries e WHERE e.SwimEventId = SwimEvents.Id) = 0
+                             AND (SELECT COUNT(*) FROM Heats h WHERE h.SwimEventId = SwimEvents.Id) = 0
+                            THEN 0 -- EMPTY
+                        WHEN (SELECT COUNT(*) FROM Heats h WHERE h.SwimEventId = SwimEvents.Id) = 0
+                             AND (SELECT COUNT(*) FROM Entries e WHERE e.SwimEventId = SwimEvents.Id) > 0
+                            THEN 1 -- ENTRY
+                        WHEN (SELECT COUNT(*) FROM Heats h WHERE h.SwimEventId = SwimEvents.Id) > 0
+                             AND (SELECT COUNT(*) FROM Heats h WHERE h.SwimEventId = SwimEvents.Id AND h.Status != 0) = 0
+                            THEN 2 -- NOT_STARTED
+                        WHEN (SELECT COUNT(*) FROM Heats h WHERE h.SwimEventId = SwimEvents.Id) > 0
+                             AND (SELECT COUNT(*) FROM Heats h WHERE h.SwimEventId = SwimEvents.Id AND h.Status != 2) = 0
+                            THEN 4 -- OFFICIAL
+                        ELSE 3 -- RUNNING
+                    END
+                WHERE Id = NEW.SwimEventId;
+            END;
+            """);
+
+        Database.ExecuteSqlRaw("""
+            CREATE TRIGGER IF NOT EXISTS trg_heats_after_update_update_swim_event_status
+            AFTER UPDATE ON Heats
+            WHEN NEW.SwimEventId IS NOT OLD.SwimEventId
+                 OR NEW.Status IS NOT OLD.Status
+                 OR (NEW.SwimEventId IS NULL AND OLD.SwimEventId IS NOT NULL)
+                 OR (NEW.SwimEventId IS NOT NULL AND OLD.SwimEventId IS NULL)
+            BEGIN
+                UPDATE SwimEvents
+                SET Status =
+                    CASE
+                        WHEN (SELECT COUNT(*) FROM Entries e WHERE e.SwimEventId = SwimEvents.Id) = 0
+                             AND (SELECT COUNT(*) FROM Heats h WHERE h.SwimEventId = SwimEvents.Id) = 0
+                            THEN 0 -- EMPTY
+                        WHEN (SELECT COUNT(*) FROM Heats h WHERE h.SwimEventId = SwimEvents.Id) = 0
+                             AND (SELECT COUNT(*) FROM Entries e WHERE e.SwimEventId = SwimEvents.Id) > 0
+                            THEN 1 -- ENTRY
+                        WHEN (SELECT COUNT(*) FROM Heats h WHERE h.SwimEventId = SwimEvents.Id) > 0
+                             AND (SELECT COUNT(*) FROM Heats h WHERE h.SwimEventId = SwimEvents.Id AND h.Status != 0) = 0
+                            THEN 2 -- NOT_STARTED
+                        WHEN (SELECT COUNT(*) FROM Heats h WHERE h.SwimEventId = SwimEvents.Id) > 0
+                             AND (SELECT COUNT(*) FROM Heats h WHERE h.SwimEventId = SwimEvents.Id AND h.Status != 2) = 0
+                            THEN 4 -- OFFICIAL
+                        ELSE 3 -- RUNNING
+                    END
+                WHERE Id IN (NEW.SwimEventId, OLD.SwimEventId);
+            END;
+            """);
+
+        Database.ExecuteSqlRaw("""
+            CREATE TRIGGER IF NOT EXISTS trg_heats_after_delete_update_swim_event_status
+            AFTER DELETE ON Heats
+            WHEN OLD.SwimEventId IS NOT NULL
+            BEGIN
+                UPDATE SwimEvents
+                SET Status =
+                    CASE
+                        WHEN (SELECT COUNT(*) FROM Entries e WHERE e.SwimEventId = SwimEvents.Id) = 0
+                             AND (SELECT COUNT(*) FROM Heats h WHERE h.SwimEventId = SwimEvents.Id) = 0
+                            THEN 0 -- EMPTY
+                        WHEN (SELECT COUNT(*) FROM Heats h WHERE h.SwimEventId = SwimEvents.Id) = 0
+                             AND (SELECT COUNT(*) FROM Entries e WHERE e.SwimEventId = SwimEvents.Id) > 0
+                            THEN 1 -- ENTRY
+                        WHEN (SELECT COUNT(*) FROM Heats h WHERE h.SwimEventId = SwimEvents.Id) > 0
+                             AND (SELECT COUNT(*) FROM Heats h WHERE h.SwimEventId = SwimEvents.Id AND h.Status != 0) = 0
+                            THEN 2 -- NOT_STARTED
+                        WHEN (SELECT COUNT(*) FROM Heats h WHERE h.SwimEventId = SwimEvents.Id) > 0
+                             AND (SELECT COUNT(*) FROM Heats h WHERE h.SwimEventId = SwimEvents.Id AND h.Status != 2) = 0
+                            THEN 4 -- OFFICIAL
+                        ELSE 3 -- RUNNING
+                    END
+                WHERE Id = OLD.SwimEventId;
+            END;
+            """);
+
         Database.ExecuteSqlRaw("""
             CREATE TRIGGER IF NOT EXISTS trg_heat_positions_after_insert
             AFTER INSERT ON HeatPositions
@@ -48,12 +223,17 @@ public sealed class EfCoreContext : DbContext
             END;
             """);
 
+        // Need to recreate trigger when logic changes (existing DBs).
+        Database.ExecuteSqlRaw("DROP TRIGGER IF EXISTS trg_heat_positions_after_delete;");
         Database.ExecuteSqlRaw("""
-            CREATE TRIGGER IF NOT EXISTS trg_heat_positions_after_delete
+            CREATE TRIGGER trg_heat_positions_after_delete
             AFTER DELETE ON HeatPositions
             BEGIN
                 UPDATE Entries
-                SET Status = 1
+                SET Status = CASE
+                    WHEN (SELECT e.SwimEventId FROM Entries e WHERE e.Id = OLD.EntryId) IS NULL THEN 0 -- ENTRY
+                    ELSE 1 -- EVENT
+                END
                 WHERE Id = OLD.EntryId;
             END;
             """);
@@ -127,7 +307,7 @@ public sealed class EfCoreContext : DbContext
             BEGIN
                 UPDATE Entries
                 SET SwimEventId = NULL,
-                    Status = 0
+                    Status = 0 -- ENTRY
                 WHERE SwimEventId = OLD.Id;
             END;
             """);
