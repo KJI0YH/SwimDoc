@@ -36,16 +36,4 @@ public partial class ClubAddViewModel(int? id, IClubService crudService)
             OnPropertyChanged();
         }
     }
-
-    public ClubType Type
-    {
-        get => Entity.Type;
-        set
-        {
-            Entity.Type = value;
-            OnPropertyChanged();
-        }
-    }
-
-    public Array ClubTypeValues => Enum.GetValues<ClubType>();
 }
