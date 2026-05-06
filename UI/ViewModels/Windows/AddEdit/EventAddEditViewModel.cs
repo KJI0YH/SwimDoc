@@ -105,6 +105,16 @@ public partial class EventAddViewModel(
         }
     }
 
+    public Course Course
+    {
+        get => Entity.Course;
+        set
+        {
+            Entity.Course = value;
+            OnPropertyChanged();
+        }
+    }
+
     public EventRound Round
     {
         get => Entity.Round;
@@ -145,6 +155,8 @@ public partial class EventAddViewModel(
         }
     }
 
+    
+    public Array CourseValues => Enum.GetValues<Course>();
     public Array EventRoundValues => Enum.GetValues<EventRound>();
 
     public void ApplyContext(AddEditContext context)

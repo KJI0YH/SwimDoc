@@ -12,6 +12,8 @@ public class SwimEvent : IValidatableObject
     public required DateOnly Date { get; set; }
     public TimeOnly? Time { get; set; }
     public EventRound Round { get; set; } = EventRound.FIN;
+
+    public Course Course { get; set; } = Course.LCM;
     public int? RoundParticipantsCount { get; set; }
     public required int LaneMin { get; set; }
     public required int LaneMax { get; set; }

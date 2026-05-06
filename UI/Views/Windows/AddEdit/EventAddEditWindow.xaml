@@ -64,9 +64,9 @@
                            VerticalAlignment="Center"
                            Margin="0,0,10,0" />
                 <searchableComboBox:SearchableComboBox Grid.Column="1"
-                                             ItemsSource="{Binding SwimStyles}"
-                                             SelectedItem="{Binding SelectedSwimStyle, Mode=TwoWay}"
-                                             Margin="0,2,0,2" />
+                                                       ItemsSource="{Binding SwimStyles}"
+                                                       SelectedItem="{Binding SelectedSwimStyle, Mode=TwoWay}"
+                                                       Margin="0,2,0,2" />
                 <Button Grid.Column="2"
                         Content="{ui:SymbolIcon Add24}"
                         Command="{Binding CreateNewSwimStyleCommand}"
@@ -85,14 +85,35 @@
                            VerticalAlignment="Center"
                            Margin="0,0,10,0" />
                 <searchableComboBox:SearchableComboBox Grid.Column="1"
-                                             ItemsSource="{Binding AgeGroups}"
-                                             SelectedItem="{Binding SelectedAgeGroup, Mode=TwoWay}"
-                                             Margin="0,2,0,2" />
+                                                       ItemsSource="{Binding AgeGroups}"
+                                                       SelectedItem="{Binding SelectedAgeGroup, Mode=TwoWay}"
+                                                       Margin="0,2,0,2" />
                 <Button Grid.Column="2"
                         Content="{ui:SymbolIcon Add24}"
                         Command="{Binding CreateNewAgeGroupCommand}"
                         Margin="5,2,0,2"
                         Padding="9" />
+            </Grid>
+
+            <Grid Margin="0,5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="180" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0"
+                           Text="Длина бассейна"
+                           VerticalAlignment="Center"
+                           Margin="0,0,10,0" />
+                <ComboBox Grid.Column="1"
+                          ItemsSource="{Binding CourseValues}"
+                          SelectedItem="{Binding Course, Mode=TwoWay}"
+                          Margin="0,2,0,2">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
             </Grid>
 
             <Grid Margin="0,5">
@@ -127,9 +148,9 @@
                            VerticalAlignment="Center"
                            Margin="0,0,10,0" />
                 <searchableComboBox:SearchableComboBox Grid.Column="1"
-                                             ItemsSource="{Binding PreviousSwimEvents}"
-                                             SelectedItem="{Binding SelectedPreviousSwimEvent, Mode=TwoWay}"
-                                             Margin="0,2,0,2" />
+                                                       ItemsSource="{Binding PreviousSwimEvents}"
+                                                       SelectedItem="{Binding SelectedPreviousSwimEvent, Mode=TwoWay}"
+                                                       Margin="0,2,0,2" />
                 <Button Grid.Column="2"
                         Content="{ui:SymbolIcon Add24}"
                         Command="{Binding CreateNewSwimEventCommand}"
