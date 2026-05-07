@@ -1,11 +1,8 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using Microsoft.EntityFrameworkCore;
-using ServiceLayer.AgeGroupService;
 using ServiceLayer.EntryDocumentReaderService;
 using ServiceLayer.EntryService;
 using ServiceLayer.EventService;
 using ServiceLayer.HeatService;
-using ServiceLayer.SwimStyleService;
 using UI.Services;
 using UI.ViewModels.Pages.Data;
 
@@ -35,9 +32,9 @@ public partial class EventDetailsViewModel : ViewModelBase, INavigationAware
     public ViewModelBase EntriesTable => _entriesTable;
 
     public ViewModelBase HeatsTable => _heatsTable;
-    
+
     public ViewModelBase FixationTable => _fixationTable;
-    
+
     public ViewModelBase ResultsTable => _resultsTable;
 
     public void OnNavigatedTo(object? parameter)

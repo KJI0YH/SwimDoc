@@ -5,12 +5,14 @@ using Microsoft.Extensions.DependencyInjection;
 using OfficeOpenXml;
 using ServiceLayer.AgeGroupService;
 using ServiceLayer.AthleteService;
+using ServiceLayer.BaseTimeRepository;
 using ServiceLayer.ClubService;
 using ServiceLayer.ConnectionService;
 using ServiceLayer.EntryDocumentReaderService;
 using ServiceLayer.EntryService;
 using ServiceLayer.EventService;
 using ServiceLayer.HeatService;
+using ServiceLayer.PointScoreProvider;
 using ServiceLayer.ReportGeneratorService;
 using ServiceLayer.SwimStyleService;
 using UI.Services;
@@ -28,8 +30,10 @@ using EventsViewModel = UI.ViewModels.Pages.EventsViewModel;
 using HeatsViewModel = UI.ViewModels.Pages.HeatsViewModel;
 using HeatsResultsViewModel = UI.ViewModels.Pages.HeatsResultsViewModel;
 using ResultsViewModel = UI.ViewModels.Pages.ResultsViewModel;
+using SettingsViewModel = UI.ViewModels.Pages.SettingsViewModel;
 using MainViewModel = UI.ViewModels.Windows.MainViewModel;
 using SwimStyleDetailsViewModel = UI.ViewModels.Pages.SwimStyleDetailsViewModel;
+using SettingsPage = UI.Views.Pages.SettingsPage;
 
 namespace UI;
 
@@ -99,6 +103,8 @@ public partial class App : Application
         services.AddSingleton<IDatabaseConnection, DatabaseConnectionService>();
         services.AddSingleton<INavigationService, NavigationService>();
         services.AddSingleton<IAddEditWindowFactory, AddEditWindowFactory>();
+        services.AddSingleton<IBaseTimeRepository, CsvBaseTimeRepository>();
+        services.AddSingleton<IPointScoreProvider, PointScoreProvider>();
 
         services.AddTransient<IAgeGroupService, AgeGroupService>();
         services.AddTransient<IAthleteService, AthleteService>();
@@ -115,6 +121,7 @@ public partial class App : Application
     {
         services.AddSingleton<CompetitionSelectionViewModel>();
         services.AddTransient<MainViewModel>();
+        services.AddTransient<SettingsViewModel>();
         services.AddTransient<EventsViewModel>();
         services.AddTransient<HeatsViewModel>();
         services.AddTransient<HeatsResultsViewModel>();
@@ -147,5 +154,6 @@ public partial class App : Application
         services.AddTransient<EventDetailsPage>();
         services.AddTransient<AgeGroupDetailsPage>();
         services.AddTransient<SwimStyleDetailsPage>();
+        services.AddTransient<SettingsPage>();
     }
 }

@@ -196,7 +196,8 @@
                 <ui:NavigationViewItem
                     Content="Настройки"
                     Tag="Settings"
-                    Icon="{ui:SymbolIcon Settings24}" />
+                    Icon="{ui:SymbolIcon Settings24}"
+                    TargetPageType="{x:Type pages:SettingsPage}" />
                 <ui:NavigationViewItem
                     Content="О программе"
                     Tag="Settings"
