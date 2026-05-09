@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using DataLayer.EfClasses;
 using Microsoft.EntityFrameworkCore.Query.Internal;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,6 +12,7 @@ using ServiceLayer.HeatService;
 using ServiceLayer.PointScoreProvider;
 using ServiceLayer.SwimStyleService;
 using UI.Services;
+using UI.ViewModels.Pages;
 using UI.Views.Windows.AddEdit;
 
 namespace UI.ViewModels.Pages.Data;
@@ -201,6 +203,34 @@ public class HeatsByAthleteViewModel : HeatsViewModel
     {
         _athleteId = athleteId;
         LoadDataCommand.Execute(null);
+    }
+
+    protected override async Task LoadHeatPositionsAsync()
+    {
+        if (SelectedSwimEvent?.Id is not int eventId || !_athleteId.HasValue)
+        {
+            HeatPositions = [];
+            return;
+        }
+
+        IsLoading = true;
+        try
+        {
+            var heats = await HeatService.GetHeatsByEventIdAsync(eventId);
+            var heatsInEvent = heats.Count;
+            var heatsForAthlete = heats
+                .Where(heat => heat.Positions.Any(hp => hp.Entry.AthleteId == _athleteId.Value))
+                .ToList();
+            var heatsTotal = HeatService.GetTotalHeats();
+            var heatPositionViews = heatsForAthlete.SelectMany(h =>
+                h.Positions.Select(p =>
+                    new HeatPositionView(p, h.Number, heatsInEvent, h.Order, heatsTotal)));
+            HeatPositions = new ObservableCollection<HeatPositionView>(heatPositionViews);
+        }
+        finally
+        {
+            IsLoading = false;
+        }
     }
 
     protected override IQueryable<SwimEvent> ApplyQuery(IQueryable<SwimEvent> query)

@@ -13,6 +13,7 @@
                  SelectionMode="Extended"
                  SelectionUnit="FullRow"
                  AutoGenerateColumns="{Binding AutoGenerateColumns}"
+                 CanUserSortColumns="False"
                  CanUserAddRows="False"
                  CanUserDeleteRows="False"
                  IsReadOnly="True"

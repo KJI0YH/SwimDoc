@@ -23,6 +23,8 @@ public partial class EntriesViewModel(
     IEntryDocumentReaderService entryDocumentReaderService)
     : DataViewModel<Entry, int?>(entryService)
 {
+    private const int SlowestTimeRank = int.MaxValue;
+
     public enum ImportFileStatus
     {
         [Description(" ")] Summary,
@@ -119,8 +121,26 @@ public partial class EntriesViewModel(
                     .ThenByDescending(e => e.Athlete != null ? e.Athlete.FirstName : null))));
         ColumnConfigurations.Add(new ColumnConfiguration<Entry>("Status", "Статус", 150));
         ColumnConfigurations.Add(new ColumnConfiguration<Entry>("DisplayEntryTime", "Заявочное время", 130,
+            (query, direction) =>
+                direction == ListSortDirection.Ascending
+                    ? query.OrderBy(e => e.EntryTime ?? SlowestTimeRank).ThenBy(e => e.Id)
+                    : query.OrderByDescending(e => e.EntryTime ?? SlowestTimeRank).ThenByDescending(e => e.Id),
             nameof(Entry.EntryTime)));
         ColumnConfigurations.Add(new ColumnConfiguration<Entry>("DisplayFinishTime", "Финишное время", 130,
+            (query, direction) =>
+                direction == ListSortDirection.Ascending
+                    ? query
+                        .OrderBy(e =>
+                            e.Status == EntryStatus.FINISH && e.FinishTime.HasValue
+                                ? e.FinishTime!.Value
+                                : SlowestTimeRank)
+                        .ThenBy(e => e.Id)
+                    : query
+                        .OrderByDescending(e =>
+                            e.Status == EntryStatus.FINISH && e.FinishTime.HasValue
+                                ? e.FinishTime!.Value
+                                : SlowestTimeRank)
+                        .ThenByDescending(e => e.Id),
             nameof(Entry.FinishTime)));
         ColumnConfigurations.Add(new ColumnConfiguration<Entry>("Points", "Очки", 100));
         ColumnConfigurations.Add(new ColumnConfiguration<Entry>("Comment", "Примечание", 100));

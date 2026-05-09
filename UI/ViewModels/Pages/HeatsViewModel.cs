@@ -14,6 +14,7 @@ namespace UI.ViewModels.Pages;
 public partial class HeatsViewModel(IEventService eventService, IHeatService heatService)
     : DataViewModel<SwimEvent, int?>(eventService)
 {
+    protected IHeatService HeatService { get; } = heatService;
     [ObservableProperty] ObservableCollection<HeatPositionView> _heatPositions = new();
 
     [ObservableProperty] private SwimEvent? _selectedSwimEvent;
@@ -64,7 +65,7 @@ public partial class HeatsViewModel(IEventService eventService, IHeatService hea
         OnPropertyChanged(nameof(HeatPositionsView));
     }
 
-    private async Task LoadHeatPositionsAsync()
+    protected virtual async Task LoadHeatPositionsAsync()
     {
         if (SelectedSwimEvent?.Id is not int eventId)
         {
@@ -75,9 +76,9 @@ public partial class HeatsViewModel(IEventService eventService, IHeatService hea
         IsLoading = true;
         try
         {
-            var heats = await heatService.GetHeatsByEventIdAsync(eventId);
+            var heats = await HeatService.GetHeatsByEventIdAsync(eventId);
             var heatsInEvent = heats.Count;
-            var heatsTotal = heatService.GetTotalHeats();
+            var heatsTotal = HeatService.GetTotalHeats();
             var heatPositionViews = heats.SelectMany(h =>
                 h.Positions.Select(p => new HeatPositionView(p, h.Number, heatsInEvent, h.Order, heatsTotal)));
             HeatPositions = new ObservableCollection<HeatPositionView>(heatPositionViews);

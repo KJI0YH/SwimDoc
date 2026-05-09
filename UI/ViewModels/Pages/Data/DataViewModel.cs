@@ -336,7 +336,10 @@ public partial class DataViewModel<TEntity, TKey> : DataViewModelBase
             SortDirection = ListSortDirection.Ascending;
         }
 
-        LoadDataCommand.Execute(null);
+        if (CurrentPage != 0)
+            CurrentPage = 0;
+        else
+            LoadDataCommand.Execute(null);
     }
 
     protected virtual IQueryable<TEntity> ApplyQuery(IQueryable<TEntity> query)
@@ -366,7 +369,14 @@ public partial class DataViewModel<TEntity, TKey> : DataViewModelBase
             return typed.SortQuery(query, SortDirection);
         }
 
-        return query;
+        try
+        {
+            return ColumnConfiguration<TEntity>.SortQueryableByPropertyPath(query, SortColumn, SortDirection);
+        }
+        catch (InvalidOperationException)
+        {
+            return query;
+        }
     }
 
     protected virtual void ShowAddEditDialog(TKey? id = default)
