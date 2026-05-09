@@ -5,5 +5,5 @@ namespace ServiceLayer.EntryService;
 
 public interface IEntryService : ICrudService<Entry, int?>
 {
-    
+    Task<List<Entry>> GetEntriesByEventIdOrderByFinishTimeAsync(int eventId);
 }

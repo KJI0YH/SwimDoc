@@ -1,8 +1,8 @@
 namespace UI.Views.Controls.DataGridView;
 
-public partial class HeatPositionsGroupedView
+public partial class HeatsView
 {
-    public HeatPositionsGroupedView()
+    public HeatsView()
     {
         InitializeComponent();
     }

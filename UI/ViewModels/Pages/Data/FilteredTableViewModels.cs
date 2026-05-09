@@ -8,6 +8,7 @@ using ServiceLayer.EntryDocumentReaderService;
 using ServiceLayer.EntryService;
 using ServiceLayer.EventService;
 using ServiceLayer.HeatService;
+using ServiceLayer.PointScoreProvider;
 using ServiceLayer.SwimStyleService;
 using UI.Services;
 using UI.Views.Windows.AddEdit;
@@ -261,8 +262,11 @@ public class HeatsByEventViewModel : HeatsViewModel
     }
 }
 
-public class HeatResultsByEventViewModel(IEventService eventService, IHeatService heatService)
-    : HeatsResultsViewModel(eventService, heatService)
+public class FixationByEventViewModel(
+    IEventService eventService,
+    IHeatService heatService,
+    IPointScoreProvider pointScoreProvider)
+    : FixationViewModel(eventService, heatService, pointScoreProvider)
 {
     private int? _eventId;
 

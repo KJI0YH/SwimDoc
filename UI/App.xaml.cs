@@ -28,7 +28,6 @@ using EntriesViewModel = UI.ViewModels.Pages.EntriesViewModel;
 using EventDetailsViewModel = UI.ViewModels.Pages.EventDetailsViewModel;
 using EventsViewModel = UI.ViewModels.Pages.EventsViewModel;
 using HeatsViewModel = UI.ViewModels.Pages.HeatsViewModel;
-using HeatsResultsViewModel = UI.ViewModels.Pages.HeatsResultsViewModel;
 using ResultsViewModel = UI.ViewModels.Pages.ResultsViewModel;
 using SettingsViewModel = UI.ViewModels.Pages.SettingsViewModel;
 using MainViewModel = UI.ViewModels.Windows.MainViewModel;
@@ -90,7 +89,7 @@ public partial class App : Application
     {
         if (Services.GetRequiredService<INavigationService>() is not NavigationService navigationService) return;
         navigationService.RegisterMapping<EventsViewModel, EventsView>();
-        navigationService.RegisterMapping<HeatsViewModel, HeatPositionsGroupedView>();
+        navigationService.RegisterMapping<HeatsViewModel, HeatsView>();
         navigationService.RegisterMapping<EntriesViewModel, EntriesView>();
         navigationService.RegisterMapping<AthletesViewModel, AthletesView>();
         navigationService.RegisterMapping<ClubsViewModel, ClubsView>();
@@ -124,7 +123,7 @@ public partial class App : Application
         services.AddTransient<SettingsViewModel>();
         services.AddTransient<EventsViewModel>();
         services.AddTransient<HeatsViewModel>();
-        services.AddTransient<HeatsResultsViewModel>();
+        services.AddTransient<FixationViewModel>();
         services.AddTransient<ResultsViewModel>();
         services.AddTransient<EntriesViewModel>();
         services.AddTransient<AthletesViewModel>();
@@ -141,7 +140,7 @@ public partial class App : Application
         services.AddTransient<CompetitionSelectionPage>();
         services.AddTransient<EventsPage>();
         services.AddTransient<HeatsPage>();
-        services.AddTransient<HeatsResultsPage>();
+        services.AddTransient<FixationPage>();
         services.AddTransient<ResultsPage>();
         services.AddTransient<EntriesPage>();
         services.AddTransient<AthletesPage>();

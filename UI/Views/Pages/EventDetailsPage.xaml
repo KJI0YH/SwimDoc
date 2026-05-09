@@ -14,10 +14,10 @@
                 <dataGridView:EntriesView DataContext="{Binding EntriesTable}" />
             </TabItem>
             <TabItem Header="Заплывы">
-                <dataGridView:HeatPositionsGroupedView DataContext="{Binding HeatsTable}" />
+                <dataGridView:HeatsView DataContext="{Binding HeatsTable}" />
             </TabItem>
             <TabItem Header="Фиксация">
-                <dataGridView:HeatsResultsView DataContext="{Binding FixationTable}" />
+                <dataGridView:FixationView DataContext="{Binding FixationTable}" />
             </TabItem>
             <TabItem Header="Результаты">
                 <dataGridView:ResultsView DataContext="{Binding ResultsTable}" />

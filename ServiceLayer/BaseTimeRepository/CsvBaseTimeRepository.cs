@@ -25,7 +25,7 @@ public sealed class CsvBaseTimeRepository : IBaseTimeRepository
         LoadFromFile();
     }
 
-    public int GetBaseTimeHundredths(Course course, int meters, Stroke stroke, int relayCount, Gender sex)
+    public int GetBaseTime(Course course, int meters, Stroke stroke, int relayCount, Gender sex)
     {
         if (meters <= 0 || relayCount < 0)
             return 0;
@@ -33,7 +33,7 @@ public sealed class CsvBaseTimeRepository : IBaseTimeRepository
         return _store.TryGetValue((course, meters, stroke, relayCount, sex), out var value) ? value : 0;
     }
 
-    public void SetBaseTimeHundredths(Course course, int meters, Stroke stroke, int relayCount, Gender sex,
+    public void SetBaseTime(Course course, int meters, Stroke stroke, int relayCount, Gender sex,
         int baseTimeHundredths)
     {
         if (meters <= 0 || relayCount < 0)

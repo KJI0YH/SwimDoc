@@ -20,7 +20,8 @@ public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbCo
 
     public HeatAllocationOutDto AllocateEntriesToHeats(HeatAllocationParameters parameters)
     {
-        var swimEvent = dbContext.SwimEvents.AsNoTracking().FirstOrDefault(swimEvent => swimEvent.Id == parameters.SwimEventId);
+        var swimEvent = dbContext.SwimEvents.AsNoTracking()
+            .FirstOrDefault(swimEvent => swimEvent.Id == parameters.SwimEventId);
         if (swimEvent is null) throw new EntityNotFoundException($"No such swim event: {parameters.SwimEventId}");
         var dataIn = new HeatAllocationInDto(parameters, swimEvent.LaneMin, swimEvent.LaneMax);
         var result = _runner.RunAction(dataIn);
@@ -44,89 +45,80 @@ public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbCo
         await dbContext.SaveChangesAsync();
     }
 
-    public async Task UpdateHeatResultsAsync(int heatId, IReadOnlyList<HeatLaneResultIn> results)
+    public Task<List<Heat>> GetHeatsByEventIdAsync(int eventId)
     {
-        var heat = await dbContext.Heats
-            .Include(h => h.Positions)
-            .ThenInclude(p => p.Entry)
-            .FirstOrDefaultAsync(h => h.Id == heatId);
-
-        if (heat is null)
-            throw new EntityNotFoundException($"No such heat: {heatId}");
-
-        if (heat.Status == HeatStatus.OFFICIAL)
-            throw new InvalidOperationException("Heat results are official and cannot be modified.");
-
-        var entryById = heat.Positions
-            .Where(p => p.Entry is not null)
-            .Select(p => p.Entry)
-            .DistinctBy(e => e!.Id)
-            .ToDictionary(e => e!.Id, e => e!);
-
-        foreach (var r in results)
-        {
-            if (!entryById.TryGetValue(r.EntryId, out var entry))
-                continue;
-
-            if (r.Status is EntryStatus.DNS or EntryStatus.DNF or EntryStatus.DSQ)
-            {
-                entry.Status = r.Status;
-                entry.FinishTime = null;
-                entry.Comment = r.Comment ?? string.Empty;
-                continue;
-            }
-
-            entry.Status = EntryStatus.FINISH;
-            entry.FinishTime = r.FinishTime;
-            entry.Comment = r.Comment ?? string.Empty;
-        }
-
-        if (heat.Status == HeatStatus.NOT_STARTED && results.Count > 0)
-            heat.Status = HeatStatus.UNOFFICIAL;
-
-        await dbContext.SaveChangesAsync();
+        return dbContext.Heats
+            .AsNoTracking()
+            .Where(heat => heat.SwimEventId == eventId)
+            .OrderBy(heat => heat.Order)
+            .Include(heat => heat.Positions.OrderBy(hp => hp.Lane))
+            .ThenInclude(hp => hp.Entry)
+            .ThenInclude(entry => entry.Athlete!)
+            .ThenInclude(athlete => athlete.Club)
+            .Include(heat => heat.Positions.OrderBy(hp => hp.Lane))
+            .ThenInclude(hp => hp.Entry)
+            .ThenInclude(entry => entry.SwimStyle)
+            .Include(heat => heat.Positions.OrderBy(hp => hp.Lane))
+            .ThenInclude(hp => hp.Entry)
+            .ThenInclude(entry => entry.SwimEvent)
+            .ToListAsync();
     }
-
-    public async Task ApproveHeatAsync(int heatId)
+    
+    public async Task ApproveHeatAsync(Heat incomingHeat)
     {
-        var heat = await dbContext.Heats
+        ArgumentNullException.ThrowIfNull(incomingHeat);
+        if (incomingHeat.Positions is null)
+            throw new ValidationException("Не переданы позиции заплыва.");
+
+        var trackedHeat = await dbContext.Heats
             .Include(h => h.Positions)
             .ThenInclude(p => p.Entry)
-            .FirstOrDefaultAsync(h => h.Id == heatId);
+            .FirstOrDefaultAsync(h => h.Id == incomingHeat.Id);
 
-        if (heat is null)
-            throw new EntityNotFoundException($"No such heat: {heatId}");
+        if (trackedHeat is null)
+            throw new EntityNotFoundException($"No such heat: {incomingHeat.Id}");
 
-        if (heat.Status == HeatStatus.OFFICIAL)
+        if (trackedHeat.Status == HeatStatus.OFFICIAL)
             return;
 
-        foreach (var pos in heat.Positions)
-        {
-            var entry = pos.Entry;
+        var incomingByEntryId = incomingHeat.Positions.ToDictionary(p => p.EntryId, p => p.Entry);
 
-            var ok = entry.Status switch
+        foreach (var trackedPosition in trackedHeat.Positions)
+        {
+            if (!incomingByEntryId.TryGetValue(trackedPosition.EntryId, out var incomingEntry))
+                throw new ValidationException($"Нет данных результата для заявки {trackedPosition.EntryId}.");
+
+            trackedPosition.Entry.Status = incomingEntry.Status;
+            trackedPosition.Entry.FinishTime = incomingEntry.FinishTime;
+            trackedPosition.Entry.Comment = incomingEntry.Comment;
+            trackedPosition.Entry.Points = incomingEntry.Points;
+
+            dbContext.NormalizeEntry(trackedPosition.Entry);
+        }
+
+        foreach (var position in trackedHeat.Positions)
+        {
+            var entry = position.Entry;
+            var isResultProvided = entry.Status switch
             {
                 EntryStatus.FINISH => entry.FinishTime.HasValue,
                 EntryStatus.DNS or EntryStatus.DNF or EntryStatus.DSQ => true,
                 _ => false
             };
 
-            if (!ok)
-                throw new ValidationException("Not all lane results are provided.");
+            if (!isResultProvided) throw new ValidationException("Not all lane results are provided.");
         }
 
-        heat.Status = HeatStatus.OFFICIAL;
+        trackedHeat.Status = HeatStatus.OFFICIAL;
         await dbContext.SaveChangesAsync();
     }
 
     public async Task UnapproveHeatAsync(int heatId)
     {
         var heat = await dbContext.Heats.FirstOrDefaultAsync(h => h.Id == heatId);
-        if (heat is null)
-            throw new EntityNotFoundException($"No such heat: {heatId}");
+        if (heat is null) throw new EntityNotFoundException($"No such heat: {heatId}");
 
-        if (heat.Status != HeatStatus.OFFICIAL)
-            return;
+        if (heat.Status != HeatStatus.OFFICIAL) return;
 
         heat.Status = HeatStatus.UNOFFICIAL;
         await dbContext.SaveChangesAsync();

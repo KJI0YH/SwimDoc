@@ -10,7 +10,6 @@ using EntriesViewModel = UI.ViewModels.Pages.EntriesViewModel;
 using EventDetailsViewModel = UI.ViewModels.Pages.EventDetailsViewModel;
 using EventsViewModel = UI.ViewModels.Pages.EventsViewModel;
 using HeatsViewModel = UI.ViewModels.Pages.HeatsViewModel;
-using HeatsResultsViewModel = UI.ViewModels.Pages.HeatsResultsViewModel;
 using ResultsViewModel = UI.ViewModels.Pages.ResultsViewModel;
 using SwimStyleDetailsViewModel = UI.ViewModels.Pages.SwimStyleDetailsViewModel;
 
@@ -25,7 +24,7 @@ public class NavigationService(IServiceProvider serviceProvider) : INavigationSe
     {
         [typeof(EventsViewModel)] = typeof(EventsPage),
         [typeof(HeatsViewModel)] = typeof(HeatsPage),
-        [typeof(HeatsResultsViewModel)] = typeof(HeatsResultsPage),
+        [typeof(FixationViewModel)] = typeof(FixationPage),
         [typeof(ResultsViewModel)] = typeof(ResultsPage),
         [typeof(EntriesViewModel)] = typeof(EntriesPage),
         [typeof(AthletesViewModel)] = typeof(AthletesPage),

@@ -18,7 +18,7 @@ public partial class MainViewModel : ViewModelBase
         Pages.CompetitionSelectionViewModel competitionSelectionViewModel,
         EventsViewModel eventsViewModel,
         HeatsViewModel heatsViewModel,
-        HeatsResultsViewModel heatsResultsViewModel,
+        FixationViewModel fixationViewModel,
         EntriesViewModel entriesViewModel,
         AthletesViewModel athletesViewModel,
         ClubsViewModel clubsViewModel,
@@ -34,7 +34,7 @@ public partial class MainViewModel : ViewModelBase
 
         EventsViewModel = eventsViewModel;
         HeatsViewModel = heatsViewModel;
-        HeatsResultsViewModel = heatsResultsViewModel;
+        FixationViewModel = fixationViewModel;
         EntriesViewModel = entriesViewModel;
         AthletesViewModel = athletesViewModel;
         ClubsViewModel = clubsViewModel;
@@ -46,7 +46,7 @@ public partial class MainViewModel : ViewModelBase
         NavigateToHeatsCommand =
             new NavigationCommand<HeatsViewModel>(_navigationService, () => _isCompetitionSelected);
         NavigateToHeatsResultsCommand =
-            new NavigationCommand<HeatsResultsViewModel>(_navigationService, () => _isCompetitionSelected);
+            new NavigationCommand<FixationViewModel>(_navigationService, () => _isCompetitionSelected);
         NavigateToEntriesCommand =
             new NavigationCommand<EntriesViewModel>(_navigationService, () => _isCompetitionSelected);
         NavigateToAthletesCommand =
@@ -63,7 +63,7 @@ public partial class MainViewModel : ViewModelBase
 
     public EventsViewModel EventsViewModel { get; }
     public HeatsViewModel HeatsViewModel { get; }
-    public HeatsResultsViewModel HeatsResultsViewModel { get; }
+    public FixationViewModel FixationViewModel { get; }
     public EntriesViewModel EntriesViewModel { get; }
     public AthletesViewModel AthletesViewModel { get; }
     public ClubsViewModel ClubsViewModel { get; }
@@ -83,7 +83,7 @@ public partial class MainViewModel : ViewModelBase
     {
         ((NavigationCommand<EventsViewModel>)NavigateToEventsCommand).RaiseCanExecuteChanged();
         ((NavigationCommand<HeatsViewModel>)NavigateToHeatsCommand).RaiseCanExecuteChanged();
-        ((NavigationCommand<HeatsResultsViewModel>)NavigateToHeatsResultsCommand).RaiseCanExecuteChanged();
+        ((NavigationCommand<FixationViewModel>)NavigateToHeatsResultsCommand).RaiseCanExecuteChanged();
         ((NavigationCommand<EntriesViewModel>)NavigateToEntriesCommand).RaiseCanExecuteChanged();
         ((NavigationCommand<AthletesViewModel>)NavigateToAthletesCommand).RaiseCanExecuteChanged();
         ((NavigationCommand<ClubsViewModel>)NavigateToClubsCommand).RaiseCanExecuteChanged();

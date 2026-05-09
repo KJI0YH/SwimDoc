@@ -3,9 +3,9 @@ using UI.ViewModels.Pages;
 
 namespace UI.Views.Pages;
 
-public partial class HeatsResultsPage : Page
+public partial class FixationPage : Page
 {
-    public HeatsResultsPage(HeatsResultsViewModel viewModel)
+    public FixationPage(FixationViewModel viewModel)
     {
         InitializeComponent();
         DataContext = viewModel;

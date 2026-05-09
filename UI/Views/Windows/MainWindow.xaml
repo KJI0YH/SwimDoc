@@ -84,7 +84,7 @@
             <dataGridView:EventsView />
         </DataTemplate>
         <DataTemplate DataType="{x:Type vm1:HeatsViewModel}">
-            <dataGridView:HeatPositionsGroupedView />
+            <dataGridView:HeatsView />
         </DataTemplate>
         <DataTemplate DataType="{x:Type vm1:EntriesViewModel}">
             <dataGridView:EntriesView />
@@ -163,7 +163,7 @@
                 <ui:NavigationViewItem Content="Фиксация"
                                        Tag="HeatsResults"
                                        Icon="{ui:SymbolIcon Clock24}"
-                                       TargetPageType="{x:Type pages:HeatsResultsPage}"
+                                       TargetPageType="{x:Type pages:FixationPage}"
                                        IsEnabled="{Binding IsCompetitionSelected}" />
                 <ui:NavigationViewItem Content="Результаты"
                                        Tag="Results"

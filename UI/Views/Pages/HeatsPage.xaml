@@ -3,5 +3,5 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       ScrollViewer.CanContentScroll="False"
       xmlns:dataGridView="clr-namespace:UI.Views.Controls.DataGridView">
-    <dataGridView:HeatPositionsGroupedView />
+    <dataGridView:HeatsView />
 </Page>

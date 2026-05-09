@@ -11,7 +11,7 @@
         </Grid.RowDefinitions>
         <TabControl Grid.Row="1" Margin="5">
             <TabItem Header="Заплыв">
-                <dataGridView:HeatPositionsGroupedView DataContext="{Binding HeatTable}"/>
+                <dataGridView:HeatsView DataContext="{Binding HeatTable}"/>
             </TabItem>
         </TabControl>
     </Grid>

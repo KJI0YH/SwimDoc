@@ -4,9 +4,9 @@ namespace ServiceLayer.BaseTimeRepository;
 
 public interface IBaseTimeRepository
 {
-    int GetBaseTimeHundredths(Course course, int meters, Stroke stroke, int relayCount, Gender sex);
+    int GetBaseTime(Course course, int meters, Stroke stroke, int relayCount, Gender sex);
 
-    void SetBaseTimeHundredths(Course course, int meters, Stroke stroke, int relayCount, Gender sex, int baseTimeHundredths);
+    void SetBaseTime(Course course, int meters, Stroke stroke, int relayCount, Gender sex, int baseTimeHundredths);
 
     void Save();
 }

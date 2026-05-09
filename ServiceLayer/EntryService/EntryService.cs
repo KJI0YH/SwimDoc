@@ -22,4 +22,15 @@ public class EntryService(EfCoreContext dbContext) : CrudService<Entry, int?>(db
         entity = dbContext.NormalizeEntry(entity);
         return base.UpdateAsync(entity, cancellationToken);
     }
+
+    public Task<List<Entry>> GetEntriesByEventIdOrderByFinishTimeAsync(int eventId)
+    {
+        return dbContext.Entries
+            .Where(e => e.SwimEventId == eventId)
+            .Include(e => e.Athlete!)
+            .ThenInclude(a => a.Club)
+            .OrderBy(e => e.Status > EntryStatus.FINISH ? 1 : 0)
+            .ThenBy(e => e.Status == EntryStatus.FINISH ? (e.FinishTime ?? int.MaxValue) : int.MaxValue)
+            .ToListAsync();
+    }
 }

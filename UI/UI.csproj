@@ -38,12 +38,12 @@
             <XamlRuntime>Wpf</XamlRuntime>
             <SubType>Designer</SubType>
         </Page>
-        <Page Update="Views\Pages\HeatsResultsPage.xaml">
+        <Page Update="Views\Pages\FixationPage.xaml">
             <Generator>MSBuild:Compile</Generator>
             <XamlRuntime>Wpf</XamlRuntime>
             <SubType>Designer</SubType>
         </Page>
-        <Page Update="Views\Controls\DataGridView\HeatPositionsGroupedView.xaml">
+        <Page Update="Views\Controls\DataGridView\HeatsView.xaml">
             <Generator>MSBuild:Compile</Generator>
             <XamlRuntime>Wpf</XamlRuntime>
             <SubType>Designer</SubType>
@@ -159,7 +159,7 @@
             <XamlRuntime>Wpf</XamlRuntime>
             <SubType>Designer</SubType>
         </Page>
-        <Page Update="Views\Controls\DataGridView\HeatsResultsView.xaml">
+        <Page Update="Views\Controls\DataGridView\FixationView.xaml">
             <Generator>MSBuild:Compile</Generator>
             <XamlRuntime>Wpf</XamlRuntime>
             <SubType>Designer</SubType>

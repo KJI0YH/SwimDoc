@@ -4,13 +4,12 @@ namespace ServiceLayer.PointScoreProvider;
 
 public interface IPointScoreProvider
 {
-    int? CalculatePoints(
+    int CalculatePoints(
         Course course,
         int meters,
         Stroke stroke,
         int relayCount,
         Gender sex,
-        int finishTimeHundredths,
-        bool scoring);
+        int? finishTimeHundredths);
 }
 

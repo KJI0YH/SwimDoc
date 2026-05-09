@@ -2,9 +2,9 @@ using System.Windows.Controls;
 
 namespace UI.Views.Controls.DataGridView;
 
-public partial class HeatsResultsView : UserControl
+public partial class FixationView : UserControl
 {
-    public HeatsResultsView()
+    public FixationView()
     {
         InitializeComponent();
     }

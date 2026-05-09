@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Windows.Documents;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DataLayer.EfClasses;
@@ -9,11 +10,11 @@ using UI.ViewModels.Pages.Data;
 
 namespace UI.ViewModels.Pages;
 
-public partial class ResultsViewModel(IEventService eventService, IEntryService entryService) : 
+public partial class ResultsViewModel(IEventService eventService, IEntryService entryService) :
     DataViewModel<SwimEvent, int?>(eventService)
 {
     [ObservableProperty] private SwimEvent? _selectedSwimEvent;
-    [ObservableProperty] private ObservableCollection<ResultEntryRowViewModel> _rows = new();
+    [ObservableProperty] private ObservableCollection<ResultEntryView> _entries = new();
 
     protected override IQueryable<SwimEvent> ApplyQuery(IQueryable<SwimEvent> query)
     {
@@ -28,46 +29,44 @@ public partial class ResultsViewModel(IEventService eventService, IEntryService 
         if (items.Count == 0)
         {
             SelectedSwimEvent = null;
-            Rows = new ObservableCollection<ResultEntryRowViewModel>();
+            Entries = [];
             return;
         }
 
-        if (SelectedSwimEvent is null || items.All(e => e.Id != SelectedSwimEvent.Id))
-            SelectedSwimEvent = items.OrderBy(e => e.Order).FirstOrDefault();
+        SelectedSwimEvent ??= items.OrderBy(e => e.Order).FirstOrDefault();
     }
 
     partial void OnSelectedSwimEventChanged(SwimEvent? value)
     {
-        _ = LoadResultsForSelectedEventAsync();
+        _ = LoadEntriesAsync();
     }
 
-    private async Task LoadResultsForSelectedEventAsync()
+    private async Task LoadEntriesAsync()
     {
         if (SelectedSwimEvent?.Id is not int eventId)
         {
-            Rows = new ObservableCollection<ResultEntryRowViewModel>();
+            Entries = [];
             return;
         }
 
         IsLoading = true;
         try
         {
-            var entries = await entryService.Query()
-                .Where(e => e.SwimEventId == eventId)
-                .Include(e => e.Athlete!)
-                .ThenInclude(a => a.Club)
-                .OrderBy(e =>
-                    e.Status == EntryStatus.DNS || e.Status == EntryStatus.DNF || e.Status == EntryStatus.DSQ ? 1 : 0)
-                .ThenBy(e => e.Status == EntryStatus.FINISH ? (e.FinishTime ?? int.MaxValue) : int.MaxValue)
-                .ThenBy(e => e.Athlete != null ? e.Athlete.LastName : string.Empty)
-                .ThenBy(e => e.Athlete != null ? e.Athlete.FirstName : string.Empty)
-                .ToListAsync();
+            var entries = await entryService.GetEntriesByEventIdOrderByFinishTimeAsync(eventId);
 
-            var rows = entries
-                .Select((e, idx) => new ResultEntryRowViewModel(place: idx + 1, entry: e))
-                .ToList();
+            var place = 1;
+            List<ResultEntryView> orderedEntries = [new(place++, entries.First())];
+            var prevResult = orderedEntries.Last();
+            foreach (var entry in entries.Skip(1))
+            {
+                orderedEntries.Add(entry.FinishTime == prevResult.Entry.FinishTime
+                    ? new ResultEntryView(prevResult.Place, entry)
+                    : new ResultEntryView(place, entry));
+                prevResult = orderedEntries.Last();
+                place++;
+            }
 
-            Rows = new ObservableCollection<ResultEntryRowViewModel>(rows);
+            Entries = new ObservableCollection<ResultEntryView>(orderedEntries);
         }
         finally
         {
@@ -99,16 +98,10 @@ public partial class ResultsViewModel(IEventService eventService, IEntryService 
     }
 }
 
-public sealed class ResultEntryRowViewModel : ObservableObject
+public sealed class ResultEntryView(int place, Entry entry) : ObservableObject
 {
-    public ResultEntryRowViewModel(int place, Entry entry)
-    {
-        Place = place;
-        Entry = entry;
-    }
-
-    public int Place { get; }
-    public Entry Entry { get; }
+    public int Place { get; } = place;
+    public Entry Entry { get; } = entry;
 
     public string ParticipantName => Entry.Athlete?.DisplayName ?? string.Empty;
     public string ParticipantYearOfBirth => Entry.Athlete?.YearOfBirth.ToString() ?? string.Empty;
@@ -117,4 +110,3 @@ public sealed class ResultEntryRowViewModel : ObservableObject
     public string ResultText => Entry.DisplayFinishTime;
     public int? Points => Entry.Points;
 }
-

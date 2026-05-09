@@ -3,6 +3,7 @@ using ServiceLayer.EntryDocumentReaderService;
 using ServiceLayer.EntryService;
 using ServiceLayer.EventService;
 using ServiceLayer.HeatService;
+using ServiceLayer.PointScoreProvider;
 using UI.Services;
 using UI.ViewModels.Pages.Data;
 
@@ -12,7 +13,7 @@ public partial class EventDetailsViewModel : ViewModelBase, INavigationAware
 {
     private readonly EntriesByEventViewModel _entriesTable;
     private readonly HeatsByEventViewModel _heatsTable;
-    private readonly HeatResultsByEventViewModel _fixationTable;
+    private readonly FixationByEventViewModel _fixationTable;
     private readonly ResultsByEventViewModel _resultsTable;
 
     [ObservableProperty] private string? _title = string.Empty;
@@ -21,11 +22,12 @@ public partial class EventDetailsViewModel : ViewModelBase, INavigationAware
         IEntryService entryService,
         IEntryDocumentReaderService entryDocumentReaderService,
         IEventService eventService,
-        IHeatService heatService)
+        IHeatService heatService,
+        IPointScoreProvider pointScoreProvider)
     {
         _entriesTable = new EntriesByEventViewModel(entryService, entryDocumentReaderService);
         _heatsTable = new HeatsByEventViewModel(eventService, heatService);
-        _fixationTable = new HeatResultsByEventViewModel(eventService, heatService);
+        _fixationTable = new FixationByEventViewModel(eventService, heatService, pointScoreProvider);
         _resultsTable = new ResultsByEventViewModel(eventService, entryService);
     }
 

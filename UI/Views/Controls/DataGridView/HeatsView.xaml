@@ -1,4 +1,4 @@
-<UserControl x:Class="UI.Views.Controls.DataGridView.HeatPositionsGroupedView"
+<UserControl x:Class="UI.Views.Controls.DataGridView.HeatsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -32,8 +32,8 @@
             </StackPanel>
         </dataView:DefaultDataView.Toolbar>
         <dataView:DefaultDataView.MainContent>
-            <DataGrid Margin="5"
-                      ItemsSource="{Binding RowsView}"
+            <DataGrid ItemsSource="{Binding HeatPositionsView}"
+                      Margin="5"
                       AutoGenerateColumns="False"
                       CanUserAddRows="False"
                       IsReadOnly="True"
@@ -46,19 +46,23 @@
                             <DataTemplate>
                                 <Border Background="#FFE8EEF7" Padding="8,5" Margin="0,0,0,2">
                                     <TextBlock FontWeight="SemiBold"
-                                               Text="{Binding Path=Items[0].HeatGroupTitle}" />
+                                               Text="{Binding Path=Items[0].HeatGroupHeader}" />
                                 </Border>
                             </DataTemplate>
                         </GroupStyle.HeaderTemplate>
                     </GroupStyle>
                 </DataGrid.GroupStyle>
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Дорожка" Binding="{Binding Lane}" Width="80" />
-                    <DataGridTextColumn Header="Участник" Binding="{Binding Participant}" Width="*"/>
-                    <DataGridTextColumn Header="Год рождения" Binding="{Binding YearOfBirth}" Width="120" />
-                    <DataGridTextColumn Header="Команда" Binding="{Binding Club}" Width="*"/>
-                    <DataGridTextColumn Header="Заявочное" Binding="{Binding EntryTime}" Width="120" />
-                    <DataGridTextColumn Header="Результат" Binding="{Binding FinishTime}" Width="120" />
+                    <DataGridTextColumn Header="Дорожка" Binding="{Binding Lane}" IsReadOnly="True" Width="80" />
+                    <DataGridTextColumn Header="Участник" Binding="{Binding Participant}" IsReadOnly="True"
+                                        Width="*" />
+                    <DataGridTextColumn Header="Год рождения" Binding="{Binding YearOfBirth}" IsReadOnly="True"
+                                        Width="120" />
+                    <DataGridTextColumn Header="Команда" Binding="{Binding Club}" IsReadOnly="True" Width="*" />
+                    <DataGridTextColumn Header="Заявочное" Binding="{Binding EntryTime}" IsReadOnly="True"
+                                        Width="150" />
+                    <DataGridTextColumn Header="Результат" Binding="{Binding FinishTime}" IsReadOnly="True"
+                                        Width="150" />
                 </DataGrid.Columns>
             </DataGrid>
         </dataView:DefaultDataView.MainContent>

@@ -18,7 +18,7 @@
                 </dataView:DefaultDataView>
             </TabItem>
             <TabItem Header="Заплывы">
-                <dataGridView:HeatPositionsGroupedView DataContext="{Binding HeatsTable}"/>
+                <dataGridView:HeatsView DataContext="{Binding HeatsTable}"/>
             </TabItem>
         </TabControl>
     </Grid>
