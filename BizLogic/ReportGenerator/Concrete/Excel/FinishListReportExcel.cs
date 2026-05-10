@@ -70,12 +70,23 @@ public class FinishListReportExcel(EfCoreContext dbContext) : BaseReportExcel(db
             headerRange.Style.WrapText = true;
             row += 1;
 
-            var i = 1;
+            var place = 1;
+            var prevEntry = swimEvent.Entries.First();
+            var prevPlace = 1;
             foreach (var entry in swimEvent.Entries)
             {
                 var athlete = entry.Athlete;
 
-                worksheet.Cells[row, colNo].Value = i++;
+                if (prevEntry.FinishTime == entry.FinishTime)
+                {
+                    worksheet.Cells[row, colNo].Value = prevPlace;
+                }
+                else
+                {
+                    worksheet.Cells[row, colNo].Value = place;
+                    prevPlace = place;
+                }
+
                 worksheet.Cells[row, colParticipant].Value = athlete?.DisplayName ?? "(нет данных)";
                 worksheet.Cells[row, colBirthYear].Value = athlete?.YearOfBirth;
                 worksheet.Cells[row, colTeam].Value = athlete?.DisplayClubName ?? "(Лично)";
@@ -88,6 +99,8 @@ public class FinishListReportExcel(EfCoreContext dbContext) : BaseReportExcel(db
                 dataRange.Style.Border.Left.Style = ExcelBorderStyle.Thin;
                 dataRange.Style.Border.Right.Style = ExcelBorderStyle.Thin;
 
+                prevEntry = entry;
+                place++;
                 row += 1;
             }
         }

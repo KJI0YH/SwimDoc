@@ -224,7 +224,7 @@ public class HeatsByAthleteViewModel : HeatsViewModel
             var heatsTotal = HeatService.GetTotalHeats();
             var heatPositionViews = heatsForAthlete.SelectMany(h =>
                 h.Positions.Select(p =>
-                    new HeatPositionView(p, h.Number, heatsInEvent, h.Order, heatsTotal)));
+                    new HeatPositionView(p, h.Number, heatsInEvent, h.Order, heatsTotal, h.Status)));
             HeatPositions = new ObservableCollection<HeatPositionView>(heatPositionViews);
         }
         finally
