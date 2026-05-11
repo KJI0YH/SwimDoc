@@ -28,6 +28,26 @@ public class Entry : IValidatableObject
 
     public string DisplaySwimName => SwimEvent is not null ? SwimEvent.DisplayName : SwimStyle.DisplayName;
 
+    public string DisplayParticipantName
+    {
+        get
+        {
+            if (Athlete is not null)
+                return Athlete.DisplayName;
+
+            if (Relay is null)
+                return string.Empty;
+
+            var clubName = Relay.Club?.Name;
+            var numberPart = Relay.Number.HasValue ? $" {Relay.Number.Value}" : string.Empty;
+
+            if (!string.IsNullOrWhiteSpace(clubName))
+                return $"{clubName}{numberPart}";
+
+            return Relay.Number.HasValue ? Relay.Number.Value.ToString() : string.Empty;
+        }
+    }
+
     public string DisplayEntryTime => EntryTime == null
         ? "N.T."
         : (EntryTime / 6000 == 0 ? "" : $"{EntryTime / 6000}:")
@@ -66,6 +86,8 @@ public class Entry : IValidatableObject
 
         if (athlete is null && relay is null)
             yield return new ValidationResult("Participant must be provided");
+        if (relay is not null && SwimEventId is null)
+            yield return new ValidationResult("Swim event must be provided");
         if (swimStyle is null)
             yield return new ValidationResult("Swim style must be provided");
         if (existed is not null && currContext.Entry(this).State == EntityState.Added)

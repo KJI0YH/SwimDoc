@@ -17,81 +17,220 @@
         AllowsTransparency="True"
         Background="Transparent">
     <Window.Resources>
+        <helpers:NullableIntConverter x:Key="NullableIntConverter" />
     </Window.Resources>
     <addEditView:AddEditWindowView>
-        <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,0,0,15">
-            <StackPanel>
-                <Grid Margin="0,5">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="180" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0"
-                               Text="Участник"
-                               VerticalAlignment="Center"
-                               Margin="0,0,10,0" />
-                    <searchableComboBox:SearchableComboBox Grid.Column="1"
-                                                 ItemsSource="{Binding Athletes}"
-                                                 SelectedItem="{Binding SelectedAthlete, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                 Margin="0,2,0,2" />
-                    <Button Grid.Column="2"
-                            Content="{ui:SymbolIcon Add24}"
-                            Command="{Binding CreateAthleteCommand}"
-                            Margin="5,2,0,2"
-                            Padding="9" />
-                </Grid>
+        <TabControl SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    Margin="0,0,0,15">
+            <TabItem Header="Личная заявка"
+                     IsEnabled="{Binding IsIndividualTabEnabled}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <Grid Margin="0,5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="180" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0"
+                                       Text="Участник"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,10,0" />
+                            <searchableComboBox:SearchableComboBox Grid.Column="1"
+                                                                   ItemsSource="{Binding Athletes}"
+                                                                   SelectedItem="{Binding SelectedAthlete, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                   Margin="0,2,0,2" />
+                            <Button Grid.Column="2"
+                                    Content="{ui:SymbolIcon Add24}"
+                                    Command="{Binding CreateAthleteCommand}"
+                                    Margin="5,2,0,2"
+                                    Padding="9" />
+                        </Grid>
 
-                <Grid Margin="0,5">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="180" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0"
-                               Text="Событие"
-                               VerticalAlignment="Center"
-                               Margin="0,0,10,0" />
-                    <searchableComboBox:SearchableComboBox Grid.Column="1"
-                                                 ItemsSource="{Binding SwimEvents}"
-                                                 SelectedItem="{Binding SelectedSwimEvent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                 Margin="0,2,0,2" />
-                    <Button Grid.Column="2"
-                            Content="{ui:SymbolIcon Add24}"
-                            Command="{Binding CreateSwimEventCommand}"
-                            Margin="5,2,0,2"
-                            Padding="9" />
-                </Grid>
+                        <Grid Margin="0,5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="180" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0"
+                                       Text="Событие"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,10,0" />
+                            <searchableComboBox:SearchableComboBox Grid.Column="1"
+                                                                   ItemsSource="{Binding SwimEvents}"
+                                                                   SelectedItem="{Binding SelectedSwimEvent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                   Margin="0,2,0,2" />
+                            <Button Grid.Column="2"
+                                    Content="{ui:SymbolIcon Add24}"
+                                    Command="{Binding CreateSwimEventCommand}"
+                                    Margin="5,2,0,2"
+                                    Padding="9" />
+                        </Grid>
 
-                <Grid Margin="0,5">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="180" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0"
-                               Text="Заявочное время"
-                               VerticalAlignment="Center"
-                               Margin="0,0,10,0" />
-                    <ui:TextBox Grid.Column="1"
-                                Text="{Binding EntryTimeText, UpdateSourceTrigger=PropertyChanged}"
-                                Margin="0,2,0,2"
-                                PlaceholderText="N.T." />
-                </Grid>
+                        <Grid Margin="0,5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="180" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0"
+                                       Text="Заявочное время"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,10,0" />
+                            <ui:TextBox Grid.Column="1"
+                                        Text="{Binding EntryTimeText, UpdateSourceTrigger=PropertyChanged}"
+                                        Margin="0,2,0,2"
+                                        PlaceholderText="N.T." />
+                        </Grid>
 
-                <Grid Margin="0,5">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="180" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0"
-                               Text="В зачёт"
-                               VerticalAlignment="Center"
-                               Margin="0,0,10,0" />
-                    <CheckBox Grid.Column="1"
-                              IsChecked="{Binding Scoring, UpdateSourceTrigger=PropertyChanged}"
-                              VerticalAlignment="Center" />
-                </Grid>
-            </StackPanel>
-        </ScrollViewer>
+                        <Grid Margin="0,5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="180" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0"
+                                       Text="В зачёт"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,10,0" />
+                            <CheckBox Grid.Column="1"
+                                      IsChecked="{Binding Scoring, UpdateSourceTrigger=PropertyChanged}"
+                                      VerticalAlignment="Center" />
+                        </Grid>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <TabItem Header="Эстафета"
+                     IsEnabled="{Binding IsRelayTabEnabled}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <Grid Margin="0,5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="180" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0"
+                                       Text="Команда"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,10,0" />
+                            <searchableComboBox:SearchableComboBox Grid.Column="1"
+                                                                   ItemsSource="{Binding Clubs}"
+                                                                   SelectedItem="{Binding SelectedClub, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                   Margin="0,2,0,2" />
+                            <Button Grid.Column="2"
+                                    Content="{ui:SymbolIcon Add24}"
+                                    Command="{Binding CreateClubCommand}"
+                                    Margin="5,2,0,2"
+                                    Padding="9" />
+                        </Grid>
+                        
+                        <Grid Margin="0,5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="180" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0"
+                                       Text="Номер"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,10,0" />
+                            <ui:NumberBox Grid.Column="1"
+                                          Minimum="1"
+                                          Value="{Binding RelayNumber, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource NullableIntConverter}, TargetNullValue=''}"
+                                          Margin="0,2,0,2"
+                                          PlaceholderText="Авто" />
+                        </Grid>
+
+                        <Grid Margin="0,5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="180" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0"
+                                       Text="Событие"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,10,0" />
+                            <searchableComboBox:SearchableComboBox Grid.Column="1"
+                                                                   ItemsSource="{Binding RelaySwimEvents}"
+                                                                   SelectedItem="{Binding SelectedRelaySwimEvent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                   Margin="0,2,0,2" />
+                            <Button Grid.Column="2"
+                                    Content="{ui:SymbolIcon Add24}"
+                                    Command="{Binding CreateRelaySwimEventCommand}"
+                                    Margin="5,2,0,2"
+                                    Padding="9" />
+                        </Grid>
+
+                        <Border Margin="0,5" CornerRadius="6" BorderThickness="1" BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="260">
+                                <ItemsControl ItemsSource="{Binding RelayLegs}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="0,5">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="50" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="140" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0"
+                                                           Text="{Binding Order}"
+                                                           VerticalAlignment="Center" />
+                                                <searchableComboBox:SearchableComboBox Grid.Column="1"
+                                                                                       ItemsSource="{Binding DataContext.RelayAthletes, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                                       SelectedItem="{Binding SelectedAthlete, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                                       Margin="0,2,10,2" />
+                                                <Button Grid.Column="2"
+                                                        Content="{ui:SymbolIcon Add24}"
+                                                        Command="{Binding DataContext.CreateRelayLegAthleteCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                        CommandParameter="{Binding}"
+                                                        Margin="0,2,10,2"
+                                                        Padding="9" />
+                                                <ui:TextBox Grid.Column="3"
+                                                            Text="{Binding EntryTimeText, UpdateSourceTrigger=PropertyChanged}"
+                                                            Margin="0,2,0,2"
+                                                            PlaceholderText="N.T." />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Border>
+
+                        <Grid Margin="0,5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="180" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0"
+                                       Text="Заявочное время"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,10,0" />
+                            <ui:TextBox Grid.Column="1"
+                                        Text="{Binding EntryTimeText, UpdateSourceTrigger=PropertyChanged}"
+                                        Margin="0,2,0,2"
+                                        PlaceholderText="N.T." />
+                        </Grid>
+
+                        <Grid Margin="0,5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="180" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0"
+                                       Text="В зачёт"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,10,0" />
+                            <CheckBox Grid.Column="1"
+                                      IsChecked="{Binding Scoring, UpdateSourceTrigger=PropertyChanged}"
+                                      VerticalAlignment="Center" />
+                        </Grid>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+        </TabControl>
     </addEditView:AddEditWindowView>
 </Window>

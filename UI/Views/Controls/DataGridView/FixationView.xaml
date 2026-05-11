@@ -94,7 +94,7 @@
                         <DataGridTextColumn Header="Дорожка" Binding="{Binding Lane}" IsReadOnly="True" Width="80" />
                         <DataGridTextColumn Header="Участник" Binding="{Binding ParticipantName}" IsReadOnly="True"
                                             Width="*" />
-                        <DataGridTextColumn Header="Год рождения" Binding="{Binding YearOfBirth}" IsReadOnly="True" Width="110"/>
+                        <DataGridTextColumn Header="Год рождения" Binding="{Binding YearOfBirth}" IsReadOnly="True" Width="120"/>
                         <DataGridTextColumn Header="Клуб" Binding="{Binding Club}" IsReadOnly="True" Width="*" />
                         <DataGridTextColumn Header="Заявочное" Binding="{Binding EntryTimeDisplay}" IsReadOnly="True"
                                             Width="100" />

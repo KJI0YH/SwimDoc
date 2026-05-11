@@ -111,7 +111,11 @@ public class EntriesByAthleteViewModel : EntriesViewModel
     protected override IQueryable<Entry> ApplyQuery(IQueryable<Entry> query)
     {
         query = base.ApplyQuery(query);
-        return _athleteId.HasValue ? query.Where(e => e.AthleteId == _athleteId.Value) : query.Where(_ => false);
+        return _athleteId.HasValue
+            ? query.Where(e =>
+                e.AthleteId == _athleteId.Value ||
+                (e.Relay != null && e.Relay.Positions.Any(p => p.AthleteId == _athleteId.Value)))
+            : query.Where(_ => false);
     }
 
     protected override void ShowAddEditDialog(int? id = default)
@@ -144,7 +148,9 @@ public class EntriesByClubViewModel : EntriesViewModel
     {
         query = base.ApplyQuery(query);
         return _clubId.HasValue
-            ? query.Where(e => e.Athlete != null && e.Athlete.ClubId == _clubId.Value)
+            ? query.Where(e =>
+                (e.Athlete != null && e.Athlete.ClubId == _clubId.Value) ||
+                (e.Relay != null && e.Relay.ClubId == _clubId.Value))
             : query.Where(_ => false);
     }
 

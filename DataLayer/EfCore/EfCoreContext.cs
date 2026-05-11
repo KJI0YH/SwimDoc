@@ -253,7 +253,7 @@ public sealed class EfCoreContext : DbContext
                       FROM Athletes a
                       JOIN AgeGroups ag ON ag.Id = NEW.AgeGroupId
                       WHERE a.Id = Entries.AthleteId
-                        AND a.Gender = ag.Gender
+                        AND (a.Gender = ag.Gender OR ag.Gender = 2) -- 2 = Mixed
                         AND a.YearOfBirth >= COALESCE(ag.BirthYearMin, 0)
                         AND a.YearOfBirth <= COALESCE(ag.BirthYearMax, 2147483647)
                   );
@@ -271,15 +271,39 @@ public sealed class EfCoreContext : DbContext
                   AND Status = 1
                   AND (
                       SwimStyleId != NEW.SwimStyleId
-                      OR AthleteId IS NULL
-                      OR NOT EXISTS (
-                          SELECT 1
-                          FROM Athletes a
-                          JOIN AgeGroups ag ON ag.Id = NEW.AgeGroupId
-                          WHERE a.Id = Entries.AthleteId
-                            AND a.Gender = ag.Gender
-                            AND a.YearOfBirth >= COALESCE(ag.BirthYearMin, 0)
-                            AND a.YearOfBirth <= COALESCE(ag.BirthYearMax, 2147483647)
+                      OR (
+                          -- Individual entry: validate by athlete against the age group.
+                          RelayId IS NULL
+                          AND AthleteId IS NOT NULL
+                          AND NOT EXISTS (
+                              SELECT 1
+                              FROM Athletes a
+                              JOIN AgeGroups ag ON ag.Id = NEW.AgeGroupId
+                              WHERE a.Id = Entries.AthleteId
+                                AND (a.Gender = ag.Gender OR ag.Gender = 2) -- 2 = Mixed
+                                AND a.YearOfBirth >= COALESCE(ag.BirthYearMin, 0)
+                                AND a.YearOfBirth <= COALESCE(ag.BirthYearMax, 2147483647)
+                          )
+                      )
+                      OR (
+                          -- Relay entry: validate each relay position athlete against the age group.
+                          RelayId IS NOT NULL
+                          AND (
+                              -- Important: do NOT unlink solely because positions aren't inserted yet
+                              -- (cascade inserts may create Entry before RelayPositions).
+                              EXISTS (
+                                  SELECT 1
+                                  FROM RelayPositions rp
+                                  JOIN Athletes a ON a.Id = rp.AthleteId
+                                  JOIN AgeGroups ag ON ag.Id = NEW.AgeGroupId
+                                  WHERE rp.RelayId = Entries.RelayId
+                                    AND NOT (
+                                        (a.Gender = ag.Gender OR ag.Gender = 2) -- 2 = Mixed
+                                        AND a.YearOfBirth >= COALESCE(ag.BirthYearMin, 0)
+                                        AND a.YearOfBirth <= COALESCE(ag.BirthYearMax, 2147483647)
+                                    )
+                              )
+                          )
                       )
                   );
 
@@ -294,9 +318,90 @@ public sealed class EfCoreContext : DbContext
                       FROM Athletes a
                       JOIN AgeGroups ag ON ag.Id = NEW.AgeGroupId
                       WHERE a.Id = Entries.AthleteId
-                        AND a.Gender = ag.Gender
+                        AND (a.Gender = ag.Gender OR ag.Gender = 2) -- 2 = Mixed
                         AND a.YearOfBirth >= COALESCE(ag.BirthYearMin, 0)
                         AND a.YearOfBirth <= COALESCE(ag.BirthYearMax, 2147483647)
+                  );
+            END;
+            """);
+
+        Database.ExecuteSqlRaw("""
+            CREATE TRIGGER IF NOT EXISTS trg_relay_positions_after_insert_validate_entry_event
+            AFTER INSERT ON RelayPositions
+            BEGIN
+                UPDATE Entries
+                SET SwimEventId = NULL,
+                    Status = 0
+                WHERE RelayId = NEW.RelayId
+                  AND Status = 1
+                  AND SwimEventId IS NOT NULL
+                  AND EXISTS (
+                      SELECT 1
+                      FROM RelayPositions rp
+                      JOIN Athletes a ON a.Id = rp.AthleteId
+                      JOIN SwimEvents se ON se.Id = Entries.SwimEventId
+                      JOIN AgeGroups ag ON ag.Id = se.AgeGroupId
+                      WHERE rp.RelayId = Entries.RelayId
+                        AND NOT (
+                            (a.Gender = ag.Gender OR ag.Gender = 2) -- 2 = Mixed
+                            AND a.YearOfBirth >= COALESCE(ag.BirthYearMin, 0)
+                            AND a.YearOfBirth <= COALESCE(ag.BirthYearMax, 2147483647)
+                        )
+                  );
+            END;
+            """);
+
+        Database.ExecuteSqlRaw("""
+            CREATE TRIGGER IF NOT EXISTS trg_relay_positions_after_update_validate_entry_event
+            AFTER UPDATE ON RelayPositions
+            BEGIN
+                UPDATE Entries
+                SET SwimEventId = NULL,
+                    Status = 0
+                WHERE RelayId = NEW.RelayId
+                  AND Status = 1
+                  AND SwimEventId IS NOT NULL
+                  AND EXISTS (
+                      SELECT 1
+                      FROM RelayPositions rp
+                      JOIN Athletes a ON a.Id = rp.AthleteId
+                      JOIN SwimEvents se ON se.Id = Entries.SwimEventId
+                      JOIN AgeGroups ag ON ag.Id = se.AgeGroupId
+                      WHERE rp.RelayId = Entries.RelayId
+                        AND NOT (
+                            (a.Gender = ag.Gender OR ag.Gender = 2) -- 2 = Mixed
+                            AND a.YearOfBirth >= COALESCE(ag.BirthYearMin, 0)
+                            AND a.YearOfBirth <= COALESCE(ag.BirthYearMax, 2147483647)
+                        )
+                  );
+            END;
+            """);
+
+        Database.ExecuteSqlRaw("""
+            CREATE TRIGGER IF NOT EXISTS trg_relay_positions_after_delete_validate_entry_event
+            AFTER DELETE ON RelayPositions
+            BEGIN
+                UPDATE Entries
+                SET SwimEventId = NULL,
+                    Status = 0
+                WHERE RelayId = OLD.RelayId
+                  AND Status = 1
+                  AND SwimEventId IS NOT NULL
+                  AND (
+                      NOT EXISTS (SELECT 1 FROM RelayPositions rp WHERE rp.RelayId = Entries.RelayId)
+                      OR EXISTS (
+                          SELECT 1
+                          FROM RelayPositions rp
+                          JOIN Athletes a ON a.Id = rp.AthleteId
+                          JOIN SwimEvents se ON se.Id = Entries.SwimEventId
+                          JOIN AgeGroups ag ON ag.Id = se.AgeGroupId
+                          WHERE rp.RelayId = Entries.RelayId
+                            AND NOT (
+                                (a.Gender = ag.Gender OR ag.Gender = 2) -- 2 = Mixed
+                                AND a.YearOfBirth >= COALESCE(ag.BirthYearMin, 0)
+                                AND a.YearOfBirth <= COALESCE(ag.BirthYearMax, 2147483647)
+                            )
+                      )
                   );
             END;
             """);

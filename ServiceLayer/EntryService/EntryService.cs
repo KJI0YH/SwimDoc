@@ -16,11 +16,57 @@ public class EntryService(EfCoreContext dbContext) : CrudService<Entry, int?>(db
         return base.CreateAsync(entity, cancellationToken);
     }
 
-    public override Task<(Entry? entity, ImmutableList<ValidationResult> errors)> UpdateAsync(Entry entity,
+    public override async Task<(Entry? entity, ImmutableList<ValidationResult> errors)> UpdateAsync(Entry entity,
         CancellationToken cancellationToken = default)
     {
         entity = dbContext.NormalizeEntry(entity);
-        return base.UpdateAsync(entity, cancellationToken);
+
+        if (entity.Relay == null && entity.RelayId == null)
+            return await base.UpdateAsync(entity, cancellationToken);
+
+        var id = entity.Id;
+        var tracked = await dbContext.Entries
+            .Include(e => e.Relay)
+            .ThenInclude(r => r.Positions)
+            .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+
+        if (tracked == null)
+            throw new InvalidOperationException($"Entity with Id {id} was not found in the database.");
+
+        // Update entry scalar fields
+        dbContext.Entry(tracked).CurrentValues.SetValues(entity);
+
+        // Sync relay fields + positions
+        if (tracked.Relay != null)
+        {
+            if (entity.Relay != null)
+            {
+                tracked.Relay.ClubId = entity.Relay.ClubId;
+                tracked.Relay.Number = entity.Relay.Number;
+            }
+
+            var incomingPositions = entity.Relay?.Positions?.ToList() ?? [];
+
+            tracked.Relay.Positions ??= new List<RelayPosition>();
+            tracked.Relay.Positions.Clear();
+
+            foreach (var p in incomingPositions.OrderBy(p => p.Order))
+            {
+                tracked.Relay.Positions.Add(new RelayPosition
+                {
+                    RelayId = tracked.Relay.Id,
+                    AthleteId = p.AthleteId,
+                    Order = p.Order,
+                    EntryTime = p.EntryTime
+                });
+            }
+        }
+
+        var errors = await dbContext.SaveChangesWithValidationAsync();
+        if (errors.Count > 0)
+            await dbContext.Entry(tracked).ReloadAsync(cancellationToken).ConfigureAwait(false);
+
+        return (tracked, errors);
     }
 
     public Task<List<Entry>> GetEntriesByEventIdOrderByFinishTimeAsync(int eventId)
@@ -32,5 +78,24 @@ public class EntryService(EfCoreContext dbContext) : CrudService<Entry, int?>(db
             .OrderBy(e => e.Status > EntryStatus.FINISH ? 1 : 0)
             .ThenBy(e => e.Status == EntryStatus.FINISH ? (e.FinishTime ?? int.MaxValue) : int.MaxValue)
             .ToListAsync();
+    }
+
+    public override async Task DeleteAsync(int? id, CancellationToken cancellationToken = default)
+    {
+        if (id == null) return;
+
+        var entry = await dbContext.Entries
+            .Include(e => e.Relay)
+            .FirstOrDefaultAsync(e => e.Id == id.Value, cancellationToken);
+
+        if (entry == null) return;
+
+        var relay = entry.Relay;
+        dbContext.Entries.Remove(entry);
+
+        if (relay != null)
+            dbContext.Relays.Remove(relay);
+
+        await dbContext.SaveChangesAsync(cancellationToken);
     }
 }

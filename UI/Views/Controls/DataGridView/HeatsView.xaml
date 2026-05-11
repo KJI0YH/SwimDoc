@@ -32,15 +32,20 @@
             </StackPanel>
         </dataView:DefaultDataView.Toolbar>
         <dataView:DefaultDataView.MainContent>
-            <DataGrid ItemsSource="{Binding HeatPositionsView}"
-                      Margin="5"
-                      AutoGenerateColumns="False"
-                      CanUserAddRows="False"
-                      IsReadOnly="True"
-                      HeadersVisibility="Column"
-                      GridLinesVisibility="Horizontal"
-                      SelectionUnit="FullRow">
-                <DataGrid.GroupStyle>
+            <ui:DataGrid ItemsSource="{Binding HeatPositionsView}"
+                         Margin="5"
+                         AutoGenerateColumns="False"
+                         CanUserAddRows="False"
+                         CanUserResizeColumns="True"
+                         IsReadOnly="True"
+                         HeadersVisibility="Column"
+                         GridLinesVisibility="Horizontal"
+                         SelectionUnit="FullRow"
+                         HorizontalAlignment="Stretch"
+                         ColumnWidth="*"
+                         MinColumnWidth="80"
+                         ScrollViewer.HorizontalScrollBarVisibility="Auto">
+                <ui:DataGrid.GroupStyle>
                     <GroupStyle>
                         <GroupStyle.HeaderTemplate>
                             <DataTemplate>
@@ -51,20 +56,21 @@
                             </DataTemplate>
                         </GroupStyle.HeaderTemplate>
                     </GroupStyle>
-                </DataGrid.GroupStyle>
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="Дорожка" Binding="{Binding Lane}" IsReadOnly="True" Width="80" />
+                </ui:DataGrid.GroupStyle>
+                <ui:DataGrid.Columns>
+                    <DataGridTextColumn Header="Дорожка" Binding="{Binding Lane}" IsReadOnly="True" Width="90" MinWidth="80" />
                     <DataGridTextColumn Header="Участник" Binding="{Binding Participant}" IsReadOnly="True"
-                                        Width="*" />
+                                        Width="*" MinWidth="220" />
                     <DataGridTextColumn Header="Год рождения" Binding="{Binding YearOfBirth}" IsReadOnly="True"
-                                        Width="120" />
-                    <DataGridTextColumn Header="Команда" Binding="{Binding Club}" IsReadOnly="True" Width="*" />
+                                        Width="140" MinWidth="120" />
+                    <DataGridTextColumn Header="Команда" Binding="{Binding Club}" IsReadOnly="True" Width="*"
+                                        MinWidth="220" />
                     <DataGridTextColumn Header="Заявочное" Binding="{Binding EntryTime}" IsReadOnly="True"
-                                        Width="150" />
+                                        Width="160" MinWidth="140" />
                     <DataGridTextColumn Header="Результат" Binding="{Binding FinishTime}" IsReadOnly="True"
-                                        Width="150" />
-                </DataGrid.Columns>
-            </DataGrid>
+                                        Width="160" MinWidth="140" />
+                </ui:DataGrid.Columns>
+            </ui:DataGrid>
         </dataView:DefaultDataView.MainContent>
     </dataView:DefaultDataView>
 </UserControl>

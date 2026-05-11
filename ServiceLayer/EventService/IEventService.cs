@@ -8,4 +8,7 @@ public interface IEventService : ICrudService<SwimEvent, int?>
     int GetNextOrderNumber();
     
     (int min, int max) GetPreviousLanes();
+    
+    Task<List<SwimEvent>> GetIndividualEventsAsync();
+    Task<List<SwimEvent>> GetRelayEventsAsync();
 }

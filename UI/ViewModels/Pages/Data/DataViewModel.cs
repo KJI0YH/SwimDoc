@@ -176,7 +176,7 @@ public partial class DataViewModel<TEntity, TKey> : DataViewModelBase
 
             if (CurrentPage >= TotalPages && TotalPages > 0)
                 CurrentPage = TotalPages - 1;
-            if (TotalPages <= 0)
+            if (TotalPages <= 0 || CurrentPage < 0)
                 CurrentPage = 0;
             _suppressPageLoad = false;
 

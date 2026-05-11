@@ -108,17 +108,19 @@ public partial class EntriesViewModel(
             (query, direction) =>
             {
                 return direction == ListSortDirection.Ascending
-                    ? query.OrderBy(e => e.SwimEvent.Order)
-                    : query.OrderByDescending(e => e.SwimEvent.Order);
+                    ? query.OrderBy(e => e.SwimEvent != null ? e.SwimEvent.Order : int.MaxValue)
+                    : query.OrderByDescending(e => e.SwimEvent != null ? e.SwimEvent.Order : int.MaxValue);
             }));
-        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("Athlete.DisplayName", "Участник", 300,
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("DisplayParticipantName", "Участник", 300,
             (query, direction) => QueryableSortByDirection.Sort(query, direction,
                 q => Queryable
-                    .OrderBy<Entry, string>(q, e => e.Athlete != null ? e.Athlete.LastName : null)
-                    .ThenBy(e => e.Athlete != null ? e.Athlete.FirstName : null),
+                    .OrderBy<Entry, string>(q, e => e.Athlete != null ? e.Athlete.LastName : e.Relay != null ? e.Relay.Club.Name : null)
+                    .ThenBy(e => e.Athlete != null ? e.Athlete.FirstName : null)
+                    .ThenBy(e => e.Id),
                 q => Queryable
-                    .OrderByDescending<Entry, string>(q, e => e.Athlete != null ? e.Athlete.LastName : null)
-                    .ThenByDescending(e => e.Athlete != null ? e.Athlete.FirstName : null))));
+                    .OrderByDescending<Entry, string>(q, e => e.Athlete != null ? e.Athlete.LastName : e.Relay != null ? e.Relay.Club.Name : null)
+                    .ThenByDescending(e => e.Athlete != null ? e.Athlete.FirstName : null)
+                    .ThenByDescending(e => e.Id))));
         ColumnConfigurations.Add(new ColumnConfiguration<Entry>("Status", "Статус", 150));
         ColumnConfigurations.Add(new ColumnConfiguration<Entry>("DisplayEntryTime", "Заявочное время", 130,
             (query, direction) =>
@@ -150,6 +152,11 @@ public partial class EntriesViewModel(
     {
         return query
             .Include(entry => entry.Athlete)
+            .Include(entry => entry.Relay)
+            .ThenInclude(relay => relay.Club)
+            .Include(entry => entry.Relay)
+            .ThenInclude(relay => relay.Positions)
+            .ThenInclude(pos => pos.Athlete)
             .Include(entry => entry.SwimStyle)
             .Include(entry => entry.SwimEvent)
             .ThenInclude(se => se.SwimStyle)
@@ -174,8 +181,12 @@ public partial class EntriesViewModel(
             return query.Where(e => e.SwimStyle.Stroke == stroke);
 
         return Queryable.Where(query, e =>
-            EF.Functions.Like(e.Athlete.FirstName, $"%{SearchText}%") ||
-            EF.Functions.Like(e.Athlete.LastName, $"%{SearchText}%"));
+            (e.Athlete != null && (EF.Functions.Like(e.Athlete.FirstName, $"%{SearchText}%") ||
+                                  EF.Functions.Like(e.Athlete.LastName, $"%{SearchText}%"))) ||
+            (e.Relay != null && EF.Functions.Like(e.Relay.Club.Name, $"%{SearchText}%")) ||
+            (e.Relay != null && e.Relay.Positions.Any(p =>
+                EF.Functions.Like(p.Athlete.FirstName, $"%{SearchText}%") ||
+                EF.Functions.Like(p.Athlete.LastName, $"%{SearchText}%"))));
     }
 
     protected override void ShowAddEditDialog(int? id = default)
