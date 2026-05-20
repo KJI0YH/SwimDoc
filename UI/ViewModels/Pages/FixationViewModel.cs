@@ -16,6 +16,8 @@ public partial class FixationViewModel(
     IPointScoreProvider pointScoreProvider)
     : DataViewModel<SwimEvent, int?>(eventService)
 {
+    public event Action<int>? EventResultsChanged;
+
     [ObservableProperty] private SwimEvent? _selectedSwimEvent;
 
     [ObservableProperty] private Heat? _selectedHeat;
@@ -159,6 +161,8 @@ public partial class FixationViewModel(
             await heatService.ApproveHeatAsync(SelectedHeat);
             await LoadEventHeatsAsync();
             SelectedHeat = EventHeats.FirstOrDefault(h => h.Id == keepHeatId) ?? SelectedHeat;
+            if (SelectedSwimEvent?.Id is int eventId)
+                EventResultsChanged?.Invoke(eventId);
         }
         catch
         {
@@ -176,6 +180,8 @@ public partial class FixationViewModel(
         {
             await heatService.UnapproveHeatAsync(heatId);
             await LoadEventHeatsAsync();
+            if (SelectedSwimEvent?.Id is int eventId)
+                EventResultsChanged?.Invoke(eventId);
         }
         catch
         {
@@ -259,11 +265,11 @@ public sealed partial class FixationHeatPositionView : ObservableObject
 
     public int Lane => _position.Lane;
 
-    public string ParticipantName => Entry.Athlete?.DisplayName ?? string.Empty;
+    public string ParticipantName => Entry.DisplayParticipantName;
 
     public string YearOfBirth => Entry.Athlete?.YearOfBirth.ToString() ?? string.Empty;
 
-    public string Club => Entry.Athlete?.DisplayClubName ?? string.Empty;
+    public string Club => Entry.DisplayParticipantClubName;
 
     public string EntryTimeDisplay => Entry.DisplayEntryTime;
 

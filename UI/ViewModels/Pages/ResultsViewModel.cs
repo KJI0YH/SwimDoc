@@ -16,6 +16,10 @@ public partial class ResultsViewModel(IEventService eventService, IEntryService 
     [ObservableProperty] private SwimEvent? _selectedSwimEvent;
     [ObservableProperty] private ObservableCollection<ResultEntryView> _entries = new();
 
+    public Task RefreshAsync() => LoadEntriesAsync();
+
+    protected Task LoadEntriesForEventIdAsync(int eventId) => LoadEntriesCoreAsync(eventId);
+
     protected override IQueryable<SwimEvent> ApplyQuery(IQueryable<SwimEvent> query)
     {
         return query
@@ -41,28 +45,38 @@ public partial class ResultsViewModel(IEventService eventService, IEntryService 
         _ = LoadEntriesAsync();
     }
 
-    private async Task LoadEntriesAsync()
+    private Task LoadEntriesAsync()
     {
         if (SelectedSwimEvent?.Id is not int eventId)
         {
             Entries = [];
-            return;
+            return Task.CompletedTask;
         }
 
+        return LoadEntriesCoreAsync(eventId);
+    }
+
+    private async Task LoadEntriesCoreAsync(int eventId)
+    {
         IsLoading = true;
         try
         {
             var entries = await entryService.GetEntriesByEventIdOrderByFinishTimeAsync(eventId);
+            if (entries.Count == 0)
+            {
+                Entries = [];
+                return;
+            }
 
             var place = 1;
-            List<ResultEntryView> orderedEntries = [new(place++, entries.First())];
-            var prevResult = orderedEntries.Last();
+            List<ResultEntryView> orderedEntries = [new(place++, entries[0])];
+            var prevResult = orderedEntries[0];
             foreach (var entry in entries.Skip(1))
             {
                 orderedEntries.Add(entry.FinishTime == prevResult.Entry.FinishTime
                     ? new ResultEntryView(prevResult.Place, entry)
                     : new ResultEntryView(place, entry));
-                prevResult = orderedEntries.Last();
+                prevResult = orderedEntries[^1];
                 place++;
             }
 
@@ -103,9 +117,9 @@ public sealed class ResultEntryView(int place, Entry entry) : ObservableObject
     public int Place { get; } = place;
     public Entry Entry { get; } = entry;
 
-    public string ParticipantName => Entry.Athlete?.DisplayName ?? string.Empty;
+    public string ParticipantName => Entry.DisplayParticipantName;
     public string ParticipantYearOfBirth => Entry.Athlete?.YearOfBirth.ToString() ?? string.Empty;
-    public string ClubName => Entry.Athlete?.DisplayClubName ?? string.Empty;
+    public string ClubName => Entry.DisplayParticipantClubName;
 
     public string ResultText => Entry.DisplayFinishTime;
     public int? Points => Entry.Points;

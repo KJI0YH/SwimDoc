@@ -225,7 +225,9 @@ public class HeatsByAthleteViewModel : HeatsViewModel
             var heats = await HeatService.GetHeatsByEventIdAsync(eventId);
             var heatsInEvent = heats.Count;
             var heatsForAthlete = heats
-                .Where(heat => heat.Positions.Any(hp => hp.Entry.AthleteId == _athleteId.Value))
+                .Where(heat => heat.Positions.Any(hp =>
+                    hp.Entry.AthleteId == _athleteId.Value ||
+                    (hp.Entry.Relay != null && hp.Entry.Relay.Positions.Any(p => p.AthleteId == _athleteId.Value))))
                 .ToList();
             var heatsTotal = HeatService.GetTotalHeats();
             var heatPositionViews = heatsForAthlete.SelectMany(h =>
@@ -255,9 +257,10 @@ public class HeatsByAthleteViewModel : HeatsViewModel
                     LaneMax = se.LaneMax,
 
                     Heats = se.Heats
-                        .Where(heat => heat.Positions
-                            .Any(hp => hp.Entry.AthleteId == _athleteId.Value)
-                        )
+                        .Where(heat => heat.Positions.Any(hp =>
+                            hp.Entry.AthleteId == _athleteId.Value ||
+                            (hp.Entry.Relay != null &&
+                             hp.Entry.Relay.Positions.Any(p => p.AthleteId == _athleteId.Value))))
                         .ToList()
                 })
                 .Where(se => se.Heats.Any())
@@ -326,9 +329,12 @@ public class ResultsByEventViewModel(IEventService eventService, IEntryService e
 {
     private int? _eventId;
 
+    public Task RefreshForEventAsync(int eventId) => LoadEntriesForEventIdAsync(eventId);
+
     public void SetEventId(int? eventId)
     {
         _eventId = eventId;
+        SelectedSwimEvent = null;
         LoadDataCommand.Execute(null);
     }
 

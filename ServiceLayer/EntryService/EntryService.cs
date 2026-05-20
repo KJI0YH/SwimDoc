@@ -72,9 +72,16 @@ public class EntryService(EfCoreContext dbContext) : CrudService<Entry, int?>(db
     public Task<List<Entry>> GetEntriesByEventIdOrderByFinishTimeAsync(int eventId)
     {
         return dbContext.Entries
+            .AsNoTracking()
             .Where(e => e.SwimEventId == eventId)
             .Include(e => e.Athlete!)
             .ThenInclude(a => a.Club)
+            .Include(e => e.Relay!)
+            .ThenInclude(r => r.Positions)
+            .ThenInclude(p => p.Athlete)
+            .ThenInclude(a => a.Club)
+            .Include(e => e.Relay!)
+            .ThenInclude(r => r.Club)
             .OrderBy(e => e.Status > EntryStatus.FINISH ? 1 : 0)
             .ThenBy(e => e.Status == EntryStatus.FINISH ? (e.FinishTime ?? int.MaxValue) : int.MaxValue)
             .ToListAsync();

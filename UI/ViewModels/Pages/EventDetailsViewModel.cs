@@ -29,6 +29,12 @@ public partial class EventDetailsViewModel : ViewModelBase, INavigationAware
         _heatsTable = new HeatsByEventViewModel(eventService, heatService);
         _fixationTable = new FixationByEventViewModel(eventService, heatService, pointScoreProvider);
         _resultsTable = new ResultsByEventViewModel(eventService, entryService);
+
+        _fixationTable.EventResultsChanged += eventId =>
+        {
+            _ = _resultsTable.RefreshForEventAsync(eventId);
+            _ = _heatsTable.RefreshAsync();
+        };
     }
 
     public ViewModelBase EntriesTable => _entriesTable;

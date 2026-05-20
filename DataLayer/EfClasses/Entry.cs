@@ -28,25 +28,17 @@ public class Entry : IValidatableObject
 
     public string DisplaySwimName => SwimEvent is not null ? SwimEvent.DisplayName : SwimStyle.DisplayName;
 
-    public string DisplayParticipantName
-    {
-        get
-        {
-            if (Athlete is not null)
-                return Athlete.DisplayName;
+    public string DisplayParticipantName => Athlete is not null
+        ? Athlete.DisplayName
+        : Relay is not null
+            ? Relay.DisplayNameWithAthletes
+            : string.Empty;
 
-            if (Relay is null)
-                return string.Empty;
-
-            var clubName = Relay.Club?.Name;
-            var numberPart = Relay.Number.HasValue ? $" {Relay.Number.Value}" : string.Empty;
-
-            if (!string.IsNullOrWhiteSpace(clubName))
-                return $"{clubName}{numberPart}";
-
-            return Relay.Number.HasValue ? Relay.Number.Value.ToString() : string.Empty;
-        }
-    }
+    public string DisplayParticipantClubName => Athlete is not null
+        ? Athlete.DisplayClubName
+        : Relay is not null
+            ? Relay.Club.Name
+            : string.Empty;
 
     public string DisplayEntryTime => EntryTime == null
         ? "N.T."
@@ -73,7 +65,13 @@ public class Entry : IValidatableObject
             e.SwimEventId == SwimEventId &&
             e.SwimStyleId == SwimStyleId);
         var athlete = Athlete ?? currContext.Athletes.AsNoTracking().FirstOrDefault(a => a.Id == AthleteId);
-        var relay = Relay ?? currContext.Relays.AsNoTracking().FirstOrDefault(r => r.Id == RelayId);
+        var relay = Relay ?? currContext.Relays.AsNoTracking()
+            .Include(r => r.Positions)
+            .ThenInclude(p => p.Athlete)
+            .FirstOrDefault(r => r.Id == RelayId);
+        var relayAthletes = relay is not null
+            ? currContext.Athletes.Where(a => relay.Positions.Select(p => p.AthleteId).Contains(a.Id)).ToList()
+            : [];
         var swimEvent = SwimEvent ?? currContext.SwimEvents.AsNoTracking()
             .Include(swimEvent => swimEvent.AgeGroup)
             .FirstOrDefault(s => s.Id == SwimEventId);
@@ -86,16 +84,15 @@ public class Entry : IValidatableObject
 
         if (athlete is null && relay is null)
             yield return new ValidationResult("Participant must be provided");
-        if (relay is not null && SwimEventId is null)
-            yield return new ValidationResult("Swim event must be provided");
         if (swimStyle is null)
             yield return new ValidationResult("Swim style must be provided");
         if (existed is not null && currContext.Entry(this).State == EntityState.Added)
             yield return new ValidationResult($"Entry already exists");
         if (athlete is not null && relay is not null)
             yield return new ValidationResult("Invalid participant");
-        if (athlete is not null && swimEvent is not null &&
-            !ageGroup.Contains(athlete.YearOfBirth, athlete.Gender))
+        if (athlete is not null && swimEvent is not null && !ageGroup.Contains(athlete.YearOfBirth, athlete.Gender) ||
+            relay is not null && swimEvent is not null &&
+            relayAthletes.Any(a => !ageGroup.Contains(a.YearOfBirth, a.Gender)))
             yield return new ValidationResult($"Athlete can not to be added to this age group");
         if (swimStyle is not null && swimStyle.IsRelay && athlete is not null)
             yield return new ValidationResult("Swim event must be individual");

@@ -55,6 +55,8 @@ public partial class HeatsViewModel(IEventService eventService, IHeatService hea
         SelectedSwimEvent ??= items.OrderBy(e => e.Order).FirstOrDefault();
     }
 
+    public Task RefreshAsync() => LoadHeatPositionsAsync();
+
     partial void OnSelectedSwimEventChanged(SwimEvent? value)
     {
         _ = LoadHeatPositionsAsync();
@@ -122,9 +124,9 @@ public sealed class HeatPositionView(
     public int HeatId => HeatPosition.HeatId;
     public string HeatGroupHeader => $"Заплыв {heatNumber} из {heatsInEvent} ({heatOrder} из {heatsTotal}) | {heatStatus}";
     public int Lane => HeatPosition.Lane;
-    public string Participant => HeatPosition.Entry.Athlete?.DisplayName ?? string.Empty;
+    public string Participant => HeatPosition.Entry.DisplayParticipantName;
     public int? YearOfBirth => HeatPosition.Entry.Athlete?.YearOfBirth;
-    public string Club => HeatPosition.Entry.Athlete?.Club?.Name ?? string.Empty;
+    public string Club => HeatPosition.Entry.DisplayParticipantClubName;
     public string EntryTime => HeatPosition.Entry.DisplayEntryTime;
     public string FinishTime => HeatPosition.Entry.DisplayFinishTime;
 }
