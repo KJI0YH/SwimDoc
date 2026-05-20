@@ -22,7 +22,7 @@ public class EntryService(EfCoreContext dbContext) : CrudService<Entry, int?>(db
         entity = dbContext.NormalizeEntry(entity);
 
         if (entity.Relay == null && entity.RelayId == null)
-            return await base.UpdateAsync(entity, cancellationToken);
+            return await UpdateIndividualEntryAsync(entity, cancellationToken);
 
         var id = entity.Id;
         var tracked = await dbContext.Entries
@@ -33,8 +33,14 @@ public class EntryService(EfCoreContext dbContext) : CrudService<Entry, int?>(db
         if (tracked == null)
             throw new InvalidOperationException($"Entity with Id {id} was not found in the database.");
 
+        var preservedStatus = tracked.Status;
+        var heatPosition = await dbContext.HeatPositions
+            .FirstOrDefaultAsync(hp => hp.EntryId == id, cancellationToken);
+        var swimEventIdBeforeUpdate = tracked.SwimEventId;
+
         // Update entry scalar fields
         dbContext.Entry(tracked).CurrentValues.SetValues(entity);
+        ApplyHeatEntryUpdateRules(tracked, preservedStatus, heatPosition, swimEventIdBeforeUpdate);
 
         // Sync relay fields + positions
         if (tracked.Relay != null)
@@ -67,6 +73,45 @@ public class EntryService(EfCoreContext dbContext) : CrudService<Entry, int?>(db
             await dbContext.Entry(tracked).ReloadAsync(cancellationToken).ConfigureAwait(false);
 
         return (tracked, errors);
+    }
+
+    private async Task<(Entry? entity, ImmutableList<ValidationResult> errors)> UpdateIndividualEntryAsync(
+        Entry entity,
+        CancellationToken cancellationToken)
+    {
+        var id = entity.Id;
+        var tracked = await dbContext.Entries.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+        if (tracked == null)
+            throw new InvalidOperationException($"Entity with Id {id} was not found in the database.");
+
+        var preservedStatus = tracked.Status;
+        var heatPosition = await dbContext.HeatPositions
+            .FirstOrDefaultAsync(hp => hp.EntryId == id, cancellationToken);
+        var swimEventIdBeforeUpdate = tracked.SwimEventId;
+
+        dbContext.Entry(tracked).CurrentValues.SetValues(entity);
+        ApplyHeatEntryUpdateRules(tracked, preservedStatus, heatPosition, swimEventIdBeforeUpdate);
+
+        var errors = await dbContext.SaveChangesWithValidationAsync();
+        if (errors.Count > 0)
+            await dbContext.Entry(tracked).ReloadAsync(cancellationToken).ConfigureAwait(false);
+
+        return (tracked, errors);
+    }
+
+    private void ApplyHeatEntryUpdateRules(
+        Entry tracked,
+        EntryStatus preservedStatus,
+        HeatPosition? heatPosition,
+        int? swimEventIdBeforeUpdate)
+    {
+        if (heatPosition is null)
+            return;
+
+        if (tracked.SwimEventId != swimEventIdBeforeUpdate)
+            dbContext.HeatPositions.Remove(heatPosition);
+        else
+            tracked.Status = preservedStatus;
     }
 
     public Task<List<Entry>> GetEntriesByEventIdOrderByFinishTimeAsync(int eventId)

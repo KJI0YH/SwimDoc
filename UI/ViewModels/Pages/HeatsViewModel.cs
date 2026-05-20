@@ -121,6 +121,8 @@ public sealed class HeatPositionView(
 {
     private HeatPosition HeatPosition { get; set; } = heatPosition;
 
+    public Entry Entry => HeatPosition.Entry;
+
     public int HeatId => HeatPosition.HeatId;
     public string HeatGroupHeader => $"Заплыв {heatNumber} из {heatsInEvent} ({heatOrder} из {heatsTotal}) | {heatStatus}";
     public int Lane => HeatPosition.Lane;

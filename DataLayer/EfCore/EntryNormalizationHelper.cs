@@ -14,7 +14,7 @@ public static class EntryNormalizationHelper
             entry.SwimStyleId = swimEvent.SwimStyleId;
 
         var state = dbContext.Entry(entry).State;
-        if (state is EntityState.Added or EntityState.Detached)
+        if (state == EntityState.Added || entry.Id == 0)
             entry.Status = swimEvent is null ? EntryStatus.ENTRY : EntryStatus.EVENT;
 
         return entry;

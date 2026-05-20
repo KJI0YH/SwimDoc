@@ -297,7 +297,10 @@ public class HeatsByEventViewModel : HeatsViewModel
         var context = _eventId.HasValue ? new AddEditContext { EventId = _eventId.Value } : null;
         var result = _windowFactory.CreateAndShow<EntryAddEditWindow>(id, context);
         if (result == true)
+        {
             _ = LoadDataAsync();
+            _ = RefreshAsync();
+        }
     }
 }
 

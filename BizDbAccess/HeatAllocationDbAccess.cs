@@ -21,7 +21,7 @@ public class HeatAllocationDbAccess(EfCoreContext context) : IHeatAllocationDbAc
     {
         return context.Entries
             .AsNoTracking()
-            .Where(entry => entry.SwimEventId == swimEventId && entry.Status == EntryStatus.EVENT)
+            .Where(entry => entry.SwimEventId == swimEventId && entry.Status >= EntryStatus.EVENT)
             .OrderBy(entry => entry.EntryTime == null ? 1 : 0)
             .ThenBy(entry => entry.EntryTime)
             .ToList();

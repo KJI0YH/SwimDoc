@@ -41,6 +41,7 @@
                          HeadersVisibility="Column"
                          GridLinesVisibility="Horizontal"
                          SelectionUnit="FullRow"
+                         RowStyle="{StaticResource DataGridRowLightBlueWhenSelectedStyle}"
                          HorizontalAlignment="Stretch"
                          ColumnWidth="*"
                          MinColumnWidth="80"

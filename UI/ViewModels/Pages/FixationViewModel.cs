@@ -259,7 +259,7 @@ public sealed partial class FixationHeatPositionView : ObservableObject
         CalculatePoints();
     }
 
-    private Entry Entry => _position.Entry;
+    public Entry Entry => _position.Entry;
 
     public int EntryId => Entry.Id;
 

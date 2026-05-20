@@ -29,7 +29,7 @@ public class AgeGroup : IValidatableObject
 
     public bool Contains(int year, Gender gender)
     {
-        return Gender == gender &&
+        return (Gender == Gender.Mixed || Gender == gender) &&
                (BirthYearMin ?? 0) <= year &&
                year <= (BirthYearMax ?? int.MaxValue);
     }
