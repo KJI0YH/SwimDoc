@@ -31,15 +31,11 @@
         </dataView:DefaultDataView.Toolbar>
         <dataView:DefaultDataView.MainContent>
 
-            <DataGrid ItemsSource="{Binding Entries}"
+            <ui:DataGrid ItemsSource="{Binding Entries}"
                       SelectedItem="{Binding SelectedResultEntry}"
                       MouseDoubleClick="ResultsGrid_MouseDoubleClick"
                       AutoGenerateColumns="False"
-                      CanUserAddRows="False"
                       IsReadOnly="False"
-                      HeadersVisibility="Column"
-                      GridLinesVisibility="Horizontal"
-                      SelectionUnit="FullRow"
                       RowStyle="{StaticResource DataGridRowResultsPlaceStyle}">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Место" Binding="{Binding Place}" IsReadOnly="True" Width="80" />
@@ -52,7 +48,7 @@
                                         Width="150" />
                     <DataGridTextColumn Header="Очки" Binding="{Binding Points}" IsReadOnly="True" Width="150" />
                 </DataGrid.Columns>
-            </DataGrid>
+            </ui:DataGrid>
         </dataView:DefaultDataView.MainContent>
     </dataView:DefaultDataView>
 </UserControl>

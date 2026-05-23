@@ -21,7 +21,7 @@
 
             <TextBlock Grid.Row="0"
                        Text="{Binding WindowTitle}"
-                       FontSize="18"
+                       FontSize="{StaticResource SwimDocFontSizeSubtitle}"
                        FontWeight="Bold"
                        Margin="0,0,0,15" />
 

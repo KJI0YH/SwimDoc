@@ -53,12 +53,11 @@
         <!-- Header -->
         <StackPanel Grid.Row="0" Margin="0,0,0,48">
             <TextBlock Text="SwimDoc"
-                       FontSize="28"
+                       FontSize="{StaticResource SwimDocFontSizeDisplay}"
                        FontWeight="SemiBold"
                        Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                        Margin="0,0,0,8" />
             <TextBlock Text="Выберите действие для начала работы"
-                       FontSize="14"
                        Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
         </StackPanel>
 
@@ -85,7 +84,6 @@
                                             Content="{ui:SymbolIcon AddCircle24}" />
                         </Viewbox>
                         <TextBlock Text="Создать новое соревнование"
-                                   FontSize="14"
                                    FontWeight="SemiBold"
                                    HorizontalAlignment="Center"
                                    Margin="0,0,0,8" />
@@ -108,7 +106,6 @@
                                             Content="{ui:SymbolIcon FolderOpen24}" />
                         </Viewbox>
                         <TextBlock Text="Открыть существующее соревнование"
-                                   FontSize="14"
                                    FontWeight="SemiBold"
                                    HorizontalAlignment="Center"
                                    Margin="0,0,0,8" />

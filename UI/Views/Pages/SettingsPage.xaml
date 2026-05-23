@@ -3,13 +3,6 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       ScrollViewer.CanContentScroll="False">
-    <Page.Resources>
-        <Style x:Key="SettingsDataGridColumnHeader" TargetType="DataGridColumnHeader">
-            <Setter Property="Padding" Value="8,8" />
-            <Setter Property="HorizontalContentAlignment" Value="Center" />
-            <Setter Property="VerticalContentAlignment" Value="Center" />
-        </Style>
-    </Page.Resources>
     <TabControl Margin="12">
         <TabItem Header="Базовое время">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
@@ -22,14 +15,9 @@
                             Padding="9" />
 
                     <GroupBox Header="SCM (25m) — Мужчины / Женщины" Margin="0,0,0,12">
-                        <DataGrid ItemsSource="{Binding ScmRows}"
+                        <ui:DataGrid ItemsSource="{Binding ScmRows}"
                                   AutoGenerateColumns="False"
-                                  CanUserAddRows="False"
-                                  IsReadOnly="False"
-                                  ColumnHeaderStyle="{StaticResource SettingsDataGridColumnHeader}"
-                                  HeadersVisibility="Column"
-                                  GridLinesVisibility="Horizontal"
-                                  SelectionUnit="FullRow">
+                                  IsReadOnly="False">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Stroke" Binding="{Binding Name}" IsReadOnly="True"
                                                     Width="*" />
@@ -44,7 +32,7 @@
                                     </DataGridTemplateColumn.Header>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <ui:TextBox
+                                            <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
                                                 Text="{Binding MenBaseTimeText, UpdateSourceTrigger=PropertyChanged}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
@@ -60,7 +48,7 @@
                                     </DataGridTemplateColumn.Header>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <ui:TextBox
+                                            <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
                                                 Text="{Binding MenSecondsText, UpdateSourceTrigger=PropertyChanged}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
@@ -76,7 +64,7 @@
                                     </DataGridTemplateColumn.Header>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <ui:TextBox
+                                            <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
                                                 Text="{Binding WomenBaseTimeText, UpdateSourceTrigger=PropertyChanged}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
@@ -92,24 +80,19 @@
                                     </DataGridTemplateColumn.Header>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <ui:TextBox
+                                            <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
                                                 Text="{Binding WomenSecondsText, UpdateSourceTrigger=PropertyChanged}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
                             </DataGrid.Columns>
-                        </DataGrid>
+                        </ui:DataGrid>
                     </GroupBox>
 
                     <GroupBox Header="SCM (25m) — Смешанные эстафеты" Margin="0,0,0,12">
-                        <DataGrid ItemsSource="{Binding ScmMixedRelayRows}"
+                        <ui:DataGrid ItemsSource="{Binding ScmMixedRelayRows}"
                                   AutoGenerateColumns="False"
-                                  CanUserAddRows="False"
-                                  IsReadOnly="False"
-                                  ColumnHeaderStyle="{StaticResource SettingsDataGridColumnHeader}"
-                                  HeadersVisibility="Column"
-                                  GridLinesVisibility="Horizontal"
-                                  SelectionUnit="FullRow">
+                                  IsReadOnly="False">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Stroke" Binding="{Binding Name}" IsReadOnly="True"
                                                     Width="*" />
@@ -124,7 +107,7 @@
                                     </DataGridTemplateColumn.Header>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <ui:TextBox
+                                            <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
                                                 Text="{Binding MixedBaseTimeText, UpdateSourceTrigger=PropertyChanged}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
@@ -140,7 +123,7 @@
                                     </DataGridTemplateColumn.Header>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <ui:TextBox
+                                            <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
                                                 Text="{Binding MixedSecondsText, UpdateSourceTrigger=PropertyChanged}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
@@ -148,18 +131,13 @@
                                 <DataGridTemplateColumn Width="*" />
                                 <DataGridTemplateColumn Width="*" />
                             </DataGrid.Columns>
-                        </DataGrid>
+                        </ui:DataGrid>
                     </GroupBox>
 
                     <GroupBox Header="LCM (50m) — Мужчины / Женщины" Margin="0,0,0,12">
-                        <DataGrid ItemsSource="{Binding LcmRows}"
+                        <ui:DataGrid ItemsSource="{Binding LcmRows}"
                                   AutoGenerateColumns="False"
-                                  CanUserAddRows="False"
-                                  IsReadOnly="False"
-                                  ColumnHeaderStyle="{StaticResource SettingsDataGridColumnHeader}"
-                                  HeadersVisibility="Column"
-                                  GridLinesVisibility="Horizontal"
-                                  SelectionUnit="FullRow">
+                                  IsReadOnly="False">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Stroke" Binding="{Binding Name}" IsReadOnly="True"
                                                     Width="*" />
@@ -174,7 +152,7 @@
                                     </DataGridTemplateColumn.Header>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <ui:TextBox
+                                            <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
                                                 Text="{Binding MenBaseTimeText, UpdateSourceTrigger=PropertyChanged}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
@@ -190,7 +168,7 @@
                                     </DataGridTemplateColumn.Header>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <ui:TextBox
+                                            <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
                                                 Text="{Binding MenSecondsText, UpdateSourceTrigger=PropertyChanged}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
@@ -206,7 +184,7 @@
                                     </DataGridTemplateColumn.Header>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <ui:TextBox
+                                            <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
                                                 Text="{Binding WomenBaseTimeText, UpdateSourceTrigger=PropertyChanged}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
@@ -222,24 +200,19 @@
                                     </DataGridTemplateColumn.Header>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <ui:TextBox
+                                            <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
                                                 Text="{Binding WomenSecondsText, UpdateSourceTrigger=PropertyChanged}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
                             </DataGrid.Columns>
-                        </DataGrid>
+                        </ui:DataGrid>
                     </GroupBox>
 
                     <GroupBox Header="LCM (50m) — Смешанные эстафеты">
-                        <DataGrid ItemsSource="{Binding LcmMixedRelayRows}"
+                        <ui:DataGrid ItemsSource="{Binding LcmMixedRelayRows}"
                                   AutoGenerateColumns="False"
-                                  CanUserAddRows="False"
-                                  IsReadOnly="False"
-                                  ColumnHeaderStyle="{StaticResource SettingsDataGridColumnHeader}"
-                                  HeadersVisibility="Column"
-                                  GridLinesVisibility="Horizontal"
-                                  SelectionUnit="FullRow">
+                                  IsReadOnly="False">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Stroke" Binding="{Binding Name}" IsReadOnly="True"
                                                     Width="*" />
@@ -254,7 +227,7 @@
                                     </DataGridTemplateColumn.Header>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <ui:TextBox
+                                            <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
                                                 Text="{Binding MixedBaseTimeText, UpdateSourceTrigger=PropertyChanged}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
@@ -270,7 +243,7 @@
                                     </DataGridTemplateColumn.Header>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <ui:TextBox
+                                            <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
                                                 Text="{Binding MixedSecondsText, UpdateSourceTrigger=PropertyChanged}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
@@ -278,7 +251,7 @@
                                 <DataGridTemplateColumn Width="*" />
                                 <DataGridTemplateColumn Width="*" />
                             </DataGrid.Columns>
-                        </DataGrid>
+                        </ui:DataGrid>
                     </GroupBox>
                 </StackPanel>
             </ScrollViewer>

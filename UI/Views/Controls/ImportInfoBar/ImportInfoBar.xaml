@@ -119,19 +119,16 @@
                         <ScrollViewer DockPanel.Dock="Top"
                                       VerticalScrollBarVisibility="Auto"
                                       HorizontalScrollBarVisibility="Disabled">
-                            <DataGrid ItemsSource="{Binding ImportFiles}"
+                            <ui:DataGrid ItemsSource="{Binding ImportFiles}"
                                       AutoGenerateColumns="False"
-                                      CanUserAddRows="False"
                                       CanUserDeleteRows="False"
                                       IsReadOnly="True"
-                                      HeadersVisibility="Column"
-                                      GridLinesVisibility="All"
                                       SelectionMode="Single"
                                       RowDetailsVisibilityMode="Visible"
                                       PreviewMouseLeftButtonDown="FilesGrid_PreviewMouseLeftButtonDown"
                                       LoadingRow="FilesGrid_LoadingRow"
                                       x:Name="FilesGrid">
-                                <DataGrid.RowStyle>
+                                <ui:DataGrid.RowStyle>
                                     <Style TargetType="DataGridRow"
                                            BasedOn="{StaticResource {x:Type DataGridRow}}">
                                         <Style.Triggers>
@@ -145,8 +142,8 @@
                                             </Trigger>
                                         </Style.Triggers>
                                     </Style>
-                                </DataGrid.RowStyle>
-                                <DataGrid.RowDetailsTemplate>
+                                </ui:DataGrid.RowStyle>
+                                <ui:DataGrid.RowDetailsTemplate>
                                     <DataTemplate>
                                         <StackPanel Margin="10">
                                             <StackPanel.Style>
@@ -235,8 +232,8 @@
                                             </GroupBox>
                                         </StackPanel>
                                     </DataTemplate>
-                                </DataGrid.RowDetailsTemplate>
-                                <DataGrid.Columns>
+                                </ui:DataGrid.RowDetailsTemplate>
+                                <ui:DataGrid.Columns>
                                     <DataGridTextColumn Header="Файл" Binding="{Binding FileName}" Width="150" />
                                     <DataGridTextColumn Header="Путь" Binding="{Binding FullPath}" Width="*" />
                                     <DataGridTextColumn Header="Статус" Width="180"
@@ -296,8 +293,8 @@
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
-                                </DataGrid.Columns>
-                            </DataGrid>
+                                </ui:DataGrid.Columns>
+                            </ui:DataGrid>
                         </ScrollViewer>
                     </DockPanel>
                 </StackPanel>

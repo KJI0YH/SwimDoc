@@ -24,7 +24,9 @@ public partial class MainWindow : FluentWindow
     private void NavigationView_OnLoaded(object sender, RoutedEventArgs e)
     {
         NavigationView.SetServiceProvider(App.Current.Services);
-        NavigationView.Navigate(typeof(CompetitionSelectionPage));
+
+        // NavigationViewContentPresenter is assigned in OnApplyTemplate, which can run after Loaded.
+        Dispatcher.BeginInvoke(() => NavigationView.Navigate(typeof(CompetitionSelectionPage)), System.Windows.Threading.DispatcherPriority.Loaded);
 
         var navigationService = App.Current.Services.GetRequiredService<INavigationService>();
         navigationService.PageNavigationRequested += OnPageNavigationRequested;

@@ -81,16 +81,12 @@
                                DockPanel.Dock="Right" />
                 </DockPanel>
 
-                <DataGrid Grid.Row="1"
+                <ui:DataGrid Grid.Row="1"
                           ItemsSource="{Binding FixationHeatPositionViews}"
                           SelectedItem="{Binding SelectedFixationPosition}"
                           MouseDoubleClick="FixationPositionsGrid_MouseDoubleClick"
                           AutoGenerateColumns="False"
-                          CanUserAddRows="False"
                           IsReadOnly="False"
-                          HeadersVisibility="Column"
-                          GridLinesVisibility="Horizontal"
-                          SelectionUnit="FullRow"
                           RowStyle="{StaticResource DataGridRowLightBlueWhenSelectedStyle}">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Дорожка" Binding="{Binding Lane}" IsReadOnly="True" Width="80" />
@@ -105,7 +101,8 @@
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <Grid>
-                                        <ComboBox ItemsSource="{Binding StatusOptions}"
+                                        <ComboBox Style="{StaticResource SwimDocDataGridInlineComboBoxStyle}"
+                                                  ItemsSource="{Binding StatusOptions}"
                                                   SelectedItem="{Binding SelectedStatus, UpdateSourceTrigger=PropertyChanged}"
                                                   Visibility="{Binding DataContext.CanEditHeat, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVis}}" />
                                         <TextBlock Text="{Binding SelectedStatus}"
@@ -121,7 +118,8 @@
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <Grid>
-                                        <ui:TextBox Text="{Binding FinishTimeText, UpdateSourceTrigger=PropertyChanged}"
+                                        <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
+                                                    Text="{Binding FinishTimeText, UpdateSourceTrigger=PropertyChanged}"
                                                     Visibility="{Binding DataContext.CanEditHeat, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVis}}" />
                                         <TextBlock Text="{Binding FinishTimeDisplay}"
                                                    Visibility="{Binding DataContext.CanEditHeat, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVis}, ConverterParameter=Invert}"
@@ -138,7 +136,8 @@
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <Grid>
-                                        <ui:TextBox Text="{Binding Comment, UpdateSourceTrigger=PropertyChanged}"
+                                        <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
+                                                    Text="{Binding Comment, UpdateSourceTrigger=PropertyChanged}"
                                                     Visibility="{Binding DataContext.CanEditHeat, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVis}}"
                                                     ToolTip="Сохраняется в Comment" />
                                         <TextBlock Text="{Binding Comment}"
@@ -151,7 +150,7 @@
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
                     </DataGrid.Columns>
-                </DataGrid>
+                </ui:DataGrid>
             </Grid>
         </dataView:DefaultDataView.MainContent>
     </dataView:DefaultDataView>

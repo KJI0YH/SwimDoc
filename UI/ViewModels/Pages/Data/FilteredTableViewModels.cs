@@ -571,6 +571,35 @@ public class HeatByEntryIdViewModel : HeatsViewModel
         LoadDataCommand.Execute(null);
     }
 
+    protected override async Task LoadHeatPositionsAsync()
+    {
+        if (SelectedSwimEvent?.Id is not int eventId || !_entryId.HasValue)
+        {
+            HeatPositions = [];
+            return;
+        }
+
+        IsLoading = true;
+        try
+        {
+            var heats = await HeatService.GetHeatsByEventIdAsync(eventId);
+            var heatsInEvent = heats.Count;
+            var heatsForEntry = heats
+                .Where(heat => heat.Positions.Any(hp => hp.EntryId == _entryId.Value))
+                .ToList();
+            var heatsTotal = HeatService.GetTotalHeats();
+            var heatPositionViews = heatsForEntry.SelectMany(h =>
+                h.Positions.Select(p =>
+                    new HeatPositionView(p, h.Number, heatsInEvent, h.Order, heatsTotal, h.Status, h.DisplayDayTime)));
+            HeatPositions = new ObservableCollection<HeatPositionView>(heatPositionViews);
+            SelectedHeatPosition = heatPositionViews.FirstOrDefault(p => p.Entry.Id == _entryId.Value);
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
     protected override IQueryable<SwimEvent> ApplyQuery(IQueryable<SwimEvent> query)
     {
         query = base.ApplyQuery(query);

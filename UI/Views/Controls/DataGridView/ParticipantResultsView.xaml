@@ -4,18 +4,15 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:dataView="clr-namespace:UI.Views.Controls.DataView"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
     <dataView:DefaultDataView>
         <dataView:DefaultDataView.MainContent>
-            <DataGrid ItemsSource="{Binding Results}"
+            <ui:DataGrid ItemsSource="{Binding Results}"
                       SelectedItem="{Binding SelectedResult}"
                       AutoGenerateColumns="False"
-                      CanUserAddRows="False"
                       IsReadOnly="True"
-                      HeadersVisibility="Column"
-                      GridLinesVisibility="Horizontal"
-                      SelectionUnit="FullRow"
                       RowStyle="{StaticResource DataGridRowResultsPlaceStyle}"
                       MouseDoubleClick="DataGrid_MouseDoubleClick">
                 <DataGrid.Columns>
@@ -26,7 +23,7 @@
                     <DataGridTextColumn Header="Результат" Binding="{Binding ResultText}" Width="150" />
                     <DataGridTextColumn Header="Очки" Binding="{Binding Points}" Width="150" />
                 </DataGrid.Columns>
-            </DataGrid>
+            </ui:DataGrid>
         </dataView:DefaultDataView.MainContent>
     </dataView:DefaultDataView>
 </UserControl>

@@ -11,14 +11,10 @@
                  x:Name="DgTableView"
                  ItemsSource="{Binding Items}"
                  SelectionMode="Extended"
-                 SelectionUnit="FullRow"
                  AutoGenerateColumns="{Binding AutoGenerateColumns}"
                  CanUserSortColumns="False"
-                 CanUserAddRows="False"
                  CanUserDeleteRows="False"
                  IsReadOnly="True"
-                 GridLinesVisibility="All"
-                 HeadersVisibility="Column"
                  Loaded="DataGrid_Loaded"
                  SelectionChanged="DataGrid_SelectionChanged"
                  AutoGeneratingColumn="DataGrid_AutoGeneratingColumn"
@@ -28,10 +24,10 @@
             <KeyBinding Key="E" Modifiers="Control" Command="{Binding EditItemCommand}" />
             <KeyBinding Key="N" Modifiers="Control" Command="{Binding CreateItemCommand}" />
         </ui:DataGrid.InputBindings>
-        <DataGrid.ColumnHeaderStyle>
-            <Style TargetType="DataGridColumnHeader">
+        <ui:DataGrid.ColumnHeaderStyle>
+            <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
                 <EventSetter Event="Click" Handler="ColumnHeader_Click" />
             </Style>
-        </DataGrid.ColumnHeaderStyle>
+        </ui:DataGrid.ColumnHeaderStyle>
     </ui:DataGrid>
 </UserControl>
