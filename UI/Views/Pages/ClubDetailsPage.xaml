@@ -20,6 +20,9 @@
                     </dataView:DefaultDataView.MainContent>
                 </dataView:DefaultDataView>
             </TabItem>
+            <TabItem Header="Результаты">
+                <dataGridView:ParticipantResultsView DataContext="{Binding ResultsTable}" />
+            </TabItem>
         </TabControl>
     </Grid>
 </Page>

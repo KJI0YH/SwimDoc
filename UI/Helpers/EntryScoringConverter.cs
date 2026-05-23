@@ -22,7 +22,7 @@ public sealed class EntryScoringConverter : IValueConverter
             null => true,
             Entry entry => entry.Scoring,
             ResultEntryView result => result.Entry.Scoring,
-            AthleteResultEntryView athleteResult => athleteResult.Entry.Scoring,
+            ParticipantResultEntryView participantResult => participantResult.Entry.Scoring,
             HeatPositionView heat => heat.Entry.Scoring,
             FixationHeatPositionView fixation => fixation.Entry.Scoring,
             _ => true

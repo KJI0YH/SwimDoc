@@ -1,4 +1,4 @@
-<UserControl x:Class="UI.Views.Controls.DataGridView.AthleteResultsView"
+<UserControl x:Class="UI.Views.Controls.DataGridView.ParticipantResultsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -20,6 +20,8 @@
                       MouseDoubleClick="DataGrid_MouseDoubleClick">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Событие" Binding="{Binding EventName}" Width="*" />
+                    <DataGridTextColumn Header="Участник" Binding="{Binding ParticipantName}" Width="*" />
+                    <DataGridTextColumn Header="Команда" Binding="{Binding ClubName}" Width="*" />
                     <DataGridTextColumn Header="Место" Binding="{Binding Place}" Width="80" />
                     <DataGridTextColumn Header="Результат" Binding="{Binding ResultText}" Width="150" />
                     <DataGridTextColumn Header="Очки" Binding="{Binding Points}" Width="150" />

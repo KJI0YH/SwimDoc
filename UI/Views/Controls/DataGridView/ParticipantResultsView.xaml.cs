@@ -7,23 +7,23 @@ using UI.ViewModels.Pages.Data;
 
 namespace UI.Views.Controls.DataGridView;
 
-public partial class AthleteResultsView : UserControl
+public partial class ParticipantResultsView : UserControl
 {
-    public AthleteResultsView()
+    public ParticipantResultsView()
     {
         InitializeComponent();
     }
 
     private void DataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
-        if (sender is not DataGrid { DataContext: ResultsByAthleteViewModel viewModel } dataGrid)
+        if (sender is not DataGrid dataGrid || dataGrid.DataContext is not IParticipantResultsViewModel viewModel)
             return;
 
         if (e.OriginalSource is DependencyObject source)
         {
             for (var current = source; current is not null && current != dataGrid; current = VisualTreeHelper.GetParent(current))
             {
-                if (current is DataGridRow { Item: AthleteResultEntryView result })
+                if (current is DataGridRow { Item: ParticipantResultEntryView result })
                 {
                     viewModel.SelectedResult = result;
                     break;

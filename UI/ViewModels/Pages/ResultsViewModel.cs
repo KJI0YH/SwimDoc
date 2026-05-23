@@ -235,6 +235,14 @@ public partial class ResultsViewModel(
             (r.Entry.RelayId != null &&
              r.Entry.Relay?.Positions.Any(p => p.AthleteId == athleteId) == true));
 
+    internal static bool IsClubEntry(Entry entry, int clubId) =>
+        entry.Athlete?.ClubId == clubId || entry.Relay?.ClubId == clubId;
+
+    internal static IEnumerable<ResultEntryView> FindClubResults(
+        IReadOnlyList<ResultEntryView> eventResults,
+        int clubId) =>
+        eventResults.Where(r => IsClubEntry(r.Entry, clubId));
+
     [RelayCommand]
     private void GoToNextEvent()
     {
@@ -287,12 +295,14 @@ public sealed class ResultEntryView(int place, Entry entry) : ObservableObject
     public int? Points => Entry.Points;
 }
 
-public sealed class AthleteResultEntryView(ResultEntryView result) : ObservableObject
+public sealed class ParticipantResultEntryView(ResultEntryView result) : ObservableObject
 {
     public int Place => result.Place;
     public Entry Entry => result.Entry;
 
     public string EventName => Entry.SwimEvent?.DisplayName ?? Entry.DisplaySwimName;
+    public string ParticipantName => result.ParticipantName;
+    public string ClubName => result.ClubName;
     public string ResultText => result.ResultText;
     public int? Points => result.Points;
 }
