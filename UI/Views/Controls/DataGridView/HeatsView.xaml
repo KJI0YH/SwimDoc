@@ -33,7 +33,9 @@
         </dataView:DefaultDataView.Toolbar>
         <dataView:DefaultDataView.MainContent>
             <ui:DataGrid ItemsSource="{Binding HeatPositionsView}"
+                         SelectedItem="{Binding SelectedHeatPosition}"
                          Margin="5"
+                         MouseDoubleClick="HeatPositionsGrid_MouseDoubleClick"
                          AutoGenerateColumns="False"
                          CanUserAddRows="False"
                          CanUserResizeColumns="True"

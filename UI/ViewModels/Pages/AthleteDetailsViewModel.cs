@@ -21,10 +21,11 @@ public partial class AthleteDetailsViewModel : ViewModelBase, INavigationAware
         IEntryService entryService,
         IEntryDocumentReaderService entryDocumentReaderService,
         IEventService eventService,
-        IHeatService heatService)
+        IHeatService heatService,
+        INavigationService navigationService)
     {
         _entriesTable = new EntriesByAthleteViewModel(entryService, entryDocumentReaderService);
-        _heatsTable = new HeatsByAthleteViewModel(eventService, heatService);
+        _heatsTable = new HeatsByAthleteViewModel(eventService, heatService, navigationService);
         _resultsTable = new ResultsByAthleteViewModel(entryService);
     }
 

@@ -203,8 +203,8 @@ public class HeatsByAthleteViewModel : HeatsViewModel
 {
     private int? _athleteId;
 
-    public HeatsByAthleteViewModel(IEventService eventService, IHeatService heatService) : base(eventService,
-        heatService)
+    public HeatsByAthleteViewModel(IEventService eventService, IHeatService heatService,
+        INavigationService navigationService) : base(eventService, heatService, navigationService)
     {
     }
 
@@ -277,7 +277,8 @@ public class HeatsByEventViewModel : HeatsViewModel
     private readonly IAddEditWindowFactory _windowFactory;
     private int? _eventId;
 
-    public HeatsByEventViewModel(IEventService eventService, IHeatService heatService) : base(eventService, heatService)
+    public HeatsByEventViewModel(IEventService eventService, IHeatService heatService,
+        INavigationService navigationService) : base(eventService, heatService, navigationService)
     {
         _windowFactory = App.Current.Services.GetRequiredService<IAddEditWindowFactory>();
     }
@@ -311,8 +312,9 @@ public class HeatsByEventViewModel : HeatsViewModel
 public class FixationByEventViewModel(
     IEventService eventService,
     IHeatService heatService,
-    IPointScoreProvider pointScoreProvider)
-    : FixationViewModel(eventService, heatService, pointScoreProvider)
+    IPointScoreProvider pointScoreProvider,
+    INavigationService navigationService)
+    : FixationViewModel(eventService, heatService, pointScoreProvider, navigationService)
 {
     private int? _eventId;
 
@@ -331,8 +333,11 @@ public class FixationByEventViewModel(
     }
 }
 
-public class ResultsByEventViewModel(IEventService eventService, IEntryService entryService)
-    : ResultsViewModel(eventService, entryService)
+public class ResultsByEventViewModel(
+    IEventService eventService,
+    IEntryService entryService,
+    INavigationService navigationService)
+    : ResultsViewModel(eventService, entryService, navigationService)
 {
     private int? _eventId;
 
@@ -473,9 +478,8 @@ public class HeatByEntryIdViewModel : HeatsViewModel
 {
     private int? _entryId;
 
-    public HeatByEntryIdViewModel(IEventService eventService, IHeatService heatService) : base(eventService,
-        heatService)
-
+    public HeatByEntryIdViewModel(IEventService eventService, IHeatService heatService,
+        INavigationService navigationService) : base(eventService, heatService, navigationService)
     {
     }
 

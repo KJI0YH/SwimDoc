@@ -6,12 +6,16 @@ using DataLayer.EfClasses;
 using Microsoft.EntityFrameworkCore;
 using ServiceLayer.EntryService;
 using ServiceLayer.EventService;
+using UI.Helpers;
 using UI.Services;
 using UI.ViewModels.Pages.Data;
 
 namespace UI.ViewModels.Pages;
 
-public partial class ResultsViewModel(IEventService eventService, IEntryService entryService) :
+public partial class ResultsViewModel(
+    IEventService eventService,
+    IEntryService entryService,
+    INavigationService navigationService) :
     DataViewModel<SwimEvent, int?>(eventService), INavigationAware
 {
     private int? _navigatedEventId;
@@ -19,6 +23,7 @@ public partial class ResultsViewModel(IEventService eventService, IEntryService 
 
     [ObservableProperty] private SwimEvent? _selectedSwimEvent;
     [ObservableProperty] private ObservableCollection<ResultEntryView> _entries = new();
+    [ObservableProperty] private ResultEntryView? _selectedResultEntry;
 
     public void OnNavigatedTo(object? parameter)
     {
@@ -251,6 +256,21 @@ public partial class ResultsViewModel(IEventService eventService, IEntryService 
         if (idx < 0) idx = 0;
         var prevIdx = Math.Max(idx - 1, 0);
         SelectedSwimEvent = Items[prevIdx];
+    }
+
+    partial void OnSelectedResultEntryChanged(ResultEntryView? value) =>
+        OpenAthleteDetailsCommand.NotifyCanExecuteChanged();
+
+    private bool CanOpenAthleteDetails() =>
+        EntryAthleteNavigationHelper.TryGetAthleteId(SelectedResultEntry?.Entry, out _);
+
+    [RelayCommand(CanExecute = nameof(CanOpenAthleteDetails))]
+    private void OpenAthleteDetails()
+    {
+        if (!EntryAthleteNavigationHelper.TryGetAthleteId(SelectedResultEntry?.Entry, out var athleteId))
+            return;
+
+        navigationService.NavigateTo<AthleteDetailsViewModel>(athleteId);
     }
 }
 

@@ -11,9 +11,12 @@ public class EntryDetailsViewModel : ViewModelBase, INavigationAware
 {
     private readonly HeatByEntryIdViewModel _heatTable;
 
-    public EntryDetailsViewModel(IEventService eventService, IHeatService heatService)
+    public EntryDetailsViewModel(
+        IEventService eventService,
+        IHeatService heatService,
+        INavigationService navigationService)
     {
-        _heatTable = new HeatByEntryIdViewModel(eventService, heatService);
+        _heatTable = new HeatByEntryIdViewModel(eventService, heatService, navigationService);
     }
 
     public ViewModelBase HeatTable => _heatTable;

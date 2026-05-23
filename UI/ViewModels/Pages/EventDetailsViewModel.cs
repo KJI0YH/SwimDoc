@@ -23,12 +23,13 @@ public partial class EventDetailsViewModel : ViewModelBase, INavigationAware
         IEntryDocumentReaderService entryDocumentReaderService,
         IEventService eventService,
         IHeatService heatService,
-        IPointScoreProvider pointScoreProvider)
+        IPointScoreProvider pointScoreProvider,
+        INavigationService navigationService)
     {
         _entriesTable = new EntriesByEventViewModel(entryService, entryDocumentReaderService);
-        _heatsTable = new HeatsByEventViewModel(eventService, heatService);
-        _fixationTable = new FixationByEventViewModel(eventService, heatService, pointScoreProvider);
-        _resultsTable = new ResultsByEventViewModel(eventService, entryService);
+        _heatsTable = new HeatsByEventViewModel(eventService, heatService, navigationService);
+        _fixationTable = new FixationByEventViewModel(eventService, heatService, pointScoreProvider, navigationService);
+        _resultsTable = new ResultsByEventViewModel(eventService, entryService, navigationService);
 
         _fixationTable.EventResultsChanged += eventId =>
         {

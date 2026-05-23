@@ -32,6 +32,8 @@
         <dataView:DefaultDataView.MainContent>
 
             <DataGrid ItemsSource="{Binding Entries}"
+                      SelectedItem="{Binding SelectedResultEntry}"
+                      MouseDoubleClick="ResultsGrid_MouseDoubleClick"
                       AutoGenerateColumns="False"
                       CanUserAddRows="False"
                       IsReadOnly="False"

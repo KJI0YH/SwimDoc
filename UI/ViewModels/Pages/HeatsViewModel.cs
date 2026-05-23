@@ -7,17 +7,24 @@ using DataLayer.EfClasses;
 using Microsoft.EntityFrameworkCore;
 using ServiceLayer.EventService;
 using ServiceLayer.HeatService;
+using UI.Helpers;
+using UI.Services;
 using UI.ViewModels.Pages.Data;
 
 namespace UI.ViewModels.Pages;
 
-public partial class HeatsViewModel(IEventService eventService, IHeatService heatService)
+public partial class HeatsViewModel(
+    IEventService eventService,
+    IHeatService heatService,
+    INavigationService navigationService)
     : DataViewModel<SwimEvent, int?>(eventService)
 {
     protected IHeatService HeatService { get; } = heatService;
     [ObservableProperty] ObservableCollection<HeatPositionView> _heatPositions = new();
 
     [ObservableProperty] private SwimEvent? _selectedSwimEvent;
+
+    [ObservableProperty] private HeatPositionView? _selectedHeatPosition;
 
     private ObservableCollection<HeatPositionView>? _heatPositionsGroupedSource;
     private ListCollectionView? _heatPositionsGroupedView;
@@ -115,6 +122,21 @@ public partial class HeatsViewModel(IEventService eventService, IHeatService hea
         var prevIdx = idx - 1;
         if (prevIdx < 0) prevIdx += Items.Count;
         SelectedSwimEvent = Items[prevIdx];
+    }
+
+    partial void OnSelectedHeatPositionChanged(HeatPositionView? value) =>
+        OpenAthleteDetailsCommand.NotifyCanExecuteChanged();
+
+    private bool CanOpenAthleteDetails() =>
+        EntryAthleteNavigationHelper.TryGetAthleteId(SelectedHeatPosition?.Entry, out _);
+
+    [RelayCommand(CanExecute = nameof(CanOpenAthleteDetails))]
+    private void OpenAthleteDetails()
+    {
+        if (!EntryAthleteNavigationHelper.TryGetAthleteId(SelectedHeatPosition?.Entry, out var athleteId))
+            return;
+
+        navigationService.NavigateTo<AthleteDetailsViewModel>(athleteId);
     }
 }
 

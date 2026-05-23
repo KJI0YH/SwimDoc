@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using ServiceLayer.EventService;
 using ServiceLayer.HeatService;
 using ServiceLayer.PointScoreProvider;
+using UI.Helpers;
+using UI.Services;
 using UI.ViewModels.Pages.Data;
 
 namespace UI.ViewModels.Pages;
@@ -13,7 +15,8 @@ namespace UI.ViewModels.Pages;
 public partial class FixationViewModel(
     IEventService eventService,
     IHeatService heatService,
-    IPointScoreProvider pointScoreProvider)
+    IPointScoreProvider pointScoreProvider,
+    INavigationService navigationService)
     : DataViewModel<SwimEvent, int?>(eventService)
 {
     public event Action<int>? EventResultsChanged;
@@ -25,6 +28,8 @@ public partial class FixationViewModel(
     [ObservableProperty] private ObservableCollection<Heat> _eventHeats = new();
 
     [ObservableProperty] private ObservableCollection<FixationHeatPositionView> _fixationHeatPositionViews = new();
+
+    [ObservableProperty] private FixationHeatPositionView? _selectedFixationPosition;
 
     [ObservableProperty] private bool _canApprove;
 
@@ -230,6 +235,21 @@ public partial class FixationViewModel(
             GoToPrevEvent();
         else
             SelectedHeat = EventHeats[prevIdx];
+    }
+
+    partial void OnSelectedFixationPositionChanged(FixationHeatPositionView? value) =>
+        OpenAthleteDetailsCommand.NotifyCanExecuteChanged();
+
+    private bool CanOpenAthleteDetails() =>
+        EntryAthleteNavigationHelper.TryGetAthleteId(SelectedFixationPosition?.Entry, out _);
+
+    [RelayCommand(CanExecute = nameof(CanOpenAthleteDetails))]
+    private void OpenAthleteDetails()
+    {
+        if (!EntryAthleteNavigationHelper.TryGetAthleteId(SelectedFixationPosition?.Entry, out var athleteId))
+            return;
+
+        navigationService.NavigateTo<AthleteDetailsViewModel>(athleteId);
     }
 }
 
