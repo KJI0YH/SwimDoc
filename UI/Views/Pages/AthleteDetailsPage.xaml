@@ -20,6 +20,9 @@
             <TabItem Header="Заплывы">
                 <dataGridView:HeatsView DataContext="{Binding HeatsTable}"/>
             </TabItem>
+            <TabItem Header="Результаты">
+                <dataGridView:AthleteResultsView DataContext="{Binding ResultsTable}" />
+            </TabItem>
         </TabControl>
     </Grid>
 

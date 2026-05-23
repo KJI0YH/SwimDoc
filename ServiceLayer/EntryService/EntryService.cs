@@ -119,6 +119,10 @@ public class EntryService(EfCoreContext dbContext) : CrudService<Entry, int?>(db
         return dbContext.Entries
             .AsNoTracking()
             .Where(e => e.SwimEventId == eventId)
+            .Include(e => e.SwimEvent!)
+            .ThenInclude(se => se.AgeGroup)
+            .Include(e => e.SwimEvent!)
+            .ThenInclude(se => se.SwimStyle)
             .Include(e => e.Athlete!)
             .ThenInclude(a => a.Club)
             .Include(e => e.Relay!)

@@ -14,6 +14,7 @@ public partial class AthleteDetailsViewModel : ViewModelBase, INavigationAware
 {
     private readonly EntriesByAthleteViewModel _entriesTable;
     private readonly HeatsByAthleteViewModel _heatsTable;
+    private readonly ResultsByAthleteViewModel _resultsTable;
     [ObservableProperty] private string? _title = string.Empty;
 
     public AthleteDetailsViewModel(
@@ -24,10 +25,12 @@ public partial class AthleteDetailsViewModel : ViewModelBase, INavigationAware
     {
         _entriesTable = new EntriesByAthleteViewModel(entryService, entryDocumentReaderService);
         _heatsTable = new HeatsByAthleteViewModel(eventService, heatService);
+        _resultsTable = new ResultsByAthleteViewModel(entryService);
     }
 
     public ViewModelBase EntriesTable => _entriesTable;
     public ViewModelBase HeatsTable => _heatsTable;
+    public ViewModelBase ResultsTable => _resultsTable;
 
     public void OnNavigatedTo(object? parameter)
     {
@@ -36,5 +39,6 @@ public partial class AthleteDetailsViewModel : ViewModelBase, INavigationAware
 
         _entriesTable.SetAthleteId(idValue);
         _heatsTable.SetAthleteId(idValue);
+        _resultsTable.SetAthleteId(idValue);
     }
 }

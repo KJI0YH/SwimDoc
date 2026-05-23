@@ -38,7 +38,7 @@
                       HeadersVisibility="Column"
                       GridLinesVisibility="Horizontal"
                       SelectionUnit="FullRow"
-                      RowStyle="{StaticResource DataGridRowLightBlueWhenSelectedStyle}">
+                      RowStyle="{StaticResource DataGridRowResultsPlaceStyle}">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Место" Binding="{Binding Place}" IsReadOnly="True" Width="80" />
                     <DataGridTextColumn Header="Участник" Binding="{Binding ParticipantName}" IsReadOnly="True"

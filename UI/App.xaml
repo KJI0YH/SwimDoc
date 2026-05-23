@@ -13,6 +13,9 @@
             <helpers:EntryScoringConverter x:Key="EntryScoringConverter" />
 
             <SolidColorBrush x:Key="DataGridSelectedRowBackgroundBrush" Color="#FFE3F2FD" />
+            <SolidColorBrush x:Key="ResultPlaceGoldBrush" Color="#FFFFF0B2" />
+            <SolidColorBrush x:Key="ResultPlaceSilverBrush" Color="#FFE8E8E8" />
+            <SolidColorBrush x:Key="ResultPlaceBronzeBrush" Color="#FFFFE4C4" />
 
             <!-- Entry with Scoring=false: gray idle/hover; selected uses light blue. -->
             <Style x:Key="DataGridRowLightBlueWhenSelectedStyle"
@@ -44,6 +47,38 @@
                     <Trigger Property="IsSelected" Value="True">
                         <Setter Property="Background" Value="{StaticResource DataGridSelectedRowBackgroundBrush}" />
                     </Trigger>
+                </Style.Triggers>
+            </Style>
+
+            <!-- Results tables: 1st–3rd place rows in gold, silver, bronze when not selected. -->
+            <Style x:Key="DataGridRowResultsPlaceStyle"
+                   TargetType="DataGridRow"
+                   BasedOn="{StaticResource DataGridRowLightBlueWhenSelectedStyle}">
+                <Style.Triggers>
+                    <MultiDataTrigger>
+                        <MultiDataTrigger.Conditions>
+                            <Condition Binding="{Binding Place}" Value="1" />
+                            <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}"
+                                       Value="False" />
+                        </MultiDataTrigger.Conditions>
+                        <Setter Property="Background" Value="{StaticResource ResultPlaceGoldBrush}" />
+                    </MultiDataTrigger>
+                    <MultiDataTrigger>
+                        <MultiDataTrigger.Conditions>
+                            <Condition Binding="{Binding Place}" Value="2" />
+                            <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}"
+                                       Value="False" />
+                        </MultiDataTrigger.Conditions>
+                        <Setter Property="Background" Value="{StaticResource ResultPlaceSilverBrush}" />
+                    </MultiDataTrigger>
+                    <MultiDataTrigger>
+                        <MultiDataTrigger.Conditions>
+                            <Condition Binding="{Binding Place}" Value="3" />
+                            <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}"
+                                       Value="False" />
+                        </MultiDataTrigger.Conditions>
+                        <Setter Property="Background" Value="{StaticResource ResultPlaceBronzeBrush}" />
+                    </MultiDataTrigger>
                 </Style.Triggers>
             </Style>
         </ResourceDictionary>
