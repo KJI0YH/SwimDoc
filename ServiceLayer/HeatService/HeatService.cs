@@ -102,6 +102,7 @@ public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbCo
             trackedPosition.Entry.FinishTime = incomingEntry.FinishTime;
             trackedPosition.Entry.Comment = incomingEntry.Comment;
             trackedPosition.Entry.Points = incomingEntry.Points;
+            trackedPosition.Entry.ApplyNonFinishResultRules();
 
             dbContext.NormalizeEntry(trackedPosition.Entry);
         }

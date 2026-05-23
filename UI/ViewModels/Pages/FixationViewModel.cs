@@ -310,7 +310,11 @@ public sealed partial class FixationHeatPositionView : ObservableObject
         get => Entry.Status;
         set
         {
+            if (Entry.Status == value)
+                return;
+
             Entry.Status = value;
+
             OnPropertyChanged();
             OnPropertyChanged(nameof(FinishTimeDisplay));
             CalculatePoints();

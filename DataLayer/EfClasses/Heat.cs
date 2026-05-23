@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using DataLayer;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataLayer.EfClasses;
@@ -12,10 +13,10 @@ public class Heat : IValidatableObject
     public HeatStatus Status { get; set; }
     public TimeOnly? DayTime { get; set; }
 
-    public string DisplayDayTime => DayTime?.ToString("HH:mm") ?? "Не назначено";
+    public string DisplayDayTime => StartTimeDisplay.Format(DayTime);
 
     public string DisplayNumberWithTime =>
-        DayTime.HasValue ? $"{Number} ({DisplayDayTime})" : Number.ToString();
+        StartTimeDisplay.IsSet(DayTime) ? $"{Number} ({DisplayDayTime})" : Number.ToString();
 
     public int SwimEventId { get; set; }
     public SwimEvent SwimEvent { get; set; }

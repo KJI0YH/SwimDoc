@@ -19,4 +19,17 @@ public static class EntryNormalizationHelper
 
         return entry;
     }
+
+    /// <summary>
+    /// DSQ, DNS и DNF не имеют финишного времени и очков.
+    /// </summary>
+    public static Entry ApplyNonFinishResultRules(this Entry entry)
+    {
+        if (entry.Status is not (EntryStatus.DSQ or EntryStatus.DNS or EntryStatus.DNF))
+            return entry;
+
+        entry.FinishTime = null;
+        entry.Points = 0;
+        return entry;
+    }
 }

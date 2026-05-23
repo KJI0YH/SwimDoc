@@ -14,8 +14,8 @@
     <system:Double x:Key="SwimDocFontSizeDisplay">16</system:Double>
 
     <!-- Align WPF UI control templates with the app body size. -->
-    <system:Double x:Key="ControlContentThemeFontSize">13</system:Double>
-    <system:Double x:Key="ContentControlFontSize">13</system:Double>
+    <system:Double x:Key="ControlContentThemeFontSize">16</system:Double>
+    <system:Double x:Key="ContentControlFontSize">16</system:Double>
 
     <Style TargetType="Window">
         <Setter Property="FontSize" Value="{StaticResource SwimDocFontSizeBody}" />

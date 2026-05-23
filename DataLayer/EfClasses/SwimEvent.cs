@@ -41,7 +41,7 @@ public class SwimEvent : IValidatableObject
 
     public string DisplayDate => Date.ToShortDateString();
 
-    public string DisplayTime => Time?.ToShortTimeString() ?? "Не назначено";
+    public string DisplayTime => StartTimeDisplay.Format(Time);
 
     public string DisplayStatus => Status.ToString();
 
