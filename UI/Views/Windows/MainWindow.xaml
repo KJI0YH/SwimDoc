@@ -12,8 +12,6 @@
                  xmlns:dataGridView="clr-namespace:UI.Views.Controls.DataGridView"
                  mc:Ignorable="d"
                  Title="SwimDoc"
-                 MinWidth="1100"
-                 MinHeight="500"
                  WindowState="Maximized"
                  WindowBackdropType="Mica"
                  WindowCornerPreference="Round"

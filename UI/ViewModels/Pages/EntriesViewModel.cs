@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using BizLogic.EntryDocumentReaderLogic;
 using BizLogic.Helpers;
@@ -13,7 +14,9 @@ using ServiceLayer.EntryDocumentReaderService;
 using ServiceLayer.EntryService;
 using UI.Services;
 using UI.ViewModels.Pages.Data;
+using UI.ViewModels.Windows.LoadEntriesFromPreviousEvent;
 using UI.Views.Windows.AddEdit;
+using UI.Views.Windows.LoadEntriesFromPreviousEvent;
 using QueryableSortByDirection = UI.ViewModels.Generic.QueryableSortByDirection;
 
 namespace UI.ViewModels.Pages;
@@ -24,6 +27,12 @@ public partial class EntriesViewModel(
     : DataViewModel<Entry, int?>(entryService)
 {
     private const int SlowestTimeRank = int.MaxValue;
+
+    public enum EntriesImportBarKind
+    {
+        File,
+        Event
+    }
 
     public enum ImportFileStatus
     {
@@ -58,9 +67,22 @@ public partial class EntriesViewModel(
     [ObservableProperty] private int _importSummaryWarningsCount;
     [ObservableProperty] private int _importTotalFiles;
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsFileImportBar), nameof(IsEventImportBar))]
+    private EntriesImportBarKind _importBarKind = EntriesImportBarKind.File;
+
     [ObservableProperty] private bool _isImportBarOpen;
     [ObservableProperty] private bool _isImportDetailsOpen;
     [ObservableProperty] private bool _isImportRunning;
+
+    [ObservableProperty] private int _eventImportCreatedCount;
+    [ObservableProperty] private ObservableCollection<string> _eventImportErrors = new();
+    [ObservableProperty] private string _eventImportPreviousEventName = string.Empty;
+    [ObservableProperty] private string _eventImportTargetEventName = string.Empty;
+
+    public bool IsFileImportBar => ImportBarKind == EntriesImportBarKind.File;
+    public bool IsEventImportBar => ImportBarKind == EntriesImportBarKind.Event;
+    public bool HasEventImportDetails => EventImportErrors.Count > 0;
 
     private EntriesFile? _summaryRow;
 
@@ -196,6 +218,78 @@ public partial class EntriesViewModel(
     }
 
     [RelayCommand]
+    private async Task LoadEntriesFromPreviousEventAsync()
+    {
+        var window = _windowFactory.CreateAndShowAndReturn<LoadEntriesFromPreviousEventWindow>();
+        if (window.DataContext is not IWindowResult { Result: LoadEntriesFromPreviousEventResult selection })
+            return;
+
+        try
+        {
+            var (created, errors) = await entryService.CopyEntriesFromPreviousEventAsync(
+                selection.PreviousEventId,
+                selection.TargetEventId);
+
+            ShowEventImportResult(selection, created.Count, errors);
+            await LoadDataAsync();
+        }
+        catch (Exception ex)
+        {
+            ShowEventImportFailure(selection, ex.Message);
+        }
+    }
+
+    private void ShowEventImportResult(
+        LoadEntriesFromPreviousEventResult selection,
+        int createdCount,
+        IReadOnlyList<ValidationResult> errors)
+    {
+        ImportBarKind = EntriesImportBarKind.Event;
+        EventImportPreviousEventName = selection.PreviousEventDisplayName;
+        EventImportTargetEventName = selection.TargetEventDisplayName;
+        EventImportCreatedCount = createdCount;
+        EventImportErrors = new ObservableCollection<string>(
+            errors.Select(e => e.ErrorMessage).OfType<string>().Where(message => message.Length > 0));
+
+        IsImportRunning = false;
+        IsImportDetailsOpen = EventImportErrors.Count > 0;
+
+        if (errors.Count == 0)
+        {
+            ImportHeader = "Заявки загружены из события";
+            ImportMessage =
+                $"Создано заявок: {createdCount}. Текущее событие: {selection.TargetEventDisplayName}";
+        }
+        else if (createdCount > 0)
+        {
+            ImportHeader = "Заявки загружены частично";
+            ImportMessage =
+                $"Создано: {createdCount}, ошибок: {errors.Count}. Текущее событие: {selection.TargetEventDisplayName}";
+        }
+        else
+        {
+            ImportHeader = "Заявки не загружены";
+            ImportMessage = $"Не удалось создать заявки. Ошибок: {errors.Count}.";
+        }
+
+        IsImportBarOpen = true;
+    }
+
+    private void ShowEventImportFailure(LoadEntriesFromPreviousEventResult selection, string message)
+    {
+        ImportBarKind = EntriesImportBarKind.Event;
+        EventImportPreviousEventName = selection.PreviousEventDisplayName;
+        EventImportTargetEventName = selection.TargetEventDisplayName;
+        EventImportCreatedCount = 0;
+        EventImportErrors = new ObservableCollection<string> { message };
+        IsImportRunning = false;
+        IsImportDetailsOpen = true;
+        ImportHeader = "Ошибка загрузки из события";
+        ImportMessage = message;
+        IsImportBarOpen = true;
+    }
+
+    [RelayCommand]
     private async Task ImportEntriesFromFileAsync()
     {
         var openFileDialog = new OpenFileDialog
@@ -234,7 +328,12 @@ public partial class EntriesViewModel(
         if (IsImportRunning) return;
         IsImportBarOpen = false;
         IsImportDetailsOpen = false;
+        EventImportErrors.Clear();
+        OnPropertyChanged(nameof(HasEventImportDetails));
     }
+
+    partial void OnEventImportErrorsChanged(ObservableCollection<string> value) =>
+        OnPropertyChanged(nameof(HasEventImportDetails));
 
     private async Task StartImportAsync(string[] files)
     {
@@ -242,6 +341,9 @@ public partial class EntriesViewModel(
 
         _importCts?.Cancel();
         _importCts = new CancellationTokenSource();
+
+        ImportBarKind = EntriesImportBarKind.File;
+        EventImportErrors.Clear();
 
         var filesToImport = files.Select(f => new EntriesFile(Path.GetFileName(f), f)).ToList();
         ImportFiles = new ObservableCollection<EntriesFile>(filesToImport);

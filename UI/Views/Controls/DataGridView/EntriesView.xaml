@@ -19,6 +19,11 @@
                             ToolTip="Загрузить заявки из файла"
                             Margin="5"
                             Padding="9" />
+                    <Button Content="{ui:SymbolIcon DocumentArrowRight24}"
+                            Command="{Binding LoadEntriesFromPreviousEventCommand}"
+                            ToolTip="Загрузить заявки из предыдущего события"
+                            Margin="5"
+                            Padding="9" />
                     <toolbar:DefaultToolbar />
                 </DockPanel>
             </dataView:DefaultDataView.Toolbar>

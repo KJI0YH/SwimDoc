@@ -132,6 +132,104 @@ public class EntryService(EfCoreContext dbContext) : CrudService<Entry, int?>(db
             .ToListAsync();
     }
 
+    public async Task<(List<Entry> Created, IReadOnlyList<ValidationResult> Errors)> CopyEntriesFromPreviousEventAsync(
+        int previousEventId,
+        int targetEventId,
+        CancellationToken cancellationToken = default)
+    {
+        var targetEvent = await dbContext.SwimEvents
+            .AsNoTracking()
+            .FirstOrDefaultAsync(e => e.Id == targetEventId, cancellationToken);
+        if (targetEvent is null)
+            throw new InvalidOperationException($"Событие с Id {targetEventId} не найдено.");
+
+        if (targetEvent.RoundParticipantsCount is null or <= 0)
+            throw new InvalidOperationException("Для текущего события не задано количество участников раунда.");
+
+        var previousEvent = await dbContext.SwimEvents
+            .AsNoTracking()
+            .FirstOrDefaultAsync(e => e.Id == previousEventId, cancellationToken);
+        if (previousEvent is null)
+            throw new InvalidOperationException($"Событие с Id {previousEventId} не найдено.");
+
+        if (previousEvent.Status != SwimEventStatus.OFFICIAL)
+            throw new InvalidOperationException("Предыдущее событие должно быть в статусе OFFICIAL.");
+
+        var orderedEntries = await GetEntriesByEventIdOrderByFinishTimeAsync(previousEventId);
+        var finishers = orderedEntries
+            .Where(e => e.Status == EntryStatus.FINISH && e.FinishTime.HasValue)
+            .ToList();
+
+        var selectedSources = SelectQualifiersByFinishTime(finishers, targetEvent.RoundParticipantsCount.Value);
+        if (selectedSources.Count == 0)
+            throw new InvalidOperationException("В предыдущем событии нет финишировавших участников с временем.");
+
+        var created = new List<Entry>();
+        var errors = new List<ValidationResult>();
+
+        foreach (var source in selectedSources)
+        {
+            var entry = BuildEntryFromPreviousResult(source, targetEvent);
+            var (entity, createErrors) = await CreateAsync(entry, cancellationToken);
+            if (createErrors.Count > 0)
+                errors.AddRange(createErrors);
+            else if (entity is not null)
+                created.Add(entity);
+        }
+
+        return (created, errors);
+    }
+
+    private static List<Entry> SelectQualifiersByFinishTime(List<Entry> finishers, int participantCount)
+    {
+        if (finishers.Count <= participantCount)
+            return finishers;
+
+        var cutoffFinishTime = finishers[participantCount - 1].FinishTime;
+        return finishers
+            .TakeWhile((entry, index) =>
+                index < participantCount || entry.FinishTime == cutoffFinishTime)
+            .ToList();
+    }
+
+    private Entry BuildEntryFromPreviousResult(Entry source, SwimEvent targetEvent)
+    {
+        var entry = new Entry
+        {
+            SwimEventId = targetEvent.Id,
+            SwimStyleId = targetEvent.SwimStyleId,
+            Scoring = source.Scoring,
+            EntryTime = source.FinishTime,
+            Comment = source.Comment
+        };
+
+        if (source.AthleteId.HasValue)
+        {
+            entry.AthleteId = source.AthleteId;
+            return dbContext.NormalizeEntry(entry);
+        }
+
+        if (source.Relay is null)
+            return dbContext.NormalizeEntry(entry);
+
+        entry.Relay = new Relay
+        {
+            ClubId = source.Relay.ClubId,
+            Number = source.Relay.Number,
+            Positions = source.Relay.Positions
+                .OrderBy(p => p.Order)
+                .Select(p => new RelayPosition
+                {
+                    AthleteId = p.AthleteId,
+                    Order = p.Order,
+                    EntryTime = p.EntryTime
+                })
+                .ToList()
+        };
+
+        return dbContext.NormalizeEntry(entry);
+    }
+
     public override async Task DeleteAsync(int? id, CancellationToken cancellationToken = default)
     {
         if (id == null) return;
