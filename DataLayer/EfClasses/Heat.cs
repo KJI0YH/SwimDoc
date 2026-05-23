@@ -12,6 +12,11 @@ public class Heat : IValidatableObject
     public HeatStatus Status { get; set; }
     public TimeOnly? DayTime { get; set; }
 
+    public string DisplayDayTime => DayTime?.ToString("HH:mm") ?? "Не назначено";
+
+    public string DisplayNumberWithTime =>
+        DayTime.HasValue ? $"{Number} ({DisplayDayTime})" : Number.ToString();
+
     public int SwimEventId { get; set; }
     public SwimEvent SwimEvent { get; set; }
 

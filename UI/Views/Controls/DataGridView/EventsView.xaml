@@ -27,7 +27,7 @@
                 <Button
                     Content="{ui:SymbolIcon Clock24}"
                     ToolTip="Подсчитать время старта"
-                    Command="{Binding GenerateReportsCommand}"
+                    Command="{Binding CalculateStartTimesCommand}"
                     Margin="5"
                     Padding="9" />
                 <toolbar:DefaultToolbar />

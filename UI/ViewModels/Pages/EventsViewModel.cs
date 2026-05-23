@@ -12,14 +12,17 @@ using UI.Services;
 using UI.ViewModels.Pages.Data;
 using UI.ViewModels.Windows.HeatAllocationParameters;
 using UI.ViewModels.Windows.ReportGeneration;
+using UI.ViewModels.Windows.StartTimeCalculation;
 using UI.Views.Windows.AddEdit;
 using HeatAllocationParametersWindow = UI.Views.Windows.HeatAllocationParameters.HeatAllocationParametersWindow;
 using ReportGenerationWindow = UI.Views.Windows.ReportGeneration.ReportGenerationWindow;
+using StartTimeCalculationWindow = UI.Views.Windows.StartTimeCalculation.StartTimeCalculationWindow;
 
 namespace UI.ViewModels.Pages;
 
 public partial class EventsViewModel : DataViewModel<SwimEvent, int?>
 {
+    private readonly IEventService _eventService;
     private readonly IHeatService _heatService;
     private readonly IAddEditWindowFactory _windowFactory;
     private readonly IReportExportService _reportExportService;
@@ -31,6 +34,7 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, int?>
 
     public EventsViewModel(IEventService eventService, IHeatService heatService) : base(eventService)
     {
+        _eventService = eventService;
         _windowFactory = App.Current.Services.GetRequiredService<IAddEditWindowFactory>();
         _heatService = heatService;
         _reportExportService = App.Current.Services.GetRequiredService<IReportExportService>();
@@ -43,6 +47,7 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, int?>
         {
             HeatAllocationCommand.NotifyCanExecuteChanged();
             GenerateReportsCommand.NotifyCanExecuteChanged();
+            CalculateStartTimesCommand.NotifyCanExecuteChanged();
         }
     }
 
@@ -169,4 +174,25 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, int?>
     {
         return SelectedItems.Count > 0;
     }
+
+    [RelayCommand(CanExecute = nameof(CanCalculateStartTimes))]
+    private async Task CalculateStartTimesAsync()
+    {
+        if (SelectedItems.Count == 0)
+            return;
+
+        var window = _windowFactory.CreateAndShowAndReturn<StartTimeCalculationWindow>();
+        if (window.DataContext is not IWindowResult { Result: StartTimeCalculationResult result })
+            return;
+
+        var swimEventIds = SelectedItems
+            .OrderBy(swimEvent => swimEvent.Order)
+            .Select(swimEvent => swimEvent.Id)
+            .ToList();
+
+        await _eventService.CalculateStartTimesAsync(swimEventIds, result.ToParameters());
+        await LoadDataAsync();
+    }
+
+    private bool CanCalculateStartTimes() => SelectedItems.Count > 0;
 }

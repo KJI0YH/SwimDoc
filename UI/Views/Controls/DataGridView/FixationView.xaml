@@ -24,7 +24,7 @@
                     <ComboBox helpers:ComboBoxAutoWidthHelper.Enable="True"
                               ItemsSource="{Binding EventHeats}"
                               SelectedItem="{Binding SelectedHeat}"
-                              DisplayMemberPath="Number"
+                              DisplayMemberPath="DisplayNumberWithTime"
                               Margin="0,5,6,5" />
                     <Button Content="{ui:SymbolIcon ArrowPrevious24}"
                             Command="{Binding GoToPrevEventCommand}"

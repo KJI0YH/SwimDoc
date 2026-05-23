@@ -57,6 +57,27 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="180" />
                     <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0"
+                           Text="Время"
+                           VerticalAlignment="Center"
+                           Margin="0,0,10,0" />
+                <UniformGrid Grid.Column="1" Columns="2">
+                    <ComboBox IsEditable="True"
+                              ItemsSource="{Binding HourOptions}"
+                              Text="{Binding HourText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              Margin="0,2,2,2" />
+                    <ComboBox IsEditable="True"
+                              ItemsSource="{Binding MinuteOptions}"
+                              Text="{Binding MinuteText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              Margin="2,2,0,2" />
+                </UniformGrid>
+            </Grid>
+
+            <Grid Margin="0,5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="180" />
+                    <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0"

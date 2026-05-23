@@ -41,7 +41,7 @@ public partial class FixationViewModel(
             var heatsInEvent = EventHeats.Count;
             var heatsTotal = heatService.GetTotalHeats();
             return
-                $"{SelectedSwimEvent.DisplayName} — Заплыв {SelectedHeat.Number} из {heatsInEvent} ({SelectedHeat.Order} из {heatsTotal})";
+                $"{SelectedSwimEvent.DisplayName} — Заплыв {SelectedHeat.Number} из {heatsInEvent} ({SelectedHeat.Order} из {heatsTotal}) — {SelectedHeat.DisplayDayTime}";
         }
     }
 

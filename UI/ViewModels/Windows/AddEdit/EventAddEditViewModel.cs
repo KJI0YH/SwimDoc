@@ -34,6 +34,9 @@ public partial class EventAddViewModel(
 
     [ObservableProperty] private ObservableCollection<SearchableItem> _swimStyles = new();
 
+    public IReadOnlyList<string> HourOptions { get; } = CreateTimePartOptions(24);
+    public IReadOnlyList<string> MinuteOptions { get; } = CreateTimePartOptions(60);
+
     public override string WindowTitle => IsAdd ? "Создание события" : "Редактирование события";
 
     public int Order
@@ -74,7 +77,32 @@ public partial class EventAddViewModel(
         {
             Entity.Time = value;
             OnPropertyChanged();
-            OnPropertyChanged(nameof(TimeString));
+            OnPropertyChanged(nameof(HourText));
+            OnPropertyChanged(nameof(MinuteText));
+        }
+    }
+
+    public string HourText
+    {
+        get => Entity.Time?.Hour.ToString("00") ?? string.Empty;
+        set
+        {
+            if (!TryParseTimePart(value, 23, out var hour))
+                return;
+
+            UpdateTime(hour, Entity.Time?.Minute);
+        }
+    }
+
+    public string MinuteText
+    {
+        get => Entity.Time?.Minute.ToString("00") ?? string.Empty;
+        set
+        {
+            if (!TryParseTimePart(value, 59, out var minute))
+                return;
+
+            UpdateTime(Entity.Time?.Hour, minute);
         }
     }
 
@@ -92,18 +120,38 @@ public partial class EventAddViewModel(
         }
     }
 
-    public string? TimeString
+    private void UpdateTime(int? hour, int? minute)
     {
-        get => Entity.Time?.ToString("HH:mm:ss");
-        set
-        {
-            if (string.IsNullOrWhiteSpace(value))
-                Entity.Time = null;
-            else if (TimeOnly.TryParse(value, out var time)) Entity.Time = time;
+        if (!hour.HasValue && !minute.HasValue)
+            Entity.Time = null;
+        else
+            Entity.Time = new TimeOnly(hour ?? 0, minute ?? 0);
 
-            OnPropertyChanged(nameof(Time));
-        }
+        OnPropertyChanged(nameof(Time));
+        OnPropertyChanged(nameof(HourText));
+        OnPropertyChanged(nameof(MinuteText));
     }
+
+    private static bool TryParseTimePart(string? text, int max, out int? value)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            value = null;
+            return true;
+        }
+
+        if (int.TryParse(text.Trim(), out var parsed) && parsed >= 0 && parsed <= max)
+        {
+            value = parsed;
+            return true;
+        }
+
+        value = null;
+        return false;
+    }
+
+    private static List<string> CreateTimePartOptions(int count) =>
+        Enumerable.Range(0, count).Select(value => value.ToString("00")).ToList();
 
     public Course Course
     {
@@ -177,6 +225,8 @@ public partial class EventAddViewModel(
     public override async Task InitializeAsync()
     {
         await base.InitializeAsync();
+        OnPropertyChanged(nameof(HourText));
+        OnPropertyChanged(nameof(MinuteText));
         LoadAgeGroups();
         LoadSwimStyles();
         LoadPreviousSwimEvents();
@@ -195,6 +245,7 @@ public partial class EventAddViewModel(
             Date = DateOnly.FromDateTime(DateTime.Today);
             Order = eventService.GetNextOrderNumber();
             (LaneMin, LaneMax) = eventService.GetPreviousLanes();
+            Time = eventService.GetPreviousTime();
             SelectedPreviousSwimEvent = Enumerable.FirstOrDefault<SearchableItem>(PreviousSwimEvents, item => item.Value == null);
             if (_contextAgeGroupId.HasValue)
                 SelectedAgeGroup =

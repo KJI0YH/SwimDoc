@@ -82,7 +82,14 @@ public partial class HeatsViewModel(IEventService eventService, IHeatService hea
             var heatsInEvent = heats.Count;
             var heatsTotal = HeatService.GetTotalHeats();
             var heatPositionViews = heats.SelectMany(h =>
-                h.Positions.Select(p => new HeatPositionView(p, h.Number, heatsInEvent, h.Order, heatsTotal, h.Status)));
+                h.Positions.Select(p => new HeatPositionView(
+                    p,
+                    h.Number,
+                    heatsInEvent,
+                    h.Order,
+                    heatsTotal,
+                    h.Status,
+                    h.DisplayDayTime)));
             HeatPositions = new ObservableCollection<HeatPositionView>(heatPositionViews);
         }
         finally
@@ -117,14 +124,16 @@ public sealed class HeatPositionView(
     int heatsInEvent,
     int heatOrder,
     int heatsTotal,
-    HeatStatus heatStatus)
+    HeatStatus heatStatus,
+    string heatDayTime)
 {
     private HeatPosition HeatPosition { get; set; } = heatPosition;
 
     public Entry Entry => HeatPosition.Entry;
 
     public int HeatId => HeatPosition.HeatId;
-    public string HeatGroupHeader => $"Заплыв {heatNumber} из {heatsInEvent} ({heatOrder} из {heatsTotal}) | {heatStatus}";
+    public string HeatGroupHeader =>
+        $"Заплыв {heatNumber} из {heatsInEvent} ({heatOrder} из {heatsTotal}) | {heatDayTime} | {heatStatus}";
     public int Lane => HeatPosition.Lane;
     public string Participant => HeatPosition.Entry.DisplayParticipantName;
     public int? YearOfBirth => HeatPosition.Entry.Athlete?.YearOfBirth;
