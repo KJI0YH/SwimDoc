@@ -1,7 +1,9 @@
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using BizLogic.HeatLogic;
-using BizLogic.Helpers;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DataLayer;
 using DataLayer.EfClasses;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,6 +29,19 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, int?>
     private readonly IAddEditWindowFactory _windowFactory;
     private readonly IReportExportService _reportExportService;
 
+    [ObservableProperty] private ObservableCollection<EventFilterOption<int>> _distanceFilterOptions = new();
+    [ObservableProperty] private ObservableCollection<EventFilterOption<Stroke>> _strokeFilterOptions = new();
+    [ObservableProperty] private ObservableCollection<EventFilterOption<Gender>> _genderFilterOptions = new();
+    [ObservableProperty] private ObservableCollection<EventFilterOption<SwimEventStatus>> _statusFilterOptions = new();
+    [ObservableProperty] private ObservableCollection<EventFilterOption<EventRound>> _roundFilterOptions = new();
+    [ObservableProperty] private bool _isFiltersPanelVisible;
+
+    public string DistanceFilterText => GetFilterText(DistanceFilterOptions, "Дистанция");
+    public string StrokeFilterText => GetFilterText(StrokeFilterOptions, "Стиль");
+    public string GenderFilterText => GetFilterText(GenderFilterOptions, "Пол");
+    public string StatusFilterText => GetFilterText(StatusFilterOptions, "Статус");
+    public string RoundFilterText => GetFilterText(RoundFilterOptions, "Этап");
+
     public EventsViewModel(IEventService eventService)
         : this(eventService, App.Current.Services.GetRequiredService<IHeatService>())
     {
@@ -39,6 +54,8 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, int?>
         _heatService = heatService;
         _reportExportService = App.Current.Services.GetRequiredService<IReportExportService>();
         PropertyChanged += OnViewModelPropertyChanged;
+        InitializeFilterOptions();
+        SubscribeFilterOptions();
     }
 
     private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -65,14 +82,7 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, int?>
                     : query.OrderByDescending(e => e.Date);
             }));
         ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("DisplayTime", "Время", 120));
-        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Round", "Раунд", 150));
-        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("AgeGroup.DisplayName", "Возрастная группа", 300,
-            (query, direction) =>
-            {
-                return direction == ListSortDirection.Ascending
-                    ? query.OrderBy(e => e.AgeGroup.Name)
-                    : query.OrderByDescending(e => e.AgeGroup.Name);
-            }));
+        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Round", "Этап", 150));
         ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("SwimStyle.DisplayName", "Дистанция", 300,
             (query, direction) =>
             {
@@ -81,6 +91,13 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, int?>
                         .ThenBy(e => e.SwimStyle.RelayCount)
                     : query.OrderByDescending(e => e.SwimStyle.Distance).ThenByDescending(e => e.SwimStyle.Stroke)
                         .ThenBy(e => e.SwimStyle.RelayCount);
+            }));
+        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("AgeGroup.DisplayName", "Возрастная группа", 300,
+            (query, direction) =>
+            {
+                return direction == ListSortDirection.Ascending
+                    ? query.OrderBy(e => e.AgeGroup.Name)
+                    : query.OrderByDescending(e => e.AgeGroup.Name);
             }));
         ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("DisplayLanes", "Дорожки", 100,
             (query, direction) =>
@@ -101,21 +118,129 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, int?>
             .Include(swimEvent => swimEvent.Heats);
     }
 
-    protected override IQueryable<SwimEvent> ApplySorting(IQueryable<SwimEvent> query)
+    protected override IQueryable<SwimEvent> ApplySearch(IQueryable<SwimEvent> query) =>
+        ApplySelectedFilters(query);
+
+    private IQueryable<SwimEvent> ApplySelectedFilters(IQueryable<SwimEvent> query)
     {
-        if (string.IsNullOrWhiteSpace(SearchText))
-            return query;
-        if (EnumHelper.TryGetEnumByDescriptionContains<EventRound>(SearchText, out var round))
-            return query.Where(e => e.Round == round);
+        var distances = DistanceFilterOptions.Where(option => option.IsSelected).Select(option => option.Value).ToArray();
+        if (distances.Length > 0)
+            query = query.Where(e => distances.Contains(e.SwimStyle.Distance));
 
-        if (EnumHelper.TryGetEnumByDescriptionContains<Stroke>(SearchText, out var stroke))
-            return query.Where(e => e.SwimStyle.Stroke == stroke);
+        var strokes = StrokeFilterOptions.Where(option => option.IsSelected).Select(option => option.Value).ToArray();
+        if (strokes.Length > 0)
+            query = query.Where(e => strokes.Contains(e.SwimStyle.Stroke));
 
-        if (EnumHelper.TryGetEnumByDescriptionContains<Gender>(SearchText, out var gender))
-            return query.Where(e => e.AgeGroup.Gender == gender);
+        var genders = GenderFilterOptions.Where(option => option.IsSelected).Select(option => option.Value).ToArray();
+        if (genders.Length > 0)
+            query = query.Where(e => genders.Contains(e.AgeGroup.Gender));
 
-        return Queryable.Where(query, e =>
-            EF.Functions.Like(e.AgeGroup.Name, $"%{SearchText}%"));
+        var statuses = StatusFilterOptions.Where(option => option.IsSelected).Select(option => option.Value).ToArray();
+        if (statuses.Length > 0)
+            query = query.Where(e => statuses.Contains(e.Status));
+
+        var rounds = RoundFilterOptions.Where(option => option.IsSelected).Select(option => option.Value).ToArray();
+        if (rounds.Length > 0)
+            query = query.Where(e => rounds.Contains(e.Round));
+
+        return query;
+    }
+
+    private void InitializeFilterOptions()
+    {
+        var distances = _eventService.Query()
+            .Select(e => e.SwimStyle.Distance)
+            .Distinct()
+            .OrderBy(distance => distance)
+            .ToList();
+
+        DistanceFilterOptions = new ObservableCollection<EventFilterOption<int>>(
+            distances.Select(distance => new EventFilterOption<int>(distance, $"{distance}м")));
+
+        StrokeFilterOptions = new ObservableCollection<EventFilterOption<Stroke>>(
+            Enum.GetValues<Stroke>().Select(stroke =>
+                new EventFilterOption<Stroke>(stroke, EnumDisplay.GetDescription(stroke))));
+
+        GenderFilterOptions = new ObservableCollection<EventFilterOption<Gender>>(
+            Enum.GetValues<Gender>().Select(gender =>
+                new EventFilterOption<Gender>(gender, EnumDisplay.GetDescription(gender))));
+
+        StatusFilterOptions = new ObservableCollection<EventFilterOption<SwimEventStatus>>(
+            Enum.GetValues<SwimEventStatus>().Select(status =>
+                new EventFilterOption<SwimEventStatus>(status, status.ToString())));
+
+        RoundFilterOptions = new ObservableCollection<EventFilterOption<EventRound>>(
+            Enum.GetValues<EventRound>().Select(round =>
+                new EventFilterOption<EventRound>(round, EnumDisplay.GetDescription(round))));
+    }
+
+    private void SubscribeFilterOptions()
+    {
+        SubscribeFilterOptions(DistanceFilterOptions);
+        SubscribeFilterOptions(StrokeFilterOptions);
+        SubscribeFilterOptions(GenderFilterOptions);
+        SubscribeFilterOptions(StatusFilterOptions);
+        SubscribeFilterOptions(RoundFilterOptions);
+    }
+
+    private void SubscribeFilterOptions<T>(IEnumerable<EventFilterOption<T>> options)
+    {
+        foreach (var option in options)
+            option.PropertyChanged += OnFilterOptionPropertyChanged;
+    }
+
+    private void OnFilterOptionPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(IEventFilterOption.IsSelected))
+            return;
+
+        OnPropertyChanged(nameof(DistanceFilterText));
+        OnPropertyChanged(nameof(StrokeFilterText));
+        OnPropertyChanged(nameof(GenderFilterText));
+        OnPropertyChanged(nameof(StatusFilterText));
+        OnPropertyChanged(nameof(RoundFilterText));
+        ClearFiltersCommand.NotifyCanExecuteChanged();
+        ReloadFromFirstPage();
+    }
+
+    [RelayCommand]
+    private void ToggleFiltersPanel() => IsFiltersPanelVisible = !IsFiltersPanelVisible;
+
+    [RelayCommand(CanExecute = nameof(HasActiveFilters))]
+    private void ClearFilters()
+    {
+        ClearFilterOptions(DistanceFilterOptions);
+        ClearFilterOptions(StrokeFilterOptions);
+        ClearFilterOptions(GenderFilterOptions);
+        ClearFilterOptions(StatusFilterOptions);
+        ClearFilterOptions(RoundFilterOptions);
+    }
+
+    private bool HasActiveFilters() =>
+        DistanceFilterOptions.Any(option => option.IsSelected) ||
+        StrokeFilterOptions.Any(option => option.IsSelected) ||
+        GenderFilterOptions.Any(option => option.IsSelected) ||
+        StatusFilterOptions.Any(option => option.IsSelected) ||
+        RoundFilterOptions.Any(option => option.IsSelected);
+
+    private static void ClearFilterOptions<T>(IEnumerable<EventFilterOption<T>> options)
+    {
+        foreach (var option in options)
+            option.IsSelected = false;
+    }
+
+    private void ReloadFromFirstPage()
+    {
+        if (CurrentPage == 0)
+            LoadDataCommand.Execute(null);
+        else
+            CurrentPage = 0;
+    }
+
+    private static string GetFilterText<T>(IEnumerable<EventFilterOption<T>> options, string placeholder)
+    {
+        var selected = options.Where(option => option.IsSelected).Select(option => option.DisplayText).ToArray();
+        return selected.Length == 0 ? placeholder : string.Join(", ", selected);
     }
 
     protected override void ShowAddEditDialog(int? id = default)

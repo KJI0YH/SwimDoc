@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using BizLogic.Helpers;
 using DataLayer.EfClasses;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -50,20 +49,27 @@ public class AthletesViewModel : DataViewModel<Athlete, int?>
         if (string.IsNullOrWhiteSpace(SearchText))
             return query;
 
-        if (int.TryParse((string?)SearchText, out _))
-            return Queryable.Where(query, a =>
-                EF.Functions.Like(a.YearOfBirth.ToString(), $"%{SearchText}%"));
+        var trimmed = SearchText.Trim();
 
-        if (EnumHelper.TryGetEnumByDescriptionContains<Category>(SearchText, out var category))
-            return query.Where(a => a.Category == category);
+        if (int.TryParse(trimmed, out _) && !trimmed.Contains(' '))
+            return query.Where(a => EF.Functions.Like(a.YearOfBirth.ToString(), $"%{trimmed}%"));
 
-        if (EnumHelper.TryGetEnumByDescriptionContains<Gender>(SearchText, out var gender))
-            return query.Where(a => a.Gender == gender);
+        var terms = trimmed.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        if (terms.Length == 0)
+            return query;
 
-        return Queryable.Where(query, a =>
-            EF.Functions.Like(a.FirstName, $"%{SearchText}%") ||
-            EF.Functions.Like(a.LastName, $"%{SearchText}%") ||
-            EF.Functions.Like(a.Club.Name, $"%{SearchText}%"));
+        foreach (var term in terms)
+        {
+            var termPattern = $"%{term}%";
+            query = query.Where(a =>
+                EF.Functions.Like(a.FirstName, termPattern) ||
+                EF.Functions.Like(a.LastName, termPattern) ||
+                EF.Functions.Like(a.FirstName + " " + a.LastName, termPattern) ||
+                EF.Functions.Like(a.LastName + " " + a.FirstName, termPattern) ||
+                (a.Club != null && EF.Functions.Like(a.Club.Name, termPattern)));
+        }
+
+        return query;
     }
 
     protected override void ShowAddEditDialog(int? id = default)

@@ -14,7 +14,7 @@
     </UserControl.Resources>
     <dataView:DefaultDataView>
         <dataView:DefaultDataView.Toolbar>
-            <DockPanel>
+            <DockPanel LastChildFill="True">
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
                     <ComboBox helpers:ComboBoxAutoWidthHelper.Enable="True"
                               ItemsSource="{Binding Items}"
@@ -61,27 +61,19 @@
                             Margin="0,5,5,5"
                             Padding="9" />
                 </StackPanel>
-            </DockPanel>
-        </dataView:DefaultDataView.Toolbar>
-        <dataView:DefaultDataView.MainContent>
-            <Grid Margin="5">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
 
-                <DockPanel Grid.Row="0" Margin="0,0,0,8" LastChildFill="True">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="8,5">
                     <TextBlock Text="{Binding SelectedHeatHeader}"
-                               Margin="5"
                                FontWeight="SemiBold"
                                VerticalAlignment="Center" />
                     <TextBlock Text="{Binding SelectedHeatStatus}"
-                               Margin="5"
-                               VerticalAlignment="Center"
-                               DockPanel.Dock="Right" />
-                </DockPanel>
-
-                <ui:DataGrid Grid.Row="1"
+                               Margin="12,0,0,0"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+            </DockPanel>
+        </dataView:DefaultDataView.Toolbar>
+        <dataView:DefaultDataView.MainContent>
+            <ui:DataGrid Margin="5"
                           ItemsSource="{Binding FixationHeatPositionViews}"
                           SelectedItem="{Binding SelectedFixationPosition}"
                           MouseDoubleClick="FixationPositionsGrid_MouseDoubleClick"
@@ -150,8 +142,7 @@
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
                     </DataGrid.Columns>
-                </ui:DataGrid>
-            </Grid>
+            </ui:DataGrid>
         </dataView:DefaultDataView.MainContent>
     </dataView:DefaultDataView>
 </UserControl>

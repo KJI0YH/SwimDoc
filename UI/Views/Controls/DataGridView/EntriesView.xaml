@@ -8,33 +8,92 @@
              xmlns:toolbar="clr-namespace:UI.Views.Controls.Toolbar"
              xmlns:dataGridView="clr-namespace:UI.Views.Controls.DataGridView"
              xmlns:importInfoBar="clr-namespace:UI.Views.Controls.ImportInfoBar"
+             xmlns:eventFilterComboBox="clr-namespace:UI.Views.Controls.EventFilterComboBox"
+             xmlns:helpers="clr-namespace:UI.Helpers"
+             x:Name="Root"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <helpers:BoolToVisibilityConverter x:Key="BoolToVis" />
+    </UserControl.Resources>
     <Grid>
         <dataView:DefaultDataView>
             <dataView:DefaultDataView.Toolbar>
-                <DockPanel>
-                    <Button Content="{ui:SymbolIcon FolderAdd24}"
-                            Command="{Binding ImportEntriesFromFileCommand}"
-                            ToolTip="Загрузить заявки из файла"
-                            Margin="5"
-                            Padding="9" />
-                    <Button Content="{ui:SymbolIcon DocumentArrowRight24}"
-                            Command="{Binding LoadEntriesFromPreviousEventCommand}"
-                            ToolTip="Загрузить заявки из предыдущего события"
-                            Margin="5"
-                            Padding="9" />
-                    <toolbar:DefaultToolbar />
-                </DockPanel>
+                <StackPanel>
+                    <WrapPanel Margin="0,0,0,4"
+                               Visibility="{Binding IsFiltersPanelVisible, Converter={StaticResource BoolToVis}}">
+                        <eventFilterComboBox:EventFilterComboBox
+                            ItemsSource="{Binding RoundFilterOptions}"
+                            DisplayText="{Binding RoundFilterText}"
+                            ItemTemplate="{StaticResource EventFilterOptionTemplate}"
+                            MinWidth="190"
+                            Margin="5,0,5,5" />
+
+                        <eventFilterComboBox:EventFilterComboBox
+                            ItemsSource="{Binding DistanceFilterOptions}"
+                            DisplayText="{Binding DistanceFilterText}"
+                            ItemTemplate="{StaticResource EventFilterOptionTemplate}"
+                            MinWidth="150"
+                            Margin="5,0,5,5" />
+
+                        <eventFilterComboBox:EventFilterComboBox
+                            ItemsSource="{Binding StrokeFilterOptions}"
+                            DisplayText="{Binding StrokeFilterText}"
+                            ItemTemplate="{StaticResource EventFilterOptionTemplate}"
+                            MinWidth="190"
+                            Margin="5,0,5,5" />
+
+                        <eventFilterComboBox:EventFilterComboBox
+                            ItemsSource="{Binding GenderFilterOptions}"
+                            DisplayText="{Binding GenderFilterText}"
+                            ItemTemplate="{StaticResource EventFilterOptionTemplate}"
+                            MinWidth="160"
+                            Margin="5,0,5,5" />
+
+                        <eventFilterComboBox:EventFilterComboBox
+                            ItemsSource="{Binding StatusFilterOptions}"
+                            DisplayText="{Binding StatusFilterText}"
+                            ItemTemplate="{StaticResource EventFilterOptionTemplate}"
+                            MinWidth="160"
+                            Margin="5,0,5,5" />
+
+                        <Button
+                            Content="{ui:SymbolIcon Dismiss24}"
+                            ToolTip="Очистить фильтры"
+                            Command="{Binding ClearFiltersCommand}"
+                            Margin="5,0,5,5"
+                            Padding="9"
+                            VerticalAlignment="Center" />
+                    </WrapPanel>
+
+                    <DockPanel>
+                        <StackPanel DockPanel.Dock="Left"
+                                    Orientation="Horizontal"
+                                    Visibility="{Binding ShowImportActions, ElementName=Root, Converter={StaticResource BoolToVis}}">
+                            <Button Content="{ui:SymbolIcon FolderAdd24}"
+                                    Command="{Binding ImportEntriesFromFileCommand}"
+                                    ToolTip="Загрузить заявки из файла"
+                                    Margin="5"
+                                    Padding="9" />
+                            <Button Content="{ui:SymbolIcon DocumentArrowRight24}"
+                                    Command="{Binding LoadEntriesFromPreviousEventCommand}"
+                                    ToolTip="Загрузить заявки из предыдущего события"
+                                    Margin="5"
+                                    Padding="9" />
+                        </StackPanel>
+                        <toolbar:EntriesToolbar DockPanel.Dock="Top" />
+                    </DockPanel>
+                </StackPanel>
             </dataView:DefaultDataView.Toolbar>
             <dataView:DefaultDataView.MainContent>
-                <dataGridView:DataGridView/>
+                <dataGridView:DataGridView />
             </dataView:DefaultDataView.MainContent>
         </dataView:DefaultDataView>
 
         <importInfoBar:ImportInfoBar Margin="10"
                                      VerticalAlignment="Bottom"
                                      HorizontalAlignment="Stretch"
-                                     Panel.ZIndex="1000" />
+                                     Panel.ZIndex="1000"
+                                     Visibility="{Binding ShowImportActions, ElementName=Root, Converter={StaticResource BoolToVis}}" />
     </Grid>
 </UserControl>

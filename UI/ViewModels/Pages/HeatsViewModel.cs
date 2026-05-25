@@ -26,7 +26,23 @@ public partial class HeatsViewModel(
         App.Current.Services.GetRequiredService<IAddEditWindowFactory>();
 
     protected IHeatService HeatService { get; } = heatService;
+
     [ObservableProperty] ObservableCollection<HeatPositionView> _heatPositions = new();
+
+    private bool _searchHandlerAttached;
+
+    private void EnsureSearchHandlerAttached()
+    {
+        if (_searchHandlerAttached)
+            return;
+
+        _searchHandlerAttached = true;
+        PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(SearchText))
+                _ = LoadHeatPositionsAsync();
+        };
+    }
 
     [ObservableProperty] private SwimEvent? _selectedSwimEvent;
 
@@ -66,6 +82,8 @@ public partial class HeatsViewModel(
 
     protected override void OnItemsLoaded(IReadOnlyList<SwimEvent> items)
     {
+        EnsureSearchHandlerAttached();
+
         if (items.Count == 0)
         {
             SelectedSwimEvent = null;
@@ -125,7 +143,8 @@ public partial class HeatsViewModel(
                     heatsTotal,
                     h.Status,
                     h.DisplayDayTime)));
-            HeatPositions = new ObservableCollection<HeatPositionView>(heatPositionViews);
+            HeatPositions = new ObservableCollection<HeatPositionView>(
+                FilterHeatPositions(heatPositionViews));
         }
         finally
         {
@@ -240,6 +259,39 @@ public partial class HeatsViewModel(
 
     partial void OnIsWholeHeatSelectedChanged(bool value) =>
         DeleteSelectedCommand.NotifyCanExecuteChanged();
+
+    private IEnumerable<HeatPositionView> FilterHeatPositions(IEnumerable<HeatPositionView> positions)
+    {
+        if (string.IsNullOrWhiteSpace(SearchText))
+            return positions;
+
+        var terms = SearchText.Trim()
+            .Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        if (terms.Length == 0)
+            return positions;
+
+        return positions.Where(position => terms.All(term =>
+            MatchesTerm(position, term)));
+    }
+
+    private static bool MatchesTerm(HeatPositionView position, string term)
+    {
+        if (Contains(position.Participant, term) || Contains(position.Club, term))
+            return true;
+
+        var athlete = position.Entry.Athlete;
+        if (athlete is null)
+            return false;
+
+        return Contains(athlete.FirstName, term) ||
+               Contains(athlete.LastName, term) ||
+               Contains($"{athlete.FirstName} {athlete.LastName}", term) ||
+               Contains($"{athlete.LastName} {athlete.FirstName}", term);
+    }
+
+    private static bool Contains(string? value, string term) =>
+        !string.IsNullOrEmpty(value) &&
+        value.Contains(term, StringComparison.OrdinalIgnoreCase);
 
     private bool CanOpenAthleteDetails() =>
         EntryAthleteNavigationHelper.TryGetAthleteId(SelectedHeatPosition?.Entry, out _);

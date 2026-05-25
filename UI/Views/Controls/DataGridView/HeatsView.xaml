@@ -14,8 +14,8 @@
     </UserControl.Resources>
     <dataView:DefaultDataView>
         <dataView:DefaultDataView.Toolbar>
-            <DockPanel>
-                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" HorizontalAlignment="Right">
+            <DockPanel LastChildFill="True">
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
                     <Button Content="{ui:SymbolIcon Add24}"
                             Command="{Binding CreateHeatCommand}"
                             ToolTip="Создать заплыв"
@@ -37,7 +37,7 @@
                             Margin="5"
                             Padding="9" />
                 </StackPanel>
-                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
                     <ComboBox helpers:ComboBoxAutoWidthHelper.Enable="True"
                               ItemsSource="{Binding Items}"
                               SelectedItem="{Binding SelectedSwimEvent}"
@@ -52,6 +52,11 @@
                             Padding="9"
                             Margin="5" />
                 </StackPanel>
+                <ui:TextBox VerticalAlignment="Center"
+                            Icon="{ui:SymbolIcon Search24}"
+                            Margin="5"
+                            MinWidth="280"
+                            Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
             </DockPanel>
         </dataView:DefaultDataView.Toolbar>
         <dataView:DefaultDataView.MainContent>

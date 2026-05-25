@@ -120,12 +120,27 @@
             <XamlRuntime>Wpf</XamlRuntime>
             <SubType>Designer</SubType>
         </Page>
+        <Page Update="Views\Controls\EventFilterComboBox\EventFilterComboBox.xaml">
+            <Generator>MSBuild:Compile</Generator>
+            <XamlRuntime>Wpf</XamlRuntime>
+            <SubType>Designer</SubType>
+        </Page>
         <Page Update="Views\Controls\DataGridView\DataGridView.xaml">
             <Generator>MSBuild:Compile</Generator>
             <XamlRuntime>Wpf</XamlRuntime>
             <SubType>Designer</SubType>
         </Page>
         <Page Update="Views\Controls\DataView\DefaultDataView.xaml">
+            <Generator>MSBuild:Compile</Generator>
+            <XamlRuntime>Wpf</XamlRuntime>
+            <SubType>Designer</SubType>
+        </Page>
+        <Page Update="Views\Controls\Toolbar\EventsToolbar.xaml">
+            <Generator>MSBuild:Compile</Generator>
+            <XamlRuntime>Wpf</XamlRuntime>
+            <SubType>Designer</SubType>
+        </Page>
+        <Page Update="Views\Controls\Toolbar\EntriesToolbar.xaml">
             <Generator>MSBuild:Compile</Generator>
             <XamlRuntime>Wpf</XamlRuntime>
             <SubType>Designer</SubType>

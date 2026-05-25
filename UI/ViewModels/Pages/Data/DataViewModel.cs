@@ -50,7 +50,7 @@ public partial class DataViewModel<TEntity, TKey> : DataViewModelBase
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ItemsInfo))]
-    private int _pageSize = 35;
+    private int _pageSize = 30;
 
     public string ItemsInfo
     {

@@ -3,9 +3,9 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using BizLogic.EntryDocumentReaderLogic;
-using BizLogic.Helpers;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DataLayer;
 using DataLayer.EfClasses;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,6 +27,20 @@ public partial class EntriesViewModel(
     : DataViewModel<Entry, int?>(entryService)
 {
     private const int SlowestTimeRank = int.MaxValue;
+    private bool _filterOptionsInitialized;
+
+    [ObservableProperty] private ObservableCollection<EventFilterOption<EventRound>> _roundFilterOptions = new();
+    [ObservableProperty] private ObservableCollection<EventFilterOption<int>> _distanceFilterOptions = new();
+    [ObservableProperty] private ObservableCollection<EventFilterOption<Stroke>> _strokeFilterOptions = new();
+    [ObservableProperty] private ObservableCollection<EventFilterOption<Gender>> _genderFilterOptions = new();
+    [ObservableProperty] private ObservableCollection<EventFilterOption<EntryStatus>> _statusFilterOptions = new();
+    [ObservableProperty] private bool _isFiltersPanelVisible;
+
+    public string RoundFilterText => GetFilterText(RoundFilterOptions, "Этап");
+    public string DistanceFilterText => GetFilterText(DistanceFilterOptions, "Дистанция");
+    public string StrokeFilterText => GetFilterText(StrokeFilterOptions, "Стиль");
+    public string GenderFilterText => GetFilterText(GenderFilterOptions, "Пол");
+    public string StatusFilterText => GetFilterText(StatusFilterOptions, "Статус");
 
     public enum EntriesImportBarKind
     {
@@ -67,8 +81,7 @@ public partial class EntriesViewModel(
     [ObservableProperty] private int _importSummaryWarningsCount;
     [ObservableProperty] private int _importTotalFiles;
 
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsFileImportBar), nameof(IsEventImportBar))]
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(IsFileImportBar), nameof(IsEventImportBar))]
     private EntriesImportBarKind _importBarKind = EntriesImportBarKind.File;
 
     [ObservableProperty] private bool _isImportBarOpen;
@@ -123,6 +136,12 @@ public partial class EntriesViewModel(
 
     protected override void InitializeColumns()
     {
+        EnsureFilterOptionsInitialized();
+        InitializeEntriesColumns();
+    }
+
+    protected void InitializeEntriesColumns()
+    {
         AutoGenerateColumns = false;
         ColumnConfigurations.Clear();
 
@@ -136,11 +155,13 @@ public partial class EntriesViewModel(
         ColumnConfigurations.Add(new ColumnConfiguration<Entry>("DisplayParticipantName", "Участник", 300,
             (query, direction) => QueryableSortByDirection.Sort(query, direction,
                 q => Queryable
-                    .OrderBy<Entry, string>(q, e => e.Athlete != null ? e.Athlete.LastName : e.Relay != null ? e.Relay.Club.Name : null)
+                    .OrderBy<Entry, string>(q,
+                        e => e.Athlete != null ? e.Athlete.LastName : e.Relay != null ? e.Relay.Club.Name : null)
                     .ThenBy(e => e.Athlete != null ? e.Athlete.FirstName : null)
                     .ThenBy(e => e.Id),
                 q => Queryable
-                    .OrderByDescending<Entry, string>(q, e => e.Athlete != null ? e.Athlete.LastName : e.Relay != null ? e.Relay.Club.Name : null)
+                    .OrderByDescending<Entry, string>(q,
+                        e => e.Athlete != null ? e.Athlete.LastName : e.Relay != null ? e.Relay.Club.Name : null)
                     .ThenByDescending(e => e.Athlete != null ? e.Athlete.FirstName : null)
                     .ThenByDescending(e => e.Id))));
         ColumnConfigurations.Add(new ColumnConfiguration<Entry>("Status", "Статус", 150));
@@ -190,25 +211,170 @@ public partial class EntriesViewModel(
 
     protected override IQueryable<Entry> ApplySearch(IQueryable<Entry> query)
     {
+        query = ApplySelectedFilters(query);
+
         if (string.IsNullOrWhiteSpace(SearchText))
             return query;
 
-        if (EnumHelper.TryGetEnumByDescriptionContains<EntryStatus>(SearchText, out var status))
-            return query.Where(e => e.Status == status);
+        var terms = SearchText.Trim()
+            .Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        if (terms.Length == 0)
+            return query;
 
-        if (EnumHelper.TryGetEnumByDescriptionContains<Gender>(SearchText, out var gender))
-            return query.Where(e => e.SwimEvent.AgeGroup.Gender == gender);
+        return terms.Select(term => $"%{term}%").Aggregate(query, (current, termPattern) => current.Where(e => (e.Athlete != null && (EF.Functions.Like(e.Athlete.FirstName, termPattern) || EF.Functions.Like(e.Athlete.LastName, termPattern))) || (e.Relay != null && EF.Functions.Like(e.Relay.Club.Name, termPattern))));
+    }
 
-        if (EnumHelper.TryGetEnumByDescriptionContains<Stroke>(SearchText, out var stroke))
-            return query.Where(e => e.SwimStyle.Stroke == stroke);
+    private IQueryable<Entry> ApplySelectedFilters(IQueryable<Entry> query)
+    {
+        var rounds = RoundFilterOptions.Where(option => option.IsSelected).Select(option => option.Value).ToArray();
+        if (rounds.Length > 0)
+            query = query.Where(e => e.SwimEvent != null && rounds.Contains(e.SwimEvent.Round));
 
-        return Queryable.Where(query, e =>
-            (e.Athlete != null && (EF.Functions.Like(e.Athlete.FirstName, $"%{SearchText}%") ||
-                                  EF.Functions.Like(e.Athlete.LastName, $"%{SearchText}%"))) ||
-            (e.Relay != null && EF.Functions.Like(e.Relay.Club.Name, $"%{SearchText}%")) ||
-            (e.Relay != null && e.Relay.Positions.Any(p =>
-                EF.Functions.Like(p.Athlete.FirstName, $"%{SearchText}%") ||
-                EF.Functions.Like(p.Athlete.LastName, $"%{SearchText}%"))));
+        var distances = DistanceFilterOptions.Where(option => option.IsSelected).Select(option => option.Value)
+            .ToArray();
+        if (distances.Length > 0)
+            query = query.Where(e => distances.Contains(e.SwimStyle.Distance));
+
+        var strokes = StrokeFilterOptions.Where(option => option.IsSelected).Select(option => option.Value).ToArray();
+        if (strokes.Length > 0)
+            query = query.Where(e => strokes.Contains(e.SwimStyle.Stroke));
+
+        var genders = GenderFilterOptions.Where(option => option.IsSelected).Select(option => option.Value).ToArray();
+        if (genders.Length > 0)
+            query = query.Where(e =>
+                (e.SwimEvent != null && genders.Contains(e.SwimEvent.AgeGroup.Gender)) ||
+                (e.Athlete != null && genders.Contains(e.Athlete.Gender)));
+
+        var statuses = StatusFilterOptions.Where(option => option.IsSelected).Select(option => option.Value).ToArray();
+        if (statuses.Length > 0)
+            query = query.Where(e => statuses.Contains(e.Status));
+
+        return query;
+    }
+
+    protected void EnsureFilterOptionsInitialized()
+    {
+        if (_filterOptionsInitialized)
+            return;
+
+        _filterOptionsInitialized = true;
+        InitializeFilterOptions();
+        SubscribeFilterOptions();
+    }
+
+    protected void ResetFilterOptions()
+    {
+        UnsubscribeFilterOptions(RoundFilterOptions);
+        UnsubscribeFilterOptions(DistanceFilterOptions);
+        UnsubscribeFilterOptions(StrokeFilterOptions);
+        UnsubscribeFilterOptions(GenderFilterOptions);
+        UnsubscribeFilterOptions(StatusFilterOptions);
+        _filterOptionsInitialized = false;
+    }
+
+    protected virtual IQueryable<Entry> GetFilterOptionsSource() => _crudService.Query();
+
+    protected virtual void InitializeFilterOptions()
+    {
+        var distances = GetFilterOptionsSource()
+            .Select(e => e.SwimStyle.Distance)
+            .Distinct()
+            .OrderBy(distance => distance)
+            .ToList();
+
+        DistanceFilterOptions = new ObservableCollection<EventFilterOption<int>>(
+            distances.Select(distance => new EventFilterOption<int>(distance, $"{distance}м")));
+
+        RoundFilterOptions = new ObservableCollection<EventFilterOption<EventRound>>(
+            Enum.GetValues<EventRound>().Select(round =>
+                new EventFilterOption<EventRound>(round, EnumDisplay.GetDescription(round))));
+
+        StrokeFilterOptions = new ObservableCollection<EventFilterOption<Stroke>>(
+            Enum.GetValues<Stroke>().Select(stroke =>
+                new EventFilterOption<Stroke>(stroke, EnumDisplay.GetDescription(stroke))));
+
+        GenderFilterOptions = new ObservableCollection<EventFilterOption<Gender>>(
+            Enum.GetValues<Gender>().Select(gender =>
+                new EventFilterOption<Gender>(gender, EnumDisplay.GetDescription(gender))));
+
+        StatusFilterOptions = new ObservableCollection<EventFilterOption<EntryStatus>>(
+            Enum.GetValues<EntryStatus>().Select(status =>
+                new EventFilterOption<EntryStatus>(status, EnumDisplay.GetDescription(status))));
+    }
+
+    private void SubscribeFilterOptions()
+    {
+        SubscribeFilterOptions(RoundFilterOptions);
+        SubscribeFilterOptions(DistanceFilterOptions);
+        SubscribeFilterOptions(StrokeFilterOptions);
+        SubscribeFilterOptions(GenderFilterOptions);
+        SubscribeFilterOptions(StatusFilterOptions);
+    }
+
+    private void SubscribeFilterOptions<T>(IEnumerable<EventFilterOption<T>> options)
+    {
+        foreach (var option in options)
+            option.PropertyChanged += OnFilterOptionPropertyChanged;
+    }
+
+    private void UnsubscribeFilterOptions<T>(IEnumerable<EventFilterOption<T>> options)
+    {
+        foreach (var option in options)
+            option.PropertyChanged -= OnFilterOptionPropertyChanged;
+    }
+
+    private void OnFilterOptionPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(IEventFilterOption.IsSelected))
+            return;
+
+        OnPropertyChanged(nameof(RoundFilterText));
+        OnPropertyChanged(nameof(DistanceFilterText));
+        OnPropertyChanged(nameof(StrokeFilterText));
+        OnPropertyChanged(nameof(GenderFilterText));
+        OnPropertyChanged(nameof(StatusFilterText));
+        ClearFiltersCommand.NotifyCanExecuteChanged();
+        ReloadFromFirstPage();
+    }
+
+    [RelayCommand]
+    private void ToggleFiltersPanel() => IsFiltersPanelVisible = !IsFiltersPanelVisible;
+
+    [RelayCommand(CanExecute = nameof(HasActiveFilters))]
+    private void ClearFilters()
+    {
+        ClearFilterOptions(RoundFilterOptions);
+        ClearFilterOptions(DistanceFilterOptions);
+        ClearFilterOptions(StrokeFilterOptions);
+        ClearFilterOptions(GenderFilterOptions);
+        ClearFilterOptions(StatusFilterOptions);
+    }
+
+    private bool HasActiveFilters() =>
+        RoundFilterOptions.Any(option => option.IsSelected) ||
+        DistanceFilterOptions.Any(option => option.IsSelected) ||
+        StrokeFilterOptions.Any(option => option.IsSelected) ||
+        GenderFilterOptions.Any(option => option.IsSelected) ||
+        StatusFilterOptions.Any(option => option.IsSelected);
+
+    private static void ClearFilterOptions<T>(IEnumerable<EventFilterOption<T>> options)
+    {
+        foreach (var option in options)
+            option.IsSelected = false;
+    }
+
+    private void ReloadFromFirstPage()
+    {
+        if (CurrentPage == 0)
+            LoadDataCommand.Execute(null);
+        else
+            CurrentPage = 0;
+    }
+
+    private static string GetFilterText<T>(IEnumerable<EventFilterOption<T>> options, string placeholder)
+    {
+        var selected = options.Where(option => option.IsSelected).Select(option => option.DisplayText).ToArray();
+        return selected.Length == 0 ? placeholder : string.Join(", ", selected);
     }
 
     protected override void ShowAddEditDialog(int? id = default)
@@ -368,9 +534,10 @@ public partial class EntriesViewModel(
 
                 try
                 {
-                    var (documents, stats) = await Task.Run<(IReadOnlyList<EntryDocument> documents, EntryImportStats stats)>(
-                        () => entryDocumentReaderService.ReadWithStats(file.FullPath),
-                        _importCts.Token);
+                    var (documents, stats) =
+                        await Task.Run<(IReadOnlyList<EntryDocument> documents, EntryImportStats stats)>(
+                            () => entryDocumentReaderService.ReadWithStats(file.FullPath),
+                            _importCts.Token);
 
                     file.ClubsAdded = stats.ClubsAdded;
                     file.ClubsUpdated = stats.ClubsUpdated;

@@ -106,21 +106,34 @@ public class EntriesByAthleteViewModel : EntriesViewModel
         _windowFactory = App.Current.Services.GetRequiredService<IAddEditWindowFactory>();
     }
 
+    protected override void InitializeColumns()
+    {
+        InitializeEntriesColumns();
+    }
+
     public void SetAthleteId(int? athleteId)
     {
         _athleteId = athleteId;
+        ResetFilterOptions();
+        EnsureFilterOptionsInitialized();
         LoadDataCommand.Execute(null);
     }
+
+    protected override IQueryable<Entry> GetFilterOptionsSource() =>
+        ApplyAthleteScope(_crudService.Query());
 
     protected override IQueryable<Entry> ApplyQuery(IQueryable<Entry> query)
     {
         query = base.ApplyQuery(query);
-        return _athleteId.HasValue
+        return ApplyAthleteScope(query);
+    }
+
+    private IQueryable<Entry> ApplyAthleteScope(IQueryable<Entry> query) =>
+        _athleteId.HasValue
             ? query.Where(e =>
                 e.AthleteId == _athleteId.Value ||
                 (e.Relay != null && e.Relay.Positions.Any(p => p.AthleteId == _athleteId.Value)))
             : query.Where(_ => false);
-    }
 
     protected override void ShowAddEditDialog(int? id = default)
     {
@@ -142,21 +155,34 @@ public class EntriesByClubViewModel : EntriesViewModel
         _windowFactory = App.Current.Services.GetRequiredService<IAddEditWindowFactory>();
     }
 
+    protected override void InitializeColumns()
+    {
+        InitializeEntriesColumns();
+    }
+
     public void SetClubId(int? clubId)
     {
         _clubId = clubId;
+        ResetFilterOptions();
+        EnsureFilterOptionsInitialized();
         LoadDataCommand.Execute(null);
     }
+
+    protected override IQueryable<Entry> GetFilterOptionsSource() =>
+        ApplyClubScope(_crudService.Query());
 
     protected override IQueryable<Entry> ApplyQuery(IQueryable<Entry> query)
     {
         query = base.ApplyQuery(query);
-        return _clubId.HasValue
+        return ApplyClubScope(query);
+    }
+
+    private IQueryable<Entry> ApplyClubScope(IQueryable<Entry> query) =>
+        _clubId.HasValue
             ? query.Where(e =>
                 (e.Athlete != null && e.Athlete.ClubId == _clubId.Value) ||
                 (e.Relay != null && e.Relay.ClubId == _clubId.Value))
             : query.Where(_ => false);
-    }
 
     protected override void ShowAddEditDialog(int? id = default)
     {

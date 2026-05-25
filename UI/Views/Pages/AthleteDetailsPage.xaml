@@ -2,7 +2,6 @@
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       ScrollViewer.CanContentScroll="False"
-      xmlns:dataView="clr-namespace:UI.Views.Controls.DataView"
       xmlns:dataGridView="clr-namespace:UI.Views.Controls.DataGridView">
     <Grid>
         <Grid.RowDefinitions>
@@ -11,19 +10,15 @@
         </Grid.RowDefinitions>
         <TabControl Grid.Row="1" Margin="5">
             <TabItem Header="Заявки">
-                <dataView:DefaultDataView DataContext="{Binding EntriesTable}">
-                    <dataView:DefaultDataView.MainContent>
-                        <dataGridView:DataGridView />
-                    </dataView:DefaultDataView.MainContent>
-                </dataView:DefaultDataView>
+                <dataGridView:EntriesView DataContext="{Binding EntriesTable}"
+                                          ShowImportActions="False" />
             </TabItem>
             <TabItem Header="Заплывы">
-                <dataGridView:HeatsView DataContext="{Binding HeatsTable}"/>
+                <dataGridView:HeatsView DataContext="{Binding HeatsTable}" />
             </TabItem>
             <TabItem Header="Результаты">
                 <dataGridView:ParticipantResultsView DataContext="{Binding ResultsTable}" />
             </TabItem>
         </TabControl>
     </Grid>
-
 </Page>

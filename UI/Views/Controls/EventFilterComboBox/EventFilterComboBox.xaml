@@ -1,0 +1,80 @@
+<UserControl x:Class="UI.Views.Controls.EventFilterComboBox.EventFilterComboBox"
+             x:Name="Root"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:helpers="clr-namespace:UI.Helpers"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             MinHeight="32"
+             d:DesignHeight="32"
+             d:DesignWidth="180"
+             helpers:EventFilterComboBoxBehavior.IsMultiSelectFilter="True">
+    <Grid>
+        <ToggleButton x:Name="DropDownToggle"
+                      HorizontalAlignment="Stretch"
+                      VerticalAlignment="Stretch"
+                      Background="Transparent"
+                      BorderThickness="0"
+                      Focusable="False"
+                      Checked="DropDownToggle_OnChecked"
+                      Unchecked="DropDownToggle_OnUnchecked" />
+
+        <Border Background="{DynamicResource ComboBoxBackground}"
+                BorderBrush="{DynamicResource ControlElevationBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="{DynamicResource ControlCornerRadius}"
+                IsHitTestVisible="False">
+            <Grid Margin="{DynamicResource ComboBoxPadding}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock x:Name="CaptionText"
+                           Grid.Column="0"
+                           Text="{Binding DisplayText, ElementName=Root}"
+                           FontSize="{StaticResource SwimDocFontSizeBody}"
+                           Foreground="{DynamicResource ComboBoxForeground}"
+                           VerticalAlignment="Center"
+                           TextTrimming="CharacterEllipsis" />
+                <ui:SymbolIcon Grid.Column="1"
+                               Symbol="ChevronDown24"
+                               FontSize="14"
+                               Foreground="{DynamicResource ComboBoxDropDownGlyphForeground}"
+                               VerticalAlignment="Center"
+                               Margin="8,0,0,0" />
+            </Grid>
+        </Border>
+
+        <Popup x:Name="ItemsPopup"
+               Placement="Bottom"
+               PlacementTarget="{Binding ElementName=Root}"
+               StaysOpen="True"
+               AllowsTransparency="True"
+               IsOpen="{Binding IsChecked, ElementName=DropDownToggle}"
+               PopupAnimation="Fade">
+            <Border Background="Transparent"
+                    MinWidth="{Binding ActualWidth, ElementName=Root}"
+                    SnapsToDevicePixels="True">
+                <Border x:Name="PopupRoot"
+                        Background="{DynamicResource ComboBoxDropDownBackground}"
+                        BorderBrush="{DynamicResource ComboBoxDropDownBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="{DynamicResource PopupCornerRadius}"
+                        ClipToBounds="True"
+                        Padding="0,4,0,6"
+                        PreviewMouseLeftButtonDown="PopupRoot_OnPreviewMouseLeftButtonDown">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                  HorizontalScrollBarVisibility="Disabled"
+                                  Background="{DynamicResource ComboBoxDropDownBackground}"
+                                  BorderThickness="0">
+                        <ItemsControl FontSize="{StaticResource SwimDocFontSizeBody}"
+                                      ItemsSource="{Binding ItemsSource, ElementName=Root}"
+                                      ItemTemplate="{Binding ItemTemplate, ElementName=Root}" />
+                    </ScrollViewer>
+                </Border>
+            </Border>
+        </Popup>
+    </Grid>
+</UserControl>

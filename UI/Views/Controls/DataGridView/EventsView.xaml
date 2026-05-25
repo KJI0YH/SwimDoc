@@ -7,31 +7,87 @@
              xmlns:dataView="clr-namespace:UI.Views.Controls.DataView"
              xmlns:toolbar="clr-namespace:UI.Views.Controls.Toolbar"
              xmlns:dataGridView="clr-namespace:UI.Views.Controls.DataGridView"
+             xmlns:eventFilterComboBox="clr-namespace:UI.Views.Controls.EventFilterComboBox"
+             xmlns:helpers="clr-namespace:UI.Helpers"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <helpers:BoolToVisibilityConverter x:Key="BoolToVis" />
+    </UserControl.Resources>
     <dataView:DefaultDataView>
         <dataView:DefaultDataView.Toolbar>
-            <DockPanel>
-                <Button
-                    Content="{ui:SymbolIcon SwimmingPool24}"
-                    ToolTip="Сгенерировать заплывы"
-                    Command="{Binding HeatAllocationCommand}"
-                    Margin="5"
-                    Padding="9" />
-                <Button
-                    Content="{ui:SymbolIcon Print24}"
-                    ToolTip="Сгенерировать отчёт"
-                    Command="{Binding GenerateReportsCommand}"
-                    Margin="5"
-                    Padding="9" />
-                <Button
-                    Content="{ui:SymbolIcon Clock24}"
-                    ToolTip="Подсчитать время старта"
-                    Command="{Binding CalculateStartTimesCommand}"
-                    Margin="5"
-                    Padding="9" />
-                <toolbar:DefaultToolbar />
-            </DockPanel>
+            <StackPanel>
+                <WrapPanel Margin="0,0,0,4"
+                           Visibility="{Binding IsFiltersPanelVisible, Converter={StaticResource BoolToVis}}">
+                    <eventFilterComboBox:EventFilterComboBox
+                        ItemsSource="{Binding RoundFilterOptions}"
+                        DisplayText="{Binding RoundFilterText}"
+                        ItemTemplate="{StaticResource EventFilterOptionTemplate}"
+                        MinWidth="120"
+                        Margin="5,0,5,5" />
+
+                    <eventFilterComboBox:EventFilterComboBox
+                        ItemsSource="{Binding DistanceFilterOptions}"
+                        DisplayText="{Binding DistanceFilterText}"
+                        ItemTemplate="{StaticResource EventFilterOptionTemplate}"
+                        MinWidth="120"
+                        Margin="5,0,5,5" />
+
+                    <eventFilterComboBox:EventFilterComboBox
+                        ItemsSource="{Binding StrokeFilterOptions}"
+                        DisplayText="{Binding StrokeFilterText}"
+                        ItemTemplate="{StaticResource EventFilterOptionTemplate}"
+                        MinWidth="120"
+                        Margin="5,0,5,5" />
+
+                    <eventFilterComboBox:EventFilterComboBox
+                        ItemsSource="{Binding GenderFilterOptions}"
+                        DisplayText="{Binding GenderFilterText}"
+                        ItemTemplate="{StaticResource EventFilterOptionTemplate}"
+                        MinWidth="120"
+                        Margin="5,0,5,5" />
+
+
+                    <eventFilterComboBox:EventFilterComboBox
+                        ItemsSource="{Binding StatusFilterOptions}"
+                        DisplayText="{Binding StatusFilterText}"
+                        ItemTemplate="{StaticResource EventFilterOptionTemplate}"
+                        MinWidth="120"
+                        Margin="5,0,5,5" />
+
+                    <Button
+                        Content="{ui:SymbolIcon Dismiss24}"
+                        ToolTip="Очистить фильтры"
+                        Command="{Binding ClearFiltersCommand}"
+                        Margin="5,0,5,5"
+                        Padding="9"
+                        VerticalAlignment="Center" />
+                </WrapPanel>
+
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
+                        <Button
+                            Content="{ui:SymbolIcon SwimmingPool24}"
+                            ToolTip="Сгенерировать заплывы"
+                            Command="{Binding HeatAllocationCommand}"
+                            Margin="5"
+                            Padding="9" />
+                        <Button
+                            Content="{ui:SymbolIcon Print24}"
+                            ToolTip="Сгенерировать отчёт"
+                            Command="{Binding GenerateReportsCommand}"
+                            Margin="5"
+                            Padding="9" />
+                        <Button
+                            Content="{ui:SymbolIcon Clock24}"
+                            ToolTip="Подсчитать время старта"
+                            Command="{Binding CalculateStartTimesCommand}"
+                            Margin="5"
+                            Padding="9" />
+                    </StackPanel>
+                    <toolbar:EventsToolbar DockPanel.Dock="Top" />
+                </DockPanel>
+            </StackPanel>
         </dataView:DefaultDataView.Toolbar>
         <dataView:DefaultDataView.MainContent>
             <dataGridView:DataGridView />

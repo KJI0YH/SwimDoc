@@ -180,6 +180,61 @@
         <Setter Property="VerticalContentAlignment" Value="Center" />
     </Style>
 
+    <DataTemplate x:Key="EventFilterOptionTemplate">
+        <Border Margin="{DynamicResource ComboBoxItemMargin}"
+                Padding="{DynamicResource ComboBoxItemContentMargin}"
+                CornerRadius="{DynamicResource ControlCornerRadius}"
+                Cursor="Hand"
+                SnapsToDevicePixels="True">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Background" Value="Transparent" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                            <Setter Property="Background" Value="{StaticResource DataGridSelectedRowBackgroundBrush}" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+            <Grid>
+                <Rectangle Width="3"
+                           Height="16"
+                           HorizontalAlignment="Left"
+                           VerticalAlignment="Center"
+                           RadiusX="2"
+                           RadiusY="2"
+                           Fill="{DynamicResource SystemAccentColorPrimaryBrush}"
+                           Visibility="Collapsed">
+                    <Rectangle.Style>
+                        <Style TargetType="Rectangle">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Rectangle.Style>
+                </Rectangle>
+                <TextBlock Margin="8,0,0,0"
+                           Text="{Binding DisplayText}"
+                           FontSize="{StaticResource SwimDocFontSizeBody}"
+                           Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                           VerticalAlignment="Center">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="FontSize" Value="{StaticResource SwimDocFontSizeBody}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                    <Setter Property="FontWeight" Value="SemiBold" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+            </Grid>
+        </Border>
+    </DataTemplate>
+
     <Style TargetType="DataGridColumnHeader"
            BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
         <Setter Property="FontSize" Value="{StaticResource SwimDocFontSizeBody}" />

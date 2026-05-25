@@ -179,6 +179,7 @@
                                        Icon="{ui:SymbolIcon BuildingTownhouse24}"
                                        TargetPageType="{x:Type pages:ClubsPage}"
                                        IsEnabled="{Binding IsCompetitionSelected}" />
+                <ui:NavigationViewItemSeparator />
                 <ui:NavigationViewItem Content="Возрастные группы"
                                        Tag="AgeGroups"
                                        Icon="{ui:SymbolIcon GroupList24}"
