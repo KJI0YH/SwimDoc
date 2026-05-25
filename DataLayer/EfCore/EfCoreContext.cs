@@ -458,5 +458,26 @@ public sealed class EfCoreContext : DbContext
                 );
             END;
             """);
+
+        Database.ExecuteSqlRaw("""
+            CREATE TRIGGER IF NOT EXISTS trg_heats_after_update_reorder
+            AFTER UPDATE OF Number ON Heats
+            BEGIN
+                UPDATE Heats
+                SET "Order" = (
+                    SELECT COUNT(*)
+                    FROM Heats h2
+                    JOIN SwimEvents se2 ON se2.Id = h2.SwimEventId
+                    WHERE se2."Order" < (SELECT se1."Order" FROM SwimEvents se1 WHERE se1.Id = Heats.SwimEventId)
+                       OR (
+                           se2."Order" = (SELECT se1."Order" FROM SwimEvents se1 WHERE se1.Id = Heats.SwimEventId)
+                           AND (
+                               h2.Number < Heats.Number
+                               OR (h2.Number = Heats.Number AND h2.Id <= Heats.Id)
+                           )
+                       )
+                );
+            END;
+            """);
     }
 }

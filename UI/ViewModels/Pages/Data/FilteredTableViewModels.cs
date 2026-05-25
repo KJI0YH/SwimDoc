@@ -297,15 +297,16 @@ public class HeatsByEventViewModel : HeatsViewModel
             : query.Where(_ => false);
     }
 
-    protected override void ShowAddEditDialog(int? id = default)
+    protected override void ShowHeatAddEditDialog(int? heatId = null)
     {
-        var context = _eventId.HasValue ? new AddEditContext { EventId = _eventId.Value } : null;
-        var result = _windowFactory.CreateAndShow<EntryAddEditWindow>(id, context);
+        var context = _eventId.HasValue
+            ? new AddEditContext { EventId = _eventId.Value }
+            : SelectedSwimEvent?.Id is int eventId
+                ? new AddEditContext { EventId = eventId }
+                : null;
+        var result = _windowFactory.CreateAndShow<HeatAddEditWindow>(heatId, context);
         if (result == true)
-        {
-            _ = LoadDataAsync();
             _ = RefreshAsync();
-        }
     }
 }
 

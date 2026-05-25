@@ -96,6 +96,9 @@
         <Page Update="Views\Windows\AddEdit\SwimStyleAddEditWindow.xaml">
             <Generator>MSBuild:Compile</Generator>
         </Page>
+        <Page Update="Views\Windows\AddEdit\HeatAddEditWindow.xaml">
+            <Generator>MSBuild:Compile</Generator>
+        </Page>
         <Page Update="Views\Windows\AddEdit\GenericAddEditWindow.xaml">
             <Generator>MSBuild:Compile</Generator>
             <XamlRuntime>Wpf</XamlRuntime>

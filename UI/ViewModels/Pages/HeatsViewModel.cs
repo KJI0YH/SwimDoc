@@ -1,15 +1,18 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Windows.Data;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DataLayer.EfClasses;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.EventService;
 using ServiceLayer.HeatService;
 using UI.Helpers;
 using UI.Services;
 using UI.ViewModels.Pages.Data;
+using UI.Views.Windows.AddEdit;
 
 namespace UI.ViewModels.Pages;
 
@@ -19,6 +22,9 @@ public partial class HeatsViewModel(
     INavigationService navigationService)
     : DataViewModel<SwimEvent, int?>(eventService)
 {
+    private readonly IAddEditWindowFactory _windowFactory =
+        App.Current.Services.GetRequiredService<IAddEditWindowFactory>();
+
     protected IHeatService HeatService { get; } = heatService;
     [ObservableProperty] ObservableCollection<HeatPositionView> _heatPositions = new();
 
@@ -26,7 +32,15 @@ public partial class HeatsViewModel(
 
     [ObservableProperty] private HeatPositionView? _selectedHeatPosition;
 
+    [ObservableProperty] private int? _selectedHeatId;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(DeleteToolTip))]
+    private bool _isWholeHeatSelected;
+
     private ObservableCollection<HeatPositionView>? _heatPositionsGroupedSource;
+
+    public string DeleteToolTip => IsWholeHeatSelected ? "Удалить заплыв" : "Удалить позицию";
     private ListCollectionView? _heatPositionsGroupedView;
 
     public ICollectionView HeatPositionsView
@@ -64,13 +78,27 @@ public partial class HeatsViewModel(
 
     public Task RefreshAsync() => LoadHeatPositionsAsync();
 
+    [RelayCommand]
+    private async Task RefreshHeatsAsync()
+    {
+        await LoadDataAsync();
+        await RefreshAsync();
+    }
+
     partial void OnSelectedSwimEventChanged(SwimEvent? value)
     {
+        CreateHeatCommand.NotifyCanExecuteChanged();
         _ = LoadHeatPositionsAsync();
     }
 
     partial void OnHeatPositionsChanged(ObservableCollection<HeatPositionView> value)
     {
+        if (SelectedHeatId is int heatId && !value.Any(position => position.HeatId == heatId))
+        {
+            SelectedHeatId = null;
+            SelectedHeatPosition = null;
+        }
+
         OnPropertyChanged(nameof(HeatPositionsView));
     }
 
@@ -105,6 +133,76 @@ public partial class HeatsViewModel(
         }
     }
 
+    [RelayCommand(CanExecute = nameof(CanCreateHeat))]
+    private void CreateHeat() => ShowHeatAddEditDialog();
+
+    [RelayCommand(CanExecute = nameof(CanEditHeat))]
+    private void EditHeat()
+    {
+        if (SelectedHeatId is not int heatId)
+            return;
+
+        ShowHeatAddEditDialog(heatId);
+    }
+
+    public void ApplySelection(int heatId, HeatPositionView? position, bool wholeHeat)
+    {
+        SelectedHeatId = heatId;
+        SelectedHeatPosition = position;
+        IsWholeHeatSelected = wholeHeat;
+    }
+
+    [RelayCommand(CanExecute = nameof(CanDeleteSelected))]
+    private async Task DeleteSelectedAsync()
+    {
+        try
+        {
+            if (ShouldDeleteWholeHeat() && SelectedHeatId is int heatId)
+            {
+                await HeatService.DeleteHeatAsync(heatId);
+                SelectedHeatId = null;
+                SelectedHeatPosition = null;
+                IsWholeHeatSelected = false;
+            }
+            else if (SelectedHeatPosition is not null)
+            {
+                await HeatService.DeleteHeatPositionAsync(
+                    SelectedHeatPosition.HeatId,
+                    SelectedHeatPosition.EntryId);
+            }
+            else
+            {
+                return;
+            }
+
+            await RefreshAsync();
+        }
+        catch (ValidationException)
+        {
+            // ignored
+        }
+    }
+
+    private bool CanCreateHeat() => SelectedSwimEvent?.Id is not null;
+
+    private bool CanEditHeat() => SelectedHeatId is not null;
+
+    private bool CanDeleteSelected() =>
+        ShouldDeleteWholeHeat() || SelectedHeatPosition is not null;
+
+    private bool ShouldDeleteWholeHeat() =>
+        IsWholeHeatSelected && SelectedHeatId is not null;
+
+    protected virtual void ShowHeatAddEditDialog(int? heatId = null)
+    {
+        var context = SelectedSwimEvent?.Id is int eventId
+            ? new AddEditContext { EventId = eventId }
+            : null;
+        var result = _windowFactory.CreateAndShow<HeatAddEditWindow>(heatId, context);
+        if (result == true)
+            _ = RefreshAsync();
+    }
+
     [RelayCommand]
     private void GoToNextEvent()
     {
@@ -124,8 +222,24 @@ public partial class HeatsViewModel(
         SelectedSwimEvent = Items[prevIdx];
     }
 
-    partial void OnSelectedHeatPositionChanged(HeatPositionView? value) =>
+    partial void OnSelectedHeatPositionChanged(HeatPositionView? value)
+    {
+        if (value is not null)
+            SelectedHeatId = value.HeatId;
+
         OpenAthleteDetailsCommand.NotifyCanExecuteChanged();
+        EditHeatCommand.NotifyCanExecuteChanged();
+        DeleteSelectedCommand.NotifyCanExecuteChanged();
+    }
+
+    partial void OnSelectedHeatIdChanged(int? value)
+    {
+        EditHeatCommand.NotifyCanExecuteChanged();
+        DeleteSelectedCommand.NotifyCanExecuteChanged();
+    }
+
+    partial void OnIsWholeHeatSelectedChanged(bool value) =>
+        DeleteSelectedCommand.NotifyCanExecuteChanged();
 
     private bool CanOpenAthleteDetails() =>
         EntryAthleteNavigationHelper.TryGetAthleteId(SelectedHeatPosition?.Entry, out _);
@@ -154,6 +268,8 @@ public sealed class HeatPositionView(
     public Entry Entry => HeatPosition.Entry;
 
     public int HeatId => HeatPosition.HeatId;
+    public int EntryId => HeatPosition.EntryId;
+    public HeatStatus HeatStatus { get; } = heatStatus;
     public string HeatGroupHeader =>
         $"Заплыв {heatNumber} из {heatsInEvent} ({heatOrder} из {heatsTotal}) | {heatDayTime} | {heatStatus}";
     public int Lane => HeatPosition.Lane;

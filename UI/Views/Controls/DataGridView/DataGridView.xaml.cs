@@ -19,10 +19,18 @@ public partial class DataGridView : UserControl
 {
     /// <summary>Light blue fill for selected entry rows (readable with default text color).</summary>
     private static readonly SolidColorBrush EntrySelectedRowBackground = CreateEntrySelectedRowBackground();
+    private static readonly SolidColorBrush EntryHoverRowBackground = CreateEntryHoverRowBackground();
 
     private static SolidColorBrush CreateEntrySelectedRowBackground()
     {
         var brush = new SolidColorBrush(Color.FromRgb(0xE3, 0xF2, 0xFD));
+        brush.Freeze();
+        return brush;
+    }
+
+    private static SolidColorBrush CreateEntryHoverRowBackground()
+    {
+        var brush = new SolidColorBrush(Color.FromRgb(0xE8, 0xEE, 0xF7));
         brush.Freeze();
         return brush;
     }
@@ -223,6 +231,12 @@ public partial class DataGridView : UserControl
             rowStyle.BasedOn = baseRowStyle;
         else if (Application.Current?.TryFindResource(typeof(DataGridRow)) is Style appRowStyle)
             rowStyle.BasedOn = appRowStyle;
+
+        var hover = new MultiTrigger();
+        hover.Conditions.Add(new Condition(DataGridRow.IsMouseOverProperty, true));
+        hover.Conditions.Add(new Condition(DataGridRow.IsSelectedProperty, false));
+        hover.Setters.Add(new Setter(Control.BackgroundProperty, EntryHoverRowBackground));
+        rowStyle.Triggers.Add(hover);
 
         var selected = new Trigger
         {

@@ -32,4 +32,10 @@ public static class EntryNormalizationHelper
         entry.Points = 0;
         return entry;
     }
+
+    public static void ClearHeatResultData(this Entry entry)
+    {
+        entry.FinishTime = null;
+        entry.Points = null;
+    }
 }

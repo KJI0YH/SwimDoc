@@ -9,36 +9,61 @@
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <helpers:IntEqualityToBoolConverter x:Key="IntEqualityToBoolConverter" />
+    </UserControl.Resources>
     <dataView:DefaultDataView>
         <dataView:DefaultDataView.Toolbar>
-            <StackPanel>
-                <DockPanel Margin="0,0,0,4">
-                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
-                        <ComboBox helpers:ComboBoxAutoWidthHelper.Enable="True"
-                                  ItemsSource="{Binding Items}"
-                                  SelectedItem="{Binding SelectedSwimEvent}"
-                                  DisplayMemberPath="DisplayName"
-                                  Margin="0,5,6,5" />
-                        <Button Content="{ui:SymbolIcon ArrowPrevious24}"
-                                Command="{Binding GoToPrevEventCommand}"
-                                Padding="9"
-                                Margin="5" />
-                        <Button Content="{ui:SymbolIcon ArrowNext24}"
-                                Command="{Binding GoToNextEventCommand}"
-                                Padding="9"
-                                Margin="5" />
-                    </StackPanel>
-                </DockPanel>
-            </StackPanel>
+            <DockPanel>
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" HorizontalAlignment="Right">
+                    <Button Content="{ui:SymbolIcon Add24}"
+                            Command="{Binding CreateHeatCommand}"
+                            ToolTip="Создать заплыв"
+                            Margin="5"
+                            Padding="9" />
+                    <Button Content="{ui:SymbolIcon Edit24}"
+                            Command="{Binding EditHeatCommand}"
+                            ToolTip="Редактировать заплыв"
+                            Margin="5"
+                            Padding="9" />
+                    <Button Content="{ui:SymbolIcon Delete24}"
+                            Command="{Binding DeleteSelectedCommand}"
+                            ToolTip="{Binding DeleteToolTip}"
+                            Margin="5"
+                            Padding="9" />
+                    <Button Content="{ui:SymbolIcon ArrowClockwise24}"
+                            Command="{Binding RefreshHeatsCommand}"
+                            ToolTip="Обновить"
+                            Margin="5"
+                            Padding="9" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                    <ComboBox helpers:ComboBoxAutoWidthHelper.Enable="True"
+                              ItemsSource="{Binding Items}"
+                              SelectedItem="{Binding SelectedSwimEvent}"
+                              DisplayMemberPath="DisplayName"
+                              Margin="0,5,6,5" />
+                    <Button Content="{ui:SymbolIcon ArrowPrevious24}"
+                            Command="{Binding GoToPrevEventCommand}"
+                            Padding="9"
+                            Margin="5" />
+                    <Button Content="{ui:SymbolIcon ArrowNext24}"
+                            Command="{Binding GoToNextEventCommand}"
+                            Padding="9"
+                            Margin="5" />
+                </StackPanel>
+            </DockPanel>
         </dataView:DefaultDataView.Toolbar>
         <dataView:DefaultDataView.MainContent>
             <ui:DataGrid ItemsSource="{Binding HeatPositionsView}"
                          SelectedItem="{Binding SelectedHeatPosition}"
                          Margin="5"
+                         SelectionChanged="HeatPositionsGrid_SelectionChanged"
                          MouseDoubleClick="HeatPositionsGrid_MouseDoubleClick"
                          AutoGenerateColumns="False"
                          CanUserResizeColumns="True"
                          IsReadOnly="True"
+                         SelectionMode="Extended"
                          RowStyle="{StaticResource DataGridRowLightBlueWhenSelectedStyle}"
                          HorizontalAlignment="Stretch"
                          ColumnWidth="*"
@@ -48,7 +73,28 @@
                     <GroupStyle>
                         <GroupStyle.HeaderTemplate>
                             <DataTemplate>
-                                <Border Background="#FFE8EEF7" Padding="8,5" Margin="0,0,0,2">
+                                <Border Padding="8,5"
+                                        Margin="0,0,0,2"
+                                        Cursor="Hand"
+                                        MouseLeftButtonUp="HeatGroupHeader_MouseLeftButtonUp">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background" Value="#FFE8EEF7" />
+                                            <Style.Triggers>
+                                                <DataTrigger Value="True">
+                                                    <DataTrigger.Binding>
+                                                        <MultiBinding Converter="{StaticResource IntEqualityToBoolConverter}">
+                                                            <Binding Path="Items[0].HeatId" />
+                                                            <Binding Path="DataContext.SelectedHeatId"
+                                                                     RelativeSource="{RelativeSource AncestorType=UserControl}" />
+                                                        </MultiBinding>
+                                                    </DataTrigger.Binding>
+                                                    <Setter Property="Background"
+                                                            Value="{StaticResource DataGridSelectedRowBackgroundBrush}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
                                     <TextBlock FontWeight="SemiBold"
                                                Text="{Binding Path=Items[0].HeatGroupHeader}" />
                                 </Border>

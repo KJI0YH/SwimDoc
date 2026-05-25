@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using ServiceLayer.BizRunners;
 using ServiceLayer.Crud;
 using ServiceLayer.HeatService.Exceptions;
+using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
 
 namespace ServiceLayer.HeatService;
 
@@ -37,12 +38,185 @@ public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbCo
     public async Task DeleteHeatPositionAsync(int heatId, int entryId)
     {
         var position = await dbContext.HeatPositions
+            .Include(heatPosition => heatPosition.Entry)
             .FirstOrDefaultAsync(heatPosition => heatPosition.HeatId == heatId && heatPosition.EntryId == entryId);
         if (position is null)
             return;
 
+        position.Entry.ClearHeatResultData();
         dbContext.HeatPositions.Remove(position);
         await dbContext.SaveChangesAsync();
+    }
+
+    public async Task DeleteHeatAsync(int heatId)
+    {
+        var heat = await dbContext.Heats
+            .Include(h => h.Positions)
+            .ThenInclude(position => position.Entry)
+            .FirstOrDefaultAsync(h => h.Id == heatId);
+        if (heat is null)
+            return;
+
+        foreach (var position in heat.Positions)
+            position.Entry.ClearHeatResultData();
+
+        dbContext.Heats.Remove(heat);
+        await dbContext.SaveChangesAsync();
+    }
+
+    public Task<int> GetNextHeatNumberAsync(int swimEventId)
+    {
+        var maxNumber = dbContext.Heats
+            .Where(heat => heat.SwimEventId == swimEventId)
+            .Select(heat => (int?)heat.Number)
+            .Max();
+        return Task.FromResult((maxNumber ?? 0) + 1);
+    }
+
+    public async Task<(Heat? heat, ImmutableList<ValidationResult> errors)> SaveHeatWithPositionsAsync(Heat heat,
+        bool isAdd)
+    {
+        ArgumentNullException.ThrowIfNull(heat);
+
+        var swimEvent = await dbContext.SwimEvents
+            .AsNoTracking()
+            .FirstOrDefaultAsync(se => se.Id == heat.SwimEventId);
+        if (swimEvent is null)
+            return (null, [new ValidationResult($"Событие {heat.SwimEventId} не найдено.")]);
+
+        var validationErrors = ValidateHeatWithPositions(heat, swimEvent, isAdd);
+        if (validationErrors.Count > 0)
+            return (null, validationErrors);
+
+        if (isAdd)
+        {
+            heat.Status = HeatStatus.NOT_STARTED;
+            heat.Positions ??= [];
+            foreach (var position in heat.Positions)
+                position.Heat = heat;
+
+            dbContext.Heats.Add(heat);
+            await dbContext.SaveChangesAsync();
+            await RecalculateHeatOrdersAsync();
+            await dbContext.Entry(heat).ReloadAsync();
+            return (heat, ImmutableList<ValidationResult>.Empty);
+        }
+
+        DetachHeatGraphIfTracked(heat);
+
+        var trackedHeat = await dbContext.Heats
+            .FirstOrDefaultAsync(h => h.Id == heat.Id);
+        if (trackedHeat is null)
+            return (null, [new ValidationResult($"Заплыв {heat.Id} не найден.")]);
+
+        trackedHeat.Number = heat.Number;
+        trackedHeat.DayTime = heat.DayTime;
+        trackedHeat.Status = heat.Status;
+
+        var existingPositions = await dbContext.HeatPositions
+            .Where(position => position.HeatId == heat.Id)
+            .ToListAsync();
+        if (existingPositions.Count > 0)
+            dbContext.HeatPositions.RemoveRange(existingPositions);
+
+        foreach (var position in heat.Positions ?? [])
+        {
+            dbContext.HeatPositions.Add(new HeatPosition
+            {
+                HeatId = trackedHeat.Id,
+                Lane = position.Lane,
+                EntryId = position.EntryId
+            });
+        }
+
+        await dbContext.SaveChangesAsync();
+        await RecalculateHeatOrdersAsync();
+        await dbContext.Entry(trackedHeat).ReloadAsync();
+        return (trackedHeat, ImmutableList<ValidationResult>.Empty);
+    }
+
+    private async Task RecalculateHeatOrdersAsync()
+    {
+        var heats = await dbContext.Heats
+            .Join(
+                dbContext.SwimEvents,
+                heat => heat.SwimEventId,
+                swimEvent => swimEvent.Id,
+                (heat, swimEvent) => new { heat, swimEvent.Order })
+            .OrderBy(x => x.Order)
+            .ThenBy(x => x.heat.Number)
+            .ThenBy(x => x.heat.Id)
+            .Select(x => x.heat)
+            .ToListAsync();
+
+        for (var order = 1; order <= heats.Count; order++)
+            heats[order - 1].Order = order;
+
+        if (heats.Count > 0)
+            await dbContext.SaveChangesAsync();
+    }
+
+    private void DetachHeatGraphIfTracked(Heat heat)
+    {
+        var heatEntry = dbContext.Entry(heat);
+        if (heatEntry.State == EntityState.Detached)
+            return;
+
+        foreach (var position in heat.Positions ?? [])
+        {
+            var positionEntry = dbContext.Entry(position);
+            if (positionEntry.State != EntityState.Detached)
+                positionEntry.State = EntityState.Detached;
+        }
+
+        heatEntry.State = EntityState.Detached;
+    }
+
+    private ImmutableList<ValidationResult> ValidateHeatWithPositions(Heat heat, SwimEvent swimEvent, bool isAdd)
+    {
+        var errors = new List<ValidationResult>();
+
+        if (heat.Number < 1)
+            errors.Add(new ValidationResult("Номер заплыва должен быть не меньше 1.", [nameof(Heat.Number)]));
+
+        var positions = heat.Positions?.ToList() ?? [];
+        var maxPositions = swimEvent.LaneMax - swimEvent.LaneMin + 1;
+        if (positions.Count > maxPositions)
+            errors.Add(new ValidationResult(
+                $"В заплыве может быть не более {maxPositions} позиций (дорожки {swimEvent.LaneMin}-{swimEvent.LaneMax}).",
+                [nameof(Heat.Positions)]));
+        var duplicateLanes = positions.GroupBy(position => position.Lane).Where(g => g.Count() > 1).Select(g => g.Key);
+        foreach (var lane in duplicateLanes)
+            errors.Add(new ValidationResult($"Дорожка {lane} указана более одного раза.", [nameof(HeatPosition.Lane)]));
+
+        var duplicateEntries = positions.GroupBy(position => position.EntryId).Where(g => g.Count() > 1)
+            .Select(g => g.Key);
+        foreach (var entryId in duplicateEntries)
+            errors.Add(new ValidationResult($"Заявка {entryId} указана более одного раза.",
+                [nameof(HeatPosition.EntryId)]));
+
+        foreach (var position in positions)
+        {
+            if (position.Lane < swimEvent.LaneMin || position.Lane > swimEvent.LaneMax)
+                errors.Add(new ValidationResult(
+                    $"Дорожка {position.Lane} вне диапазона {swimEvent.LaneMin}-{swimEvent.LaneMax}.",
+                    [nameof(HeatPosition.Lane)]));
+
+            var entryExists = dbContext.Entries.Any(entry =>
+                entry.Id == position.EntryId && entry.SwimEventId == swimEvent.Id);
+            if (!entryExists)
+                errors.Add(new ValidationResult($"Заявка {position.EntryId} не принадлежит событию.",
+                    [nameof(HeatPosition.EntryId)]));
+
+            var entryInOtherHeat = dbContext.HeatPositions.Any(existing =>
+                existing.EntryId == position.EntryId &&
+                existing.HeatId != (isAdd ? 0 : heat.Id));
+            if (entryInOtherHeat)
+                errors.Add(new ValidationResult($"Заявка {position.EntryId} уже назначена в другой заплыв.",
+                    [nameof(HeatPosition.EntryId)]));
+        }
+
+        return errors.ToImmutableList();
     }
 
     public Task<List<Heat>> GetHeatsByEventIdAsync(int eventId)
@@ -50,7 +224,7 @@ public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbCo
         return dbContext.Heats
             .AsNoTracking()
             .Where(heat => heat.SwimEventId == eventId)
-            .OrderBy(heat => heat.Order)
+            .OrderBy(heat => heat.Number)
             .Include(heat => heat.Positions.OrderBy(hp => hp.Lane))
             .ThenInclude(hp => hp.Entry)
             .ThenInclude(entry => entry.Athlete!)

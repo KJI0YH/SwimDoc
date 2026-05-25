@@ -136,6 +136,14 @@
                                                 <Setter Property="FontWeight" Value="SemiBold" />
                                                 <Setter Property="Background" Value="#140EA5E9" />
                                             </DataTrigger>
+                                            <MultiTrigger>
+                                                <MultiTrigger.Conditions>
+                                                    <Condition Property="IsMouseOver" Value="True" />
+                                                    <Condition Property="IsSelected" Value="False" />
+                                                </MultiTrigger.Conditions>
+                                                <Setter Property="Background"
+                                                        Value="{StaticResource DataGridRowHoverBackgroundBrush}" />
+                                            </MultiTrigger>
                                             <Trigger Property="IsSelected" Value="True">
                                                 <Setter Property="Background"
                                                         Value="{StaticResource DataGridSelectedRowBackgroundBrush}" />

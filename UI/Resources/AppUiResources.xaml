@@ -136,6 +136,7 @@
     </Style>
 
     <SolidColorBrush x:Key="DataGridSelectedRowBackgroundBrush" Color="#FFE3F2FD" />
+    <SolidColorBrush x:Key="DataGridRowHoverBackgroundBrush" Color="#FFE8EEF7" />
     <SolidColorBrush x:Key="ResultPlaceGoldBrush" Color="#FFFFF0B2" />
     <SolidColorBrush x:Key="ResultPlaceSilverBrush" Color="#FFE8E8E8" />
     <SolidColorBrush x:Key="ResultPlaceBronzeBrush" Color="#FFFFE4C4" />
@@ -205,6 +206,18 @@
            BasedOn="{StaticResource {x:Type DataGridRow}}">
         <Setter Property="MinHeight" Value="24" />
         <Setter Property="Margin" Value="0" />
+        <Style.Triggers>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsMouseOver" Value="True" />
+                    <Condition Property="IsSelected" Value="False" />
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" Value="{StaticResource DataGridRowHoverBackgroundBrush}" />
+            </MultiTrigger>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="{StaticResource DataGridSelectedRowBackgroundBrush}" />
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <Style TargetType="DataGrid"
@@ -258,6 +271,17 @@
                 </MultiDataTrigger.Conditions>
                 <Setter Property="Background" Value="#FFC8C8C8" />
             </MultiDataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding Converter={StaticResource EntryScoringConverter}}"
+                               Value="True" />
+                    <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}"
+                               Value="False" />
+                    <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}"
+                               Value="True" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Background" Value="{StaticResource DataGridRowHoverBackgroundBrush}" />
+            </MultiDataTrigger>
             <Trigger Property="IsSelected" Value="True">
                 <Setter Property="Background" Value="{StaticResource DataGridSelectedRowBackgroundBrush}" />
             </Trigger>
@@ -292,6 +316,36 @@
                                Value="False" />
                 </MultiDataTrigger.Conditions>
                 <Setter Property="Background" Value="{StaticResource ResultPlaceBronzeBrush}" />
+            </MultiDataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding Place}" Value="1" />
+                    <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}"
+                               Value="False" />
+                    <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}"
+                               Value="True" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Background" Value="#FFFFE699" />
+            </MultiDataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding Place}" Value="2" />
+                    <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}"
+                               Value="False" />
+                    <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}"
+                               Value="True" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Background" Value="#FFD0D0D0" />
+            </MultiDataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding Place}" Value="3" />
+                    <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}"
+                               Value="False" />
+                    <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}"
+                               Value="True" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Background" Value="#FFFFD4A3" />
             </MultiDataTrigger>
         </Style.Triggers>
     </Style>
