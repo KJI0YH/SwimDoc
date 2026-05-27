@@ -14,12 +14,6 @@ public class HeatAllocationAction(IHeatAllocationDbAccess dbAccess) :
 
     public HeatAllocationOutDto Action(HeatAllocationInDto dataIn)
     {
-        if (dbAccess.IsEventStarted(dataIn.SwimEventId))
-        {
-            _errors.Add($"Can not create heats for started or finished event");
-            return new HeatAllocationOutDto([], _warnings, _errors);
-        }
-
         if (dbAccess.IsHeatsAllocated(dataIn.SwimEventId))
         {
             _warnings.Add($"Heats were reallocated");

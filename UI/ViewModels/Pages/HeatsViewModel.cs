@@ -176,8 +176,13 @@ public partial class HeatsViewModel(
     {
         try
         {
+            var deleteConfirmation = App.Current.Services.GetRequiredService<IConfirmDialogService>();
+
             if (ShouldDeleteWholeHeat() && SelectedHeatId is int heatId)
             {
+                if (!await deleteConfirmation.ConfirmDeleteIfOfficialResultsAffectedAsync<Heat>([heatId]))
+                    return;
+
                 await HeatService.DeleteHeatAsync(heatId);
                 SelectedHeatId = null;
                 SelectedHeatPosition = null;
@@ -185,6 +190,10 @@ public partial class HeatsViewModel(
             }
             else if (SelectedHeatPosition is not null)
             {
+                if (!await deleteConfirmation.ConfirmDeleteIfOfficialResultsAffectedAsync<Entry>(
+                        [SelectedHeatPosition.EntryId]))
+                    return;
+
                 await HeatService.DeleteHeatPositionAsync(
                     SelectedHeatPosition.HeatId,
                     SelectedHeatPosition.EntryId);

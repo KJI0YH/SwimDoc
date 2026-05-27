@@ -41,6 +41,18 @@ public class HeatAllocationDbAccess(EfCoreContext context) : IHeatAllocationDbAc
 
     public void DeleteExistedHeats(int swimEventId)
     {
+        // Heats can be reallocated even after results were entered.
+        // Entries remain; reset official result fields before bulk-deleting heats.
+        var entriesWithOfficialResults = context.Entries
+            .Where(e => e.SwimEventId == swimEventId && e.Status >= EntryStatus.FINISH)
+            .ToList();
+
+        foreach (var entry in entriesWithOfficialResults)
+        {
+            entry.ClearHeatResultData();
+            entry.Status = EntryStatus.EVENT;
+        }
+
         context.Heats
             .Where(heat => heat.SwimEventId == swimEventId)
             .ExecuteDelete();

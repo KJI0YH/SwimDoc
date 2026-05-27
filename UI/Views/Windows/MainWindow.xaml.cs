@@ -18,7 +18,15 @@ public partial class MainWindow : FluentWindow
         DataContext = _viewModel;
 
         StateChanged += (_, _) => UpdateRestoreButtonIcon();
-        Loaded += (_, _) => UpdateRestoreButtonIcon();
+        Loaded += OnMainWindowLoaded;
+    }
+
+    private void OnMainWindowLoaded(object sender, RoutedEventArgs e)
+    {
+        UpdateRestoreButtonIcon();
+
+        var contentDialogService = App.Current.Services.GetRequiredService<Wpf.Ui.IContentDialogService>();
+        contentDialogService.SetDialogHost(RootContentDialog);
     }
 
     private void NavigationView_OnLoaded(object sender, RoutedEventArgs e)

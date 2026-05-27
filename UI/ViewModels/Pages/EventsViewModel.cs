@@ -250,7 +250,7 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, int?>
     }
 
     [RelayCommand(CanExecute = nameof(CanAllocateHeats))]
-    private void HeatAllocation()
+    private async Task HeatAllocation()
     {
         if (SelectedItems.Count == 0)
             return;
@@ -259,8 +259,13 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, int?>
         if (window.DataContext is not IWindowResult { Result: HeatAllocationParametersResult result })
             return;
 
+        var deleteConfirmation = App.Current.Services.GetRequiredService<IConfirmDialogService>();
+
         foreach (var swimEvent in SelectedItems)
         {
+            if (!await deleteConfirmation.ConfirmHeatReformIfOfficialResultsExistAsync(swimEvent.Id))
+                continue;
+
             var parameters = new HeatAllocationParameters(swimEvent.Id, result.HeatOrder, result.MinHeatSize);
             _heatService.AllocateEntriesToHeats(parameters);
         }

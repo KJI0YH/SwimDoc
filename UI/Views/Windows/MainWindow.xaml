@@ -209,5 +209,8 @@
                 Background="#80000000"
                 Visibility="Collapsed"
                 IsHitTestVisible="False" />
+        <ui:ContentDialogHost x:Name="RootContentDialog"
+                              Grid.RowSpan="2"
+                              Panel.ZIndex="1001" />
     </Grid>
 </ui:FluentWindow>

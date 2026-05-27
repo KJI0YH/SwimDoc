@@ -31,6 +31,17 @@ public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbCo
 
     public async Task DeleteSwimEventHeatsAsync(int swimEventId)
     {
+        var entriesInEventHeats = await dbContext.Entries
+            .Include(e => e.HeatPosition)
+            .Where(e => e.HeatPosition != null && e.HeatPosition.Heat.SwimEventId == swimEventId)
+            .ToListAsync();
+
+        foreach (var entry in entriesInEventHeats)
+        {
+            entry.ClearHeatResultData();
+            entry.Status = EntryStatus.EVENT;
+        }
+
         dbContext.Heats.RemoveRange(dbContext.Heats.Where(heat => heat.SwimEventId == swimEventId));
         await dbContext.SaveChangesAsync();
     }
@@ -59,6 +70,8 @@ public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbCo
 
         foreach (var position in heat.Positions)
             position.Entry.ClearHeatResultData();
+        foreach (var position in heat.Positions)
+            position.Entry.Status = EntryStatus.EVENT;
 
         dbContext.Heats.Remove(heat);
         await dbContext.SaveChangesAsync();

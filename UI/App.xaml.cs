@@ -104,6 +104,8 @@ public partial class App : Application
         services.AddSingleton<IAddEditWindowFactory, AddEditWindowFactory>();
         services.AddSingleton<IBaseTimeRepository, CsvBaseTimeRepository>();
         services.AddSingleton<IPointScoreProvider, PointScoreProvider>();
+        services.AddSingleton<Wpf.Ui.IContentDialogService, Wpf.Ui.ContentDialogService>();
+        services.AddTransient<IConfirmDialogService, ConfirmDialogService>();
 
         services.AddTransient<IAgeGroupService, AgeGroupService>();
         services.AddTransient<IAthleteService, AthleteService>();

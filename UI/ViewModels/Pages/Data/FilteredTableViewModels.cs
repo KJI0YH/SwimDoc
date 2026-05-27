@@ -388,14 +388,6 @@ public class ResultsByEventViewModel(
 
 public partial class ResultsByAthleteViewModel(IEntryService entryService) : ViewModelBase, IParticipantResultsViewModel
 {
-    private static readonly EntryStatus[] ResultStatuses =
-    [
-        EntryStatus.FINISH,
-        EntryStatus.DNF,
-        EntryStatus.DNS,
-        EntryStatus.DSQ
-    ];
-
     private readonly INavigationService _navigationService =
         App.Current.Services.GetRequiredService<INavigationService>();
 
@@ -428,7 +420,7 @@ public partial class ResultsByAthleteViewModel(IEntryService entryService) : Vie
                 .Where(e =>
                     e.AthleteId == _athleteId.Value ||
                     (e.Relay != null && e.Relay.Positions.Any(p => p.AthleteId == _athleteId.Value)))
-                .Where(e => ResultStatuses.Contains(e.Status))
+                .Where(e => e.Status >= EntryStatus.FINISH)
                 .Include(e => e.SwimEvent)
                 .OrderBy(e => e.SwimEvent!.Order)
                 .Select(e => e.SwimEventId!.Value)
@@ -470,14 +462,6 @@ public partial class ResultsByAthleteViewModel(IEntryService entryService) : Vie
 
 public partial class ResultsByClubViewModel(IEntryService entryService) : ViewModelBase, IParticipantResultsViewModel
 {
-    private static readonly EntryStatus[] ResultStatuses =
-    [
-        EntryStatus.FINISH,
-        EntryStatus.DNF,
-        EntryStatus.DNS,
-        EntryStatus.DSQ
-    ];
-
     private readonly INavigationService _navigationService =
         App.Current.Services.GetRequiredService<INavigationService>();
 
@@ -511,7 +495,7 @@ public partial class ResultsByClubViewModel(IEntryService entryService) : ViewMo
                 .Where(e =>
                     (e.Athlete != null && e.Athlete.ClubId == clubId) ||
                     (e.Relay != null && e.Relay.ClubId == clubId))
-                .Where(e => ResultStatuses.Contains(e.Status))
+                .Where(e => e.Status >= EntryStatus.FINISH)
                 .Include(e => e.SwimEvent)
                 .OrderBy(e => e.SwimEvent!.Order)
                 .Select(e => e.SwimEventId!.Value)

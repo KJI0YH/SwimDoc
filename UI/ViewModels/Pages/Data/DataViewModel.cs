@@ -218,12 +218,28 @@ public partial class DataViewModel<TEntity, TKey> : DataViewModelBase
 
         try
         {
-            var ids = SelectedItems.Select(GetEntityId).ToList();
-            foreach (var id in ids)
-                await _crudService.DeleteAsync(id);
+            var keys = SelectedItems
+                .Select(GetEntityId)
+                .Distinct()
+                .ToList();
+
+            var ids = SelectedItems
+                .Select(GetEntityIntId)
+                .Distinct()
+                .ToList();
+
+            if (keys.Count == 0 || ids.Count == 0)
+                return;
+
+            var deleteConfirmation = App.Current.Services.GetRequiredService<IConfirmDialogService>();
+            if (!await deleteConfirmation.ConfirmDeleteIfOfficialResultsAffectedAsync<TEntity>(ids))
+                return;
+
+            foreach (var key in keys)
+                await _crudService.DeleteAsync(key);
             await LoadDataAsync();
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             // ignored
         }
@@ -423,5 +439,18 @@ public partial class DataViewModel<TEntity, TKey> : DataViewModelBase
             throw new InvalidOperationException($"Entity {typeof(TEntity).Name} does not have an Id property");
 
         return (TKey)idProperty.GetValue(entity)!;
+    }
+
+    protected virtual int GetEntityIntId(TEntity entity)
+    {
+        var idProperty = typeof(TEntity).GetProperty("Id");
+        if (idProperty == null)
+            throw new InvalidOperationException($"Entity {typeof(TEntity).Name} does not have an Id property");
+
+        var value = idProperty.GetValue(entity);
+        if (value is int id)
+            return id;
+
+        throw new InvalidOperationException($"Entity {typeof(TEntity).Name} Id property is not an int");
     }
 }
