@@ -145,14 +145,14 @@ public partial class EntriesViewModel(
         AutoGenerateColumns = false;
         ColumnConfigurations.Clear();
 
-        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("DisplaySwimName", "Дистанция", 500,
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("DisplaySwimName", "Дистанция", 400,
             (query, direction) =>
             {
                 return direction == ListSortDirection.Ascending
                     ? query.OrderBy(e => e.SwimEvent != null ? e.SwimEvent.Order : int.MaxValue)
                     : query.OrderByDescending(e => e.SwimEvent != null ? e.SwimEvent.Order : int.MaxValue);
             }));
-        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("DisplayParticipantName", "Участник", 300,
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("DisplayParticipantName", "Участник", 250,
             (query, direction) => QueryableSortByDirection.Sort(query, direction,
                 q => Queryable
                     .OrderBy<Entry, string>(q,
@@ -164,14 +164,24 @@ public partial class EntriesViewModel(
                         e => e.Athlete != null ? e.Athlete.LastName : e.Relay != null ? e.Relay.Club.Name : null)
                     .ThenByDescending(e => e.Athlete != null ? e.Athlete.FirstName : null)
                     .ThenByDescending(e => e.Id))));
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("DisplayParticipantClubName", "Команда", 200,
+            (query, direction) => QueryableSortByDirection.Sort(query, direction,
+                q => Queryable
+                    .OrderBy<Entry, string>(q,
+                        e => e.Athlete != null ? e.Athlete.Club.Name : e.Relay != null ? e.Relay.Club.Name : null)
+                    .ThenBy(e => e.Id),
+                q => Queryable
+                    .OrderByDescending<Entry, string>(q,
+                        e => e.Athlete != null ? e.Athlete.Club.Name : e.Relay != null ? e.Relay.Club.Name : null)
+                    .ThenByDescending(e => e.Id))));
         ColumnConfigurations.Add(new ColumnConfiguration<Entry>("Status", "Статус", 150));
-        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("DisplayEntryTime", "Заявочное время", 130,
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("DisplayEntryTime", "Заявочное", 130,
             (query, direction) =>
                 direction == ListSortDirection.Ascending
                     ? query.OrderBy(e => e.EntryTime ?? SlowestTimeRank).ThenBy(e => e.Id)
                     : query.OrderByDescending(e => e.EntryTime ?? SlowestTimeRank).ThenByDescending(e => e.Id),
             nameof(Entry.EntryTime)));
-        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("DisplayFinishTime", "Финишное время", 130,
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("DisplayFinishTime", "Финишное", 130,
             (query, direction) =>
                 direction == ListSortDirection.Ascending
                     ? query
@@ -195,6 +205,7 @@ public partial class EntriesViewModel(
     {
         return query
             .Include(entry => entry.Athlete)
+            .ThenInclude(a => a.Club)
             .Include(entry => entry.Relay)
             .ThenInclude(relay => relay.Club)
             .Include(entry => entry.Relay)

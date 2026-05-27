@@ -224,14 +224,13 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
 
     private Club? ReadClub(ExcelWorksheet workSheet, Dictionary<string, ExcelCellAddress?> clubHeaders)
     {
-        if (!clubHeaders.TryGetValue(CLUB_NAME_HEADER, out var colClub)) return null;
-        var fromRowClub = clubHeaders.First(pair => pair.Key == CLUB_NAME_HEADER).Value!.Row + 1;
-        while (workSheet.Cells[fromRowClub, colClub!.Column].IsEmpty()) fromRowClub++;
-        var clubName = workSheet.Cells[fromRowClub, colClub!.Column].Text;
+        if (!clubHeaders.TryGetValue(CLUB_NAME_HEADER, out var colClub )) return null;
+        var fromRowClub = clubHeaders.First(pair => pair.Key == CLUB_NAME_HEADER).Value!.Row;
+        while (workSheet.Cells[fromRowClub, colClub!.Column + 1].IsEmpty()) fromRowClub++;
+        var clubName = workSheet.Cells[fromRowClub, colClub!.Column + 1].Text;
         if (string.IsNullOrWhiteSpace(clubName))
         {
-            _warnings.Add(
-                $"Имя клуба не найдено, спортсмены добавлены в личный зачёт: {MessageLocation(workSheet.Name, null, null)}");
+            _warnings.Add($"Имя клуба не найдено, спортсмены добавлены в личный зачёт: {MessageLocation(workSheet.Name, null, null)}");
             return null;
         }
 
