@@ -24,8 +24,7 @@ public class ClubsViewModel : DataViewModel<Club, int?>
         AutoGenerateColumns = false;
         ColumnConfigurations.Clear();
 
-        ColumnConfigurations.Add(new ColumnConfiguration<Club>("Name", "Полное название", 300));
-        ColumnConfigurations.Add(new ColumnConfiguration<Club>("ShortName", "Короткое название", 150));
+        ColumnConfigurations.Add(new ColumnConfiguration<Club>("Name", "Название", 300));
         ColumnConfigurations.Add(new ColumnConfiguration<Club>("DisplayAthleteCount", "Спортсмены", 150,
             (query, direction) =>
             {
@@ -73,8 +72,7 @@ public class ClubsViewModel : DataViewModel<Club, int?>
             return query;
 
         return Queryable.Where(query, club =>
-            EF.Functions.Like(club.Name, $"%{SearchText}%") ||
-            EF.Functions.Like(club.ShortName, $"%{SearchText}%"));
+            EF.Functions.Like(club.Name, $"%{SearchText}%"));
     }
 
     protected override void ShowAddEditDialog(int? id = default)

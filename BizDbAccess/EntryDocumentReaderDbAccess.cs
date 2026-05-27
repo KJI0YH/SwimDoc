@@ -6,7 +6,7 @@ namespace BizDbAccess;
 
 public interface IEntryDocumentReaderDbAccess
 {
-    Club GetOrAddClub(string name, string shortName);
+    Club GetOrAddClub(string name);
 
     Athlete GetOrAddAthlete(string firstName, string lastName, int yearOfBirth, Gender gender, Category category);
 
@@ -17,10 +17,9 @@ public interface IEntryDocumentReaderDbAccess
 
 public class EntryDocumentReaderDbAccess(EfCoreContext context) : IEntryDocumentReaderDbAccess
 {
-    public Club GetOrAddClub(string name, string shortName)
+    public Club GetOrAddClub(string name)
     {
-        return context.GetOrAdd(club => club.Name == name && club.ShortName == shortName,
-            () => new Club { Name = name, ShortName = shortName });
+        return context.GetOrAdd(club => club.Name == name, () => new Club { Name = name });
     }
 
     public Athlete GetOrAddAthlete(string firstName, string lastName, int yearOfBirth, Gender gender, Category category)

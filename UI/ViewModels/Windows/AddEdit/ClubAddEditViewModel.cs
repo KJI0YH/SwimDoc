@@ -26,14 +26,4 @@ public partial class ClubAddViewModel(int? id, IClubService crudService)
             OnPropertyChanged();
         }
     }
-
-    public string? ShortName
-    {
-        get => Entity.ShortName;
-        set
-        {
-            Entity.ShortName = value;
-            OnPropertyChanged();
-        }
-    }
 }

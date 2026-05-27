@@ -134,7 +134,7 @@ public partial class AthleteAddViewModel(int? id, IAthleteService athleteService
             Clubs.Add(new SearchableItem
             {
                 Value = club,
-                DisplayText = $"{club.Name} | {club.ShortName ?? string.Empty}"
+                DisplayText = club.Name
             });
     }
 

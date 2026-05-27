@@ -21,7 +21,6 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
     private const string CATEGORY_HEADER = "Разряд";
 
     private const string CLUB_NAME_HEADER = "Команда";
-    private const string CLUB_SHORT_NAME_HEADER = "Короткое название";
 
     private const string BUTTERFLY = "Баттерфляй";
     private const string BACKSTROKE = "На спине";
@@ -52,10 +51,10 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
         _errors = [];
         var athleteHeaders = FindHeaders(workSheet, FIRSTNAME_HEADER, LASTNAME_HEADER, BIRTH_YEAR_HEADER, GENDER_HEADER,
             CATEGORY_HEADER);
-        var clubHeaders = FindHeaders(workSheet, CLUB_NAME_HEADER, CLUB_SHORT_NAME_HEADER);
+        var clubHeaders = FindHeaders(workSheet, CLUB_NAME_HEADER);
         var swimStyleHeaders = FindSwimStyles(workSheet);
         _warnings.AddRange(CheckHeaders(workSheet, athleteHeaders, CATEGORY_HEADER));
-        _warnings.AddRange(CheckHeaders(workSheet, clubHeaders, CLUB_NAME_HEADER, CLUB_SHORT_NAME_HEADER));
+        _warnings.AddRange(CheckHeaders(workSheet, clubHeaders, CLUB_NAME_HEADER));
         _errors.AddRange(CheckHeaders(workSheet, athleteHeaders, FIRSTNAME_HEADER, LASTNAME_HEADER, BIRTH_YEAR_HEADER,
             GENDER_HEADER));
         if (_errors.Count != 0) return EntryDocument.OfError(_warnings, _errors);
@@ -236,13 +235,7 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
             return null;
         }
 
-        var shortName = clubHeaders.TryGetValue(CLUB_SHORT_NAME_HEADER, out var cell)
-            ? workSheet.Cells[fromRowClub, cell!.Column].Text
-            : clubName;
-        if (string.IsNullOrWhiteSpace(shortName))
-            shortName = clubName;
-        var club = dbAccess.GetOrAddClub(clubName, shortName);
-        return club;
+        return dbAccess.GetOrAddClub(clubName);
     }
 
     private static int ConvertEntryTimeToHundreds(string entryTime)
