@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using BizLogic.HeatLogic;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -279,7 +280,7 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, int?>
     }
 
     [RelayCommand(CanExecute = nameof(CanGenerateReports))]
-    private void GenerateReports()
+    private async Task GenerateReports()
     {
         if (SelectedItems.Count == 0)
             return;
@@ -297,7 +298,17 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, int?>
             IncludeFinishList = result.IncludeFinishList
         };
 
-        _reportExportService.ExportToExcel(options);
+        try
+        {
+            _reportExportService.ExportToExcel(options);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            var dialogs = App.Current.Services.GetRequiredService<IErrorDialogService>();
+            await dialogs.ShowErrorAsync(
+                title: "Не удалось сохранить отчёт",
+                message: $"Файл занят другим процессом или недоступен");
+        }
     }
 
     private bool CanGenerateReports()

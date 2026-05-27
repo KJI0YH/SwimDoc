@@ -9,6 +9,7 @@ using ServiceLayer.BaseTimeRepository;
 using ServiceLayer.ClubService;
 using ServiceLayer.ConnectionService;
 using ServiceLayer.EntryDocumentReaderService;
+using ServiceLayer.EntryDocumentTemplateService;
 using ServiceLayer.EntryService;
 using ServiceLayer.EventService;
 using ServiceLayer.HeatService;
@@ -106,11 +107,13 @@ public partial class App : Application
         services.AddSingleton<IPointScoreProvider, PointScoreProvider>();
         services.AddSingleton<Wpf.Ui.IContentDialogService, Wpf.Ui.ContentDialogService>();
         services.AddTransient<IConfirmDialogService, ConfirmDialogService>();
+        services.AddTransient<IErrorDialogService, ErrorDialogService>();
 
         services.AddTransient<IAgeGroupService, AgeGroupService>();
         services.AddTransient<IAthleteService, AthleteService>();
         services.AddTransient<IClubService, ClubService>();
         services.AddTransient<IEntryDocumentReaderService, EntryDocumentReaderService>();
+        services.AddTransient<IEntryDocumentTemplateService, EntryDocumentTemplateService>();
         services.AddTransient<IEntryService, EntryService>();
         services.AddTransient<IEventService, EventService>();
         services.AddTransient<IHeatService, HeatService>();

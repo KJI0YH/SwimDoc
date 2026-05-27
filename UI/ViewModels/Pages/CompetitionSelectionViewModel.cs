@@ -1,6 +1,8 @@
 using System.IO;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
+using UI.Services;
 
 namespace UI.ViewModels.Pages;
 
@@ -9,7 +11,7 @@ public partial class CompetitionSelectionViewModel : ViewModelBase
     public event Action<string>? CompetitionSelected;
 
     [RelayCommand]
-    private void CreateNew()
+    private async Task CreateNew()
     {
         var saveFileDialog = new SaveFileDialog
         {
@@ -20,8 +22,18 @@ public partial class CompetitionSelectionViewModel : ViewModelBase
 
         if (saveFileDialog.ShowDialog() == true)
         {
-            File.Create(saveFileDialog.FileName).Close();
-            InitializeDatabase(saveFileDialog.FileName);
+            try
+            {
+                File.Create(saveFileDialog.FileName).Close();
+                InitializeDatabase(saveFileDialog.FileName);
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                var dialogs = App.Current.Services.GetRequiredService<IErrorDialogService>();
+                await dialogs.ShowErrorAsync(
+                    title: "Не удалось создать файл базы данных",
+                    message: $"Файл занят другим процессом или недоступен.\n\n{ex.Message}");
+            }
         }
     }
 

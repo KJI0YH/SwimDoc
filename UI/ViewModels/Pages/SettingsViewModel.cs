@@ -1,15 +1,21 @@
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DataLayer.EfClasses;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Win32;
 using ServiceLayer.BaseTimeRepository;
+using ServiceLayer.EntryDocumentTemplateService;
+using UI.Services;
 
 namespace UI.ViewModels.Pages;
 
 public sealed partial class SettingsViewModel : ObservableObject
 {
     private readonly IBaseTimeRepository _baseTimeRepository;
+    private readonly IEntryDocumentTemplateService _entryDocumentTemplateService;
 
     [ObservableProperty] private ObservableCollection<BaseTimeTableRowViewModel> _scmRows = new();
     [ObservableProperty] private ObservableCollection<BaseTimeTableRowViewModel> _lcmRows = new();
@@ -93,9 +99,12 @@ public sealed partial class SettingsViewModel : ObservableObject
         new(Course.LCM, 4, 100, Stroke.Medley, "4x100м Комплексное плавание (Микст)"),
     ];
 
-    public SettingsViewModel(IBaseTimeRepository baseTimeRepository)
+    public SettingsViewModel(
+        IBaseTimeRepository baseTimeRepository,
+        IEntryDocumentTemplateService entryDocumentTemplateService)
     {
         _baseTimeRepository = baseTimeRepository;
+        _entryDocumentTemplateService = entryDocumentTemplateService;
         LoadRows();
     }
 
@@ -121,7 +130,7 @@ public sealed partial class SettingsViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void Save()
+    private async Task Save()
     {
         foreach (var row in ScmRows)
         {
@@ -141,7 +150,47 @@ public sealed partial class SettingsViewModel : ObservableObject
         foreach (var row in LcmMixedRelayRows)
             _baseTimeRepository.SetBaseTime(row.Course, row.Distance, row.Stroke, row.RelayCount, Gender.Mixed, row.MixedBaseTimeHundredths ?? 0);
 
-        _baseTimeRepository.Save();
+        try
+        {
+            _baseTimeRepository.Save();
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            var dialogs = App.Current.Services.GetRequiredService<IErrorDialogService>();
+            await dialogs.ShowErrorAsync(
+                title: "Не удалось сохранить базовое время",
+                message: $"Файл базовых времен занят другим процессом или недоступен");
+        }
+    }
+
+    [RelayCommand]
+    private async Task DownloadEntryDocumentTemplate()
+    {
+        var dialog = new SaveFileDialog
+        {
+            Title = "Сохранить шаблон Excel",
+            Filter = "Excel (*.xlsx)|*.xlsx",
+            FileName = "EntryDocumentTemplate.xlsx",
+            AddExtension = true,
+            DefaultExt = ".xlsx",
+            OverwritePrompt = true
+        };
+
+        if (dialog.ShowDialog() != true)
+            return;
+
+        try
+        {
+            var bytes = _entryDocumentTemplateService.CreateTemplate();
+            File.WriteAllBytes(dialog.FileName, bytes);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            var dialogs = App.Current.Services.GetRequiredService<IErrorDialogService>();
+            await dialogs.ShowErrorAsync(
+                title: "Не удалось сохранить файл",
+                message: $"Файл занят другим процессом или недоступен");
+        }
     }
 }
 
