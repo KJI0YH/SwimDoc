@@ -7,6 +7,7 @@
              xmlns:toolbar="clr-namespace:UI.Views.Controls.Toolbar"
              xmlns:helpers="clr-namespace:UI.Helpers"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:loc="clr-namespace:UI.Localization"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -18,12 +19,12 @@
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
                     <Button Content="{ui:SymbolIcon Add24}"
                             Command="{Binding CreateHeatCommand}"
-                            ToolTip="Создать заплыв"
+                            ToolTip="{loc:Loc Heats_Create}"
                             Margin="5"
                             Padding="9" />
                     <Button Content="{ui:SymbolIcon Edit24}"
                             Command="{Binding EditHeatCommand}"
-                            ToolTip="Редактировать заплыв"
+                            ToolTip="{loc:Loc Heats_Edit}"
                             Margin="5"
                             Padding="9" />
                     <Button Content="{ui:SymbolIcon Delete24}"
@@ -33,15 +34,15 @@
                             Padding="9" />
                     <Button Content="{ui:SymbolIcon ArrowClockwise24}"
                             Command="{Binding RefreshHeatsCommand}"
-                            ToolTip="Обновить"
+                            ToolTip="{loc:Loc Heats_Refresh}"
                             Margin="5"
                             Padding="9" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
                     <ComboBox helpers:ComboBoxAutoWidthHelper.Enable="True"
-                              ItemsSource="{Binding Items}"
-                              SelectedItem="{Binding SelectedSwimEvent}"
-                              DisplayMemberPath="DisplayName"
+                              ItemsSource="{Binding SwimEventOptions}"
+                              SelectedValue="{Binding SelectedSwimEvent}"
+                              SelectedValuePath="Value"
                               Margin="0,5,6,5" />
                     <Button Content="{ui:SymbolIcon ArrowPrevious24}"
                             Command="{Binding GoToPrevEventCommand}"
@@ -108,16 +109,16 @@
                     </GroupStyle>
                 </ui:DataGrid.GroupStyle>
                 <ui:DataGrid.Columns>
-                    <DataGridTextColumn Header="Дорожка" Binding="{Binding Lane}" IsReadOnly="True" Width="90" MinWidth="80" />
-                    <DataGridTextColumn Header="Участник" Binding="{Binding Participant}" IsReadOnly="True"
+                    <DataGridTextColumn Header="{loc:Loc Heats_Col_Lane}" Binding="{Binding Lane}" IsReadOnly="True" Width="90" MinWidth="80" />
+                    <DataGridTextColumn Header="{loc:Loc Heats_Col_Participant}" Binding="{Binding Participant}" IsReadOnly="True"
                                         Width="*" MinWidth="220" />
-                    <DataGridTextColumn Header="Год рождения" Binding="{Binding YearOfBirth}" IsReadOnly="True"
+                    <DataGridTextColumn Header="{loc:Loc Heats_Col_BirthYear}" Binding="{Binding YearOfBirth}" IsReadOnly="True"
                                         Width="140" MinWidth="120" />
-                    <DataGridTextColumn Header="Команда" Binding="{Binding Club}" IsReadOnly="True" Width="*"
+                    <DataGridTextColumn Header="{loc:Loc Heats_Col_Team}" Binding="{Binding Club}" IsReadOnly="True" Width="*"
                                         MinWidth="220" />
-                    <DataGridTextColumn Header="Заявочное" Binding="{Binding EntryTime}" IsReadOnly="True"
+                    <DataGridTextColumn Header="{loc:Loc Heats_Col_EntryTime}" Binding="{Binding EntryTime}" IsReadOnly="True"
                                         Width="160" MinWidth="140" />
-                    <DataGridTextColumn Header="Результат" Binding="{Binding FinishTime}" IsReadOnly="True"
+                    <DataGridTextColumn Header="{loc:Loc Heats_Col_Result}" Binding="{Binding FinishTime}" IsReadOnly="True"
                                         Width="160" MinWidth="140" />
                 </ui:DataGrid.Columns>
             </ui:DataGrid>

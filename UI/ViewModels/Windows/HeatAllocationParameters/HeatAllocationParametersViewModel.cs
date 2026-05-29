@@ -3,6 +3,7 @@ using System.Collections.Specialized;
 using BizLogic.HeatLogic;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using UI.Resources;
 using UI.Services;
 
 namespace UI.ViewModels.Windows.HeatAllocationParameters;
@@ -24,7 +25,7 @@ public partial class HeatAllocationParametersViewModel : ViewModelBase, IWindowR
         ValidationErrors.CollectionChanged += OnValidationErrorsChanged;
     }
 
-    public string WindowTitle => "Параметры формирования заплывов";
+    public string WindowTitle => Strings.HeatAlloc_WindowTitle;
 
     public bool HasErrors => ValidationErrors.Count > 0;
 
@@ -46,7 +47,7 @@ public partial class HeatAllocationParametersViewModel : ViewModelBase, IWindowR
 
         if (MinHeatSize < 1)
         {
-            ValidationErrors.Add("Минимальный размер заплыва должен быть больше или равен 1.");
+            ValidationErrors.Add(Strings.HeatAlloc_Validation_MinHeatSize);
             return;
         }
 

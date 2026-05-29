@@ -10,6 +10,7 @@
              xmlns:importInfoBar="clr-namespace:UI.Views.Controls.ImportInfoBar"
              xmlns:eventFilterComboBox="clr-namespace:UI.Views.Controls.EventFilterComboBox"
              xmlns:helpers="clr-namespace:UI.Helpers"
+             xmlns:loc="clr-namespace:UI.Localization"
              x:Name="Root"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
@@ -59,7 +60,7 @@
 
                         <Button
                             Content="{ui:SymbolIcon Dismiss24}"
-                            ToolTip="Очистить фильтры"
+                            ToolTip="{loc:Loc Filters_Clear}"
                             Command="{Binding ClearFiltersCommand}"
                             Margin="5,0,5,5"
                             Padding="9"
@@ -72,12 +73,12 @@
                                     Visibility="{Binding ShowImportActions, ElementName=Root, Converter={StaticResource BoolToVis}}">
                             <Button Content="{ui:SymbolIcon FolderAdd24}"
                                     Command="{Binding ImportEntriesFromFileCommand}"
-                                    ToolTip="Загрузить заявки из файла"
+                                    ToolTip="{loc:Loc Entries_ImportFromFile}"
                                     Margin="5"
                                     Padding="9" />
                             <Button Content="{ui:SymbolIcon DocumentArrowRight24}"
                                     Command="{Binding LoadEntriesFromPreviousEventCommand}"
-                                    ToolTip="Загрузить заявки из предыдущего события"
+                                    ToolTip="{loc:Loc Entries_ImportFromPrevEvent}"
                                     Margin="5"
                                     Padding="9" />
                         </StackPanel>

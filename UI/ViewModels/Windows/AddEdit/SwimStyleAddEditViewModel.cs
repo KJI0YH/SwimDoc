@@ -1,12 +1,14 @@
 using DataLayer.EfClasses;
 using ServiceLayer.SwimStyleService;
+using UI.Helpers;
+using UI.Resources;
 
 namespace UI.ViewModels.Windows.AddEdit;
 
 public class SwimStyleAddViewModel(int? id, ISwimStyleService crudService)
     : AddEditViewModel<SwimStyle, int?>(id, crudService)
 {
-    public override string WindowTitle => IsAdd ? "Создание стиля плавания" : "Редактирование стиля плавания";
+    public override string WindowTitle => IsAdd ? Strings.WindowTitle_CreateSwimStyle : Strings.WindowTitle_EditSwimStyle;
 
     public Stroke Stroke
     {
@@ -38,5 +40,6 @@ public class SwimStyleAddViewModel(int? id, ISwimStyleService crudService)
         }
     }
 
-    public Array StrokeValues => Enum.GetValues<Stroke>();
+    public IEnumerable<EnumOption<Stroke>> StrokeOptions =>
+        Enum.GetValues<Stroke>().Select(s => new EnumOption<Stroke>(s));
 }

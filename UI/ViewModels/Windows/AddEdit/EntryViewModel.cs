@@ -8,6 +8,8 @@ using ServiceLayer.AthleteService;
 using ServiceLayer.ClubService;
 using ServiceLayer.EntryService;
 using ServiceLayer.EventService;
+using UI.Helpers;
+using UI.Resources;
 using UI.Services;
 using UI.Views.Controls.SearchableComboBox;
 using UI.Views.Windows.AddEdit;
@@ -96,7 +98,7 @@ public partial class EntryViewModel(
         }
     }
 
-    public override string WindowTitle => IsAdd ? "Создание заявки" : "Редактирование заявки";
+    public override string WindowTitle => IsAdd ? Strings.WindowTitle_CreateEntry : Strings.WindowTitle_EditEntry;
 
     public int? EntryTime
     {
@@ -353,18 +355,18 @@ public partial class EntryViewModel(
         {
             var indEvent = individualEvents.FirstOrDefault(item => item.Id == _contextEventId.Value);
             if (indEvent != null)
-                SwimEvents.Add(new SearchableItem { Value = indEvent, DisplayText = indEvent.DisplayName });
+                SwimEvents.Add(new SearchableItem { Value = indEvent, DisplayText = EntityDisplayFormatter.FormatSwimEvent(indEvent) });
         }
         else if (_contextSwimStyleId.HasValue && individualEvents.Count != 0)
         {
             var indEvent = individualEvents.FirstOrDefault(item => item.SwimStyleId == _contextSwimStyleId.Value);
             if (indEvent != null)
-                SwimEvents.Add(new SearchableItem { Value = indEvent, DisplayText = indEvent.DisplayName });
+                SwimEvents.Add(new SearchableItem { Value = indEvent, DisplayText = EntityDisplayFormatter.FormatSwimEvent(indEvent) });
         }
         else
         {
             foreach (var swimEvent in individualEvents)
-                SwimEvents.Add(new SearchableItem { Value = swimEvent, DisplayText = swimEvent.DisplayName });
+                SwimEvents.Add(new SearchableItem { Value = swimEvent, DisplayText = EntityDisplayFormatter.FormatSwimEvent(swimEvent) });
         }
     }
 
@@ -378,18 +380,18 @@ public partial class EntryViewModel(
         {
             var relayEvent = relayEvents.FirstOrDefault(se => se.Id == _contextEventId.Value);
             if (relayEvent != null)
-                RelaySwimEvents.Add(new SearchableItem { Value = relayEvent, DisplayText = relayEvent.DisplayName });
+                RelaySwimEvents.Add(new SearchableItem { Value = relayEvent, DisplayText = EntityDisplayFormatter.FormatSwimEvent(relayEvent) });
         }   
         else if (_contextSwimStyleId.HasValue && relayEvents.Count != 0)
         {
             var relayEvent = relayEvents.FirstOrDefault(se => se.SwimStyleId == _contextSwimStyleId.Value);
             if (relayEvent != null)
-                RelaySwimEvents.Add(new SearchableItem { Value = relayEvent, DisplayText = relayEvent.DisplayName });
+                RelaySwimEvents.Add(new SearchableItem { Value = relayEvent, DisplayText = EntityDisplayFormatter.FormatSwimEvent(relayEvent) });
         }
         else
         {
             foreach (var swimEvent in relayEvents)
-                RelaySwimEvents.Add(new SearchableItem { Value = swimEvent, DisplayText = swimEvent.DisplayName });
+                RelaySwimEvents.Add(new SearchableItem { Value = swimEvent, DisplayText = EntityDisplayFormatter.FormatSwimEvent(swimEvent) });
         }
 
         if (IsAdd && Entity.SwimEventId == null && SelectedRelaySwimEvent == null && RelaySwimEvents.Count > 0)

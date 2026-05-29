@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.AthleteService;
 using ServiceLayer.ClubService;
+using UI.Helpers;
+using UI.Resources;
 using UI.Services;
 using UI.Views.Controls.SearchableComboBox;
 using UI.Views.Windows.AddEdit;
@@ -20,7 +22,7 @@ public partial class AthleteAddViewModel(int? id, IAthleteService athleteService
 
     [ObservableProperty] private SearchableItem? _selectedClub;
 
-    public override string WindowTitle => IsAdd ? "Создание спортсмена" : "Редактирование спортсмена";
+    public override string WindowTitle => IsAdd ? Strings.WindowTitle_CreateAthlete : Strings.WindowTitle_EditAthlete;
 
     public string FirstName
     {
@@ -72,8 +74,10 @@ public partial class AthleteAddViewModel(int? id, IAthleteService athleteService
         }
     }
 
-    public Array GenderValues => Enum.GetValues<Gender>().Where(g => g != Gender.Mixed).ToArray();
-    public Array CategoryValues => Enum.GetValues<Category>();
+    public IEnumerable<EnumOption<Gender>> GenderOptions =>
+        Enum.GetValues<Gender>().Where(g => g != Gender.Mixed).Select(g => new EnumOption<Gender>(g));
+    public IEnumerable<EnumOption<Category>> CategoryOptions =>
+        Enum.GetValues<Category>().Select(c => new EnumOption<Category>(c));
 
     public void ApplyContext(AddEditContext context)
     {
@@ -128,7 +132,7 @@ public partial class AthleteAddViewModel(int? id, IAthleteService athleteService
         Clubs.Clear();
 
         if (!_contextClubId.HasValue)
-            Clubs.Add(new SearchableItem { Value = null, DisplayText = "(Лично)" });
+            Clubs.Add(new SearchableItem { Value = null, DisplayText = Strings.Common_PersonalParen });
 
         foreach (var club in clubs)
             Clubs.Add(new SearchableItem

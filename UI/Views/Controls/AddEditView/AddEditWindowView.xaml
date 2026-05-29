@@ -4,6 +4,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:loc="clr-namespace:UI.Localization"
              mc:Ignorable="d"
              Width="500">
     <Border Background="White" CornerRadius="12">
@@ -57,7 +58,7 @@
                     Padding="5"
                     Margin="5"
                     Appearance="Secondary"
-                    Content="Отмена"
+                    Content="{loc:Loc Common_Cancel}"
                     Command="{Binding CancelCommand}"
                     IsCancel="True"
                     HorizontalAlignment="Stretch" />
@@ -65,7 +66,7 @@
                     Padding="5"
                     Margin="5"
                     Appearance="Primary"
-                    Content="Сохранить"
+                    Content="{loc:Loc Common_Save}"
                     Command="{Binding SaveCommand}"
                     IsDefault="True"
                     HorizontalAlignment="Stretch" />

@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:dataView="clr-namespace:UI.Views.Controls.DataView"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:loc="clr-namespace:UI.Localization"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
     <dataView:DefaultDataView>
@@ -16,12 +17,12 @@
                       RowStyle="{StaticResource DataGridRowResultsPlaceStyle}"
                       MouseDoubleClick="DataGrid_MouseDoubleClick">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Событие" Binding="{Binding EventName}" Width="*" />
-                    <DataGridTextColumn Header="Участник" Binding="{Binding ParticipantName}" Width="*" />
-                    <DataGridTextColumn Header="Команда" Binding="{Binding ClubName}" Width="*" />
-                    <DataGridTextColumn Header="Место" Binding="{Binding Place}" Width="80" />
-                    <DataGridTextColumn Header="Результат" Binding="{Binding ResultText}" Width="150" />
-                    <DataGridTextColumn Header="Очки" Binding="{Binding Points}" Width="150" />
+                    <DataGridTextColumn Header="{loc:Loc Results_Col_Event}" Binding="{Binding EventName}" Width="*" />
+                    <DataGridTextColumn Header="{loc:Loc Results_Col_Participant}" Binding="{Binding ParticipantName}" Width="*" />
+                    <DataGridTextColumn Header="{loc:Loc Results_Col_Team}" Binding="{Binding ClubName}" Width="*" />
+                    <DataGridTextColumn Header="{loc:Loc Results_Col_Place}" Binding="{Binding Place}" Width="80" />
+                    <DataGridTextColumn Header="{loc:Loc Results_Col_Result}" Binding="{Binding ResultText}" Width="150" />
+                    <DataGridTextColumn Header="{loc:Loc Results_Col_Points}" Binding="{Binding Points}" Width="150" />
                 </DataGrid.Columns>
             </ui:DataGrid>
         </dataView:DefaultDataView.MainContent>

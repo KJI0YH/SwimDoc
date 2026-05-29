@@ -7,7 +7,9 @@ using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.AgeGroupService;
 using ServiceLayer.EventService;
 using ServiceLayer.SwimStyleService;
+using UI.Helpers;
 using UI.Services;
+using UI.Resources;
 using UI.Views.Controls.SearchableComboBox;
 using UI.Views.Windows.AddEdit;
 
@@ -37,7 +39,7 @@ public partial class EventAddViewModel(
     public IReadOnlyList<string> HourOptions { get; } = CreateTimePartOptions(24);
     public IReadOnlyList<string> MinuteOptions { get; } = CreateTimePartOptions(60);
 
-    public override string WindowTitle => IsAdd ? "Создание события" : "Редактирование события";
+    public override string WindowTitle => IsAdd ? Strings.WindowTitle_CreateEvent : Strings.WindowTitle_EditEvent;
 
     public int Order
     {
@@ -287,7 +289,7 @@ public partial class EventAddViewModel(
             AgeGroups.Add(new SearchableItem
             {
                 Value = ageGroup,
-                DisplayText = ageGroup.DisplayName
+                DisplayText = EntityDisplayFormatter.FormatAgeGroup(ageGroup)
             });
     }
 
@@ -304,7 +306,7 @@ public partial class EventAddViewModel(
             SwimStyles.Add(new SearchableItem
             {
                 Value = swimStyle,
-                DisplayText = swimStyle.DisplayName
+                DisplayText = EntityDisplayFormatter.FormatSwimStyle(swimStyle)
             });
     }
 
@@ -316,7 +318,7 @@ public partial class EventAddViewModel(
             .Include(swimEvent => swimEvent.PreviousSwimEvent)
             .ToList();
         PreviousSwimEvents.Clear();
-        PreviousSwimEvents.Add(new SearchableItem { Value = null, DisplayText = "(Нет)" });
+        PreviousSwimEvents.Add(new SearchableItem { Value = null, DisplayText = Strings.Common_NoneParen });
 
         foreach (var swimEvent in swimEvents)
         {
@@ -326,7 +328,7 @@ public partial class EventAddViewModel(
             PreviousSwimEvents.Add(new SearchableItem
             {
                 Value = swimEvent,
-                DisplayText = swimEvent.DisplayName
+                DisplayText = EntityDisplayFormatter.FormatSwimEvent(swimEvent)
             });
         }
     }

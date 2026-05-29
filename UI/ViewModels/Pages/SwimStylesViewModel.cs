@@ -1,9 +1,10 @@
 using System.ComponentModel;
-using BizLogic.Helpers;
 using DataLayer.EfClasses;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.SwimStyleService;
+using UI.Helpers;
+using UI.Resources;
 using UI.Services;
 using UI.ViewModels.Pages.Data;
 using UI.Views.Windows.AddEdit;
@@ -25,16 +26,20 @@ public class SwimStylesViewModel : DataViewModel<SwimStyle, int?>
         AutoGenerateColumns = false;
         ColumnConfigurations.Clear();
 
-        ColumnConfigurations.Add(new ColumnConfiguration<SwimStyle>("DisplayName", "Название", 300,
+        ColumnConfigurations.Add(new ColumnConfiguration<SwimStyle>(".", Strings.SwimStyles_Col_Name, 300,
             (query, direction) =>
             {
                 return direction == ListSortDirection.Ascending
                     ? query.OrderBy(e => e.Distance).ThenBy(e => e.Stroke).ThenBy(e => e.RelayCount)
                     : query.OrderByDescending(e => e.Distance).ThenByDescending(e => e.Stroke)
                         .ThenBy(e => e.RelayCount);
-            }));
-        ColumnConfigurations.Add(new ColumnConfiguration<SwimStyle>("Distance", "Дистанция", 150));
-        ColumnConfigurations.Add(new ColumnConfiguration<SwimStyle>("Stroke", "Стиль", 200));
+            })
+        {
+            Converter = EntityDisplayConverter.Instance,
+            ConverterParameter = EntityDisplayConverter.SwimStyleKind
+        });
+        ColumnConfigurations.Add(new ColumnConfiguration<SwimStyle>("Distance", Strings.SwimStyles_Col_Distance, 150));
+        ColumnConfigurations.Add(new ColumnConfiguration<SwimStyle>("Stroke", Strings.SwimStyles_Col_Stroke, 200));
     }
 
     protected override IQueryable<SwimStyle> ApplySearch(IQueryable<SwimStyle> query)
@@ -42,7 +47,7 @@ public class SwimStylesViewModel : DataViewModel<SwimStyle, int?>
         if (string.IsNullOrWhiteSpace(SearchText))
             return query;
 
-        if (EnumHelper.TryGetEnumByDescriptionContains<Stroke>(SearchText, out var stroke))
+        if (Strings.TryFindEnumByDisplayContains(SearchText, out Stroke stroke))
             return query.Where(ss => ss.Stroke == stroke);
 
         if (int.TryParse((string?)SearchText, out var distance))

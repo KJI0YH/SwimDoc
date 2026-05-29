@@ -16,6 +16,8 @@ using ServiceLayer.HeatService;
 using ServiceLayer.PointScoreProvider;
 using ServiceLayer.ReportGeneratorService;
 using ServiceLayer.SwimStyleService;
+using System.Globalization;
+using UI.Localization;
 using UI.Services;
 using UI.ViewModels.Pages;
 using UI.Views.Controls.DataGridView;
@@ -77,7 +79,14 @@ public partial class App : Application
 
         ConfigureServices(serviceCollection);
         ConfigureViewModels(serviceCollection);
-        return serviceCollection.BuildServiceProvider();
+        var provider = serviceCollection.BuildServiceProvider();
+
+        // Bind localization provider to culture changes (for dynamic XAML updates).
+        var localization = provider.GetRequiredService<ILocalizationService>();
+        LocalizationProvider.Instance.Culture = CultureInfo.CurrentUICulture;
+        localization.CultureChanged += culture => LocalizationProvider.Instance.Culture = culture;
+
+        return provider;
     }
 
     public void SetConnectionString(string connectionString)
@@ -108,6 +117,7 @@ public partial class App : Application
         services.AddSingleton<Wpf.Ui.IContentDialogService, Wpf.Ui.ContentDialogService>();
         services.AddTransient<IConfirmDialogService, ConfirmDialogService>();
         services.AddTransient<IErrorDialogService, ErrorDialogService>();
+        services.AddSingleton<ILocalizationService, LocalizationService>();
 
         services.AddTransient<IAgeGroupService, AgeGroupService>();
         services.AddTransient<IAthleteService, AthleteService>();
@@ -126,6 +136,7 @@ public partial class App : Application
         services.AddSingleton<CompetitionSelectionViewModel>();
         services.AddTransient<MainViewModel>();
         services.AddTransient<SettingsViewModel>();
+        services.AddTransient<BaseTimesSettingsViewModel>();
         services.AddTransient<EventsViewModel>();
         services.AddTransient<HeatsViewModel>();
         services.AddTransient<FixationViewModel>();

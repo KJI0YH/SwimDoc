@@ -7,8 +7,10 @@ using ServiceLayer.EventService;
 using ServiceLayer.HeatService;
 using ServiceLayer.PointScoreProvider;
 using UI.Helpers;
+using UI.Resources;
 using UI.Services;
 using UI.ViewModels.Pages.Data;
+using UI.Views.Controls.SearchableComboBox;
 
 namespace UI.ViewModels.Pages;
 
@@ -22,6 +24,7 @@ public partial class FixationViewModel(
     public event Action<int>? EventResultsChanged;
 
     [ObservableProperty] private SwimEvent? _selectedSwimEvent;
+    [ObservableProperty] private ObservableCollection<SearchableItem> _swimEventOptions = new();
 
     [ObservableProperty] private Heat? _selectedHeat;
 
@@ -45,8 +48,13 @@ public partial class FixationViewModel(
 
             var heatsInEvent = EventHeats.Count;
             var heatsTotal = heatService.GetTotalHeats();
-            return
-                $"{SelectedSwimEvent.DisplayName} — Заплыв {SelectedHeat.Number} из {heatsInEvent} ({SelectedHeat.Order} из {heatsTotal}) — {SelectedHeat.DisplayDayTime}";
+            return string.Format(
+                Strings.Get("Fixation_SelectedHeatHeader_NoEvent_Format"),
+                SelectedHeat.Number,
+                heatsInEvent,
+                SelectedHeat.Order,
+                heatsTotal,
+                SelectedHeat.DisplayDayTime);
         }
     }
 
@@ -65,6 +73,7 @@ public partial class FixationViewModel(
         if (items.Count == 0)
         {
             SelectedSwimEvent = null;
+            SwimEventOptions = [];
             EventHeats = [];
             SelectedHeat = null;
             FixationHeatPositionViews = [];
@@ -72,6 +81,13 @@ public partial class FixationViewModel(
         }
 
         SelectedSwimEvent ??= items.OrderBy(e => e.Order).FirstOrDefault();
+
+        SwimEventOptions = new ObservableCollection<SearchableItem>(
+            items.Select(e => new SearchableItem
+            {
+                Value = e,
+                DisplayText = EntityDisplayFormatter.FormatSwimEvent(e)
+            }));
     }
 
     partial void OnSelectedSwimEventChanged(SwimEvent? value)

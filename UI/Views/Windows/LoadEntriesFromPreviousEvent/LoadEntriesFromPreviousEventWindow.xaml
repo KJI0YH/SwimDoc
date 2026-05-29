@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:addEditView="clr-namespace:UI.Views.Controls.AddEditView"
         xmlns:searchableComboBox="clr-namespace:UI.Views.Controls.SearchableComboBox"
+        xmlns:loc="clr-namespace:UI.Localization"
         mc:Ignorable="d"
         SizeToContent="WidthAndHeight"
         MinWidth="520"
@@ -26,7 +27,7 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0"
-                           Text="Предыдущее событие"
+                           Text="{loc:Loc LoadPrev_Field_PreviousEvent}"
                            VerticalAlignment="Center"
                            Margin="0,0,10,0"
                            TextWrapping="Wrap" />
@@ -42,7 +43,7 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0"
-                           Text="Текущее событие"
+                           Text="{loc:Loc LoadPrev_Field_CurrentEvent}"
                            VerticalAlignment="Center"
                            Margin="0,0,10,0"
                            TextWrapping="Wrap" />

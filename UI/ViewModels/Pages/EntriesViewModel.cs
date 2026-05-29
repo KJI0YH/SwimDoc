@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.IO;
 using BizLogic.EntryDocumentReaderLogic;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -12,6 +13,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
 using ServiceLayer.EntryDocumentReaderService;
 using ServiceLayer.EntryService;
+using UI.Helpers;
+using UI.Resources;
 using UI.Services;
 using UI.ViewModels.Pages.Data;
 using UI.ViewModels.Windows.LoadEntriesFromPreviousEvent;
@@ -28,6 +31,7 @@ public partial class EntriesViewModel(
 {
     private const int SlowestTimeRank = int.MaxValue;
     private bool _filterOptionsInitialized;
+    private bool _cultureSubscribed;
 
     [ObservableProperty] private ObservableCollection<EventFilterOption<EventRound>> _roundFilterOptions = new();
     [ObservableProperty] private ObservableCollection<EventFilterOption<int>> _distanceFilterOptions = new();
@@ -36,11 +40,11 @@ public partial class EntriesViewModel(
     [ObservableProperty] private ObservableCollection<EventFilterOption<EntryStatus>> _statusFilterOptions = new();
     [ObservableProperty] private bool _isFiltersPanelVisible;
 
-    public string RoundFilterText => GetFilterText(RoundFilterOptions, "Этап");
-    public string DistanceFilterText => GetFilterText(DistanceFilterOptions, "Дистанция");
-    public string StrokeFilterText => GetFilterText(StrokeFilterOptions, "Стиль");
-    public string GenderFilterText => GetFilterText(GenderFilterOptions, "Пол");
-    public string StatusFilterText => GetFilterText(StatusFilterOptions, "Статус");
+    public string RoundFilterText => GetFilterText(RoundFilterOptions, Strings.Filters_Round);
+    public string DistanceFilterText => GetFilterText(DistanceFilterOptions, Strings.Filters_Distance);
+    public string StrokeFilterText => GetFilterText(StrokeFilterOptions, Strings.Filters_Stroke);
+    public string GenderFilterText => GetFilterText(GenderFilterOptions, Strings.Filters_Gender);
+    public string StatusFilterText => GetFilterText(StatusFilterOptions, Strings.Filters_Status);
 
     public enum EntriesImportBarKind
     {
@@ -50,15 +54,13 @@ public partial class EntriesViewModel(
 
     public enum ImportFileStatus
     {
-        [Description(" ")] Summary,
-        [Description("В очереди")] Pending,
-        [Description("В обработке")] Processing,
-        [Description("Обработан")] Completed,
-
-        [Description("Обработан с предупреждениями")]
+        Summary,
+        Pending,
+        Processing,
+        Completed,
         CompletedWithWarnings,
-        [Description("Сбой")] Failed,
-        [Description("Отменён")] Canceled
+        Failed,
+        Canceled
     }
 
     private readonly IAddEditWindowFactory _windowFactory =
@@ -114,12 +116,12 @@ public partial class EntriesViewModel(
         ImportSummaryWarningsCount = dataFiles.Sum(f => f.WarningsCount);
         ImportSummaryErrorsCount = dataFiles.Sum(f => f.ErrorsCount);
 
-        _summaryRow ??= new EntriesFile("Итого", string.Empty) { IsSummaryRow = true };
+        _summaryRow ??= new EntriesFile(Strings.Import_Summary_Total, string.Empty) { IsSummaryRow = true };
         if (!files.Contains(_summaryRow))
             files.Add(_summaryRow);
 
-        _summaryRow.FileName = "Итого";
-        _summaryRow.FullPath = $"Файлов: {ImportSummaryFilesCount}";
+        _summaryRow.FileName = Strings.Import_Summary_Total;
+        _summaryRow.FullPath = string.Format(Strings.Import_Summary_FilesCountFormat, ImportSummaryFilesCount);
         _summaryRow.ClubsAdded = ImportSummaryClubsAdded;
         _summaryRow.ClubsUpdated = ImportSummaryClubsUpdated;
         _summaryRow.AthletesAdded = ImportSummaryAthletesAdded;
@@ -145,14 +147,18 @@ public partial class EntriesViewModel(
         AutoGenerateColumns = false;
         ColumnConfigurations.Clear();
 
-        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("DisplaySwimName", "Дистанция", 400,
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>(".", Strings.Entries_Col_Distance, 400,
             (query, direction) =>
             {
                 return direction == ListSortDirection.Ascending
                     ? query.OrderBy(e => e.SwimEvent != null ? e.SwimEvent.Order : int.MaxValue)
                     : query.OrderByDescending(e => e.SwimEvent != null ? e.SwimEvent.Order : int.MaxValue);
-            }));
-        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("DisplayParticipantName", "Участник", 250,
+            })
+        {
+            Converter = EntityDisplayConverter.Instance,
+            ConverterParameter = EntityDisplayConverter.EntrySwimKind
+        });
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("DisplayParticipantName", Strings.Entries_Col_Participant, 250,
             (query, direction) => QueryableSortByDirection.Sort(query, direction,
                 q => Queryable
                     .OrderBy<Entry, string>(q,
@@ -164,7 +170,7 @@ public partial class EntriesViewModel(
                         e => e.Athlete != null ? e.Athlete.LastName : e.Relay != null ? e.Relay.Club.Name : null)
                     .ThenByDescending(e => e.Athlete != null ? e.Athlete.FirstName : null)
                     .ThenByDescending(e => e.Id))));
-        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("DisplayParticipantClubName", "Команда", 200,
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("DisplayParticipantClubName", Strings.Entries_Col_Team, 200,
             (query, direction) => QueryableSortByDirection.Sort(query, direction,
                 q => Queryable
                     .OrderBy<Entry, string>(q,
@@ -174,14 +180,14 @@ public partial class EntriesViewModel(
                     .OrderByDescending<Entry, string>(q,
                         e => e.Athlete != null ? e.Athlete.Club.Name : e.Relay != null ? e.Relay.Club.Name : null)
                     .ThenByDescending(e => e.Id))));
-        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("Status", "Статус", 150));
-        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("DisplayEntryTime", "Заявочное", 130,
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("Status", Strings.Entries_Col_Status, 150));
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("DisplayEntryTime", Strings.Entries_Col_EntryTime, 95,
             (query, direction) =>
                 direction == ListSortDirection.Ascending
                     ? query.OrderBy(e => e.EntryTime ?? SlowestTimeRank).ThenBy(e => e.Id)
                     : query.OrderByDescending(e => e.EntryTime ?? SlowestTimeRank).ThenByDescending(e => e.Id),
             nameof(Entry.EntryTime)));
-        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("DisplayFinishTime", "Финишное", 130,
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("DisplayFinishTime", Strings.Entries_Col_FinishTime, 95 ,
             (query, direction) =>
                 direction == ListSortDirection.Ascending
                     ? query
@@ -197,8 +203,8 @@ public partial class EntriesViewModel(
                                 : SlowestTimeRank)
                         .ThenByDescending(e => e.Id),
             nameof(Entry.FinishTime)));
-        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("Points", "Очки", 100));
-        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("Comment", "Примечание", 100));
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("Points", Strings.Entries_Col_Points, 50));
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("Comment", Strings.Entries_Col_Comment, 250));
     }
 
     protected override IQueryable<Entry> ApplyQuery(IQueryable<Entry> query)
@@ -271,6 +277,42 @@ public partial class EntriesViewModel(
         _filterOptionsInitialized = true;
         InitializeFilterOptions();
         SubscribeFilterOptions();
+        EnsureCultureSubscription();
+    }
+
+    private void EnsureCultureSubscription()
+    {
+        if (_cultureSubscribed)
+            return;
+
+        _cultureSubscribed = true;
+        App.Current.Services.GetRequiredService<ILocalizationService>().CultureChanged += OnCultureChanged;
+    }
+
+    private void OnCultureChanged(CultureInfo culture)
+    {
+        if (!_filterOptionsInitialized)
+            return;
+
+        RefreshLocalizedEnumFilterOptions();
+        ReloadFromFirstPage();
+    }
+
+    private void RefreshLocalizedEnumFilterOptions()
+    {
+        foreach (var option in RoundFilterOptions)
+            option.DisplayText = Strings.GetEnumDisplay(option.Value);
+        foreach (var option in StrokeFilterOptions)
+            option.DisplayText = Strings.GetEnumDisplay(option.Value);
+        foreach (var option in GenderFilterOptions)
+            option.DisplayText = Strings.GetEnumDisplay(option.Value);
+        foreach (var option in StatusFilterOptions)
+            option.DisplayText = Strings.GetEnumDisplay(option.Value);
+
+        OnPropertyChanged(nameof(RoundFilterText));
+        OnPropertyChanged(nameof(StrokeFilterText));
+        OnPropertyChanged(nameof(GenderFilterText));
+        OnPropertyChanged(nameof(StatusFilterText));
     }
 
     protected void ResetFilterOptions()
@@ -294,23 +336,25 @@ public partial class EntriesViewModel(
             .ToList();
 
         DistanceFilterOptions = new ObservableCollection<EventFilterOption<int>>(
-            distances.Select(distance => new EventFilterOption<int>(distance, $"{distance}м")));
+            distances.Select(distance => new EventFilterOption<int>(
+                distance,
+                string.Format(Strings.Distance_MetersFormat, distance))));
 
         RoundFilterOptions = new ObservableCollection<EventFilterOption<EventRound>>(
             Enum.GetValues<EventRound>().Select(round =>
-                new EventFilterOption<EventRound>(round, EnumDisplay.GetDescription(round))));
+                new EventFilterOption<EventRound>(round, Strings.GetEnumDisplay(round))));
 
         StrokeFilterOptions = new ObservableCollection<EventFilterOption<Stroke>>(
             Enum.GetValues<Stroke>().Select(stroke =>
-                new EventFilterOption<Stroke>(stroke, EnumDisplay.GetDescription(stroke))));
+                new EventFilterOption<Stroke>(stroke, Strings.GetEnumDisplay(stroke))));
 
         GenderFilterOptions = new ObservableCollection<EventFilterOption<Gender>>(
             Enum.GetValues<Gender>().Select(gender =>
-                new EventFilterOption<Gender>(gender, EnumDisplay.GetDescription(gender))));
+                new EventFilterOption<Gender>(gender, Strings.GetEnumDisplay(gender))));
 
         StatusFilterOptions = new ObservableCollection<EventFilterOption<EntryStatus>>(
             Enum.GetValues<EntryStatus>().Select(status =>
-                new EventFilterOption<EntryStatus>(status, EnumDisplay.GetDescription(status))));
+                new EventFilterOption<EntryStatus>(status, Strings.GetEnumDisplay(status))));
     }
 
     private void SubscribeFilterOptions()
@@ -433,20 +477,25 @@ public partial class EntriesViewModel(
 
         if (errors.Count == 0)
         {
-            ImportHeader = "Заявки загружены из события";
-            ImportMessage =
-                $"Создано заявок: {createdCount}. Текущее событие: {selection.TargetEventDisplayName}";
+            ImportHeader = Strings.Import_Event_Success_Header;
+            ImportMessage = string.Format(
+                Strings.Import_Event_Success_MessageFormat,
+                createdCount,
+                selection.TargetEventDisplayName);
         }
         else if (createdCount > 0)
         {
-            ImportHeader = "Заявки загружены частично";
-            ImportMessage =
-                $"Создано: {createdCount}, ошибок: {errors.Count}. Текущее событие: {selection.TargetEventDisplayName}";
+            ImportHeader = Strings.Import_Event_Partial_Header;
+            ImportMessage = string.Format(
+                Strings.Import_Event_Partial_MessageFormat,
+                createdCount,
+                errors.Count,
+                selection.TargetEventDisplayName);
         }
         else
         {
-            ImportHeader = "Заявки не загружены";
-            ImportMessage = $"Не удалось создать заявки. Ошибок: {errors.Count}.";
+            ImportHeader = Strings.Import_Event_Failed_Header;
+            ImportMessage = string.Format(Strings.Import_Event_Failed_MessageFormat, errors.Count);
         }
 
         IsImportBarOpen = true;
@@ -461,7 +510,7 @@ public partial class EntriesViewModel(
         EventImportErrors = new ObservableCollection<string> { message };
         IsImportRunning = false;
         IsImportDetailsOpen = true;
-        ImportHeader = "Ошибка загрузки из события";
+        ImportHeader = Strings.Import_Event_Error_Header;
         ImportMessage = message;
         IsImportBarOpen = true;
     }
@@ -471,8 +520,8 @@ public partial class EntriesViewModel(
     {
         var openFileDialog = new OpenFileDialog
         {
-            Title = "Выберите файлы заявок",
-            Filter = "Excel (*.xlsx)|*.xlsx|All Files (*.*)|*.*",
+            Title = Strings.Dialog_SelectEntryFiles_Title,
+            Filter = Strings.Dialog_SelectEntryFiles_Filter,
             Multiselect = true
         };
 
@@ -530,8 +579,8 @@ public partial class EntriesViewModel(
         ImportProcessedFiles = 0;
         IsImportRunning = true;
         IsImportBarOpen = true;
-        ImportHeader = "Импорт заявок";
-        ImportMessage = $"Подготовка {ImportTotalFiles} файлов";
+        ImportHeader = Strings.Import_File_Header;
+        ImportMessage = string.Format(Strings.Import_File_Preparing_MessageFormat, ImportTotalFiles);
         CancelImportCommand.NotifyCanExecuteChanged();
 
         try
@@ -541,7 +590,11 @@ public partial class EntriesViewModel(
                 _importCts.Token.ThrowIfCancellationRequested();
 
                 file.Status = ImportFileStatus.Processing;
-                ImportMessage = $"Загрузка: {file.FileName} {ImportProcessedFiles + 1}/{ImportTotalFiles}";
+                ImportMessage = string.Format(
+                    Strings.Import_File_Processing_MessageFormat,
+                    file.FileName,
+                    ImportProcessedFiles + 1,
+                    ImportTotalFiles);
 
                 try
                 {
@@ -588,12 +641,15 @@ public partial class EntriesViewModel(
         }
         catch (OperationCanceledException)
         {
-            ImportHeader = "Загрузка отменена";
+            ImportHeader = Strings.Import_File_Canceled_Header;
             return;
         }
         finally
         {
-            ImportMessage = $"Загружено {ImportProcessedFiles}/{ImportTotalFiles} файлов";
+            ImportMessage = string.Format(
+                Strings.Import_File_Finished_MessageFormat,
+                ImportProcessedFiles,
+                ImportTotalFiles);
             IsImportRunning = false;
             CancelImportCommand.NotifyCanExecuteChanged();
             RecalculateImportSummary();

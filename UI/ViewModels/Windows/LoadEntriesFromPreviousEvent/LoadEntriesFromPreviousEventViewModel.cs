@@ -5,6 +5,8 @@ using CommunityToolkit.Mvvm.Input;
 using DataLayer.EfClasses;
 using Microsoft.EntityFrameworkCore;
 using ServiceLayer.EventService;
+using UI.Helpers;
+using UI.Resources;
 using UI.Services;
 using UI.Views.Controls.SearchableComboBox;
 
@@ -27,7 +29,7 @@ public partial class LoadEntriesFromPreviousEventViewModel : ViewModelBase, IWin
         LoadEvents();
     }
 
-    public string WindowTitle => "Загрузка заявок из предыдущего события";
+    public string WindowTitle => Strings.LoadPrev_WindowTitle;
 
     public bool HasErrors => ValidationErrors.Count > 0;
 
@@ -57,7 +59,7 @@ public partial class LoadEntriesFromPreviousEventViewModel : ViewModelBase, IWin
             OfficialPreviousEvents.Add(new SearchableItem
             {
                 Value = swimEvent,
-                DisplayText = swimEvent.DisplayName
+                DisplayText = EntityDisplayFormatter.FormatSwimEvent(swimEvent)
             });
         }
 
@@ -67,7 +69,7 @@ public partial class LoadEntriesFromPreviousEventViewModel : ViewModelBase, IWin
             TargetEvents.Add(new SearchableItem
             {
                 Value = swimEvent,
-                DisplayText = swimEvent.DisplayName
+                DisplayText = EntityDisplayFormatter.FormatSwimEvent(swimEvent)
             });
         }
     }
@@ -79,33 +81,33 @@ public partial class LoadEntriesFromPreviousEventViewModel : ViewModelBase, IWin
 
         if (SelectedPreviousEvent?.Value is not SwimEvent previousEvent)
         {
-            ValidationErrors.Add("Выберите предыдущее событие в статусе OFFICIAL.");
+            ValidationErrors.Add(Strings.LoadPrev_Validation_SelectOfficialPreviousEvent);
             return;
         }
 
         if (SelectedTargetEvent?.Value is not SwimEvent targetEvent)
         {
-            ValidationErrors.Add("Выберите текущее событие.");
+            ValidationErrors.Add(Strings.LoadPrev_Validation_SelectCurrentEvent);
             return;
         }
 
         if (previousEvent.Id == targetEvent.Id)
         {
-            ValidationErrors.Add("Предыдущее и текущее события должны отличаться.");
+            ValidationErrors.Add(Strings.LoadPrev_Validation_EventsMustDiffer);
             return;
         }
 
         if (targetEvent.RoundParticipantsCount is null or <= 0)
         {
-            ValidationErrors.Add("Для текущего события задайте количество участников раунда.");
+            ValidationErrors.Add(Strings.LoadPrev_Validation_RoundParticipantsRequired);
             return;
         }
 
         Result = new LoadEntriesFromPreviousEventResult(
             previousEvent.Id,
             targetEvent.Id,
-            previousEvent.DisplayName,
-            targetEvent.DisplayName);
+            EntityDisplayFormatter.FormatSwimEvent(previousEvent),
+            EntityDisplayFormatter.FormatSwimEvent(targetEvent));
         CloseRequested?.Invoke(this, EventArgs.Empty);
     }
 

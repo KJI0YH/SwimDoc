@@ -3,6 +3,7 @@ using DataLayer.EfClasses;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.AthleteService;
+using UI.Resources;
 using UI.Services;
 using UI.ViewModels.Pages.Data;
 using UI.Views.Windows.AddEdit;
@@ -25,12 +26,12 @@ public class AthletesViewModel : DataViewModel<Athlete, int?>
         AutoGenerateColumns = false;
         ColumnConfigurations.Clear();
 
-        ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("FirstName", "Имя", 200));
-        ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("LastName", "Фамилия", 200));
-        ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("Gender", "Пол", 90));
-        ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("YearOfBirth", "Год рождения", 120));
-        ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("Category", "Разряд", 100));
-        ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("DisplayClubName", "Команда", 300,
+        ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("FirstName", Strings.Athletes_Col_FirstName, 200));
+        ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("LastName", Strings.Athletes_Col_LastName, 200));
+        ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("Gender", Strings.Athletes_Col_Gender, 90));
+        ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("YearOfBirth", Strings.Athletes_Col_BirthYear, 120));
+        ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("Category", Strings.Athletes_Col_Category, 100));
+        ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("DisplayClubName", Strings.Athletes_Col_Team, 300,
             (query, direction) =>
             {
                 return direction == ListSortDirection.Ascending
@@ -60,6 +61,12 @@ public class AthletesViewModel : DataViewModel<Athlete, int?>
 
         foreach (var term in terms)
         {
+            if (Strings.TryFindEnumByDisplayContains(term, out Gender gender))
+            {
+                query = query.Where(a => a.Gender == gender);
+                continue;
+            }
+
             var termPattern = $"%{term}%";
             query = query.Where(a =>
                 EF.Functions.Like(a.FirstName, termPattern) ||

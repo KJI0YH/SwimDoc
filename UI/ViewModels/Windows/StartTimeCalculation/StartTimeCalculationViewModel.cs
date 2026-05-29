@@ -3,6 +3,7 @@ using System.Collections.Specialized;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ServiceLayer.EventService;
+using UI.Resources;
 using UI.Services;
 
 namespace UI.ViewModels.Windows.StartTimeCalculation;
@@ -37,7 +38,7 @@ public partial class StartTimeCalculationViewModel : ViewModelBase, IWindowResul
     public IReadOnlyList<string> HourOptions { get; } = CreateTimePartOptions(24);
     public IReadOnlyList<string> MinuteOptions { get; } = CreateTimePartOptions(60);
 
-    public string WindowTitle => "Расчёт времени старта";
+    public string WindowTitle => Strings.StartTimes_WindowTitle;
 
     public bool HasErrors => ValidationErrors.Count > 0;
 
@@ -86,19 +87,19 @@ public partial class StartTimeCalculationViewModel : ViewModelBase, IWindowResul
 
         if (!_hour.HasValue || !_minute.HasValue)
         {
-            ValidationErrors.Add("Укажите время начала.");
+            ValidationErrors.Add(Strings.StartTimes_Validation_StartTimeRequired);
             return;
         }
 
         if (HeatPauseMinutes < 0)
         {
-            ValidationErrors.Add("Пауза между заплывами не может быть отрицательной.");
+            ValidationErrors.Add(Strings.StartTimes_Validation_HeatPauseNonNegative);
             return;
         }
 
         if (EventPauseMinutes < 0)
         {
-            ValidationErrors.Add("Пауза между событиями не может быть отрицательной.");
+            ValidationErrors.Add(Strings.StartTimes_Validation_EventPauseNonNegative);
             return;
         }
 

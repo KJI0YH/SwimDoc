@@ -8,10 +8,11 @@
                  xmlns:views="clr-namespace:UI.Views"
                  xmlns:pages="clr-namespace:UI.Views.Pages"
                  xmlns:vm1="clr-namespace:UI.ViewModels.Pages"
+                 xmlns:loc="clr-namespace:UI.Localization"
                  xmlns:competitionSelectionView="clr-namespace:UI.Views.Controls.CompetitionSelectionView"
                  xmlns:dataGridView="clr-namespace:UI.Views.Controls.DataGridView"
                  mc:Ignorable="d"
-                 Title="SwimDoc"
+                 Title="{loc:Loc App_Title}"
                  WindowState="Maximized"
                  WindowBackdropType="Mica"
                  WindowCornerPreference="Round"
@@ -107,11 +108,11 @@
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
             <Menu VerticalAlignment="Center">
-                <MenuItem Header="Соревнование">
-                    <MenuItem Header="Создать"
+                <MenuItem Header="{loc:Loc Menu_Competition}">
+                    <MenuItem Header="{loc:Loc Menu_Create}"
                               InputGestureText="Ctrl+N"
                               Command="{Binding CompetitionSelectionViewModel.CreateNewCommand}" />
-                    <MenuItem Header="Открыть"
+                    <MenuItem Header="{loc:Loc Menu_Open}"
                               InputGestureText="Ctrl+O"
                               Command="{Binding CompetitionSelectionViewModel.OpenExistingCommand}" />
                 </MenuItem>
@@ -122,17 +123,17 @@
                 <Button x:Name="MinimizeButton"
                         Style="{StaticResource RestoreWindowControlButtonStyle}"
                         Click="MinimizeButton_Click"
-                        ToolTip="Minimize"
+                        ToolTip="{loc:Loc Window_Minimize}"
                         Content="{ui:SymbolIcon Subtract24}" />
                 <Button x:Name="RestoreButton"
                         Style="{StaticResource RestoreWindowControlButtonStyle}"
                         Click="RestoreButton_Click"
-                        ToolTip="Restore"
+                        ToolTip="{loc:Loc Window_Restore}"
                         Content="{ui:SymbolIcon SquareMultiple24}" />
                 <Button x:Name="CloseButton"
                         Style="{StaticResource CloseWindowControlButtonStyle}"
                         Click="CloseButton_Click"
-                        ToolTip="Close"
+                        ToolTip="{loc:Loc Window_Close}"
                         Content="{ui:SymbolIcon Dismiss24}" />
             </StackPanel>
         </Grid>
@@ -143,49 +144,49 @@
                            IsBackButtonVisible="Auto"
                            Loaded="NavigationView_OnLoaded">
             <ui:NavigationView.MenuItems>
-                <ui:NavigationViewItem Content="Программа"
+                <ui:NavigationViewItem Content="{loc:Loc Nav_Program}"
                                        Tag="Events"
                                        Icon="{ui:SymbolIcon CalendarLtr24}"
                                        TargetPageType="{x:Type pages:EventsPage}"
                                        IsEnabled="{Binding IsCompetitionSelected}" />
-                <ui:NavigationViewItem Content="Заявки"
+                <ui:NavigationViewItem Content="{loc:Loc Nav_Entries}"
                                        Tag="Entries"
                                        Icon="{ui:SymbolIcon DocumentCopy24}"
                                        TargetPageType="{x:Type pages:EntriesPage}"
                                        IsEnabled="{Binding IsCompetitionSelected}" />
-                <ui:NavigationViewItem Content="Заплывы"
+                <ui:NavigationViewItem Content="{loc:Loc Nav_Heats}"
                                        Tag="Heats"
                                        Icon="{ui:SymbolIcon SwimmingPool24}"
                                        TargetPageType="{x:Type pages:HeatsPage}"
                                        IsEnabled="{Binding IsCompetitionSelected}" />
-                <ui:NavigationViewItem Content="Фиксация"
+                <ui:NavigationViewItem Content="{loc:Loc Nav_Fixation}"
                                        Tag="HeatsResults"
                                        Icon="{ui:SymbolIcon Clock24}"
                                        TargetPageType="{x:Type pages:FixationPage}"
                                        IsEnabled="{Binding IsCompetitionSelected}" />
-                <ui:NavigationViewItem Content="Результаты"
+                <ui:NavigationViewItem Content="{loc:Loc Nav_Results}"
                                        Tag="Results"
                                        Icon="{ui:SymbolIcon Trophy24}"
                                        TargetPageType="{x:Type pages:ResultsPage}"
                                        IsEnabled="{Binding IsCompetitionSelected}" />
                 <ui:NavigationViewItemSeparator />
-                <ui:NavigationViewItem Content="Спортсмены"
+                <ui:NavigationViewItem Content="{loc:Loc Nav_Athletes}"
                                        Tag="Athletes"
                                        Icon="{ui:SymbolIcon People24}"
                                        TargetPageType="{x:Type pages:AthletesPage}"
                                        IsEnabled="{Binding IsCompetitionSelected}" />
-                <ui:NavigationViewItem Content="Команды"
+                <ui:NavigationViewItem Content="{loc:Loc Nav_Clubs}"
                                        Tag="Clubs"
                                        Icon="{ui:SymbolIcon BuildingTownhouse24}"
                                        TargetPageType="{x:Type pages:ClubsPage}"
                                        IsEnabled="{Binding IsCompetitionSelected}" />
                 <ui:NavigationViewItemSeparator />
-                <ui:NavigationViewItem Content="Возрастные группы"
+                <ui:NavigationViewItem Content="{loc:Loc Nav_AgeGroups}"
                                        Tag="AgeGroups"
                                        Icon="{ui:SymbolIcon GroupList24}"
                                        TargetPageType="{x:Type pages:AgeGroupsPage}"
                                        IsEnabled="{Binding IsCompetitionSelected}" />
-                <ui:NavigationViewItem Content="Дистанции"
+                <ui:NavigationViewItem Content="{loc:Loc Nav_SwimStyles}"
                                        Tag="SwimStyles"
                                        Icon="{ui:SymbolIcon Accessibility24}"
                                        TargetPageType="{x:Type pages:SwimStylesPage}"
@@ -193,12 +194,12 @@
             </ui:NavigationView.MenuItems>
             <ui:NavigationView.FooterMenuItems>
                 <ui:NavigationViewItem
-                    Content="Настройки"
+                    Content="{loc:Loc Nav_Settings}"
                     Tag="Settings"
                     Icon="{ui:SymbolIcon Settings24}"
                     TargetPageType="{x:Type pages:SettingsPage}" />
                 <ui:NavigationViewItem
-                    Content="О программе"
+                    Content="{loc:Loc Nav_About}"
                     Tag="Settings"
                     Icon="{ui:SymbolIcon Info24}" />
             </ui:NavigationView.FooterMenuItems>

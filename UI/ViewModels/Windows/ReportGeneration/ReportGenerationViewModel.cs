@@ -3,6 +3,7 @@ using System.Collections.Specialized;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
+using UI.Resources;
 using UI.Services;
 
 namespace UI.ViewModels.Windows.ReportGeneration;
@@ -28,7 +29,7 @@ public partial class ReportGenerationViewModel : ViewModelBase, IWindowResult
         ValidationErrors.CollectionChanged += OnValidationErrorsChanged;
     }
 
-    public string WindowTitle => "Генерация отчётов";
+    public string WindowTitle => Strings.Reports_WindowTitle;
 
     public bool HasErrors => ValidationErrors.Count > 0;
 
@@ -48,11 +49,11 @@ public partial class ReportGenerationViewModel : ViewModelBase, IWindowResult
     {
         var dialog = new SaveFileDialog
         {
-            Title = "Сохранить отчёты",
-            Filter = "Excel (*.xlsx)|*.xlsx|All Files (*.*)|*.*",
-            DefaultExt = "xlsx",
+            Title = Strings.Reports_SaveDialog_Title,
+            Filter = Strings.Dialog_SaveExcelReports_Filter,
+            DefaultExt = Strings.Dialog_SaveExcelReports_DefaultExt,
             AddExtension = true,
-            FileName = "Reports.xlsx"
+            FileName = Strings.Dialog_SaveExcelReports_DefaultFileName
         };
 
         if (dialog.ShowDialog() == true)
@@ -66,13 +67,13 @@ public partial class ReportGenerationViewModel : ViewModelBase, IWindowResult
 
         if (!IncludeEntryList && !IncludeStartList && !IncludeFinishList)
         {
-            ValidationErrors.Add("Выберите хотя бы один тип отчёта.");
+            ValidationErrors.Add(Strings.Reports_Validation_SelectAtLeastOne);
             return;
         }
 
         if (string.IsNullOrWhiteSpace(OutputFilePath))
         {
-            ValidationErrors.Add("Выберите файл для сохранения (.xlsx).");
+            ValidationErrors.Add(Strings.Reports_Validation_SelectOutputFile);
             return;
         }
 

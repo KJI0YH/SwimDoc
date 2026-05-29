@@ -1,12 +1,14 @@
 using DataLayer.EfClasses;
 using ServiceLayer.AgeGroupService;
+using UI.Helpers;
+using UI.Resources;
 
 namespace UI.ViewModels.Windows.AddEdit;
 
 public class AgeGroupAddViewModel(int? id, IAgeGroupService crudService)
     : AddEditViewModel<AgeGroup, int?>(id, crudService)
 {
-    public override string WindowTitle => IsAdd ? "Создание возрастной группы" : "Редактирование возрастной группы";
+    public override string WindowTitle => IsAdd ? Strings.WindowTitle_CreateAgeGroup : Strings.WindowTitle_EditAgeGroup;
 
     public string? Name
     {
@@ -48,5 +50,6 @@ public class AgeGroupAddViewModel(int? id, IAgeGroupService crudService)
         }
     }
 
-    public Array GenderValues => Enum.GetValues<Gender>();
+    public IEnumerable<EnumOption<Gender>> GenderOptions =>
+        Enum.GetValues<Gender>().Select(g => new EnumOption<Gender>(g));
 }

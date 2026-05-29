@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using BizLogic.HeatLogic;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -11,6 +12,8 @@ using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.EventService;
 using ServiceLayer.HeatService;
 using ServiceLayer.ReportGeneratorService;
+using UI.Helpers;
+using UI.Resources;
 using UI.Services;
 using UI.ViewModels.Pages.Data;
 using UI.ViewModels.Windows.HeatAllocationParameters;
@@ -37,11 +40,11 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, int?>
     [ObservableProperty] private ObservableCollection<EventFilterOption<EventRound>> _roundFilterOptions = new();
     [ObservableProperty] private bool _isFiltersPanelVisible;
 
-    public string DistanceFilterText => GetFilterText(DistanceFilterOptions, "Дистанция");
-    public string StrokeFilterText => GetFilterText(StrokeFilterOptions, "Стиль");
-    public string GenderFilterText => GetFilterText(GenderFilterOptions, "Пол");
-    public string StatusFilterText => GetFilterText(StatusFilterOptions, "Статус");
-    public string RoundFilterText => GetFilterText(RoundFilterOptions, "Этап");
+    public string DistanceFilterText => GetFilterText(DistanceFilterOptions, Strings.Filters_Distance);
+    public string StrokeFilterText => GetFilterText(StrokeFilterOptions, Strings.Filters_Stroke);
+    public string GenderFilterText => GetFilterText(GenderFilterOptions, Strings.Filters_Gender);
+    public string StatusFilterText => GetFilterText(StatusFilterOptions, Strings.Filters_Status);
+    public string RoundFilterText => GetFilterText(RoundFilterOptions, Strings.Filters_Round);
 
     public EventsViewModel(IEventService eventService)
         : this(eventService, App.Current.Services.GetRequiredService<IHeatService>())
@@ -57,6 +60,30 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, int?>
         PropertyChanged += OnViewModelPropertyChanged;
         InitializeFilterOptions();
         SubscribeFilterOptions();
+        App.Current.Services.GetRequiredService<ILocalizationService>().CultureChanged += OnCultureChanged;
+    }
+
+    private void OnCultureChanged(CultureInfo culture)
+    {
+        RefreshLocalizedEnumFilterOptions();
+        ReloadFromFirstPage();
+    }
+
+    private void RefreshLocalizedEnumFilterOptions()
+    {
+        foreach (var option in StrokeFilterOptions)
+            option.DisplayText = Strings.GetEnumDisplay(option.Value);
+        foreach (var option in GenderFilterOptions)
+            option.DisplayText = Strings.GetEnumDisplay(option.Value);
+        foreach (var option in StatusFilterOptions)
+            option.DisplayText = Strings.GetEnumDisplay(option.Value);
+        foreach (var option in RoundFilterOptions)
+            option.DisplayText = Strings.GetEnumDisplay(option.Value);
+
+        OnPropertyChanged(nameof(StrokeFilterText));
+        OnPropertyChanged(nameof(GenderFilterText));
+        OnPropertyChanged(nameof(StatusFilterText));
+        OnPropertyChanged(nameof(RoundFilterText));
     }
 
     private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -74,17 +101,17 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, int?>
         AutoGenerateColumns = false;
         ColumnConfigurations.Clear();
 
-        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Order", "Порядок", 80));
-        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("DisplayDate", "Дата", 100,
+        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Order", Strings.Events_Col_Order, 80));
+        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("DisplayDate", Strings.Events_Col_Date, 85,
             (query, direction) =>
             {
                 return direction == ListSortDirection.Ascending
                     ? query.OrderBy(e => e.Date)
                     : query.OrderByDescending(e => e.Date);
             }));
-        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("DisplayTime", "Время", 120));
-        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Round", "Этап", 150));
-        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("SwimStyle.DisplayName", "Дистанция", 300,
+        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("DisplayTime", Strings.Events_Col_Time, 57));
+        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Round", Strings.Events_Col_Round, 150));
+        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("SwimStyle", Strings.Events_Col_Distance, 300,
             (query, direction) =>
             {
                 return direction == ListSortDirection.Ascending
@@ -92,22 +119,30 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, int?>
                         .ThenBy(e => e.SwimStyle.RelayCount)
                     : query.OrderByDescending(e => e.SwimStyle.Distance).ThenByDescending(e => e.SwimStyle.Stroke)
                         .ThenBy(e => e.SwimStyle.RelayCount);
-            }));
-        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("AgeGroup.DisplayName", "Возрастная группа", 300,
+            })
+        {
+            Converter = EntityDisplayConverter.Instance,
+            ConverterParameter = EntityDisplayConverter.SwimStyleKind
+        });
+        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("AgeGroup", Strings.Events_Col_AgeGroup, 300,
             (query, direction) =>
             {
                 return direction == ListSortDirection.Ascending
                     ? query.OrderBy(e => e.AgeGroup.Name)
                     : query.OrderByDescending(e => e.AgeGroup.Name);
-            }));
-        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("DisplayLanes", "Дорожки", 100,
+            })
+        {
+            Converter = EntityDisplayConverter.Instance,
+            ConverterParameter = EntityDisplayConverter.AgeGroupKind
+        });
+        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("DisplayLanes", Strings.Events_Col_Lanes, 80,
             (query, direction) =>
             {
                 return direction == ListSortDirection.Ascending
                     ? query.OrderBy(e => e.LaneMin).ThenBy(e => e.LaneMax)
                     : query.OrderByDescending(e => e.LaneMin).ThenByDescending(e => e.LaneMax);
             }));
-        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("DisplayStatus", "Статус", 120));
+        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Status", Strings.Events_Col_Status, 210));
     }
 
     protected override IQueryable<SwimEvent> ApplyQuery(IQueryable<SwimEvent> query)
@@ -156,23 +191,25 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, int?>
             .ToList();
 
         DistanceFilterOptions = new ObservableCollection<EventFilterOption<int>>(
-            distances.Select(distance => new EventFilterOption<int>(distance, $"{distance}м")));
+            distances.Select(distance => new EventFilterOption<int>(
+                distance,
+                string.Format(Strings.Distance_MetersFormat, distance))));
 
         StrokeFilterOptions = new ObservableCollection<EventFilterOption<Stroke>>(
             Enum.GetValues<Stroke>().Select(stroke =>
-                new EventFilterOption<Stroke>(stroke, EnumDisplay.GetDescription(stroke))));
+                new EventFilterOption<Stroke>(stroke, Strings.GetEnumDisplay(stroke))));
 
         GenderFilterOptions = new ObservableCollection<EventFilterOption<Gender>>(
             Enum.GetValues<Gender>().Select(gender =>
-                new EventFilterOption<Gender>(gender, EnumDisplay.GetDescription(gender))));
+                new EventFilterOption<Gender>(gender, Strings.GetEnumDisplay(gender))));
 
         StatusFilterOptions = new ObservableCollection<EventFilterOption<SwimEventStatus>>(
             Enum.GetValues<SwimEventStatus>().Select(status =>
-                new EventFilterOption<SwimEventStatus>(status, status.ToString())));
+                new EventFilterOption<SwimEventStatus>(status, Strings.GetEnumDisplay(status))));
 
         RoundFilterOptions = new ObservableCollection<EventFilterOption<EventRound>>(
             Enum.GetValues<EventRound>().Select(round =>
-                new EventFilterOption<EventRound>(round, EnumDisplay.GetDescription(round))));
+                new EventFilterOption<EventRound>(round, Strings.GetEnumDisplay(round))));
     }
 
     private void SubscribeFilterOptions()
@@ -306,8 +343,8 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, int?>
         {
             var dialogs = App.Current.Services.GetRequiredService<IErrorDialogService>();
             await dialogs.ShowErrorAsync(
-                title: "Не удалось сохранить отчёт",
-                message: $"Файл занят другим процессом или недоступен");
+                title: Strings.Dialog_Error_SaveReport_Title,
+                message: Strings.Dialog_Error_FileBusyOrUnavailable);
         }
     }
 

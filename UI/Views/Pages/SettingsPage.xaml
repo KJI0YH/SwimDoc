@@ -2,306 +2,253 @@
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:loc="clr-namespace:UI.Localization"
+      xmlns:helpers="clr-namespace:UI.Helpers"
+      xmlns:baseTimesView="clr-namespace:UI.Views.Controls.BaseTimesSettingsView"
       ScrollViewer.CanContentScroll="False">
-    <TabControl Margin="12">
-        <TabItem Header="Базовое время">
-            <ScrollViewer VerticalScrollBarVisibility="Auto">
-                <StackPanel>
-                    <Button Content="{ui:SymbolIcon Save24}"
-                            ToolTip="Сохранить"
-                            Command="{Binding SaveCommand}"
-                            HorizontalAlignment="Left"
-                            Margin="5"
-                            Padding="9" />
+    <Page.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <helpers:AppLanguageDisplayConverter x:Key="AppLanguageDisplayConverter" />
 
-                    <GroupBox Header="SCM (25m) — Мужчины / Женщины" Margin="0,0,0,12">
-                        <ui:DataGrid ItemsSource="{Binding ScmRows}"
-                                     AutoGenerateColumns="False"
-                                     IsReadOnly="False">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="Stroke" Binding="{Binding Name}" IsReadOnly="True"
-                                                    Width="*" />
-                                <DataGridTemplateColumn Width="*">
-                                    <DataGridTemplateColumn.Header>
-                                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                            <TextBlock Text="Мужчины" HorizontalAlignment="Center"
-                                                       TextAlignment="Center" FontWeight="SemiBold" />
-                                            <TextBlock Text="Базовое время" HorizontalAlignment="Center"
-                                                       TextAlignment="Center" />
-                                        </StackPanel>
-                                    </DataGridTemplateColumn.Header>
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
-                                                        Text="{Binding MenBaseTimeText, UpdateSourceTrigger=PropertyChanged}" />
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                                <DataGridTemplateColumn Width="*">
-                                    <DataGridTemplateColumn.Header>
-                                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                            <TextBlock Text="Мужчины" HorizontalAlignment="Center"
-                                                       TextAlignment="Center" FontWeight="SemiBold" />
-                                            <TextBlock Text="Базовое время, секунды" HorizontalAlignment="Center"
-                                                       TextAlignment="Center" />
-                                        </StackPanel>
-                                    </DataGridTemplateColumn.Header>
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
-                                                        Text="{Binding MenSecondsText, UpdateSourceTrigger=PropertyChanged}" />
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                                <DataGridTemplateColumn Width="*">
-                                    <DataGridTemplateColumn.Header>
-                                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                            <TextBlock Text="Женщины" HorizontalAlignment="Center"
-                                                       TextAlignment="Center" FontWeight="SemiBold" />
-                                            <TextBlock Text="Базовое время" HorizontalAlignment="Center"
-                                                       TextAlignment="Center" />
-                                        </StackPanel>
-                                    </DataGridTemplateColumn.Header>
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
-                                                        Text="{Binding WomenBaseTimeText, UpdateSourceTrigger=PropertyChanged}" />
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                                <DataGridTemplateColumn Width="*">
-                                    <DataGridTemplateColumn.Header>
-                                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                            <TextBlock Text="Женщины" HorizontalAlignment="Center"
-                                                       TextAlignment="Center" FontWeight="SemiBold" />
-                                            <TextBlock Text="Базовое время, секунды" HorizontalAlignment="Center"
-                                                       TextAlignment="Center" />
-                                        </StackPanel>
-                                    </DataGridTemplateColumn.Header>
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
-                                                        Text="{Binding WomenSecondsText, UpdateSourceTrigger=PropertyChanged}" />
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                            </DataGrid.Columns>
-                        </ui:DataGrid>
-                    </GroupBox>
+        <Style x:Key="SettingsCardBorderStyle" TargetType="Border">
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="Background" Value="{DynamicResource ControlFillColorDefaultBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ControlStrokeColorDefaultBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="20" />
+            <Setter Property="Margin" Value="0,0,0,12" />
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect BlurRadius="10" ShadowDepth="1" Opacity="0.08" />
+                </Setter.Value>
+            </Setter>
+        </Style>
 
-                    <GroupBox Header="SCM (25m) — Смешанные эстафеты" Margin="0,0,0,12">
-                        <ui:DataGrid ItemsSource="{Binding ScmMixedRelayRows}"
-                                     AutoGenerateColumns="False"
-                                     IsReadOnly="False">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="Stroke" Binding="{Binding Name}" IsReadOnly="True"
-                                                    Width="*" />
-                                <DataGridTemplateColumn Width="*">
-                                    <DataGridTemplateColumn.Header>
-                                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                            <TextBlock Text="Смешанные" HorizontalAlignment="Center"
-                                                       TextAlignment="Center" FontWeight="SemiBold" />
-                                            <TextBlock Text="Базовое время" HorizontalAlignment="Center"
-                                                       TextAlignment="Center" />
-                                        </StackPanel>
-                                    </DataGridTemplateColumn.Header>
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
-                                                        Text="{Binding MixedBaseTimeText, UpdateSourceTrigger=PropertyChanged}" />
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                                <DataGridTemplateColumn Width="*">
-                                    <DataGridTemplateColumn.Header>
-                                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                            <TextBlock Text="Смешанные" HorizontalAlignment="Center"
-                                                       TextAlignment="Center" FontWeight="SemiBold" />
-                                            <TextBlock Text="Базовое время, секунды" HorizontalAlignment="Center"
-                                                       TextAlignment="Center" />
-                                        </StackPanel>
-                                    </DataGridTemplateColumn.Header>
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
-                                                        Text="{Binding MixedSecondsText, UpdateSourceTrigger=PropertyChanged}" />
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                                <DataGridTemplateColumn Width="*" />
-                                <DataGridTemplateColumn Width="*" />
-                            </DataGrid.Columns>
-                        </ui:DataGrid>
-                    </GroupBox>
+        <Style x:Key="SettingsNavCardButtonStyle" TargetType="Button">
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="Background" Value="{DynamicResource ControlFillColorDefaultBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ControlStrokeColorDefaultBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="20" />
+            <Setter Property="Margin" Value="0,0,0,12" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="10" ShadowDepth="1" Opacity="0.08" />
+                            </Border.Effect>
+                            <ContentPresenter />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background"
+                                        Value="{DynamicResource ControlFillColorSecondaryBrush}" />
+                                <Setter TargetName="border" Property="BorderBrush"
+                                        Value="{DynamicResource AccentFillColorDefaultBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
 
-                    <GroupBox Header="LCM (50m) — Мужчины / Женщины" Margin="0,0,0,12">
-                        <ui:DataGrid ItemsSource="{Binding LcmRows}"
-                                     AutoGenerateColumns="False"
-                                     IsReadOnly="False">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="Stroke" Binding="{Binding Name}" IsReadOnly="True"
-                                                    Width="*" />
-                                <DataGridTemplateColumn Width="*">
-                                    <DataGridTemplateColumn.Header>
-                                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                            <TextBlock Text="Мужчины" HorizontalAlignment="Center"
-                                                       TextAlignment="Center" FontWeight="SemiBold" />
-                                            <TextBlock Text="Базовое время" HorizontalAlignment="Center"
-                                                       TextAlignment="Center" />
-                                        </StackPanel>
-                                    </DataGridTemplateColumn.Header>
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
-                                                        Text="{Binding MenBaseTimeText, UpdateSourceTrigger=PropertyChanged}" />
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                                <DataGridTemplateColumn Width="*">
-                                    <DataGridTemplateColumn.Header>
-                                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                            <TextBlock Text="Мужчины" HorizontalAlignment="Center"
-                                                       TextAlignment="Center" FontWeight="SemiBold" />
-                                            <TextBlock Text="Базовое время, секунды" HorizontalAlignment="Center"
-                                                       TextAlignment="Center" />
-                                        </StackPanel>
-                                    </DataGridTemplateColumn.Header>
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
-                                                        Text="{Binding MenSecondsText, UpdateSourceTrigger=PropertyChanged}" />
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                                <DataGridTemplateColumn Width="*">
-                                    <DataGridTemplateColumn.Header>
-                                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                            <TextBlock Text="Женщины" HorizontalAlignment="Center"
-                                                       TextAlignment="Center" FontWeight="SemiBold" />
-                                            <TextBlock Text="Базовое время" HorizontalAlignment="Center"
-                                                       TextAlignment="Center" />
-                                        </StackPanel>
-                                    </DataGridTemplateColumn.Header>
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
-                                                        Text="{Binding WomenBaseTimeText, UpdateSourceTrigger=PropertyChanged}" />
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                                <DataGridTemplateColumn Width="*">
-                                    <DataGridTemplateColumn.Header>
-                                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                            <TextBlock Text="Женщины" HorizontalAlignment="Center"
-                                                       TextAlignment="Center" FontWeight="SemiBold" />
-                                            <TextBlock Text="Базовое время, секунды" HorizontalAlignment="Center"
-                                                       TextAlignment="Center" />
-                                        </StackPanel>
-                                    </DataGridTemplateColumn.Header>
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
-                                                        Text="{Binding WomenSecondsText, UpdateSourceTrigger=PropertyChanged}" />
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                            </DataGrid.Columns>
-                        </ui:DataGrid>
-                    </GroupBox>
+    <Grid HorizontalAlignment="Stretch"
+          VerticalAlignment="Stretch">
+        <!-- Hub -->
+        <Grid x:Name="SettingsHubRoot"
+              Margin="24,24,24,24"
+              HorizontalAlignment="Stretch"
+              VerticalAlignment="Stretch"
+              SizeChanged="SettingsHubRoot_OnSizeChanged">
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Setter Property="Visibility" Value="Visible" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsBaseTimesOpen}" Value="True">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
 
-                    <GroupBox Header="LCM (50m) — Смешанные эстафеты">
-                        <ui:DataGrid ItemsSource="{Binding LcmMixedRelayRows}"
-                                     AutoGenerateColumns="False"
-                                     IsReadOnly="False">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="Stroke" Binding="{Binding Name}" IsReadOnly="True"
-                                                    Width="*" />
-                                <DataGridTemplateColumn Width="*">
-                                    <DataGridTemplateColumn.Header>
-                                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                            <TextBlock Text="Смешанные" HorizontalAlignment="Center"
-                                                       TextAlignment="Center" FontWeight="SemiBold" />
-                                            <TextBlock Text="Базовое время" HorizontalAlignment="Center"
-                                                       TextAlignment="Center" />
-                                        </StackPanel>
-                                    </DataGridTemplateColumn.Header>
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
-                                                        Text="{Binding MixedBaseTimeText, UpdateSourceTrigger=PropertyChanged}" />
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                                <DataGridTemplateColumn Width="*">
-                                    <DataGridTemplateColumn.Header>
-                                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                            <TextBlock Text="Смешанные" HorizontalAlignment="Center"
-                                                       TextAlignment="Center" FontWeight="SemiBold" />
-                                            <TextBlock Text="Базовое время, секунды" HorizontalAlignment="Center"
-                                                       TextAlignment="Center" />
-                                        </StackPanel>
-                                    </DataGridTemplateColumn.Header>
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
-                                                        Text="{Binding MixedSecondsText, UpdateSourceTrigger=PropertyChanged}" />
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                                <DataGridTemplateColumn Width="*" />
-                                <DataGridTemplateColumn Width="*" />
-                            </DataGrid.Columns>
-                        </ui:DataGrid>
-                    </GroupBox>
-                </StackPanel>
+            <ScrollViewer x:Name="SettingsHubScroll"
+                          HorizontalAlignment="Stretch"
+                          HorizontalContentAlignment="Stretch"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled">
+            <StackPanel x:Name="SettingsHubContent"
+                        HorizontalAlignment="Stretch">
+                <TextBlock Style="{StaticResource TitleLargeTextBlockStyle}"
+                           Text="{loc:Loc Nav_Settings}"
+                           Margin="0,0,0,8" />
+                <TextBlock Margin="0,0,0,32"
+                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                           TextWrapping="Wrap"
+                           Text="{loc:Loc Settings_Page_Subtitle}" />
+
+                <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
+                           Text="{loc:Loc Settings_Section_General}"
+                           Margin="0,0,0,12" />
+
+                <Border Style="{StaticResource SettingsCardBorderStyle}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Column="0"
+                                Width="44"
+                                Height="44"
+                                CornerRadius="10"
+                                Background="{StaticResource DataGridSelectedRowBackgroundBrush}"
+                                VerticalAlignment="Center">
+                            <ContentPresenter Content="{ui:SymbolIcon LocalLanguage24}"
+                                              HorizontalAlignment="Center"
+                                              VerticalAlignment="Center" />
+                        </Border>
+
+                        <StackPanel Grid.Column="1" Margin="16,0,16,0" VerticalAlignment="Center">
+                            <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}"
+                                       Text="{loc:Loc Language_Label}" />
+                            <TextBlock Margin="0,4,0,0"
+                                       Opacity="0.8"
+                                       TextWrapping="Wrap"
+                                       Text="{loc:Loc Settings_Language_Description}" />
+                        </StackPanel>
+
+                        <ComboBox Grid.Column="2"
+                                  Width="200"
+                                  VerticalAlignment="Center"
+                                  ItemsSource="{Binding AvailableLanguages}"
+                                  SelectedItem="{Binding SelectedLanguage}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Converter={StaticResource AppLanguageDisplayConverter}}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </Grid>
+                </Border>
+
+                <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
+                           Text="{loc:Loc Settings_Section_Files}"
+                           Margin="0,8,0,12" />
+
+                <Border Style="{StaticResource SettingsCardBorderStyle}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Column="0"
+                                Width="44"
+                                Height="44"
+                                CornerRadius="10"
+                                Background="{StaticResource DataGridSelectedRowBackgroundBrush}"
+                                VerticalAlignment="Top">
+                            <ContentPresenter Content="{ui:SymbolIcon DocumentArrowRight24}"
+                                              HorizontalAlignment="Center"
+                                              VerticalAlignment="Center" />
+                        </Border>
+
+                        <StackPanel Grid.Column="1" Margin="16,0,16,0">
+                            <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}"
+                                       Text="{loc:Loc Templates_EntryDoc_Title}" />
+                            <TextBlock Margin="0,4,0,0"
+                                       Opacity="0.8"
+                                       TextWrapping="Wrap"
+                                       Text="{loc:Loc Templates_EntryDoc_Subtitle}" />
+                        </StackPanel>
+
+                        <Button Grid.Column="2"
+                                VerticalAlignment="Center"
+                                Padding="16,8"
+                                Command="{Binding DownloadEntryDocumentTemplateCommand}">
+                            <StackPanel Orientation="Horizontal">
+                                <ContentControl Content="{ui:SymbolIcon ArrowDownload24}"
+                                                Margin="0,0,8,0"
+                                                VerticalAlignment="Center" />
+                                <TextBlock Text="{loc:Loc Templates_Download}" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+                </Border>
+
+                <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
+                           Text="{loc:Loc Settings_Section_Competition}"
+                           Margin="0,8,0,12" />
+
+                <Button Style="{StaticResource SettingsNavCardButtonStyle}"
+                        Command="{Binding OpenBaseTimesCommand}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Column="0"
+                                Width="44"
+                                Height="44"
+                                CornerRadius="10"
+                                Background="{StaticResource DataGridSelectedRowBackgroundBrush}"
+                                VerticalAlignment="Center">
+                            <ContentPresenter Content="{ui:SymbolIcon Timer24}"
+                                              HorizontalAlignment="Center"
+                                              VerticalAlignment="Center" />
+                        </Border>
+
+                        <StackPanel Grid.Column="1" Margin="16,0,16,0" VerticalAlignment="Center">
+                            <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}"
+                                       Text="{loc:Loc Settings_Tab_BaseTime}" />
+                            <TextBlock Margin="0,4,0,0"
+                                       Opacity="0.8"
+                                       TextWrapping="Wrap"
+                                       Text="{loc:Loc Settings_BaseTimes_Description}" />
+                        </StackPanel>
+
+                        <ContentControl Grid.Column="2"
+                                        VerticalAlignment="Center"
+                                        Content="{ui:SymbolIcon ChevronRight24}" />
+                    </Grid>
+                </Button>
+            </StackPanel>
             </ScrollViewer>
-        </TabItem>
+        </Grid>
 
-        <TabItem Header="Шаблоны">
-            <ScrollViewer VerticalScrollBarVisibility="Auto">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
+        <!-- Base times — full content width of the navigation area -->
+        <Grid Margin="24,24,24,24"
+              HorizontalAlignment="Stretch"
+              VerticalAlignment="Stretch">
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsBaseTimesOpen}" Value="True">
+                            <Setter Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
 
-                    <GroupBox Grid.Row="1"
-                              Header="Заявочный протокол"
-                              Padding="12"
-                              Margin="0,0,0,12">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-
-                            <Border Grid.Column="0" Width="44"
-                                    Height="44"
-                                    CornerRadius="10"
-                                    Background="{StaticResource DataGridSelectedRowBackgroundBrush}"
-                                    VerticalAlignment="Top">
-                                <ContentPresenter Content="{ui:SymbolIcon DocumentArrowRight24}"
-                                                  HorizontalAlignment="Center"
-                                                  VerticalAlignment="Center" />
-                            </Border>
-
-
-                            <TextBlock Grid.Column="1" Margin="12" Style="{StaticResource BodyStrongTextBlockStyle}"
-                                       Text="Шаблон Excel для импорта заявок" />
-
-
-                            <Button Grid.Column="2" Content="{ui:SymbolIcon ArrowDownload24}"
-                                    ToolTip="Скачать шаблон (.xlsx)"
-                                    Padding="9"
-                                    Margin="0,0,8,0"
-                                    Command="{Binding DownloadEntryDocumentTemplateCommand}" />
-
-                        </Grid>
-                    </GroupBox>
-                </Grid>
-            </ScrollViewer>
-        </TabItem>
-    </TabControl>
+            <baseTimesView:BaseTimesSettingsView DataContext="{Binding BaseTimes}"
+                                                 HorizontalAlignment="Stretch"
+                                                 VerticalAlignment="Stretch" />
+        </Grid>
+    </Grid>
 </Page>

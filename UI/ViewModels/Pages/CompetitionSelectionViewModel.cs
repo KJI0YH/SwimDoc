@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
 using UI.Services;
+using UI.Resources;
 
 namespace UI.ViewModels.Pages;
 
@@ -15,9 +16,9 @@ public partial class CompetitionSelectionViewModel : ViewModelBase
     {
         var saveFileDialog = new SaveFileDialog
         {
-            Filter = "SQLite Database (*.db)|*.db|SQLite Database (*.sqlite)|*.sqlite|All Files (*.*)|*.*",
-            Title = "Создать новое соревнование",
-            DefaultExt = "db"
+            Filter = Strings.Dialog_CompetitionDb_Filter,
+            Title = Strings.Dialog_CreateCompetition_Title,
+            DefaultExt = Strings.Dialog_CompetitionDb_DefaultExt
         };
 
         if (saveFileDialog.ShowDialog() == true)
@@ -31,8 +32,8 @@ public partial class CompetitionSelectionViewModel : ViewModelBase
             {
                 var dialogs = App.Current.Services.GetRequiredService<IErrorDialogService>();
                 await dialogs.ShowErrorAsync(
-                    title: "Не удалось создать файл базы данных",
-                    message: $"Файл занят другим процессом или недоступен.\n\n{ex.Message}");
+                    title: Strings.Dialog_Error_CreateDbFile_Title,
+                    message: string.Format(Strings.Dialog_Error_FileBusyOrUnavailableWithDetailsFormat, ex.Message));
             }
         }
     }
@@ -42,8 +43,8 @@ public partial class CompetitionSelectionViewModel : ViewModelBase
     {
         var openFileDialog = new OpenFileDialog
         {
-            Filter = "SQLite Database (*.db)|*.db|SQLite Database (*.sqlite)|*.sqlite|All Files (*.*)|*.*",
-            Title = "Выберите файл соревнования"
+            Filter = Strings.Dialog_CompetitionDb_Filter,
+            Title = Strings.Dialog_OpenCompetition_Title
         };
 
         if (openFileDialog.ShowDialog() == true) InitializeDatabase(openFileDialog.FileName);

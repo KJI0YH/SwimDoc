@@ -10,9 +10,9 @@ public interface IEventFilterOption
 public sealed partial class EventFilterOption<T>(T value, string displayText) : ObservableObject, IEventFilterOption
 {
     [ObservableProperty] private bool _isSelected;
+    [ObservableProperty] private string _displayText = displayText;
 
     public T Value { get; } = value;
-    public string DisplayText { get; } = displayText;
 
     public override string ToString() => DisplayText;
 }

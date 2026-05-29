@@ -6,6 +6,7 @@
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:media="clr-namespace:System.Windows.Media.Effects;assembly=PresentationCore"
              xmlns:helpers="clr-namespace:UI.Helpers"
+             xmlns:loc="clr-namespace:UI.Localization"
              mc:Ignorable="d"
              d:DesignHeight="120"
              d:DesignWidth="800">
@@ -14,6 +15,7 @@
         <helpers:IntGreaterThanZeroConverter x:Key="IntGt0" />
         <helpers:EnumDescriptionConverter x:Key="EnumDescription" />
         <helpers:RectHeightConverter x:Key="RectHeight" />
+        <helpers:LocalizedStringFormatConverter x:Key="LocFormat" />
     </UserControl.Resources>
 
     <!-- Bottom overlay import status (does not shift content) -->
@@ -29,7 +31,7 @@
             <!-- Compact bar -->
             <DockPanel LastChildFill="True">
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
-                    <Button ToolTip="Подробнее"
+                    <Button ToolTip="{loc:Loc Import_Details}"
                             Margin="5,0,0,0"
                             Padding="9"
                             Command="{Binding ToggleImportDetailsCommand}">
@@ -51,13 +53,13 @@
                     </Button>
 
                     <Button Content="{ui:SymbolIcon Stop24}"
-                            ToolTip="Прервать"
+                            ToolTip="{loc:Loc Import_Cancel}"
                             Margin="5,0,0,0"
                             Padding="9"
                             Command="{Binding CancelImportCommand}"
                             Visibility="{Binding IsImportRunning, Converter={StaticResource BoolToVis}}" />
 
-                    <Button ToolTip="Закрыть"
+                    <Button ToolTip="{loc:Loc Import_Close}"
                             Margin="5,0,0,0"
                             Padding="9"
                             Command="{Binding DismissImportBarCommand}">
@@ -193,7 +195,7 @@
                                                                         Foreground="#D97706"
                                                                         Margin="0,0,6,0" />
                                                         <TextBlock Foreground="#D97706"
-                                                                   Text="{Binding WarningsCount, StringFormat=Предупреждения ({0})}" />
+                                                                   Text="{Binding WarningsCount, Converter={StaticResource LocFormat}, ConverterParameter=Import_WarningsFormat}" />
                                                     </StackPanel>
                                                 </GroupBox.Header>
                                                 <ScrollViewer MaxHeight="160" VerticalScrollBarVisibility="Auto">
@@ -224,7 +226,7 @@
                                                                         Foreground="#B91C1C"
                                                                         Margin="0,0,6,0" />
                                                         <TextBlock Foreground="#B91C1C"
-                                                                   Text="{Binding ErrorsCount, StringFormat=Ошибки ({0})}" />
+                                                                   Text="{Binding ErrorsCount, Converter={StaticResource LocFormat}, ConverterParameter=Import_ErrorsFormat}" />
                                                     </StackPanel>
                                                 </GroupBox.Header>
                                                 <ScrollViewer MaxHeight="160" VerticalScrollBarVisibility="Auto">
@@ -242,11 +244,11 @@
                                     </DataTemplate>
                                 </ui:DataGrid.RowDetailsTemplate>
                                 <ui:DataGrid.Columns>
-                                    <DataGridTextColumn Header="Файл" Binding="{Binding FileName}" Width="150" />
-                                    <DataGridTextColumn Header="Путь" Binding="{Binding FullPath}" Width="*" />
-                                    <DataGridTextColumn Header="Статус" Width="180"
+                                    <DataGridTextColumn Header="{loc:Loc Import_Col_File}" Binding="{Binding FileName}" Width="150" />
+                                    <DataGridTextColumn Header="{loc:Loc Import_Col_Path}" Binding="{Binding FullPath}" Width="*" />
+                                    <DataGridTextColumn Header="{loc:Loc Import_Col_Status}" Width="180"
                                                         Binding="{Binding Status, Converter={StaticResource EnumDescription}}" />
-                                    <DataGridTemplateColumn Header="Команды" Width="100">
+                                    <DataGridTemplateColumn Header="{loc:Loc Import_Col_Clubs}" Width="100">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
                                                 <TextBlock HorizontalAlignment="Center" TextAlignment="Center">
@@ -258,7 +260,7 @@
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
 
-                                    <DataGridTemplateColumn Header="Спортсмены" Width="130">
+                                    <DataGridTemplateColumn Header="{loc:Loc Import_Col_Athletes}" Width="130">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
                                                 <TextBlock HorizontalAlignment="Center" TextAlignment="Center">
@@ -270,7 +272,7 @@
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
 
-                                    <DataGridTemplateColumn Header="Заявки" Width="90">
+                                    <DataGridTemplateColumn Header="{loc:Loc Import_Col_Entries}" Width="90">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
                                                 <TextBlock HorizontalAlignment="Center" TextAlignment="Center">
@@ -282,7 +284,7 @@
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
 
-                                    <DataGridTemplateColumn Header="Предупреждения" Width="170">
+                                    <DataGridTemplateColumn Header="{loc:Loc Import_Col_Warnings}" Width="170">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
                                                 <TextBlock HorizontalAlignment="Center" TextAlignment="Center">
@@ -292,7 +294,7 @@
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
 
-                                    <DataGridTemplateColumn Header="Ошибки" Width="100">
+                                    <DataGridTemplateColumn Header="{loc:Loc Import_Col_Errors}" Width="100">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
                                                 <TextBlock HorizontalAlignment="Center" TextAlignment="Center">
@@ -331,7 +333,7 @@
                             <ColumnDefinition Width="160" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="Предыдущее событие" Opacity="0.75" />
+                        <TextBlock Grid.Column="0" Text="{loc:Loc Import_EventPrev}" Opacity="0.75" />
                         <TextBlock Grid.Column="1" Text="{Binding EventImportPreviousEventName}" TextWrapping="Wrap" />
                     </Grid>
                     <Grid Margin="0,0,0,8">
@@ -339,7 +341,7 @@
                             <ColumnDefinition Width="160" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="Текущее событие" Opacity="0.75" />
+                        <TextBlock Grid.Column="0" Text="{loc:Loc Import_EventCurrent}" Opacity="0.75" />
                         <TextBlock Grid.Column="1" Text="{Binding EventImportTargetEventName}" TextWrapping="Wrap" />
                     </Grid>
                     <Grid Margin="0,0,0,8">
@@ -347,7 +349,7 @@
                             <ColumnDefinition Width="160" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="Создано заявок" Opacity="0.75" />
+                        <TextBlock Grid.Column="0" Text="{loc:Loc Import_CreatedEntries}" Opacity="0.75" />
                         <TextBlock Grid.Column="1" Text="{Binding EventImportCreatedCount}" />
                     </Grid>
                     <GroupBox>
@@ -367,7 +369,7 @@
                                                 Foreground="#B91C1C"
                                                 Margin="0,0,6,0" />
                                 <TextBlock Foreground="#B91C1C"
-                                           Text="{Binding EventImportErrors.Count, StringFormat=Ошибки ({0})}" />
+                                           Text="{Binding EventImportErrors.Count, Converter={StaticResource LocFormat}, ConverterParameter=Import_ErrorsFormat}" />
                             </StackPanel>
                         </GroupBox.Header>
                         <ScrollViewer MaxHeight="160" VerticalScrollBarVisibility="Auto">

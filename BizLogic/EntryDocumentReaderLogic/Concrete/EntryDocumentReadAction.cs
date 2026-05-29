@@ -13,20 +13,31 @@ namespace BizLogic.EntryDocumentReaderLogic.Concrete;
 public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAccess)
     : BizActionErrors, IEntryDocumentReadAction
 {
-    private const string SETTINGS_WORKSHEET_NAME = "Настройки";
-    private const string FIRSTNAME_HEADER = "Имя";
-    private const string LASTNAME_HEADER = "Фамилия";
-    private const string BIRTH_YEAR_HEADER = "Год рождения";
-    private const string GENDER_HEADER = "Пол";
-    private const string CATEGORY_HEADER = "Разряд";
+    private static readonly string[] SettingsWorksheetNames = ["Настройки", "Settings"];
 
-    private const string CLUB_NAME_HEADER = "Команда";
+    private const string FIRSTNAME_HEADER = "FirstName";
+    private const string LASTNAME_HEADER = "LastName";
+    private const string BIRTH_YEAR_HEADER = "BirthYear";
+    private const string GENDER_HEADER = "Gender";
+    private const string CATEGORY_HEADER = "Category";
 
-    private const string BUTTERFLY = "Баттерфляй";
-    private const string BACKSTROKE = "На спине";
-    private const string BREASTROKE = "Брасс";
-    private const string FREESTYLE = "Вольный стиль";
-    private const string MEDLEY = "Комплексное плавание";
+    private const string CLUB_NAME_HEADER = "ClubName";
+
+    private static readonly string[] ButterflyNames = ["Баттерфляй", "Butterfly"];
+    private static readonly string[] BackstrokeNames = ["На спине", "Backstroke"];
+    private static readonly string[] BreaststrokeNames = ["Брасс", "Breaststroke"];
+    private static readonly string[] FreestyleNames = ["Вольный стиль", "Freestyle"];
+    private static readonly string[] MedleyNames = ["Комплексное плавание", "Medley"];
+
+    private static readonly Dictionary<string, string[]> HeaderAliases = new(StringComparer.OrdinalIgnoreCase)
+    {
+        [FIRSTNAME_HEADER] = ["Имя", "First name", "First Name", "Firstname"],
+        [LASTNAME_HEADER] = ["Фамилия", "Last name", "Last Name", "Lastname"],
+        [BIRTH_YEAR_HEADER] = ["Год рождения", "Birth year", "Birth Year", "Year of birth", "Year Of Birth"],
+        [GENDER_HEADER] = ["Пол", "Gender"],
+        [CATEGORY_HEADER] = ["Разряд", "Category"],
+        [CLUB_NAME_HEADER] = ["Команда", "Team", "Club", "Team name", "Club name"]
+    };
 
     private List<string> _warnings;
     private List<string> _errors;
@@ -41,7 +52,7 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
         var workBook = package.Workbook;
         return workBook.Worksheets
             .Where(worksheet =>
-                !string.Equals(worksheet.Name?.Trim(), SETTINGS_WORKSHEET_NAME, StringComparison.OrdinalIgnoreCase))
+                !SettingsWorksheetNames.Contains(worksheet.Name?.Trim() ?? string.Empty, StringComparer.OrdinalIgnoreCase))
             .Select(ReadClubEntry).ToList();
     }
 
@@ -49,8 +60,7 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
     {
         _warnings = [];
         _errors = [];
-        var athleteHeaders = FindHeaders(workSheet, FIRSTNAME_HEADER, LASTNAME_HEADER, BIRTH_YEAR_HEADER, GENDER_HEADER,
-            CATEGORY_HEADER);
+        var athleteHeaders = FindHeaders(workSheet, FIRSTNAME_HEADER, LASTNAME_HEADER, BIRTH_YEAR_HEADER, GENDER_HEADER, CATEGORY_HEADER);
         var clubHeaders = FindHeaders(workSheet, CLUB_NAME_HEADER);
         var swimStyleHeaders = FindSwimStyles(workSheet);
         _warnings.AddRange(CheckHeaders(workSheet, athleteHeaders, CATEGORY_HEADER));
@@ -69,16 +79,21 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
         return EntryDocument.OfClub(club, _warnings, _errors);
     }
 
-    private static Dictionary<string, ExcelCellAddress?> FindHeaders(ExcelWorksheet workSheet, params string[] headers)
+    private static Dictionary<string, ExcelCellAddress?> FindHeaders(ExcelWorksheet workSheet, params string[] canonicalHeaders)
     {
-        var headersCols = headers.ToDictionary<string, string, ExcelCellAddress?>(k => k, v => null);
+        var headersCols = canonicalHeaders.ToDictionary<string, string, ExcelCellAddress?>(k => k, v => null);
         var usedCells = workSheet.Cells.Where(cell => !string.IsNullOrEmpty(cell.Text));
         foreach (var cell in usedCells)
         {
             if (!headersCols.ContainsValue(null)) break;
-            if (headers.Contains(cell.Text, StringComparer.OrdinalIgnoreCase))
+            foreach (var canonical in canonicalHeaders)
             {
-                headersCols[cell.Text] = cell.Start;
+                var aliases = HeaderAliases.TryGetValue(canonical, out var list) ? list : [canonical];
+                if (aliases.Contains(cell.Text, StringComparer.OrdinalIgnoreCase))
+                {
+                    headersCols[canonical] = cell.Start;
+                    break;
+                }
             }
         }
 
@@ -100,7 +115,13 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
     private Dictionary<int, SwimStyle> FindSwimStyles(ExcelWorksheet workSheet)
     {
         Dictionary<int, SwimStyle> swimStyles = new();
-        var startCell = FindFirstHeaderFromList(workSheet, BUTTERFLY, BACKSTROKE, BREASTROKE, FREESTYLE, MEDLEY);
+        var strokeHeaders = ButterflyNames
+            .Concat(BackstrokeNames)
+            .Concat(BreaststrokeNames)
+            .Concat(FreestyleNames)
+            .Concat(MedleyNames)
+            .ToArray();
+        var startCell = FindFirstHeaderFromList(workSheet, strokeHeaders);
         if (startCell is null) return swimStyles;
         var startCol = startCell.Column;
         var endCol = workSheet.Dimension.End.Column;
@@ -118,7 +139,7 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
 
             var strokeText = workSheet.Cells[strokeRow, col].Text;
             if (string.IsNullOrWhiteSpace(strokeText)) continue;
-            if (!EnumHelper.TryGetEnumByDescription<Stroke>(workSheet.Cells[strokeRow, col].Text, out var style))
+            if (!TryParseStroke(strokeText, out var style))
             {
                 _warnings.Add($"Не удалось обработать стиль: {MessageLocation(workSheet.Name, strokeRow, col)}");
                 continue;
@@ -145,6 +166,31 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
         }
 
         return errors;
+    }
+
+    private static bool TryParseStroke(string text, out Stroke stroke)
+    {
+        var t = (text ?? string.Empty).Trim();
+        if (ButterflyNames.Contains(t, StringComparer.OrdinalIgnoreCase)) { stroke = Stroke.Fly; return true; }
+        if (BackstrokeNames.Contains(t, StringComparer.OrdinalIgnoreCase)) { stroke = Stroke.Back; return true; }
+        if (BreaststrokeNames.Contains(t, StringComparer.OrdinalIgnoreCase)) { stroke = Stroke.Breast; return true; }
+        if (FreestyleNames.Contains(t, StringComparer.OrdinalIgnoreCase)) { stroke = Stroke.Free; return true; }
+        if (MedleyNames.Contains(t, StringComparer.OrdinalIgnoreCase)) { stroke = Stroke.Medley; return true; }
+        stroke = default;
+        return false;
+    }
+
+    private static bool TryParseGender(string text, out Gender gender)
+    {
+        var t = (text ?? string.Empty).Trim();
+        if (string.Equals(t, "Мужчины", StringComparison.OrdinalIgnoreCase) || string.Equals(t, "Men", StringComparison.OrdinalIgnoreCase))
+        { gender = Gender.Male; return true; }
+        if (string.Equals(t, "Женщины", StringComparison.OrdinalIgnoreCase) || string.Equals(t, "Women", StringComparison.OrdinalIgnoreCase))
+        { gender = Gender.Female; return true; }
+        if (string.Equals(t, "Смешанная", StringComparison.OrdinalIgnoreCase) || string.Equals(t, "Mixed", StringComparison.OrdinalIgnoreCase))
+        { gender = Gender.Mixed; return true; }
+        gender = default;
+        return false;
     }
 
     private List<Athlete> ReadAthletes(ExcelWorksheet workSheet, Dictionary<string, ExcelCellAddress?> athleteHeaders,
@@ -181,8 +227,7 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
                 hasErrors = true;
             }
 
-            if (!EnumHelper.TryGetEnumByDescription<Gender>(
-                    workSheet.Cells[row, athleteHeaders[GENDER_HEADER]!.Column].Text, out var gender))
+            if (!TryParseGender(workSheet.Cells[row, athleteHeaders[GENDER_HEADER]!.Column].Text, out var gender))
             {
                 _errors.Add(
                     $"Некорректный пол спортсмена: {MessageLocation(workSheet.Name, row, athleteHeaders[GENDER_HEADER]!.Column)}");
@@ -224,10 +269,17 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
 
     private Club? ReadClub(ExcelWorksheet workSheet, Dictionary<string, ExcelCellAddress?> clubHeaders)
     {
-        if (!clubHeaders.TryGetValue(CLUB_NAME_HEADER, out var colClub )) return null;
-        var fromRowClub = clubHeaders.First(pair => pair.Key == CLUB_NAME_HEADER).Value!.Row;
-        while (workSheet.Cells[fromRowClub, colClub!.Column + 1].IsEmpty()) fromRowClub++;
-        var clubName = workSheet.Cells[fromRowClub, colClub!.Column + 1].Text;
+        if (!clubHeaders.TryGetValue(CLUB_NAME_HEADER, out var colClub)) return null;
+        var row = clubHeaders.First(pair => pair.Key == CLUB_NAME_HEADER).Value!.Row;
+        var col = colClub!.Column;
+        // Support both formats: either club name in the header cell itself, or in the next column.
+        var clubName = workSheet.Cells[row, col].Text;
+        if (string.Equals(clubName?.Trim(), HeaderAliases[CLUB_NAME_HEADER].First(), StringComparison.OrdinalIgnoreCase) ||
+            HeaderAliases[CLUB_NAME_HEADER].Contains(clubName ?? string.Empty, StringComparer.OrdinalIgnoreCase))
+        {
+            while (workSheet.Cells[row, col + 1].IsEmpty()) row++;
+            clubName = workSheet.Cells[row, col + 1].Text;
+        }
         if (string.IsNullOrWhiteSpace(clubName))
         {
             _warnings.Add($"Имя клуба не найдено, спортсмены добавлены в личный зачёт: {MessageLocation(workSheet.Name, null, null)}");

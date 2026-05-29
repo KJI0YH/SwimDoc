@@ -6,6 +6,7 @@
         xmlns:helpers="clr-namespace:UI.Helpers"
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         xmlns:addEditView="clr-namespace:UI.Views.Controls.AddEditView"
+        xmlns:loc="clr-namespace:UI.Localization"
         mc:Ignorable="d"
         Title="{Binding WindowTitle}"
         SizeToContent="WidthAndHeight"
@@ -16,7 +17,6 @@
         Background="Transparent">
     <Window.Resources>
         <helpers:NullableIntConverter x:Key="NullableIntConverter" />
-        <helpers:EnumDescriptionConverter x:Key="EnumDescriptionConverter" />
     </Window.Resources>
     <addEditView:AddEditWindowView>
         <StackPanel Margin="0,0,0,15">
@@ -26,12 +26,12 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0"
-                           Text="Название"
+                           Text="{loc:Loc Field_Name}"
                            VerticalAlignment="Center"
                            Margin="0,0,10,0" />
                 <ui:TextBox Grid.Column="1"
                             Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
-                            PlaceholderText="Auto"
+                            PlaceholderText="{loc:Loc Common_Auto}"
                             Margin="0,2,0,2" />
             </Grid>
 
@@ -41,19 +41,15 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0"
-                           Text="Пол"
+                           Text="{loc:Loc Athlete_Field_Gender}"
                            VerticalAlignment="Center"
                            Margin="0,0,10,0" />
                 <ComboBox Grid.Column="1"
-                          ItemsSource="{Binding GenderValues}"
-                          SelectedItem="{Binding Gender}"
-                          Margin="0,2,0,2">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}}" />
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
+                          ItemsSource="{Binding GenderOptions}"
+                          SelectedValue="{Binding Gender}"
+                          SelectedValuePath="Value"
+                          DisplayMemberPath="Display"
+                          Margin="0,2,0,2" />
             </Grid>
 
             <Grid Margin="0,5">
@@ -62,15 +58,15 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0"
-                           Text="Год рождения"
+                           Text="{loc:Loc Athlete_Field_BirthYear}"
                            VerticalAlignment="Center"
                            Margin="0,0,10,0" />
                 <UniformGrid Grid.Column="1" Columns="2">
-                    <ui:NumberBox PlaceholderText="Absolute (min)"
+                    <ui:NumberBox PlaceholderText="{loc:Loc Common_AbsoluteMin}"
                                   Value="{Binding BirthYearMin, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource NullableIntConverter}, TargetNullValue=''}"
                                   Margin="0,2,2,2"
                                   Minimum="1900" />
-                    <ui:NumberBox PlaceholderText="Absolute (max)"
+                    <ui:NumberBox PlaceholderText="{loc:Loc Common_AbsoluteMax}"
                                   Value="{Binding BirthYearMax, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource NullableIntConverter}, TargetNullValue=''}"
                                   Margin="2, 2, 0, 2"
                                   Minimum="1900" />

@@ -9,6 +9,7 @@
              xmlns:dataGridView="clr-namespace:UI.Views.Controls.DataGridView"
              xmlns:eventFilterComboBox="clr-namespace:UI.Views.Controls.EventFilterComboBox"
              xmlns:helpers="clr-namespace:UI.Helpers"
+             xmlns:loc="clr-namespace:UI.Localization"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -57,7 +58,7 @@
 
                     <Button
                         Content="{ui:SymbolIcon Dismiss24}"
-                        ToolTip="Очистить фильтры"
+                        ToolTip="{loc:Loc Filters_Clear}"
                         Command="{Binding ClearFiltersCommand}"
                         Margin="5,0,5,5"
                         Padding="9"
@@ -68,19 +69,19 @@
                     <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
                         <Button
                             Content="{ui:SymbolIcon SwimmingPool24}"
-                            ToolTip="Сгенерировать заплывы"
+                            ToolTip="{loc:Loc Events_AllocateHeats}"
                             Command="{Binding HeatAllocationCommand}"
                             Margin="5"
                             Padding="9" />
                         <Button
                             Content="{ui:SymbolIcon Print24}"
-                            ToolTip="Сгенерировать отчёт"
+                            ToolTip="{loc:Loc Events_GenerateReports}"
                             Command="{Binding GenerateReportsCommand}"
                             Margin="5"
                             Padding="9" />
                         <Button
                             Content="{ui:SymbolIcon Clock24}"
-                            ToolTip="Подсчитать время старта"
+                            ToolTip="{loc:Loc Events_CalculateStartTimes}"
                             Command="{Binding CalculateStartTimesCommand}"
                             Margin="5"
                             Padding="9" />

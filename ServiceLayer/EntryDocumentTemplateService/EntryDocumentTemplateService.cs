@@ -1,5 +1,6 @@
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
+using ServiceLayer.Resources;
 
 namespace ServiceLayer.EntryDocumentTemplateService;
 
@@ -14,10 +15,10 @@ public sealed class EntryDocumentTemplateService : IEntryDocumentTemplateService
     {
         using var package = new ExcelPackage();
 
-        var entriesSheet = package.Workbook.Worksheets.Add("Заявочные команды");
+        var entriesSheet = package.Workbook.Worksheets.Add(TemplateStrings.Sheet_Entries);
         BuildEntriesSheet(entriesSheet);
 
-        var settingsSheet = package.Workbook.Worksheets.Add("Настройки");
+        var settingsSheet = package.Workbook.Worksheets.Add(TemplateStrings.Sheet_Settings);
         BuildSettingsSheet(settingsSheet);
 
         ApplyValidations(entriesSheet);
@@ -45,24 +46,24 @@ public sealed class EntryDocumentTemplateService : IEntryDocumentTemplateService
         ws.Row(3).Height = 15;
         ws.Row(4).Height = 18;
 
-        ws.Cells["A1"].Value = "Команда";
-        ws.Cells["B1"].Value = "Заявочные команды";
+        ws.Cells["A1"].Value = TemplateStrings.Entries_Title_A1;
+        ws.Cells["B1"].Value = TemplateStrings.Entries_Title_B1;
 
-        ws.Cells["A2"].Value = "Имя";
-        ws.Cells["B2"].Value = "Фамилия";
-        ws.Cells["C2"].Value = "Год рождения";
-        ws.Cells["D2"].Value = "Пол";
-        ws.Cells["E2"].Value = "Разряд";
+        ws.Cells["A2"].Value = TemplateStrings.Entries_Header_FirstName;
+        ws.Cells["B2"].Value = TemplateStrings.Entries_Header_LastName;
+        ws.Cells["C2"].Value = TemplateStrings.Entries_Header_BirthYear;
+        ws.Cells["D2"].Value = TemplateStrings.Entries_Header_Gender;
+        ws.Cells["E2"].Value = TemplateStrings.Entries_Header_Category;
 
         // Swim style columns header (distance row + stroke row)
         ws.Cells["F2"].Value = 50;
-        ws.Cells["F3"].Value = "Вольный стиль";
+        ws.Cells["F3"].Value = TemplateStrings.Stroke_Free;
 
         // Example row (as in reference)
         ws.Cells["A4"].Value = "Имя";
         ws.Cells["B4"].Value = "Фамилия";
         ws.Cells["C4"].Value = 2000;
-        ws.Cells["D4"].Value = "Мужчины";
+        ws.Cells["D4"].Value = TemplateStrings.Gender_Male;
         ws.Cells["E4"].Value = "МС";
         ws.Cells["F4"].Style.Numberformat.Format = "@";
         ws.Cells["F4"].Value = "19.90";
@@ -115,13 +116,13 @@ public sealed class EntryDocumentTemplateService : IEntryDocumentTemplateService
 
         ws.Row(1).Height = 29;
 
-        ws.Cells["A1"].Value = "Пол";
-        ws.Cells["B1"].Value = "Разряд";
-        ws.Cells["C1"].Value = "Дистанция";
-        ws.Cells["D1"].Value = "Стиль";
+        ws.Cells["A1"].Value = TemplateStrings.Settings_Header_Gender;
+        ws.Cells["B1"].Value = TemplateStrings.Settings_Header_Category;
+        ws.Cells["C1"].Value = TemplateStrings.Settings_Header_Distance;
+        ws.Cells["D1"].Value = TemplateStrings.Settings_Header_Stroke;
 
-        ws.Cells["A2"].Value = "Мужчины";
-        ws.Cells["A3"].Value = "Женщины";
+        ws.Cells["A2"].Value = TemplateStrings.Gender_Male;
+        ws.Cells["A3"].Value = TemplateStrings.Gender_Female;
 
         ws.Cells["B2"].Value = "МСМК";
         ws.Cells["B3"].Value = "МС";
@@ -140,11 +141,11 @@ public sealed class EntryDocumentTemplateService : IEntryDocumentTemplateService
         ws.Cells["C6"].Value = 800;
         ws.Cells["C7"].Value = 1500;
 
-        ws.Cells["D2"].Value = "Баттерфляй";
-        ws.Cells["D3"].Value = "На спине";
-        ws.Cells["D4"].Value = "Брасс";
-        ws.Cells["D5"].Value = "Вольный стиль";
-        ws.Cells["D6"].Value = "Комплексное плавание";
+        ws.Cells["D2"].Value = TemplateStrings.Stroke_Fly;
+        ws.Cells["D3"].Value = TemplateStrings.Stroke_Back;
+        ws.Cells["D4"].Value = TemplateStrings.Stroke_Breast;
+        ws.Cells["D5"].Value = TemplateStrings.Stroke_Free;
+        ws.Cells["D6"].Value = TemplateStrings.Stroke_Medley;
 
         ApplySettingsSheetStyles(ws);
     }
@@ -156,13 +157,13 @@ public sealed class EntryDocumentTemplateService : IEntryDocumentTemplateService
         // Row 2 (distances) dropdown across full swim-style header width
         var distanceAddress = ExcelCellBase.GetAddress(2, FirstSwimStyleColumn, 2, lastSwimStyleColumn);
         var distanceDv = entriesSheet.DataValidations.AddListValidation(distanceAddress);
-        distanceDv.Formula.ExcelFormula = "Настройки!$C$2:$C$7";
+        distanceDv.Formula.ExcelFormula = $"{TemplateStrings.Sheet_Settings}!$C$2:$C$7";
         distanceDv.AllowBlank = true;
 
         // Row 3 (strokes) dropdown across full swim-style header width
         var strokeAddress = ExcelCellBase.GetAddress(3, FirstSwimStyleColumn, 3, lastSwimStyleColumn);
         var strokeDv = entriesSheet.DataValidations.AddListValidation(strokeAddress);
-        strokeDv.Formula.ExcelFormula = "Настройки!$D$2:$D$6";
+        strokeDv.Formula.ExcelFormula = $"{TemplateStrings.Sheet_Settings}!$D$2:$D$6";
         strokeDv.AllowBlank = true;
 
         // Entry rows: gender + category dropdowns to the end of the sheet
@@ -170,12 +171,12 @@ public sealed class EntryDocumentTemplateService : IEntryDocumentTemplateService
 
         var genderAddress = ExcelCellBase.GetAddress(FirstEntryRow, 4, lastEntryRow, 4); // D
         var genderDv = entriesSheet.DataValidations.AddListValidation(genderAddress);
-        genderDv.Formula.ExcelFormula = "Настройки!$A$2:$A$3";
+        genderDv.Formula.ExcelFormula = $"{TemplateStrings.Sheet_Settings}!$A$2:$A$3";
         genderDv.AllowBlank = true;
 
         var categoryAddress = ExcelCellBase.GetAddress(FirstEntryRow, 5, lastEntryRow, 5); // E
         var categoryDv = entriesSheet.DataValidations.AddListValidation(categoryAddress);
-        categoryDv.Formula.ExcelFormula = "Настройки!$B$2:$B$10";
+        categoryDv.Formula.ExcelFormula = $"{TemplateStrings.Sheet_Settings}!$B$2:$B$10";
         categoryDv.AllowBlank = true;
     }
 

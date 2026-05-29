@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ServiceLayer.Crud;
+using UI.Resources;
 using UI.Services;
 
 namespace UI.ViewModels.Windows.AddEdit;
@@ -32,7 +33,7 @@ public partial class AddEditViewModel<TEntity, TKey> : ViewModelBase, IWindowRes
 
     protected TEntity? Entity { get; set; }
 
-    public virtual string WindowTitle => IsAdd ? "Создание" : "Редактирование";
+    public virtual string WindowTitle => IsAdd ? Strings.WindowMode_Create : Strings.WindowMode_Edit;
 
     object? IWindowResult.Result => Entity;
 
@@ -81,7 +82,7 @@ public partial class AddEditViewModel<TEntity, TKey> : ViewModelBase, IWindowRes
 
         if (errors.Count > 0)
         {
-            foreach (var error in errors) ValidationErrors.Add(error.ErrorMessage ?? "Ошибка валидации");
+            foreach (var error in errors) ValidationErrors.Add(error.ErrorMessage ?? Strings.Validation_ErrorFallback);
             return;
         }
 

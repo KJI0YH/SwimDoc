@@ -7,6 +7,7 @@
              xmlns:helpers="clr-namespace:UI.Helpers"
              xmlns:dataGridView="clr-namespace:UI.Views.Controls.DataGridView"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:loc="clr-namespace:UI.Localization"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -17,9 +18,9 @@
             <DockPanel LastChildFill="True">
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
                     <ComboBox helpers:ComboBoxAutoWidthHelper.Enable="True"
-                              ItemsSource="{Binding Items}"
-                              SelectedItem="{Binding SelectedSwimEvent}"
-                              DisplayMemberPath="DisplayName"
+                              ItemsSource="{Binding SwimEventOptions}"
+                              SelectedValue="{Binding SelectedSwimEvent}"
+                              SelectedValuePath="Value"
                               Margin="0,5,6,5" />
                     <ComboBox helpers:ComboBoxAutoWidthHelper.Enable="True"
                               ItemsSource="{Binding EventHeats}"
@@ -57,7 +58,7 @@
                             Margin="5" />
                     <Button Content="{ui:SymbolIcon ArrowClockwise24}"
                             Command="{Binding LoadDataCommand}"
-                            ToolTip="Обновить"
+                            ToolTip="{loc:Loc Fixation_Refresh}"
                             Margin="0,5,5,5"
                             Padding="9" />
                 </StackPanel>
@@ -81,15 +82,15 @@
                           IsReadOnly="False"
                           RowStyle="{StaticResource DataGridRowLightBlueWhenSelectedStyle}">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Дорожка" Binding="{Binding Lane}" IsReadOnly="True" Width="80" />
-                        <DataGridTextColumn Header="Участник" Binding="{Binding ParticipantName}" IsReadOnly="True"
+                        <DataGridTextColumn Header="{loc:Loc Fixation_Col_Lane}" Binding="{Binding Lane}" IsReadOnly="True" Width="80" />
+                        <DataGridTextColumn Header="{loc:Loc Fixation_Col_Participant}" Binding="{Binding ParticipantName}" IsReadOnly="True"
                                             Width="*" />
-                        <DataGridTextColumn Header="Год рождения" Binding="{Binding YearOfBirth}" IsReadOnly="True" Width="120"/>
-                        <DataGridTextColumn Header="Клуб" Binding="{Binding Club}" IsReadOnly="True" Width="*" />
-                        <DataGridTextColumn Header="Заявочное" Binding="{Binding EntryTimeDisplay}" IsReadOnly="True"
+                        <DataGridTextColumn Header="{loc:Loc Fixation_Col_BirthYear}" Binding="{Binding YearOfBirth}" IsReadOnly="True" Width="120"/>
+                        <DataGridTextColumn Header="{loc:Loc Fixation_Col_Club}" Binding="{Binding Club}" IsReadOnly="True" Width="*" />
+                        <DataGridTextColumn Header="{loc:Loc Fixation_Col_EntryTime}" Binding="{Binding EntryTimeDisplay}" IsReadOnly="True"
                                             Width="100" />
 
-                        <DataGridTemplateColumn Header="Статус" Width="110">
+                        <DataGridTemplateColumn Header="{loc:Loc Fixation_Col_Status}" Width="110">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <Grid>
@@ -106,7 +107,7 @@
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
 
-                        <DataGridTemplateColumn Header="Результат" Width="150">
+                        <DataGridTemplateColumn Header="{loc:Loc Fixation_Col_Result}" Width="150">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <Grid>
@@ -122,16 +123,16 @@
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
                         
-                        <DataGridTextColumn Header="Очки" Binding="{Binding Points}" IsReadOnly="True" Width="100"/>
+                        <DataGridTextColumn Header="{loc:Loc Fixation_Col_Points}" Binding="{Binding Points}" IsReadOnly="True" Width="100"/>
 
-                        <DataGridTemplateColumn Header="Примечание" Width="*">
+                        <DataGridTemplateColumn Header="{loc:Loc Fixation_Col_Comment}" Width="*">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <Grid>
                                         <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
                                                     Text="{Binding Comment, UpdateSourceTrigger=PropertyChanged}"
                                                     Visibility="{Binding DataContext.CanEditHeat, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVis}}"
-                                                    ToolTip="Сохраняется в Comment" />
+                                                    ToolTip="{loc:Loc Fixation_Comment_Tooltip}" />
                                         <TextBlock Text="{Binding Comment}"
                                                    Visibility="{Binding DataContext.CanEditHeat, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVis}, ConverterParameter=Invert}"
                                                    VerticalAlignment="Center"

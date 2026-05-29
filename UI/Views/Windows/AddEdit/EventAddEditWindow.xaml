@@ -8,6 +8,7 @@
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         xmlns:addEditView="clr-namespace:UI.Views.Controls.AddEditView"
         xmlns:searchableComboBox="clr-namespace:UI.Views.Controls.SearchableComboBox"
+        xmlns:loc="clr-namespace:UI.Localization"
         mc:Ignorable="d"
         Title="{Binding WindowTitle}"
         SizeToContent="WidthAndHeight"
@@ -28,7 +29,7 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0"
-                           Text="Порядок"
+                           Text="{loc:Loc Event_Field_Order}"
                            VerticalAlignment="Center"
                            Margin="0,0,10,0" />
 
@@ -43,7 +44,7 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0"
-                           Text="Дата"
+                           Text="{loc:Loc Event_Field_Date}"
                            VerticalAlignment="Center"
                            Margin="0,0,10,0" />
                 <DatePicker Grid.Column="1"
@@ -59,7 +60,7 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0"
-                           Text="Время"
+                           Text="{loc:Loc Event_Field_Time}"
                            VerticalAlignment="Center"
                            Margin="0,0,10,0" />
                 <UniformGrid Grid.Column="1" Columns="2">
@@ -81,7 +82,7 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0"
-                           Text="Стиль плавания"
+                           Text="{loc:Loc Event_Field_SwimStyle}"
                            VerticalAlignment="Center"
                            Margin="0,0,10,0" />
                 <searchableComboBox:SearchableComboBox Grid.Column="1"
@@ -102,7 +103,7 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0"
-                           Text="Возрастная группа"
+                           Text="{loc:Loc Event_Field_AgeGroup}"
                            VerticalAlignment="Center"
                            Margin="0,0,10,0" />
                 <searchableComboBox:SearchableComboBox Grid.Column="1"
@@ -122,7 +123,7 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0"
-                           Text="Длина бассейна"
+                           Text="{loc:Loc Event_Field_Course}"
                            VerticalAlignment="Center"
                            Margin="0,0,10,0" />
                 <ComboBox Grid.Column="1"
@@ -143,7 +144,7 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0"
-                           Text="Раунд"
+                           Text="{loc:Loc Event_Field_Round}"
                            VerticalAlignment="Center"
                            Margin="0,0,10,0" />
                 <ComboBox Grid.Column="1"
@@ -165,7 +166,7 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0"
-                           Text="Предыдущее событие"
+                           Text="{loc:Loc Event_Field_PreviousEvent}"
                            VerticalAlignment="Center"
                            Margin="0,0,10,0" />
                 <searchableComboBox:SearchableComboBox Grid.Column="1"
@@ -185,11 +186,11 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0"
-                           Text="Количество участников"
+                           Text="{loc:Loc Event_Field_RoundParticipantsCount}"
                            VerticalAlignment="Center"
                            Margin="0,0,10,0" />
                 <ui:NumberBox Grid.Column="1"
-                              PlaceholderText="All"
+                              PlaceholderText="{loc:Loc Common_All}"
                               Value="{Binding RoundParticipantsCount, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource NullableIntConverter}, TargetNullValue=''}"
                               Margin="0,2,0,2" />
             </Grid>
@@ -200,18 +201,18 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0"
-                           Text="Доступные дорожки"
+                           Text="{loc:Loc Event_Field_AvailableLanes}"
                            VerticalAlignment="Center"
                            Margin="0,0,10,0" />
                 <UniformGrid Grid.Column="1" Columns="2">
                     <ui:NumberBox
                         Minimum="0"
-                        PlaceholderText="Min"
+                        PlaceholderText="{loc:Loc Common_Min}"
                         Value="{Binding LaneMin, UpdateSourceTrigger=PropertyChanged}"
                         Margin="0,2,2,2" />
                     <ui:NumberBox
                         Minimum="{Binding LaneMin, UpdateSourceTrigger=PropertyChanged}"
-                        PlaceholderText="Max"
+                        PlaceholderText="{loc:Loc Common_Max}"
                         Value="{Binding LaneMax, UpdateSourceTrigger=PropertyChanged}"
                         Margin="2,2,0,2" />
                 </UniformGrid>

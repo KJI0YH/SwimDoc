@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:helpers="clr-namespace:UI.Helpers"
+             xmlns:loc="clr-namespace:UI.Localization"
              mc:Ignorable="d">
     <Grid>
         <Grid.ColumnDefinitions>
@@ -16,22 +17,22 @@
         <StackPanel Grid.Column="0" Orientation="Horizontal">
             <Button Content="{ui:SymbolIcon Add24}"
                     Command="{Binding CreateItemCommand}"
-                    ToolTip="Создать"
+                    ToolTip="{loc:Loc Toolbar_Create}"
                     Margin="5"
                     Padding="9" />
             <Button Content="{ui:SymbolIcon Edit24}"
                     Command="{Binding EditItemCommand}"
-                    ToolTip="Редактировать"
+                    ToolTip="{loc:Loc Toolbar_Edit}"
                     Margin="5"
                     Padding="9" />
             <Button Content="{ui:SymbolIcon Delete24}"
                     Command="{Binding DeleteItemCommand}"
-                    ToolTip="Удалить"
+                    ToolTip="{loc:Loc Toolbar_Delete}"
                     Margin="5"
                     Padding="9" />
             <Button Content="{ui:SymbolIcon ArrowClockwise24}"
                     Command="{Binding LoadDataCommand}"
-                    ToolTip="Обновить"
+                    ToolTip="{loc:Loc Toolbar_Refresh}"
                     Margin="5"
                     Padding="9" />
         </StackPanel>
@@ -51,12 +52,12 @@
                     VerticalAlignment="Center"/>
             <Button Content="{ui:SymbolIcon ArrowPrevious24}"
                     Command="{Binding GoToFirstPageCommand}"
-                    ToolTip="Первая страница"
+                    ToolTip="{loc:Loc Paging_First}"
                     Margin="5"
                     Padding="9" />
             <Button Content="{ui:SymbolIcon ChevronLeft24}"
                     Command="{Binding GoToPreviousPageCommand}"
-                    ToolTip="Предыдущая страница"
+                    ToolTip="{loc:Loc Paging_Previous}"
                     Margin="5"
                     Padding="9" />
             <ComboBox
@@ -70,12 +71,12 @@
                 helpers:PageComboBoxBehavior.CurrentPage="{Binding CurrentPage, Mode=TwoWay}" />
             <Button Content="{ui:SymbolIcon ChevronRight24}"
                     Command="{Binding GoToNextPageCommand}"
-                    ToolTip="Следующая страница"
+                    ToolTip="{loc:Loc Paging_Next}"
                     Margin="5"
                     Padding="9" />
             <Button Content="{ui:SymbolIcon ArrowNext24}"
                     Command="{Binding GoToLastPageCommand}"
-                    ToolTip="Последняя страница"
+                    ToolTip="{loc:Loc Paging_Last}"
                     Margin="5"
                     Padding="9" />
         </StackPanel>

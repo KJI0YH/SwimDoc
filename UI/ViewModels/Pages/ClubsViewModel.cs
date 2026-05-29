@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.AthleteService;
 using ServiceLayer.ClubService;
+using UI.Resources;
 using UI.Services;
 using UI.ViewModels.Pages.Data;
 using UI.Views.Windows.AddEdit;
@@ -24,8 +25,8 @@ public class ClubsViewModel : DataViewModel<Club, int?>
         AutoGenerateColumns = false;
         ColumnConfigurations.Clear();
 
-        ColumnConfigurations.Add(new ColumnConfiguration<Club>("Name", "Название", 300));
-        ColumnConfigurations.Add(new ColumnConfiguration<Club>("DisplayAthleteCount", "Спортсмены", 150,
+        ColumnConfigurations.Add(new ColumnConfiguration<Club>("Name", Strings.Clubs_Col_Name, 300));
+        ColumnConfigurations.Add(new ColumnConfiguration<Club>("DisplayAthleteCount", Strings.Clubs_Col_Athletes, 150,
             (query, direction) =>
             {
                 return direction == ListSortDirection.Ascending
@@ -33,21 +34,21 @@ public class ClubsViewModel : DataViewModel<Club, int?>
                     : query.OrderByDescending(club => club.Athletes.Count);
             }));
 
-        ColumnConfigurations.Add(new ColumnConfiguration<Club>("DisplayEntryCount", "Заявки", 150,
+        ColumnConfigurations.Add(new ColumnConfiguration<Club>("DisplayEntryCount", Strings.Clubs_Col_Entries, 150,
             (query, direction) =>
             {
                 return direction == ListSortDirection.Ascending
                     ? query.OrderBy(club => club.Athletes.Sum(a => a.Entries.Count))
                     : query.OrderByDescending(club => club.Athletes.Sum(a => a.Entries.Count));
             }));
-        ColumnConfigurations.Add(new ColumnConfiguration<Club>("DisplayRelayCount", "Эстафеты", 150,
+        ColumnConfigurations.Add(new ColumnConfiguration<Club>("DisplayRelayCount", Strings.Clubs_Col_Relays, 150,
             (query, direction) =>
             {
                 return direction == ListSortDirection.Ascending
                     ? query.OrderBy(club => club.Relays.Count)
                     : query.OrderByDescending(club => club.Relays.Count);
             }));
-        ColumnConfigurations.Add(new ColumnConfiguration<Club>("DisplayPointCount", "Очки", 150,
+        ColumnConfigurations.Add(new ColumnConfiguration<Club>("DisplayPointCount", Strings.Clubs_Col_Points, 150,
             (query, direction) =>
             {
                 return direction == ListSortDirection.Ascending

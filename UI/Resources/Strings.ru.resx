@@ -1,0 +1,437 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <data name="Nav_Program" xml:space="preserve"><value>Программа</value></data>
+  <data name="Nav_Entries" xml:space="preserve"><value>Заявки</value></data>
+  <data name="Nav_Heats" xml:space="preserve"><value>Заплывы</value></data>
+  <data name="Nav_Fixation" xml:space="preserve"><value>Фиксация</value></data>
+  <data name="Nav_Results" xml:space="preserve"><value>Результаты</value></data>
+  <data name="Nav_Athletes" xml:space="preserve"><value>Спортсмены</value></data>
+  <data name="Nav_Clubs" xml:space="preserve"><value>Команды</value></data>
+  <data name="Nav_AgeGroups" xml:space="preserve"><value>Возрастные группы</value></data>
+  <data name="Nav_SwimStyles" xml:space="preserve"><value>Дистанции</value></data>
+  <data name="Nav_Settings" xml:space="preserve"><value>Настройки</value></data>
+  <data name="Nav_About" xml:space="preserve"><value>О программе</value></data>
+
+  <data name="Menu_Competition" xml:space="preserve"><value>Соревнование</value></data>
+  <data name="Menu_Create" xml:space="preserve"><value>Создать</value></data>
+  <data name="Menu_Open" xml:space="preserve"><value>Открыть</value></data>
+
+  <data name="Settings_Tab_BaseTime" xml:space="preserve"><value>Базовое время</value></data>
+  <data name="Settings_Tab_Templates" xml:space="preserve"><value>Шаблоны</value></data>
+  <data name="Settings_Page_Subtitle" xml:space="preserve"><value>Настройки приложения, шаблоны и параметры соревнований.</value></data>
+  <data name="Settings_Section_General" xml:space="preserve"><value>Общие</value></data>
+  <data name="Settings_Section_Files" xml:space="preserve"><value>Файлы</value></data>
+  <data name="Settings_Section_Competition" xml:space="preserve"><value>Соревнование</value></data>
+  <data name="Settings_Language_Description" xml:space="preserve"><value>Язык интерфейса. Применяется сразу.</value></data>
+  <data name="Settings_BaseTimes_Description" xml:space="preserve"><value>Эталонное время World Aquatics для рассчёта очков</value></data>
+  <data name="Common_Back" xml:space="preserve"><value>Назад</value></data>
+  <data name="BaseTimes_WorldAquaticsPoints" xml:space="preserve"><value>World Aquatics Points</value></data>
+  <data name="BaseTimes_WorldAquaticsPoints_Tooltip" xml:space="preserve"><value>Открыть таблицу базовых времён и очков World Aquatics (worldaquatics.com)</value></data>
+  <data name="BaseTimes_Group_Scm" xml:space="preserve"><value>SCM (25m) — Мужчины / Женщины</value></data>
+  <data name="BaseTimes_Group_ScmMixedRelay" xml:space="preserve"><value>SCM (25m) — Смешанные эстафеты</value></data>
+  <data name="BaseTimes_Group_Lcm" xml:space="preserve"><value>LCM (50m) — Мужчины / Женщины</value></data>
+  <data name="BaseTimes_Group_LcmMixedRelay" xml:space="preserve"><value>LCM (50m) — Смешанные эстафеты</value></data>
+  <data name="BaseTimes_Col_Stroke" xml:space="preserve"><value>Стиль</value></data>
+  <data name="BaseTimes_Header_BaseTime" xml:space="preserve"><value>Базовое время</value></data>
+  <data name="BaseTimes_Header_BaseTimeSeconds" xml:space="preserve"><value>Базовое время, секунды</value></data>
+  <data name="Templates_Title" xml:space="preserve"><value>Шаблоны</value></data>
+  <data name="Templates_Description" xml:space="preserve"><value>Здесь можно скачать готовые шаблоны файлов для импорта данных в SwimDoc.</value></data>
+  <data name="Templates_EntryDoc_GroupHeader" xml:space="preserve"><value>Заявки</value></data>
+  <data name="Templates_EntryDoc_Title" xml:space="preserve"><value>Шаблон Excel для импорта заявок</value></data>
+  <data name="Templates_EntryDoc_Subtitle" xml:space="preserve"><value>Содержит листы «Заявочные команды» и «Настройки» с выпадающими списками.</value></data>
+  <data name="Templates_Download" xml:space="preserve"><value>Скачать</value></data>
+  <data name="Templates_Download_Tooltip" xml:space="preserve"><value>Скачать шаблон (.xlsx)</value></data>
+
+  <data name="Dialog_SaveExcelTemplate_Title" xml:space="preserve"><value>Сохранить шаблон Excel</value></data>
+  <data name="Dialog_SaveExcelTemplate_Filter" xml:space="preserve"><value>Excel (*.xlsx)|*.xlsx</value></data>
+  <data name="Dialog_SaveExcelTemplate_DefaultFileName" xml:space="preserve"><value>EntryDocumentTemplate.xlsx</value></data>
+
+  <data name="Language_Label" xml:space="preserve"><value>Язык</value></data>
+  <data name="Language_English" xml:space="preserve"><value>English</value></data>
+  <data name="Language_Russian" xml:space="preserve"><value>Русский</value></data>
+
+  <data name="CompetitionSelection_Subtitle" xml:space="preserve"><value>Выберите действие для начала работы</value></data>
+  <data name="CompetitionSelection_Create" xml:space="preserve"><value>Создать новое соревнование</value></data>
+  <data name="CompetitionSelection_Open" xml:space="preserve"><value>Открыть существующее соревнование</value></data>
+
+  <data name="Toolbar_Create" xml:space="preserve"><value>Создать</value></data>
+  <data name="Toolbar_Edit" xml:space="preserve"><value>Редактировать</value></data>
+  <data name="Toolbar_Delete" xml:space="preserve"><value>Удалить</value></data>
+  <data name="Toolbar_Refresh" xml:space="preserve"><value>Обновить</value></data>
+  <data name="Toolbar_ToggleFilters" xml:space="preserve"><value>Показать или скрыть фильтры</value></data>
+  <data name="Paging_First" xml:space="preserve"><value>Первая страница</value></data>
+  <data name="Paging_Previous" xml:space="preserve"><value>Предыдущая страница</value></data>
+  <data name="Paging_Next" xml:space="preserve"><value>Следующая страница</value></data>
+  <data name="Paging_Last" xml:space="preserve"><value>Последняя страница</value></data>
+  <data name="Paging_ItemsInfo_EmptyFormat" xml:space="preserve"><value>0-0 из {0}</value></data>
+  <data name="Paging_ItemsInfo_RangeFormat" xml:space="preserve"><value>{0}-{1} из {2}</value></data>
+
+  <data name="Import_Details" xml:space="preserve"><value>Подробнее</value></data>
+  <data name="Import_Cancel" xml:space="preserve"><value>Прервать</value></data>
+  <data name="Import_Close" xml:space="preserve"><value>Закрыть</value></data>
+  <data name="Import_WarningsFormat" xml:space="preserve"><value>Предупреждения ({0})</value></data>
+  <data name="Import_ErrorsFormat" xml:space="preserve"><value>Ошибки ({0})</value></data>
+  <data name="Import_Col_File" xml:space="preserve"><value>Файл</value></data>
+  <data name="Import_Col_Path" xml:space="preserve"><value>Путь</value></data>
+  <data name="Import_Col_Status" xml:space="preserve"><value>Статус</value></data>
+  <data name="Import_Col_Clubs" xml:space="preserve"><value>Команды</value></data>
+  <data name="Import_Col_Athletes" xml:space="preserve"><value>Спортсмены</value></data>
+  <data name="Import_Col_Entries" xml:space="preserve"><value>Заявки</value></data>
+  <data name="Import_Col_Warnings" xml:space="preserve"><value>Предупреждения</value></data>
+  <data name="Import_Col_Errors" xml:space="preserve"><value>Ошибки</value></data>
+  <data name="Import_EventPrev" xml:space="preserve"><value>Предыдущее событие</value></data>
+  <data name="Import_EventCurrent" xml:space="preserve"><value>Текущее событие</value></data>
+  <data name="Import_CreatedEntries" xml:space="preserve"><value>Создано заявок</value></data>
+
+  <data name="Filters_Clear" xml:space="preserve"><value>Очистить фильтры</value></data>
+  <data name="Filters_Round" xml:space="preserve"><value>Этап</value></data>
+  <data name="Filters_Distance" xml:space="preserve"><value>Дистанция</value></data>
+  <data name="Filters_Stroke" xml:space="preserve"><value>Стиль</value></data>
+  <data name="Filters_Gender" xml:space="preserve"><value>Пол</value></data>
+  <data name="Filters_Status" xml:space="preserve"><value>Статус</value></data>
+  <data name="Entries_ImportFromFile" xml:space="preserve"><value>Загрузить заявки из файла</value></data>
+  <data name="Entries_ImportFromPrevEvent" xml:space="preserve"><value>Загрузить заявки из предыдущего события</value></data>
+
+  <data name="Entries_Col_Distance" xml:space="preserve"><value>Дистанция</value></data>
+  <data name="Entries_Col_Participant" xml:space="preserve"><value>Участник</value></data>
+  <data name="Entries_Col_Team" xml:space="preserve"><value>Команда</value></data>
+  <data name="Entries_Col_Status" xml:space="preserve"><value>Статус</value></data>
+  <data name="Entries_Col_EntryTime" xml:space="preserve"><value>Заявочное</value></data>
+  <data name="Entries_Col_FinishTime" xml:space="preserve"><value>Финишное</value></data>
+  <data name="Entries_Col_Points" xml:space="preserve"><value>Очки</value></data>
+  <data name="Entries_Col_Comment" xml:space="preserve"><value>Примечание</value></data>
+  <data name="Distance_MetersFormat" xml:space="preserve"><value>{0}м</value></data>
+  <data name="SwimStyle_DisplayName_Format" xml:space="preserve"><value>{0}{1}м {2}</value></data>
+  <data name="SwimEvent_DisplayName_Format" xml:space="preserve"><value>#{0} {1} {2} {3}</value></data>
+  <data name="AgeGroup_DisplayName_Format" xml:space="preserve"><value>{0} {1}</value></data>
+  <data name="AgeGroup_YearRange_Open" xml:space="preserve"><value>абсолютного</value></data>
+  <data name="AgeGroup_YearRange_OpenWithSuffix" xml:space="preserve"><value>абсолютного г.р.</value></data>
+  <data name="AgeGroup_YearRange_WithSuffix_Format" xml:space="preserve"><value>{0} г.р.</value></data>
+  <data name="AgeGroup_YearRange_OlderThan" xml:space="preserve"><value>старше</value></data>
+  <data name="AgeGroup_YearRange_YoungerThan" xml:space="preserve"><value>моложе</value></data>
+
+  <data name="Import_Summary_Total" xml:space="preserve"><value>Итого</value></data>
+  <data name="Import_Summary_FilesCountFormat" xml:space="preserve"><value>Файлов: {0}</value></data>
+
+  <data name="Import_Event_Success_Header" xml:space="preserve"><value>Заявки загружены из события</value></data>
+  <data name="Import_Event_Success_MessageFormat" xml:space="preserve"><value>Создано заявок: {0}. Текущее событие: {1}</value></data>
+  <data name="Import_Event_Partial_Header" xml:space="preserve"><value>Заявки загружены частично</value></data>
+  <data name="Import_Event_Partial_MessageFormat" xml:space="preserve"><value>Создано: {0}, ошибок: {1}. Текущее событие: {2}</value></data>
+  <data name="Import_Event_Failed_Header" xml:space="preserve"><value>Заявки не загружены</value></data>
+  <data name="Import_Event_Failed_MessageFormat" xml:space="preserve"><value>Не удалось создать заявки. Ошибок: {0}.</value></data>
+  <data name="Import_Event_Error_Header" xml:space="preserve"><value>Ошибка загрузки из события</value></data>
+
+  <data name="Dialog_SelectEntryFiles_Title" xml:space="preserve"><value>Выберите файлы заявок</value></data>
+  <data name="Dialog_SelectEntryFiles_Filter" xml:space="preserve"><value>Excel (*.xlsx)|*.xlsx|All Files (*.*)|*.*</value></data>
+  <data name="Dialog_SaveExcelReports_Filter" xml:space="preserve"><value>Excel (*.xlsx)|*.xlsx|All Files (*.*)|*.*</value></data>
+  <data name="Dialog_SaveExcelReports_DefaultExt" xml:space="preserve"><value>xlsx</value></data>
+  <data name="Dialog_SaveExcelReports_DefaultFileName" xml:space="preserve"><value>Reports.xlsx</value></data>
+
+  <data name="Dialog_CompetitionDb_Filter" xml:space="preserve"><value>SQLite Database (*.db)|*.db|SQLite Database (*.sqlite)|*.sqlite|All Files (*.*)|*.*</value></data>
+  <data name="Dialog_CompetitionDb_DefaultExt" xml:space="preserve"><value>db</value></data>
+
+  <data name="Import_File_Header" xml:space="preserve"><value>Импорт заявок</value></data>
+  <data name="Import_File_Preparing_MessageFormat" xml:space="preserve"><value>Подготовка {0} файлов</value></data>
+  <data name="Import_File_Processing_MessageFormat" xml:space="preserve"><value>Загрузка: {0} {1}/{2}</value></data>
+  <data name="Import_File_Canceled_Header" xml:space="preserve"><value>Загрузка отменена</value></data>
+  <data name="Import_File_Finished_MessageFormat" xml:space="preserve"><value>Загружено {0}/{1} файлов</value></data>
+  <data name="Dialog_Error_SaveReport_Title" xml:space="preserve"><value>Не удалось сохранить отчёт</value></data>
+  <data name="Dialog_Error_FileBusyOrUnavailable" xml:space="preserve"><value>Файл занят другим процессом или недоступен</value></data>
+  <data name="Dialog_Error_FileBusyOrUnavailableWithDetailsFormat" xml:space="preserve"><value>Файл занят другим процессом или недоступен.\n\n{0}</value></data>
+  <data name="Dialog_Error_SaveBaseTimes_Title" xml:space="preserve"><value>Не удалось сохранить базовое время</value></data>
+  <data name="Dialog_Error_BaseTimesFileBusyOrUnavailable" xml:space="preserve"><value>Файл базовых времен занят другим процессом или недоступен</value></data>
+  <data name="Dialog_Error_SaveFile_Title" xml:space="preserve"><value>Не удалось сохранить файл</value></data>
+
+  <data name="Dialog_CreateCompetition_Title" xml:space="preserve"><value>Создать новое соревнование</value></data>
+  <data name="Dialog_OpenCompetition_Title" xml:space="preserve"><value>Выберите файл соревнования</value></data>
+  <data name="Dialog_Error_CreateDbFile_Title" xml:space="preserve"><value>Не удалось создать файл базы данных</value></data>
+
+  <data name="Reports_WindowTitle" xml:space="preserve"><value>Генерация отчётов</value></data>
+  <data name="Reports_SaveDialog_Title" xml:space="preserve"><value>Сохранить отчёты</value></data>
+  <data name="Reports_Validation_SelectAtLeastOne" xml:space="preserve"><value>Выберите хотя бы один тип отчёта.</value></data>
+  <data name="Reports_Validation_SelectOutputFile" xml:space="preserve"><value>Выберите файл для сохранения (.xlsx).</value></data>
+
+  <data name="LoadPrev_WindowTitle" xml:space="preserve"><value>Загрузка заявок из предыдущего события</value></data>
+  <data name="LoadPrev_Validation_SelectOfficialPreviousEvent" xml:space="preserve"><value>Выберите предыдущее событие в статусе OFFICIAL.</value></data>
+  <data name="LoadPrev_Validation_SelectCurrentEvent" xml:space="preserve"><value>Выберите текущее событие.</value></data>
+  <data name="LoadPrev_Validation_EventsMustDiffer" xml:space="preserve"><value>Предыдущее и текущее события должны отличаться.</value></data>
+  <data name="LoadPrev_Validation_RoundParticipantsRequired" xml:space="preserve"><value>Для текущего события задайте количество участников раунда.</value></data>
+  <data name="Enum_ImportFileStatus_Pending" xml:space="preserve"><value>В очереди</value></data>
+  <data name="Enum_ImportFileStatus_Processing" xml:space="preserve"><value>В обработке</value></data>
+  <data name="Enum_ImportFileStatus_Completed" xml:space="preserve"><value>Обработан</value></data>
+  <data name="Enum_ImportFileStatus_CompletedWithWarnings" xml:space="preserve"><value>Обработан с предупреждениями</value></data>
+  <data name="Enum_ImportFileStatus_Failed" xml:space="preserve"><value>Сбой</value></data>
+  <data name="Enum_ImportFileStatus_Canceled" xml:space="preserve"><value>Отменён</value></data>
+  <data name="Events_Col_Order" xml:space="preserve"><value>Порядок</value></data>
+  <data name="Events_Col_Date" xml:space="preserve"><value>Дата</value></data>
+  <data name="Events_Col_Time" xml:space="preserve"><value>Время</value></data>
+  <data name="Events_Col_Round" xml:space="preserve"><value>Этап</value></data>
+  <data name="Events_Col_Distance" xml:space="preserve"><value>Дистанция</value></data>
+  <data name="Events_Col_AgeGroup" xml:space="preserve"><value>Возрастная группа</value></data>
+  <data name="Events_Col_Lanes" xml:space="preserve"><value>Дорожки</value></data>
+  <data name="Events_Col_Status" xml:space="preserve"><value>Статус</value></data>
+
+  <data name="WindowMode_Create" xml:space="preserve"><value>Создание</value></data>
+  <data name="WindowMode_Edit" xml:space="preserve"><value>Редактирование</value></data>
+  <data name="Validation_ErrorFallback" xml:space="preserve"><value>Ошибка валидации</value></data>
+
+  <data name="StartTimes_WindowTitle" xml:space="preserve"><value>Расчёт времени старта</value></data>
+  <data name="StartTimes_Validation_StartTimeRequired" xml:space="preserve"><value>Укажите время начала.</value></data>
+  <data name="StartTimes_Validation_HeatPauseNonNegative" xml:space="preserve"><value>Пауза между заплывами не может быть отрицательной.</value></data>
+  <data name="StartTimes_Validation_EventPauseNonNegative" xml:space="preserve"><value>Пауза между событиями не может быть отрицательной.</value></data>
+
+  <data name="Heats_DeleteTooltip_Heat" xml:space="preserve"><value>Удалить заплыв</value></data>
+  <data name="Heats_DeleteTooltip_Position" xml:space="preserve"><value>Удалить позицию</value></data>
+
+  <data name="Fixation_SelectedHeatHeader_Format" xml:space="preserve"><value>{0} — Заплыв {1} из {2} ({3} из {4}) — {5}</value></data>
+  <data name="Fixation_SelectedHeatHeader_NoEvent_Format" xml:space="preserve"><value>Заплыв {0} из {1} ({2} из {3}) — {4}</value></data>
+
+  <data name="WindowTitle_CreateClub" xml:space="preserve"><value>Создание команды</value></data>
+  <data name="WindowTitle_EditClub" xml:space="preserve"><value>Редактирование клуба</value></data>
+  <data name="WindowTitle_CreateAthlete" xml:space="preserve"><value>Создание спортсмена</value></data>
+  <data name="WindowTitle_EditAthlete" xml:space="preserve"><value>Редактирование спортсмена</value></data>
+  <data name="WindowTitle_CreateEvent" xml:space="preserve"><value>Создание события</value></data>
+  <data name="WindowTitle_EditEvent" xml:space="preserve"><value>Редактирование события</value></data>
+  <data name="WindowTitle_CreateEntry" xml:space="preserve"><value>Создание заявки</value></data>
+  <data name="WindowTitle_EditEntry" xml:space="preserve"><value>Редактирование заявки</value></data>
+  <data name="WindowTitle_CreateHeat" xml:space="preserve"><value>Создание заплыва</value></data>
+  <data name="WindowTitle_EditHeat" xml:space="preserve"><value>Редактирование заплыва</value></data>
+  <data name="WindowTitle_CreateSwimStyle" xml:space="preserve"><value>Создание стиля плавания</value></data>
+  <data name="WindowTitle_EditSwimStyle" xml:space="preserve"><value>Редактирование стиля плавания</value></data>
+  <data name="WindowTitle_CreateAgeGroup" xml:space="preserve"><value>Создание возрастной группы</value></data>
+  <data name="WindowTitle_EditAgeGroup" xml:space="preserve"><value>Редактирование возрастной группы</value></data>
+
+  <data name="Common_NoneParen" xml:space="preserve"><value>(Нет)</value></data>
+  <data name="Common_PersonalParen" xml:space="preserve"><value>(Лично)</value></data>
+
+  <data name="HeatAlloc_WindowTitle" xml:space="preserve"><value>Параметры формирования заплывов</value></data>
+  <data name="HeatAlloc_Validation_MinHeatSize" xml:space="preserve"><value>Минимальный размер заплыва должен быть больше или равен 1.</value></data>
+
+  <data name="Heat_Validation_EventRequired" xml:space="preserve"><value>Для создания заплыва необходимо выбрать событие.</value></data>
+  <data name="Heat_Validation_MinHeatNumber" xml:space="preserve"><value>Номер заплыва должен быть не меньше 1.</value></data>
+  <data name="Heat_Validation_MaxPositionsFormat" xml:space="preserve"><value>В заплыве может быть не более {0} позиций (дорожки {1}-{2}).</value></data>
+
+  <data name="Clubs_Col_Name" xml:space="preserve"><value>Название</value></data>
+  <data name="Clubs_Col_Athletes" xml:space="preserve"><value>Спортсмены</value></data>
+  <data name="Clubs_Col_Entries" xml:space="preserve"><value>Заявки</value></data>
+  <data name="Clubs_Col_Relays" xml:space="preserve"><value>Эстафеты</value></data>
+  <data name="Clubs_Col_Points" xml:space="preserve"><value>Очки</value></data>
+  <data name="Athletes_Col_FirstName" xml:space="preserve"><value>Имя</value></data>
+  <data name="Athletes_Col_LastName" xml:space="preserve"><value>Фамилия</value></data>
+  <data name="Athletes_Col_Gender" xml:space="preserve"><value>Пол</value></data>
+  <data name="Athletes_Col_BirthYear" xml:space="preserve"><value>Год рождения</value></data>
+  <data name="Athletes_Col_Category" xml:space="preserve"><value>Разряд</value></data>
+  <data name="Athletes_Col_Team" xml:space="preserve"><value>Команда</value></data>
+
+  <data name="SwimStyles_Col_Name" xml:space="preserve"><value>Название</value></data>
+  <data name="SwimStyles_Col_Distance" xml:space="preserve"><value>Дистанция</value></data>
+  <data name="SwimStyles_Col_Stroke" xml:space="preserve"><value>Стиль</value></data>
+
+  <data name="AgeGroups_Col_Name" xml:space="preserve"><value>Название</value></data>
+  <data name="AgeGroups_Col_Gender" xml:space="preserve"><value>Пол</value></data>
+  <data name="AgeGroups_Col_BirthYearFrom" xml:space="preserve"><value>Год рождения от</value></data>
+  <data name="AgeGroups_Col_BirthYearTo" xml:space="preserve"><value>Год рождения до</value></data>
+
+  <data name="Heats_GroupHeader_Format" xml:space="preserve"><value>Заплыв {0} из {1} ({2} из {3}) | {4} | {5}</value></data>
+
+  <data name="Common_Cancel" xml:space="preserve"><value>Отмена</value></data>
+  <data name="Common_Save" xml:space="preserve"><value>Сохранить</value></data>
+  <data name="Common_Add" xml:space="preserve"><value>Добавить</value></data>
+  <data name="Common_Auto" xml:space="preserve"><value>Авто</value></data>
+  <data name="Common_SearchPlaceholder" xml:space="preserve"><value>Поиск...</value></data>
+  <data name="Common_All" xml:space="preserve"><value>Все</value></data>
+  <data name="Common_Min" xml:space="preserve"><value>Мин.</value></data>
+  <data name="Common_Max" xml:space="preserve"><value>Макс.</value></data>
+  <data name="Common_AbsoluteMin" xml:space="preserve"><value>Г.р. от</value></data>
+  <data name="Common_AbsoluteMax" xml:space="preserve"><value>Г.р. до</value></data>
+  <data name="Common_Individual" xml:space="preserve"><value>Личная</value></data>
+  <data name="Common_NoTime" xml:space="preserve"><value>N.T.</value></data>
+  <data name="Common_Ok" xml:space="preserve"><value>OK</value></data>
+
+  <data name="Window_Minimize" xml:space="preserve"><value>Свернуть</value></data>
+  <data name="Window_Restore" xml:space="preserve"><value>Восстановить</value></data>
+  <data name="Window_Close" xml:space="preserve"><value>Закрыть</value></data>
+
+  <data name="App_Title" xml:space="preserve"><value>SwimDoc</value></data>
+
+  <data name="Tabs_Athletes" xml:space="preserve"><value>Спортсмены</value></data>
+  <data name="Tabs_Entries" xml:space="preserve"><value>Заявки</value></data>
+  <data name="Tabs_Heats" xml:space="preserve"><value>Заплывы</value></data>
+  <data name="Tabs_Results" xml:space="preserve"><value>Результаты</value></data>
+  <data name="Tabs_Fixation" xml:space="preserve"><value>Фиксация</value></data>
+  <data name="Tabs_Heat" xml:space="preserve"><value>Заплыв</value></data>
+  <data name="Tabs_Events" xml:space="preserve"><value>События</value></data>
+
+  <data name="Field_Name" xml:space="preserve"><value>Название</value></data>
+
+  <data name="Heat_Field_Number" xml:space="preserve"><value>Номер заплыва</value></data>
+  <data name="Heat_Field_StartTime" xml:space="preserve"><value>Время старта</value></data>
+  <data name="Heat_Field_Status" xml:space="preserve"><value>Статус</value></data>
+  <data name="Heat_Col_Lane" xml:space="preserve"><value>Дорожка</value></data>
+  <data name="Heat_Col_Entry" xml:space="preserve"><value>Заявка</value></data>
+
+  <data name="StartTimes_Field_StartTime" xml:space="preserve"><value>Время начала</value></data>
+  <data name="StartTimes_Field_HeatPauseMinutes" xml:space="preserve"><value>Пауза между заплывами (мин)</value></data>
+  <data name="StartTimes_Field_EventPauseMinutes" xml:space="preserve"><value>Пауза между событиями (мин)</value></data>
+
+  <data name="Event_Field_Order" xml:space="preserve"><value>Порядок</value></data>
+  <data name="Event_Field_Date" xml:space="preserve"><value>Дата</value></data>
+  <data name="Event_Field_Time" xml:space="preserve"><value>Время</value></data>
+  <data name="Event_Field_SwimStyle" xml:space="preserve"><value>Стиль плавания</value></data>
+  <data name="Event_Field_AgeGroup" xml:space="preserve"><value>Возрастная группа</value></data>
+  <data name="Event_Field_Course" xml:space="preserve"><value>Длина бассейна</value></data>
+  <data name="Event_Field_Round" xml:space="preserve"><value>Раунд</value></data>
+  <data name="Event_Field_PreviousEvent" xml:space="preserve"><value>Предыдущее событие</value></data>
+  <data name="Event_Field_RoundParticipantsCount" xml:space="preserve"><value>Количество участников</value></data>
+  <data name="Event_Field_AvailableLanes" xml:space="preserve"><value>Доступные дорожки</value></data>
+
+  <data name="LoadPrev_Field_PreviousEvent" xml:space="preserve"><value>Предыдущее событие</value></data>
+  <data name="LoadPrev_Field_CurrentEvent" xml:space="preserve"><value>Текущее событие</value></data>
+
+  <data name="Entry_Tab_Individual" xml:space="preserve"><value>Личная заявка</value></data>
+  <data name="Entry_Tab_Relay" xml:space="preserve"><value>Эстафета</value></data>
+  <data name="Entry_Field_Athlete" xml:space="preserve"><value>Участник</value></data>
+  <data name="Entry_Field_Event" xml:space="preserve"><value>Событие</value></data>
+  <data name="Entry_Field_EntryTime" xml:space="preserve"><value>Заявочное время</value></data>
+  <data name="Entry_Field_Scoring" xml:space="preserve"><value>В зачёт</value></data>
+  <data name="Entry_Field_Club" xml:space="preserve"><value>Команда</value></data>
+  <data name="Entry_Field_RelayNumber" xml:space="preserve"><value>Номер</value></data>
+
+  <data name="Reports_Include_EntryList" xml:space="preserve"><value>Заявочный протокол</value></data>
+  <data name="Reports_Include_StartList" xml:space="preserve"><value>Стартовый протокол</value></data>
+  <data name="Reports_Include_FinishList" xml:space="preserve"><value>Итоговый протокол</value></data>
+  <data name="Reports_Field_OutputFile" xml:space="preserve"><value>Файл для сохранения</value></data>
+
+  <data name="HeatAlloc_Field_Order" xml:space="preserve"><value>Порядок заплывов</value></data>
+  <data name="HeatAlloc_Order_WeakToStrong" xml:space="preserve"><value>От медленного к быстрому</value></data>
+  <data name="HeatAlloc_Order_StrongToWeak" xml:space="preserve"><value>От быстрого к медленному</value></data>
+  <data name="HeatAlloc_Field_MinHeatSize" xml:space="preserve"><value>Минимум в заплыве</value></data>
+  <data name="Common_Delete" xml:space="preserve"><value>Удалить</value></data>
+  <data name="Common_Allocate" xml:space="preserve"><value>Сформировать</value></data>
+  <data name="Common_Reform" xml:space="preserve"><value>Переформировать</value></data>
+
+  <data name="Confirm_Title_Delete" xml:space="preserve"><value>Удалить</value></data>
+  <data name="Confirm_Title_HeatAllocation" xml:space="preserve"><value>Формирование заплывов</value></data>
+
+  <data name="Common_Entry_Accusative_Singular" xml:space="preserve"><value>заявку</value></data>
+  <data name="Common_Entry_Accusative_Few" xml:space="preserve"><value>заявки</value></data>
+  <data name="Common_Entry_Accusative_Many" xml:space="preserve"><value>заявок</value></data>
+
+  <data name="Confirm_DeleteOfficialResults_MessageFormat" xml:space="preserve"><value>Операция затронет {0} {1} с официальными результатами. Результаты будут потеряны. Продолжить?</value></data>
+  <data name="Confirm_HeatAllocationOfficialResults_MessageFormat" xml:space="preserve"><value>На этой дистанции есть {0} {1} с официальными результатами. Формирование удалит существующие заплывы и создаст новые. Результаты будут потеряны. Продолжить?</value></data>
+
+  <data name="SwimStyle_Field_Stroke" xml:space="preserve"><value>Стиль</value></data>
+  <data name="SwimStyle_Field_Distance" xml:space="preserve"><value>Дистанция</value></data>
+  <data name="SwimStyle_Field_RelayCount" xml:space="preserve"><value>Участников эстафеты</value></data>
+
+  <data name="Athlete_Field_FirstName" xml:space="preserve"><value>Имя</value></data>
+  <data name="Athlete_Field_LastName" xml:space="preserve"><value>Фамилия</value></data>
+  <data name="Athlete_Field_Gender" xml:space="preserve"><value>Пол</value></data>
+  <data name="Athlete_Field_BirthYear" xml:space="preserve"><value>Год рождения</value></data>
+  <data name="Athlete_Field_Category" xml:space="preserve"><value>Разряд</value></data>
+  <data name="Athlete_Field_Club" xml:space="preserve"><value>Клуб</value></data>
+
+  <data name="Events_AllocateHeats" xml:space="preserve"><value>Сгенерировать заплывы</value></data>
+  <data name="Events_GenerateReports" xml:space="preserve"><value>Сгенерировать отчёт</value></data>
+  <data name="Events_CalculateStartTimes" xml:space="preserve"><value>Подсчитать время старта</value></data>
+
+  <data name="Heats_Create" xml:space="preserve"><value>Создать заплыв</value></data>
+  <data name="Heats_Edit" xml:space="preserve"><value>Редактировать заплыв</value></data>
+  <data name="Heats_Refresh" xml:space="preserve"><value>Обновить</value></data>
+  <data name="Heats_Col_Lane" xml:space="preserve"><value>Дорожка</value></data>
+  <data name="Heats_Col_Participant" xml:space="preserve"><value>Участник</value></data>
+  <data name="Heats_Col_BirthYear" xml:space="preserve"><value>Год рождения</value></data>
+  <data name="Heats_Col_Team" xml:space="preserve"><value>Команда</value></data>
+  <data name="Heats_Col_EntryTime" xml:space="preserve"><value>Заявочное</value></data>
+  <data name="Heats_Col_Result" xml:space="preserve"><value>Результат</value></data>
+
+  <data name="Results_Col_Event" xml:space="preserve"><value>Событие</value></data>
+  <data name="Results_Col_Participant" xml:space="preserve"><value>Участник</value></data>
+  <data name="Results_Col_Team" xml:space="preserve"><value>Команда</value></data>
+  <data name="Results_Col_Place" xml:space="preserve"><value>Место</value></data>
+  <data name="Results_Col_Result" xml:space="preserve"><value>Результат</value></data>
+  <data name="Results_Col_Points" xml:space="preserve"><value>Очки</value></data>
+
+  <data name="Fixation_Refresh" xml:space="preserve"><value>Обновить</value></data>
+  <data name="Fixation_Col_Lane" xml:space="preserve"><value>Дорожка</value></data>
+  <data name="Fixation_Col_Participant" xml:space="preserve"><value>Участник</value></data>
+  <data name="Fixation_Col_BirthYear" xml:space="preserve"><value>Год рождения</value></data>
+  <data name="Fixation_Col_Club" xml:space="preserve"><value>Клуб</value></data>
+  <data name="Fixation_Col_EntryTime" xml:space="preserve"><value>Заявочное</value></data>
+  <data name="Fixation_Col_Status" xml:space="preserve"><value>Статус</value></data>
+  <data name="Fixation_Col_Result" xml:space="preserve"><value>Результат</value></data>
+  <data name="Fixation_Col_Points" xml:space="preserve"><value>Очки</value></data>
+  <data name="Fixation_Col_Comment" xml:space="preserve"><value>Примечание</value></data>
+  <data name="Fixation_Comment_Tooltip" xml:space="preserve"><value>Сохраняется в примечание</value></data>
+
+  <data name="Enum_HeatStatus_NOT_STARTED" xml:space="preserve"><value>Не стартовал</value></data>
+  <data name="Enum_HeatStatus_UNOFFICIAL" xml:space="preserve"><value>Неофициальный</value></data>
+  <data name="Enum_HeatStatus_OFFICIAL" xml:space="preserve"><value>Официальный</value></data>
+
+  <data name="Enum_SwimEventStatus_EMPTY" xml:space="preserve"><value>Без заявок</value></data>
+  <data name="Enum_SwimEventStatus_ENTRY" xml:space="preserve"><value>Заявки поданы</value></data>
+  <data name="Enum_SwimEventStatus_NOT_STARTED" xml:space="preserve"><value>Заплывы сформированы</value></data>
+  <data name="Enum_SwimEventStatus_RUNNING" xml:space="preserve"><value>На дистанции</value></data>
+  <data name="Enum_SwimEventStatus_OFFICIAL" xml:space="preserve"><value>Официальные результаты</value></data>
+
+  <data name="Enum_EventRound_PRE" xml:space="preserve"><value>Предварительный</value></data>
+  <data name="Enum_EventRound_SOP" xml:space="preserve"><value>Переплыв предварительный</value></data>
+  <data name="Enum_EventRound_SEM" xml:space="preserve"><value>Полуфинал</value></data>
+  <data name="Enum_EventRound_SOS" xml:space="preserve"><value>Переплыв полуфинал</value></data>
+  <data name="Enum_EventRound_FIN" xml:space="preserve"><value>Финал</value></data>
+
+  <data name="Enum_EntryStatus_ENTRY" xml:space="preserve"><value>Вне программы</value></data>
+  <data name="Enum_EntryStatus_EVENT" xml:space="preserve"><value>В заявке</value></data>
+  <data name="Enum_EntryStatus_HEAT" xml:space="preserve"><value>В заплыве</value></data>
+  <data name="Enum_EntryStatus_FINISH" xml:space="preserve"><value>Финишировал</value></data>
+  <data name="Enum_EntryStatus_DSQ" xml:space="preserve"><value>Дисквалифицирован</value></data>
+  <data name="Enum_EntryStatus_DNS" xml:space="preserve"><value>Не стартовал</value></data>
+  <data name="Enum_EntryStatus_DNF" xml:space="preserve"><value>Не финишировал</value></data>
+  <data name="Enum_ImportFileStatus_Summary" xml:space="preserve"><value> </value></data>
+
+  <data name="Enum_Gender_Male" xml:space="preserve"><value>Мужчины</value></data>
+  <data name="Enum_Gender_Female" xml:space="preserve"><value>Женщины</value></data>
+  <data name="Enum_Gender_Mixed" xml:space="preserve"><value>Смешанная</value></data>
+
+  <data name="Enum_Stroke_Fly" xml:space="preserve"><value>Баттерфляй</value></data>
+  <data name="Enum_Stroke_Back" xml:space="preserve"><value>На спине</value></data>
+  <data name="Enum_Stroke_Breast" xml:space="preserve"><value>Брасс</value></data>
+  <data name="Enum_Stroke_Free" xml:space="preserve"><value>Вольный стиль</value></data>
+  <data name="Enum_Stroke_Medley" xml:space="preserve"><value>Комплексное плавание</value></data>
+
+  <data name="Enum_Course_SCM" xml:space="preserve"><value>SCM (25м)</value></data>
+  <data name="Enum_Course_LCM" xml:space="preserve"><value>LCM (50м)</value></data>
+
+  <data name="Enum_Category_NoCategory" xml:space="preserve"><value>-</value></data>
+  <data name="Enum_Category_IMoS" xml:space="preserve"><value>МСМК</value></data>
+  <data name="Enum_Category_MoS" xml:space="preserve"><value>МС</value></data>
+  <data name="Enum_Category_CMoS" xml:space="preserve"><value>КМС</value></data>
+  <data name="Enum_Category_FirstAdult" xml:space="preserve"><value>I</value></data>
+  <data name="Enum_Category_SecondAdult" xml:space="preserve"><value>II</value></data>
+  <data name="Enum_Category_ThirdAdult" xml:space="preserve"><value>III</value></data>
+  <data name="Enum_Category_FirstJunior" xml:space="preserve"><value>I юн.</value></data>
+  <data name="Enum_Category_SecondJunior" xml:space="preserve"><value>II юн.</value></data>
+  <data name="Common_Men" xml:space="preserve">
+    <value>Мужчины</value>
+  </data>
+  <data name="Common_Mixed" xml:space="preserve">
+    <value>Смешанная</value>
+  </data>
+  <data name="Common_Women" xml:space="preserve">
+    <value>Женщины</value>
+  </data>
+</root>
+

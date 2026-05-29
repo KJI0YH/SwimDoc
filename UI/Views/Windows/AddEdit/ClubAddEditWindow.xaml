@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:helpers="clr-namespace:UI.Helpers"
         xmlns:addEditView="clr-namespace:UI.Views.Controls.AddEditView"
+        xmlns:loc="clr-namespace:UI.Localization"
         mc:Ignorable="d"
         Title="{Binding WindowTitle}"
         SizeToContent="WidthAndHeight"
@@ -24,7 +25,7 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0"
-                           Text="Название"
+                           Text="{loc:Loc Field_Name}"
                            VerticalAlignment="Center"
                            Margin="0,0,10,0" />
                 <TextBox Grid.Column="1"

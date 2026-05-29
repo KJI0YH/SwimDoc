@@ -8,6 +8,7 @@
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         xmlns:addEditView="clr-namespace:UI.Views.Controls.AddEditView"
         xmlns:searchableComboBox="clr-namespace:UI.Views.Controls.SearchableComboBox"
+        xmlns:loc="clr-namespace:UI.Localization"
         mc:Ignorable="d"
         Title="{Binding WindowTitle}"
         SizeToContent="WidthAndHeight"
@@ -16,9 +17,6 @@
         WindowStyle="None"
         AllowsTransparency="True"
         Background="Transparent">
-    <Window.Resources>
-        <helpers:EnumDescriptionConverter x:Key="EnumDescriptionConverter" />
-    </Window.Resources>
     <addEditView:AddEditWindowView>
         <StackPanel Margin="0,0,0,15">
             <Grid Margin="0,5">
@@ -27,7 +25,7 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0"
-                           Text="Имя"
+                           Text="{loc:Loc Athlete_Field_FirstName}"
                            VerticalAlignment="Center"
                            Margin="0,0,10,0" />
                 <TextBox Grid.Column="1"
@@ -41,7 +39,7 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0"
-                           Text="Фамилия"
+                           Text="{loc:Loc Athlete_Field_LastName}"
                            VerticalAlignment="Center"
                            Margin="0,0,10,0" />
                 <TextBox Grid.Column="1"
@@ -55,19 +53,15 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0"
-                           Text="Пол"
+                           Text="{loc:Loc Athlete_Field_Gender}"
                            VerticalAlignment="Center"
                            Margin="0,0,10,0" />
                 <ComboBox Grid.Column="1"
-                          ItemsSource="{Binding GenderValues}"
-                          SelectedItem="{Binding Gender}"
-                          Margin="0,2,0,2">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}}" />
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
+                          ItemsSource="{Binding GenderOptions}"
+                          SelectedValue="{Binding Gender}"
+                          SelectedValuePath="Value"
+                          DisplayMemberPath="Display"
+                          Margin="0,2,0,2" />
             </Grid>
 
             <Grid Margin="0,5">
@@ -76,7 +70,7 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0"
-                           Text="Год рождения"
+                           Text="{loc:Loc Athlete_Field_BirthYear}"
                            VerticalAlignment="Center"
                            Margin="0,0,10,0" />
                 <ui:NumberBox Grid.Column="1"
@@ -90,19 +84,15 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0"
-                           Text="Разряд"
+                           Text="{loc:Loc Athlete_Field_Category}"
                            VerticalAlignment="Center"
                            Margin="0,0,10,0" />
                 <ComboBox Grid.Column="1"
-                          ItemsSource="{Binding CategoryValues}"
-                          SelectedItem="{Binding Category}"
-                          Margin="0,2,0,2">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}}" />
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
+                          ItemsSource="{Binding CategoryOptions}"
+                          SelectedValue="{Binding Category}"
+                          SelectedValuePath="Value"
+                          DisplayMemberPath="Display"
+                          Margin="0,2,0,2" />
             </Grid>
 
             <Grid Margin="0,5">
@@ -112,7 +102,7 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0"
-                           Text="Клуб"
+                           Text="{loc:Loc Athlete_Field_Club}"
                            VerticalAlignment="Center"
                            Margin="0,0,10,0" />
                 <searchableComboBox:SearchableComboBox Grid.Column="1"

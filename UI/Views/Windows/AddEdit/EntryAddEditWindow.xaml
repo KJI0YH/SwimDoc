@@ -8,6 +8,7 @@
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         xmlns:addEditView="clr-namespace:UI.Views.Controls.AddEditView"
         xmlns:searchableComboBox="clr-namespace:UI.Views.Controls.SearchableComboBox"
+        xmlns:loc="clr-namespace:UI.Localization"
         mc:Ignorable="d"
         Title="{Binding WindowTitle}"
         SizeToContent="WidthAndHeight"
@@ -22,7 +23,7 @@
     <addEditView:AddEditWindowView>
         <TabControl SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     Margin="0,0,0,15">
-            <TabItem Header="Личная заявка"
+            <TabItem Header="{loc:Loc Entry_Tab_Individual}"
                      IsEnabled="{Binding IsIndividualTabEnabled}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel>
@@ -33,7 +34,7 @@
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0"
-                                       Text="Участник"
+                                       Text="{loc:Loc Entry_Field_Athlete}"
                                        VerticalAlignment="Center"
                                        Margin="0,0,10,0" />
                             <searchableComboBox:SearchableComboBox Grid.Column="1"
@@ -54,7 +55,7 @@
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0"
-                                       Text="Событие"
+                                       Text="{loc:Loc Entry_Field_Event}"
                                        VerticalAlignment="Center"
                                        Margin="0,0,10,0" />
                             <searchableComboBox:SearchableComboBox Grid.Column="1"
@@ -74,13 +75,13 @@
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0"
-                                       Text="Заявочное время"
+                                       Text="{loc:Loc Entry_Field_EntryTime}"
                                        VerticalAlignment="Center"
                                        Margin="0,0,10,0" />
                             <ui:TextBox Grid.Column="1"
                                         Text="{Binding EntryTimeText, UpdateSourceTrigger=PropertyChanged}"
                                         Margin="0,2,0,2"
-                                        PlaceholderText="N.T." />
+                                        PlaceholderText="{loc:Loc Common_NoTime}" />
                         </Grid>
 
                         <Grid Margin="0,5">
@@ -89,7 +90,7 @@
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0"
-                                       Text="В зачёт"
+                                       Text="{loc:Loc Entry_Field_Scoring}"
                                        VerticalAlignment="Center"
                                        Margin="0,0,10,0" />
                             <CheckBox Grid.Column="1"
@@ -101,7 +102,7 @@
                 </ScrollViewer>
             </TabItem>
 
-            <TabItem Header="Эстафета"
+            <TabItem Header="{loc:Loc Entry_Tab_Relay}"
                      IsEnabled="{Binding IsRelayTabEnabled}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel>
@@ -112,7 +113,7 @@
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0"
-                                       Text="Команда"
+                                       Text="{loc:Loc Entry_Field_Club}"
                                        VerticalAlignment="Center"
                                        Margin="0,0,10,0" />
                             <searchableComboBox:SearchableComboBox Grid.Column="1"
@@ -132,14 +133,14 @@
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0"
-                                       Text="Номер"
+                                       Text="{loc:Loc Entry_Field_RelayNumber}"
                                        VerticalAlignment="Center"
                                        Margin="0,0,10,0" />
                             <ui:NumberBox Grid.Column="1"
                                           Minimum="1"
                                           Value="{Binding RelayNumber, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource NullableIntConverter}, TargetNullValue=''}"
                                           Margin="0,2,0,2"
-                                          PlaceholderText="Авто" />
+                                          PlaceholderText="{loc:Loc Common_Auto}" />
                         </Grid>
 
                         <Grid Margin="0,5">
@@ -149,7 +150,7 @@
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0"
-                                       Text="Событие"
+                                       Text="{loc:Loc Entry_Field_Event}"
                                        VerticalAlignment="Center"
                                        Margin="0,0,10,0" />
                             <searchableComboBox:SearchableComboBox Grid.Column="1"
@@ -192,7 +193,7 @@
                                                 <ui:TextBox Grid.Column="3"
                                                             Text="{Binding EntryTimeText, UpdateSourceTrigger=PropertyChanged}"
                                                             Margin="0,2,0,2"
-                                                            PlaceholderText="N.T." />
+                                                            PlaceholderText="{loc:Loc Common_NoTime}" />
                                             </Grid>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
@@ -206,13 +207,13 @@
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0"
-                                       Text="Заявочное время"
+                                       Text="{loc:Loc Entry_Field_EntryTime}"
                                        VerticalAlignment="Center"
                                        Margin="0,0,10,0" />
                             <ui:TextBox Grid.Column="1"
                                         Text="{Binding EntryTimeText, UpdateSourceTrigger=PropertyChanged}"
                                         Margin="0,2,0,2"
-                                        PlaceholderText="N.T." />
+                                        PlaceholderText="{loc:Loc Common_NoTime}" />
                         </Grid>
 
                         <Grid Margin="0,5">
@@ -221,7 +222,7 @@
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0"
-                                       Text="В зачёт"
+                                       Text="{loc:Loc Entry_Field_Scoring}"
                                        VerticalAlignment="Center"
                                        Margin="0,0,10,0" />
                             <CheckBox Grid.Column="1"

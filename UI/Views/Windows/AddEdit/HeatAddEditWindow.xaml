@@ -7,6 +7,7 @@
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         xmlns:addEditView="clr-namespace:UI.Views.Controls.AddEditView"
         xmlns:searchableComboBox="clr-namespace:UI.Views.Controls.SearchableComboBox"
+        xmlns:loc="clr-namespace:UI.Localization"
         mc:Ignorable="d"
         Title="{Binding WindowTitle}"
         SizeToContent="WidthAndHeight"
@@ -28,7 +29,7 @@
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Grid.Column="0"
-                           Text="Номер заплыва"
+                           Text="{loc:Loc Heat_Field_Number}"
                            VerticalAlignment="Center"
                            Margin="0,0,10,0" />
                 <ui:NumberBox Grid.Column="1"
@@ -45,7 +46,7 @@
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Grid.Column="0"
-                           Text="Время старта"
+                           Text="{loc:Loc Heat_Field_StartTime}"
                            VerticalAlignment="Center"
                            Margin="0,0,10,0" />
                 <UniformGrid Grid.Column="1" Columns="2">
@@ -71,7 +72,7 @@
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Grid.Column="0"
-                           Text="Статус"
+                           Text="{loc:Loc Heat_Field_Status}"
                            VerticalAlignment="Center"
                            Margin="0,0,10,0" />
                 <ComboBox Grid.Column="1"
@@ -91,7 +92,7 @@
                 <Button DockPanel.Dock="Right"
                         Content="{ui:SymbolIcon Add24}"
                         Command="{Binding AddPositionRowCommand}"
-                        ToolTip="Добавить"
+                        ToolTip="{loc:Loc Common_Add}"
                         Padding="9"
                         Margin="5,0,0,0" />
             </DockPanel>
@@ -105,7 +106,7 @@
                       Margin="0,0,0,5">
                 <DataGrid.Columns>
 
-                    <DataGridTemplateColumn Header="Дорожка" Width="130">
+                    <DataGridTemplateColumn Header="{loc:Loc Heat_Col_Lane}" Width="130">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <ui:NumberBox Value="{Binding Lane, UpdateSourceTrigger=PropertyChanged}"
@@ -117,7 +118,7 @@
 
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Header="Заявка" Width="*">
+                    <DataGridTemplateColumn Header="{loc:Loc Heat_Col_Entry}" Width="*">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <searchableComboBox:SearchableComboBox

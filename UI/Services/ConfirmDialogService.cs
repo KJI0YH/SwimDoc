@@ -1,6 +1,7 @@
 using DataLayer.EfClasses;
 using DataLayer.EfCore;
 using Microsoft.EntityFrameworkCore;
+using UI.Resources;
 using Wpf.Ui;
 using Wpf.Ui.Controls;
 
@@ -17,8 +18,8 @@ public class ConfirmDialogService(
         var count = await CountOfficialResultEntriesAffectedAsync<TEntity>(ids, cancellationToken);
         return await ConfirmIfNeededAsync(
             count,
-            title: "Удаление",
-            primaryButtonText: "Удалить",
+            title: Strings.Confirm_Title_Delete,
+            primaryButtonText: Strings.Common_Delete,
             content: BuildDeleteMessage(count),
             cancellationToken);
     }
@@ -30,8 +31,8 @@ public class ConfirmDialogService(
         var count = await CountOfficialResultEntriesInEventHeatsAsync(swimEventId, cancellationToken);
         return await ConfirmIfNeededAsync(
             count,
-            title: "Формирование заплывов",
-            primaryButtonText: "Сформировать",
+            title: Strings.Confirm_Title_HeatAllocation,
+            primaryButtonText: Strings.Common_Allocate,
             content: BuildHeatReformMessage(count),
             cancellationToken);
     }
@@ -96,7 +97,7 @@ public class ConfirmDialogService(
             Title = title,
             Content = content,
             PrimaryButtonText = primaryButtonText,
-            CloseButtonText = "Отмена",
+            CloseButtonText = Strings.Common_Cancel,
             DefaultButton = ContentDialogButton.Close
         };
 
@@ -106,14 +107,30 @@ public class ConfirmDialogService(
 
     private static string BuildDeleteMessage(int count)
     {
-        var entriesWord = count == 1 ? "заявку" : count is >= 2 and <= 4 ? "заявки" : "заявок";
-        return $"Операция затронет {count} {entriesWord} с официальными результатами. Результаты будут потеряны. Продолжить?";
+        var entriesWord = count == 1
+            ? Strings.Common_Entry_Accusative_Singular
+            : count is >= 2 and <= 4
+                ? Strings.Common_Entry_Accusative_Few
+                : Strings.Common_Entry_Accusative_Many;
+
+        return string.Format(
+            Strings.Confirm_DeleteOfficialResults_MessageFormat,
+            count,
+            entriesWord);
     }
 
     private static string BuildHeatReformMessage(int count)
     {
-        var entriesWord = count == 1 ? "заявку" : count is >= 2 and <= 4 ? "заявки" : "заявок";
-        return $"На этой дистанции есть {count} {entriesWord} с официальными результатами. Переформирование удалит существующие заплывы и создаст новые. Результаты будут потеряны. Продолжить?";
+        var entriesWord = count == 1
+            ? Strings.Common_Entry_Accusative_Singular
+            : count is >= 2 and <= 4
+                ? Strings.Common_Entry_Accusative_Few
+                : Strings.Common_Entry_Accusative_Many;
+
+        return string.Format(
+            Strings.Confirm_HeatAllocationOfficialResults_MessageFormat,
+            count,
+            entriesWord);
     }
 }
 

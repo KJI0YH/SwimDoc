@@ -6,6 +6,7 @@
         xmlns:heatLogic="clr-namespace:BizLogic.HeatLogic;assembly=BizLogic"
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         xmlns:addEditView="clr-namespace:UI.Views.Controls.AddEditView"
+        xmlns:loc="clr-namespace:UI.Localization"
         mc:Ignorable="d"
         SizeToContent="WidthAndHeight"
         WindowStartupLocation="CenterOwner"
@@ -26,15 +27,15 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0"
-                           Text="Порядок заплывов"
+                           Text="{loc:Loc HeatAlloc_Field_Order}"
                            VerticalAlignment="Center"
                            Margin="0,0,10,0" />
                 <ComboBox Grid.Column="1"
                           SelectedValuePath="Tag"
                           SelectedValue="{Binding SelectedHeatOrder, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                    <ComboBoxItem Content="От слабого к сильному"
+                    <ComboBoxItem Content="{loc:Loc HeatAlloc_Order_WeakToStrong}"
                                   Tag="{x:Static heatLogic:HeatOrder.FromWeakToStrong}" />
-                    <ComboBoxItem Content="От сильного к слабому"
+                    <ComboBoxItem Content="{loc:Loc HeatAlloc_Order_StrongToWeak}"
                                   Tag="{x:Static heatLogic:HeatOrder.FromStrongToWeak}" />
                 </ComboBox>
             </Grid>
@@ -45,7 +46,7 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0"
-                           Text="Минимум в заплыве"
+                           Text="{loc:Loc HeatAlloc_Field_MinHeatSize}"
                            VerticalAlignment="Center"
                            Margin="0,0,10,0" />
                 <ui:NumberBox Grid.Column="1"

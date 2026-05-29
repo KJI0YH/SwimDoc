@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:loc="clr-namespace:UI.Localization"
              mc:Ignorable="d"
              d:DesignHeight="500" d:DesignWidth="830">
     <UserControl.Resources>
@@ -57,7 +58,7 @@
                        FontWeight="SemiBold"
                        Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                        Margin="0,0,0,8" />
-            <TextBlock Text="Выберите действие для начала работы"
+            <TextBlock Text="{loc:Loc CompetitionSelection_Subtitle}"
                        Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
         </StackPanel>
 
@@ -83,7 +84,7 @@
                                             HorizontalAlignment="Center"
                                             Content="{ui:SymbolIcon AddCircle24}" />
                         </Viewbox>
-                        <TextBlock Text="Создать новое соревнование"
+                        <TextBlock Text="{loc:Loc CompetitionSelection_Create}"
                                    FontWeight="SemiBold"
                                    HorizontalAlignment="Center"
                                    Margin="0,0,0,8" />
@@ -105,7 +106,7 @@
                                             HorizontalAlignment="Center"
                                             Content="{ui:SymbolIcon FolderOpen24}" />
                         </Viewbox>
-                        <TextBlock Text="Открыть существующее соревнование"
+                        <TextBlock Text="{loc:Loc CompetitionSelection_Open}"
                                    FontWeight="SemiBold"
                                    HorizontalAlignment="Center"
                                    Margin="0,0,0,8" />

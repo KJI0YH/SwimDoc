@@ -9,6 +9,7 @@ using ServiceLayer.EventService;
 using UI.Helpers;
 using UI.Services;
 using UI.ViewModels.Pages.Data;
+using UI.Views.Controls.SearchableComboBox;
 
 namespace UI.ViewModels.Pages;
 
@@ -22,6 +23,7 @@ public partial class ResultsViewModel(
     private bool _navigatedEventPageAdjusted;
 
     [ObservableProperty] private SwimEvent? _selectedSwimEvent;
+    [ObservableProperty] private ObservableCollection<SearchableItem> _swimEventOptions = new();
     [ObservableProperty] private ObservableCollection<ResultEntryView> _entries = new();
     [ObservableProperty] private ResultEntryView? _selectedResultEntry;
 
@@ -52,6 +54,7 @@ public partial class ResultsViewModel(
         if (items.Count == 0)
         {
             SelectedSwimEvent = null;
+            SwimEventOptions = [];
             Entries = [];
             return;
         }
@@ -84,6 +87,13 @@ public partial class ResultsViewModel(
             return;
 
         SelectedSwimEvent ??= items.OrderBy(e => e.Order).FirstOrDefault();
+
+        SwimEventOptions = new ObservableCollection<SearchableItem>(
+            items.Select(e => new SearchableItem
+            {
+                Value = e,
+                DisplayText = EntityDisplayFormatter.FormatSwimEvent(e)
+            }));
     }
 
     private async Task SelectNavigatedEventAsync(int eventId)
@@ -300,7 +310,7 @@ public sealed class ParticipantResultEntryView(ResultEntryView result) : Observa
     public int Place => result.Place;
     public Entry Entry => result.Entry;
 
-    public string EventName => Entry.SwimEvent?.DisplayName ?? Entry.DisplaySwimName;
+    public string EventName => EntityDisplayFormatter.FormatEntrySwimName(Entry);
     public string ParticipantName => result.ParticipantName;
     public string ClubName => result.ClubName;
     public string ResultText => result.ResultText;

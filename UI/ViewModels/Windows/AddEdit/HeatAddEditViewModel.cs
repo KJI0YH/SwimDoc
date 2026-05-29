@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using ServiceLayer.EntryService;
 using ServiceLayer.EventService;
 using ServiceLayer.HeatService;
+using UI.Helpers;
+using UI.Resources;
 using UI.Services;
 using UI.ViewModels;
 using UI.Views.Controls.SearchableComboBox;
@@ -40,7 +42,7 @@ public partial class HeatAddEditViewModel(
     public bool WasSaved { get; private set; }
     public bool IsReadOnly => false;
     public bool CanEditFields => true;
-    public string WindowTitle => _isAdd ? "Создание заплыва" : "Редактирование заплыва";
+    public string WindowTitle => _isAdd ? Strings.WindowTitle_CreateHeat : Strings.WindowTitle_EditHeat;
     object? IWindowResult.Result => _entity;
 
     public event EventHandler? CloseRequested;
@@ -103,7 +105,7 @@ public partial class HeatAddEditViewModel(
         if (_isAdd)
         {
             if (!_contextEventId.HasValue)
-                throw new InvalidOperationException("Для создания заплыва необходимо выбрать событие.");
+                throw new InvalidOperationException(Strings.Heat_Validation_EventRequired);
 
             _entity = new Heat
             {
@@ -181,7 +183,7 @@ public partial class HeatAddEditViewModel(
 
         if (Number < MinHeatNumber)
         {
-            ValidationErrors.Add("Номер заплыва должен быть не меньше 1.");
+            ValidationErrors.Add(Strings.Heat_Validation_MinHeatNumber);
             return;
         }
 
@@ -191,7 +193,7 @@ public partial class HeatAddEditViewModel(
         if (filledRows.Count > MaxPositionCount)
         {
             ValidationErrors.Add(
-                $"В заплыве может быть не более {MaxPositionCount} позиций (дорожки {LaneMin}-{LaneMax}).");
+                string.Format(Strings.Heat_Validation_MaxPositionsFormat, MaxPositionCount, LaneMin, LaneMax));
             return;
         }
 
@@ -208,7 +210,7 @@ public partial class HeatAddEditViewModel(
         if (errors.Count > 0)
         {
             foreach (var error in errors)
-                ValidationErrors.Add(error.ErrorMessage ?? "Ошибка валидации");
+                ValidationErrors.Add(error.ErrorMessage ?? Strings.Validation_ErrorFallback);
             return;
         }
 
@@ -238,7 +240,7 @@ public partial class HeatAddEditViewModel(
             .Include(se => se.SwimStyle)
             .FirstOrDefaultAsync(se => se.Id == _contextEventId.Value);
 
-        SwimEventDisplayName = swimEvent?.DisplayName ?? string.Empty;
+        SwimEventDisplayName = EntityDisplayFormatter.FormatSwimEvent(swimEvent);
         if (swimEvent is not null)
         {
             LaneMin = swimEvent.LaneMin;

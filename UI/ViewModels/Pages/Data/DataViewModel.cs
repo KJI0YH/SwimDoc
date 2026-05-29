@@ -12,6 +12,7 @@ using DataLayer.QueryObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.Crud;
+using UI.Resources;
 using UI.Services;
 using UI.Views.Windows;
 using UI.Views.Windows.AddEdit;
@@ -56,10 +57,10 @@ public partial class DataViewModel<TEntity, TKey> : DataViewModelBase
     {
         get
         {
-            if (TotalItems <= 0) return $"0-0 из {TotalItems}";
+            if (TotalItems <= 0) return string.Format(Strings.Paging_ItemsInfo_EmptyFormat, TotalItems);
             var from = CurrentPage * PageSize + 1;
             var to = Math.Min(TotalItems, CurrentPage * PageSize + PageSize);
-            return $"{from}-{to} из {TotalItems}";
+            return string.Format(Strings.Paging_ItemsInfo_RangeFormat, from, to, TotalItems);
         }
     }
 

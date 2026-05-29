@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <data name="Sheet_Entries" xml:space="preserve"><value>Заявочные команды</value></data>
+  <data name="Sheet_Settings" xml:space="preserve"><value>Настройки</value></data>
+
+  <data name="Entries_Title_A1" xml:space="preserve"><value>Команда</value></data>
+  <data name="Entries_Title_B1" xml:space="preserve"><value>Заявочные команды</value></data>
+
+  <data name="Entries_Header_FirstName" xml:space="preserve"><value>Имя</value></data>
+  <data name="Entries_Header_LastName" xml:space="preserve"><value>Фамилия</value></data>
+  <data name="Entries_Header_BirthYear" xml:space="preserve"><value>Год рождения</value></data>
+  <data name="Entries_Header_Gender" xml:space="preserve"><value>Пол</value></data>
+  <data name="Entries_Header_Category" xml:space="preserve"><value>Разряд</value></data>
+
+  <data name="Settings_Header_Gender" xml:space="preserve"><value>Пол</value></data>
+  <data name="Settings_Header_Category" xml:space="preserve"><value>Разряд</value></data>
+  <data name="Settings_Header_Distance" xml:space="preserve"><value>Дистанция</value></data>
+  <data name="Settings_Header_Stroke" xml:space="preserve"><value>Стиль</value></data>
+  <data name="Settings_Header_TeamType" xml:space="preserve"><value>Тип команды</value></data>
+
+  <data name="Gender_Male" xml:space="preserve"><value>Мужчины</value></data>
+  <data name="Gender_Female" xml:space="preserve"><value>Женщины</value></data>
+
+  <data name="Stroke_Fly" xml:space="preserve"><value>Баттерфляй</value></data>
+  <data name="Stroke_Back" xml:space="preserve"><value>На спине</value></data>
+  <data name="Stroke_Breast" xml:space="preserve"><value>Брасс</value></data>
+  <data name="Stroke_Free" xml:space="preserve"><value>Вольный стиль</value></data>
+  <data name="Stroke_Medley" xml:space="preserve"><value>Комплексное плавание</value></data>
+</root>
+

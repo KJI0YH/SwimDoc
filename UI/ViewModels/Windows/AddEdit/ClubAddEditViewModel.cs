@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using DataLayer.EfClasses;
 using ServiceLayer.ClubService;
+using UI.Resources;
 using UI.Views.Controls.SearchableComboBox;
 
 namespace UI.ViewModels.Windows.AddEdit;
@@ -15,7 +16,7 @@ public partial class ClubAddViewModel(int? id, IClubService crudService)
 
     [ObservableProperty] private SearchableItem? _selectedAvailableAthlete;
 
-    public override string WindowTitle => IsAdd ? "Создание клуба" : "Редактирование клуба";
+    public override string WindowTitle => IsAdd ? Strings.WindowTitle_CreateClub : Strings.WindowTitle_EditClub;
 
     public string Name
     {

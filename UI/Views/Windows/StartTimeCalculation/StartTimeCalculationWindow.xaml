@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         xmlns:addEditView="clr-namespace:UI.Views.Controls.AddEditView"
+        xmlns:loc="clr-namespace:UI.Localization"
         mc:Ignorable="d"
         SizeToContent="WidthAndHeight"
         WindowStartupLocation="CenterOwner"
@@ -26,7 +27,7 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0"
-                           Text="Время начала"
+                           Text="{loc:Loc StartTimes_Field_StartTime}"
                            VerticalAlignment="Center"
                            Margin="0,0,10,0" />
                 <UniformGrid Grid.Column="1" Columns="2">
@@ -47,7 +48,7 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0"
-                           Text="Пауза между заплывами (минут)"
+                           Text="{loc:Loc StartTimes_Field_HeatPauseMinutes}"
                            VerticalAlignment="Center"
                            Margin="0,0,10,0" />
                 <ui:NumberBox Grid.Column="1"
@@ -62,7 +63,7 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0"
-                           Text="Пауза между событиями (минут)"
+                           Text="{loc:Loc StartTimes_Field_EventPauseMinutes}"
                            VerticalAlignment="Center"
                            Margin="0,0,10,0" />
                 <ui:NumberBox Grid.Column="1"

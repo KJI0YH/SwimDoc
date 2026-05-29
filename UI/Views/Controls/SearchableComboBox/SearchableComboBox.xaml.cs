@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using UI.Resources;
 
 namespace UI.Views.Controls.SearchableComboBox;
 
@@ -26,7 +27,7 @@ public partial class SearchableComboBox : UserControl
 
     public static readonly DependencyProperty WatermarkProperty =
         DependencyProperty.Register(nameof(Watermark), typeof(string),
-            typeof(SearchableComboBox), new PropertyMetadata("Поиск..."));
+            typeof(SearchableComboBox), new PropertyMetadata(Strings.Common_SearchPlaceholder));
 
     private bool _isSearchActive;
     private bool _isSyncingSelection;

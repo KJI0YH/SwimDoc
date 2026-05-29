@@ -1,5 +1,6 @@
 using Wpf.Ui;
 using Wpf.Ui.Controls;
+using UI.Resources;
 
 namespace UI.Services;
 
@@ -11,7 +12,7 @@ public sealed class ErrorDialogService(IContentDialogService contentDialogServic
         {
             Title = title,
             Content = message,
-            CloseButtonText = "OK",
+            CloseButtonText = Strings.Common_Ok,
             DefaultButton = ContentDialogButton.Close
         };
 

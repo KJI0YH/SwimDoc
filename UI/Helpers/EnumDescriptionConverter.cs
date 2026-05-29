@@ -1,6 +1,6 @@
 using System.Globalization;
 using System.Windows.Data;
-using DataLayer;
+using UI.Resources;
 
 namespace UI.Helpers;
 
@@ -11,7 +11,10 @@ public class EnumDescriptionConverter : IValueConverter
         if (value == null)
             return string.Empty;
 
-        return value is Enum e ? EnumDisplay.GetDescription(e) : value.ToString() ?? string.Empty;
+        if (value is Enum e)
+            return Strings.GetEnumDisplay(e);
+
+        return value.ToString() ?? string.Empty;
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

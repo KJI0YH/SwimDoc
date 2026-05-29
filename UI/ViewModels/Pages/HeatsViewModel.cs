@@ -10,8 +10,10 @@ using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.EventService;
 using ServiceLayer.HeatService;
 using UI.Helpers;
+using UI.Resources;
 using UI.Services;
 using UI.ViewModels.Pages.Data;
+using UI.Views.Controls.SearchableComboBox;
 using UI.Views.Windows.AddEdit;
 
 namespace UI.ViewModels.Pages;
@@ -45,6 +47,7 @@ public partial class HeatsViewModel(
     }
 
     [ObservableProperty] private SwimEvent? _selectedSwimEvent;
+    [ObservableProperty] private ObservableCollection<SearchableItem> _swimEventOptions = new();
 
     [ObservableProperty] private HeatPositionView? _selectedHeatPosition;
 
@@ -56,7 +59,7 @@ public partial class HeatsViewModel(
 
     private ObservableCollection<HeatPositionView>? _heatPositionsGroupedSource;
 
-    public string DeleteToolTip => IsWholeHeatSelected ? "Удалить заплыв" : "Удалить позицию";
+    public string DeleteToolTip => IsWholeHeatSelected ? Strings.Heats_DeleteTooltip_Heat : Strings.Heats_DeleteTooltip_Position;
     private ListCollectionView? _heatPositionsGroupedView;
 
     public ICollectionView HeatPositionsView
@@ -87,11 +90,19 @@ public partial class HeatsViewModel(
         if (items.Count == 0)
         {
             SelectedSwimEvent = null;
+            SwimEventOptions = [];
             HeatPositions = [];
             return;
         }
 
         SelectedSwimEvent ??= items.OrderBy(e => e.Order).FirstOrDefault();
+
+        SwimEventOptions = new ObservableCollection<SearchableItem>(
+            items.Select(e => new SearchableItem
+            {
+                Value = e,
+                DisplayText = EntityDisplayFormatter.FormatSwimEvent(e)
+            }));
     }
 
     public Task RefreshAsync() => LoadHeatPositionsAsync();
@@ -331,8 +342,14 @@ public sealed class HeatPositionView(
     public int HeatId => HeatPosition.HeatId;
     public int EntryId => HeatPosition.EntryId;
     public HeatStatus HeatStatus { get; } = heatStatus;
-    public string HeatGroupHeader =>
-        $"Заплыв {heatNumber} из {heatsInEvent} ({heatOrder} из {heatsTotal}) | {heatDayTime} | {heatStatus}";
+    public string HeatGroupHeader => string.Format(
+        Strings.Heats_GroupHeader_Format,
+        heatNumber,
+        heatsInEvent,
+        heatOrder,
+        heatsTotal,
+        heatDayTime,
+        heatStatus);
     public int Lane => HeatPosition.Lane;
     public string Participant => HeatPosition.Entry.DisplayParticipantName;
     public int? YearOfBirth => HeatPosition.Entry.Athlete?.YearOfBirth;

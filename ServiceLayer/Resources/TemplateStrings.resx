@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <data name="Sheet_Entries" xml:space="preserve"><value>Entries</value></data>
+  <data name="Sheet_Settings" xml:space="preserve"><value>Settings</value></data>
+
+  <data name="Entries_Title_A1" xml:space="preserve"><value>Team</value></data>
+  <data name="Entries_Title_B1" xml:space="preserve"><value>Entry document</value></data>
+
+  <data name="Entries_Header_FirstName" xml:space="preserve"><value>First name</value></data>
+  <data name="Entries_Header_LastName" xml:space="preserve"><value>Last name</value></data>
+  <data name="Entries_Header_BirthYear" xml:space="preserve"><value>Birth year</value></data>
+  <data name="Entries_Header_Gender" xml:space="preserve"><value>Gender</value></data>
+  <data name="Entries_Header_Category" xml:space="preserve"><value>Category</value></data>
+
+  <data name="Settings_Header_Gender" xml:space="preserve"><value>Gender</value></data>
+  <data name="Settings_Header_Category" xml:space="preserve"><value>Category</value></data>
+  <data name="Settings_Header_Distance" xml:space="preserve"><value>Distance</value></data>
+  <data name="Settings_Header_Stroke" xml:space="preserve"><value>Stroke</value></data>
+  <data name="Settings_Header_TeamType" xml:space="preserve"><value>Team type</value></data>
+
+  <data name="Gender_Male" xml:space="preserve"><value>Men</value></data>
+  <data name="Gender_Female" xml:space="preserve"><value>Women</value></data>
+
+  <data name="Stroke_Fly" xml:space="preserve"><value>Butterfly</value></data>
+  <data name="Stroke_Back" xml:space="preserve"><value>Backstroke</value></data>
+  <data name="Stroke_Breast" xml:space="preserve"><value>Breaststroke</value></data>
+  <data name="Stroke_Free" xml:space="preserve"><value>Freestyle</value></data>
+  <data name="Stroke_Medley" xml:space="preserve"><value>Medley</value></data>
+</root>
+

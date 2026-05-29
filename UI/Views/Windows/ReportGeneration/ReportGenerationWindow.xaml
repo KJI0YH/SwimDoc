@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         xmlns:addEditView="clr-namespace:UI.Views.Controls.AddEditView"
+        xmlns:loc="clr-namespace:UI.Localization"
         mc:Ignorable="d"
         SizeToContent="WidthAndHeight"
         WindowStartupLocation="CenterOwner"
@@ -21,18 +22,18 @@
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Row="0" Margin="0,0,0,15">
-                <CheckBox Content="Заявочный протокол"
+                <CheckBox Content="{loc:Loc Reports_Include_EntryList}"
                           IsChecked="{Binding IncludeEntryList, Mode=TwoWay}" />
-                <CheckBox Content="Стартовый протокол"
+                <CheckBox Content="{loc:Loc Reports_Include_StartList}"
                           IsChecked="{Binding IncludeStartList, Mode=TwoWay}"
                           Margin="0,5,0,0" />
-                <CheckBox Content="Итоговый протокол"
+                <CheckBox Content="{loc:Loc Reports_Include_FinishList}"
                           IsChecked="{Binding IncludeFinishList, Mode=TwoWay}"
                           Margin="0,5,0,0" />
             </StackPanel>
 
             <TextBlock Grid.Row="1"
-                       Text="Файл для сохранения"
+                       Text="{loc:Loc Reports_Field_OutputFile}"
                        FontWeight="SemiBold"
                        Margin="0,0,0,10" />
 

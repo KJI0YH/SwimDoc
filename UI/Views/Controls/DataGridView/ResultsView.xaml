@@ -7,6 +7,7 @@
              xmlns:helpers="clr-namespace:UI.Helpers"
              xmlns:dataGridView="clr-namespace:UI.Views.Controls.DataGridView"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:loc="clr-namespace:UI.Localization"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
     <dataView:DefaultDataView>
@@ -14,9 +15,9 @@
             <DockPanel>
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
                     <ComboBox helpers:ComboBoxAutoWidthHelper.Enable="True"
-                              ItemsSource="{Binding Items}"
-                              SelectedItem="{Binding SelectedSwimEvent}"
-                              DisplayMemberPath="DisplayName"
+                              ItemsSource="{Binding SwimEventOptions}"
+                              SelectedValue="{Binding SelectedSwimEvent}"
+                              SelectedValuePath="Value"
                               Margin="0,5,6,5" />
                     <Button Content="{ui:SymbolIcon ArrowPrevious24}"
                             Command="{Binding GoToPrevEventCommand}"
@@ -38,15 +39,15 @@
                       IsReadOnly="False"
                       RowStyle="{StaticResource DataGridRowResultsPlaceStyle}">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Место" Binding="{Binding Place}" IsReadOnly="True" Width="80" />
-                    <DataGridTextColumn Header="Участник" Binding="{Binding ParticipantName}" IsReadOnly="True"
+                    <DataGridTextColumn Header="{loc:Loc Results_Col_Place}" Binding="{Binding Place}" IsReadOnly="True" Width="80" />
+                    <DataGridTextColumn Header="{loc:Loc Results_Col_Participant}" Binding="{Binding ParticipantName}" IsReadOnly="True"
                                         Width="*" />
-                    <DataGridTextColumn Header="Год рождения" Binding="{Binding ParticipantYearOfBirth}"
+                    <DataGridTextColumn Header="{loc:Loc Fixation_Col_BirthYear}" Binding="{Binding ParticipantYearOfBirth}"
                                         IsReadOnly="True" Width="120" />
-                    <DataGridTextColumn Header="Команда" Binding="{Binding ClubName}" IsReadOnly="True" Width="*" />
-                    <DataGridTextColumn Header="Результат" Binding="{Binding ResultText}" IsReadOnly="True"
+                    <DataGridTextColumn Header="{loc:Loc Results_Col_Team}" Binding="{Binding ClubName}" IsReadOnly="True" Width="*" />
+                    <DataGridTextColumn Header="{loc:Loc Results_Col_Result}" Binding="{Binding ResultText}" IsReadOnly="True"
                                         Width="150" />
-                    <DataGridTextColumn Header="Очки" Binding="{Binding Points}" IsReadOnly="True" Width="150" />
+                    <DataGridTextColumn Header="{loc:Loc Results_Col_Points}" Binding="{Binding Points}" IsReadOnly="True" Width="150" />
                 </DataGrid.Columns>
             </ui:DataGrid>
         </dataView:DefaultDataView.MainContent>

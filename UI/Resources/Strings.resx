@@ -1,0 +1,431 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <data name="Nav_Program" xml:space="preserve"><value>Program</value></data>
+  <data name="Nav_Entries" xml:space="preserve"><value>Entries</value></data>
+  <data name="Nav_Heats" xml:space="preserve"><value>Heats</value></data>
+  <data name="Nav_Fixation" xml:space="preserve"><value>Fixation</value></data>
+  <data name="Nav_Results" xml:space="preserve"><value>Results</value></data>
+  <data name="Nav_Athletes" xml:space="preserve"><value>Athletes</value></data>
+  <data name="Nav_Clubs" xml:space="preserve"><value>Clubs</value></data>
+  <data name="Nav_AgeGroups" xml:space="preserve"><value>Age groups</value></data>
+  <data name="Nav_SwimStyles" xml:space="preserve"><value>Distances</value></data>
+  <data name="Nav_Settings" xml:space="preserve"><value>Settings</value></data>
+  <data name="Nav_About" xml:space="preserve"><value>About</value></data>
+
+  <data name="Menu_Competition" xml:space="preserve"><value>Competition</value></data>
+  <data name="Menu_Create" xml:space="preserve"><value>Create</value></data>
+  <data name="Menu_Open" xml:space="preserve"><value>Open</value></data>
+
+  <data name="Settings_Tab_BaseTime" xml:space="preserve"><value>Base times</value></data>
+  <data name="Settings_Tab_Templates" xml:space="preserve"><value>Templates</value></data>
+  <data name="Settings_Page_Subtitle" xml:space="preserve"><value>Application preferences, templates, and competition defaults.</value></data>
+  <data name="Settings_Section_General" xml:space="preserve"><value>General</value></data>
+  <data name="Settings_Section_Files" xml:space="preserve"><value>Files</value></data>
+  <data name="Settings_Section_Competition" xml:space="preserve"><value>Competition</value></data>
+  <data name="Settings_Language_Description" xml:space="preserve"><value>Interface language. Applied immediately.</value></data>
+  <data name="Settings_BaseTimes_Description" xml:space="preserve"><value>World Aquatics Points Base Times.</value></data>
+  <data name="Common_Back" xml:space="preserve"><value>Back</value></data>
+  <data name="BaseTimes_WorldAquaticsPoints" xml:space="preserve"><value>World Aquatics Points</value></data>
+  <data name="BaseTimes_WorldAquaticsPoints_Tooltip" xml:space="preserve"><value>Open World Aquatics base times and points table (worldaquatics.com)</value></data>
+  <data name="BaseTimes_Group_Scm" xml:space="preserve"><value>SCM (25m) — Men / Women</value></data>
+  <data name="BaseTimes_Group_ScmMixedRelay" xml:space="preserve"><value>SCM (25m) — Mixed relays</value></data>
+  <data name="BaseTimes_Group_Lcm" xml:space="preserve"><value>LCM (50m) — Men / Women</value></data>
+  <data name="BaseTimes_Group_LcmMixedRelay" xml:space="preserve"><value>LCM (50m) — Mixed relays</value></data>
+  <data name="BaseTimes_Col_Stroke" xml:space="preserve"><value>Stroke</value></data>
+  <data name="BaseTimes_Header_BaseTime" xml:space="preserve"><value>Base time</value></data>
+  <data name="BaseTimes_Header_BaseTimeSeconds" xml:space="preserve"><value>Base time (seconds)</value></data>
+  <data name="Templates_Title" xml:space="preserve"><value>Templates</value></data>
+  <data name="Templates_Description" xml:space="preserve"><value>Download ready-to-use templates for importing data into SwimDoc.</value></data>
+  <data name="Templates_EntryDoc_GroupHeader" xml:space="preserve"><value>Entry Document</value></data>
+  <data name="Templates_EntryDoc_Title" xml:space="preserve"><value>Excel template for entries import</value></data>
+  <data name="Templates_EntryDoc_Subtitle" xml:space="preserve"><value>Includes “Entries” and “Settings” sheets with dropdown lists.</value></data>
+  <data name="Templates_Download" xml:space="preserve"><value>Download</value></data>
+  <data name="Templates_Download_Tooltip" xml:space="preserve"><value>Download template (.xlsx)</value></data>
+
+  <data name="Dialog_SaveExcelTemplate_Title" xml:space="preserve"><value>Save Excel template</value></data>
+  <data name="Dialog_SaveExcelTemplate_Filter" xml:space="preserve"><value>Excel (*.xlsx)|*.xlsx</value></data>
+  <data name="Dialog_SaveExcelTemplate_DefaultFileName" xml:space="preserve"><value>EntryDocumentTemplate.xlsx</value></data>
+
+  <data name="Language_Label" xml:space="preserve"><value>Language</value></data>
+  <data name="Language_English" xml:space="preserve"><value>English</value></data>
+  <data name="Language_Russian" xml:space="preserve"><value>Russian</value></data>
+
+  <data name="CompetitionSelection_Subtitle" xml:space="preserve"><value>Choose an action to start</value></data>
+  <data name="CompetitionSelection_Create" xml:space="preserve"><value>Create new competition</value></data>
+  <data name="CompetitionSelection_Open" xml:space="preserve"><value>Open existing competition</value></data>
+
+  <data name="Toolbar_Create" xml:space="preserve"><value>Create</value></data>
+  <data name="Toolbar_Edit" xml:space="preserve"><value>Edit</value></data>
+  <data name="Toolbar_Delete" xml:space="preserve"><value>Delete</value></data>
+  <data name="Toolbar_Refresh" xml:space="preserve"><value>Refresh</value></data>
+  <data name="Toolbar_ToggleFilters" xml:space="preserve"><value>Show or hide filters</value></data>
+  <data name="Paging_First" xml:space="preserve"><value>First page</value></data>
+  <data name="Paging_Previous" xml:space="preserve"><value>Previous page</value></data>
+  <data name="Paging_Next" xml:space="preserve"><value>Next page</value></data>
+  <data name="Paging_Last" xml:space="preserve"><value>Last page</value></data>
+  <data name="Paging_ItemsInfo_EmptyFormat" xml:space="preserve"><value>0-0 of {0}</value></data>
+  <data name="Paging_ItemsInfo_RangeFormat" xml:space="preserve"><value>{0}-{1} of {2}</value></data>
+
+  <data name="Import_Details" xml:space="preserve"><value>Details</value></data>
+  <data name="Import_Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Import_Close" xml:space="preserve"><value>Close</value></data>
+  <data name="Import_WarningsFormat" xml:space="preserve"><value>Warnings ({0})</value></data>
+  <data name="Import_ErrorsFormat" xml:space="preserve"><value>Errors ({0})</value></data>
+  <data name="Import_Col_File" xml:space="preserve"><value>File</value></data>
+  <data name="Import_Col_Path" xml:space="preserve"><value>Path</value></data>
+  <data name="Import_Col_Status" xml:space="preserve"><value>Status</value></data>
+  <data name="Import_Col_Clubs" xml:space="preserve"><value>Clubs</value></data>
+  <data name="Import_Col_Athletes" xml:space="preserve"><value>Athletes</value></data>
+  <data name="Import_Col_Entries" xml:space="preserve"><value>Entries</value></data>
+  <data name="Import_Col_Warnings" xml:space="preserve"><value>Warnings</value></data>
+  <data name="Import_Col_Errors" xml:space="preserve"><value>Errors</value></data>
+  <data name="Import_EventPrev" xml:space="preserve"><value>Previous event</value></data>
+  <data name="Import_EventCurrent" xml:space="preserve"><value>Current event</value></data>
+  <data name="Import_CreatedEntries" xml:space="preserve"><value>Entries created</value></data>
+
+  <data name="Filters_Clear" xml:space="preserve"><value>Clear filters</value></data>
+  <data name="Filters_Round" xml:space="preserve"><value>Round</value></data>
+  <data name="Filters_Distance" xml:space="preserve"><value>Distance</value></data>
+  <data name="Filters_Stroke" xml:space="preserve"><value>Stroke</value></data>
+  <data name="Filters_Gender" xml:space="preserve"><value>Gender</value></data>
+  <data name="Filters_Status" xml:space="preserve"><value>Status</value></data>
+  <data name="Entries_ImportFromFile" xml:space="preserve"><value>Import entries from file</value></data>
+  <data name="Entries_ImportFromPrevEvent" xml:space="preserve"><value>Import entries from previous event</value></data>
+
+  <data name="Entries_Col_Distance" xml:space="preserve"><value>Distance</value></data>
+  <data name="Entries_Col_Participant" xml:space="preserve"><value>Participant</value></data>
+  <data name="Entries_Col_Team" xml:space="preserve"><value>Club</value></data>
+  <data name="Entries_Col_Status" xml:space="preserve"><value>Status</value></data>
+  <data name="Entries_Col_EntryTime" xml:space="preserve"><value>Entry time</value></data>
+  <data name="Entries_Col_FinishTime" xml:space="preserve"><value>Finish time</value></data>
+  <data name="Entries_Col_Points" xml:space="preserve"><value>Points</value></data>
+  <data name="Entries_Col_Comment" xml:space="preserve"><value>Comment</value></data>
+  <data name="Distance_MetersFormat" xml:space="preserve"><value>{0}m</value></data>
+  <data name="SwimStyle_DisplayName_Format" xml:space="preserve"><value>{0}{1}m {2}</value></data>
+  <data name="SwimEvent_DisplayName_Format" xml:space="preserve"><value>#{0} {1} {2} {3}</value></data>
+  <data name="AgeGroup_DisplayName_Format" xml:space="preserve"><value>{0} {1}</value></data>
+  <data name="AgeGroup_YearRange_Open" xml:space="preserve"><value>open age</value></data>
+  <data name="AgeGroup_YearRange_OpenWithSuffix" xml:space="preserve"><value>open age</value></data>
+  <data name="AgeGroup_YearRange_WithSuffix_Format" xml:space="preserve"><value>{0}</value></data>
+  <data name="AgeGroup_YearRange_OlderThan" xml:space="preserve"><value>older</value></data>
+  <data name="AgeGroup_YearRange_YoungerThan" xml:space="preserve"><value>younger</value></data>
+
+  <data name="Import_Summary_Total" xml:space="preserve"><value>Total</value></data>
+  <data name="Import_Summary_FilesCountFormat" xml:space="preserve"><value>Files: {0}</value></data>
+
+  <data name="Import_Event_Success_Header" xml:space="preserve"><value>Entries loaded from event</value></data>
+  <data name="Import_Event_Success_MessageFormat" xml:space="preserve"><value>Entries created: {0}. Current event: {1}</value></data>
+  <data name="Import_Event_Partial_Header" xml:space="preserve"><value>Entries loaded partially</value></data>
+  <data name="Import_Event_Partial_MessageFormat" xml:space="preserve"><value>Created: {0}, errors: {1}. Current event: {2}</value></data>
+  <data name="Import_Event_Failed_Header" xml:space="preserve"><value>Entries not loaded</value></data>
+  <data name="Import_Event_Failed_MessageFormat" xml:space="preserve"><value>Could not create entries. Errors: {0}.</value></data>
+  <data name="Import_Event_Error_Header" xml:space="preserve"><value>Error importing from event</value></data>
+
+  <data name="Dialog_SelectEntryFiles_Title" xml:space="preserve"><value>Select entry files</value></data>
+  <data name="Dialog_SelectEntryFiles_Filter" xml:space="preserve"><value>Excel (*.xlsx)|*.xlsx|All Files (*.*)|*.*</value></data>
+  <data name="Dialog_SaveExcelReports_Filter" xml:space="preserve"><value>Excel (*.xlsx)|*.xlsx|All Files (*.*)|*.*</value></data>
+  <data name="Dialog_SaveExcelReports_DefaultExt" xml:space="preserve"><value>xlsx</value></data>
+  <data name="Dialog_SaveExcelReports_DefaultFileName" xml:space="preserve"><value>Reports.xlsx</value></data>
+
+  <data name="Dialog_CompetitionDb_Filter" xml:space="preserve"><value>SQLite Database (*.db)|*.db|SQLite Database (*.sqlite)|*.sqlite|All Files (*.*)|*.*</value></data>
+  <data name="Dialog_CompetitionDb_DefaultExt" xml:space="preserve"><value>db</value></data>
+
+  <data name="Import_File_Header" xml:space="preserve"><value>Entries import</value></data>
+  <data name="Import_File_Preparing_MessageFormat" xml:space="preserve"><value>Preparing {0} files</value></data>
+  <data name="Import_File_Processing_MessageFormat" xml:space="preserve"><value>Importing: {0} {1}/{2}</value></data>
+  <data name="Import_File_Canceled_Header" xml:space="preserve"><value>Import canceled</value></data>
+  <data name="Import_File_Finished_MessageFormat" xml:space="preserve"><value>Imported {0}/{1} files</value></data>
+  <data name="Dialog_Error_SaveReport_Title" xml:space="preserve"><value>Could not save report</value></data>
+  <data name="Dialog_Error_FileBusyOrUnavailable" xml:space="preserve"><value>The file is used by another process or is unavailable.</value></data>
+  <data name="Dialog_Error_FileBusyOrUnavailableWithDetailsFormat" xml:space="preserve"><value>The file is used by another process or is unavailable.\n\n{0}</value></data>
+  <data name="Dialog_Error_SaveBaseTimes_Title" xml:space="preserve"><value>Could not save base times</value></data>
+  <data name="Dialog_Error_BaseTimesFileBusyOrUnavailable" xml:space="preserve"><value>The base times file is used by another process or is unavailable.</value></data>
+  <data name="Dialog_Error_SaveFile_Title" xml:space="preserve"><value>Could not save file</value></data>
+
+  <data name="Dialog_CreateCompetition_Title" xml:space="preserve"><value>Create new competition</value></data>
+  <data name="Dialog_OpenCompetition_Title" xml:space="preserve"><value>Select competition file</value></data>
+  <data name="Dialog_Error_CreateDbFile_Title" xml:space="preserve"><value>Could not create database file</value></data>
+
+  <data name="Reports_WindowTitle" xml:space="preserve"><value>Report generation</value></data>
+  <data name="Reports_SaveDialog_Title" xml:space="preserve"><value>Save reports</value></data>
+  <data name="Reports_Validation_SelectAtLeastOne" xml:space="preserve"><value>Select at least one report type.</value></data>
+  <data name="Reports_Validation_SelectOutputFile" xml:space="preserve"><value>Select an output file (.xlsx).</value></data>
+
+  <data name="LoadPrev_WindowTitle" xml:space="preserve"><value>Load entries from previous event</value></data>
+  <data name="LoadPrev_Validation_SelectOfficialPreviousEvent" xml:space="preserve"><value>Select a previous event with OFFICIAL status.</value></data>
+  <data name="LoadPrev_Validation_SelectCurrentEvent" xml:space="preserve"><value>Select the current event.</value></data>
+  <data name="LoadPrev_Validation_EventsMustDiffer" xml:space="preserve"><value>Previous and current events must be different.</value></data>
+  <data name="LoadPrev_Validation_RoundParticipantsRequired" xml:space="preserve"><value>Set the round participants count for the current event.</value></data>
+  <data name="Enum_ImportFileStatus_Pending" xml:space="preserve"><value>Pending</value></data>
+  <data name="Enum_ImportFileStatus_Processing" xml:space="preserve"><value>Processing</value></data>
+  <data name="Enum_ImportFileStatus_Completed" xml:space="preserve"><value>Completed</value></data>
+  <data name="Enum_ImportFileStatus_CompletedWithWarnings" xml:space="preserve"><value>Completed with warnings</value></data>
+  <data name="Enum_ImportFileStatus_Failed" xml:space="preserve"><value>Failed</value></data>
+  <data name="Enum_ImportFileStatus_Canceled" xml:space="preserve"><value>Canceled</value></data>
+  <data name="Events_Col_Order" xml:space="preserve"><value>Order</value></data>
+  <data name="Events_Col_Date" xml:space="preserve"><value>Date</value></data>
+  <data name="Events_Col_Time" xml:space="preserve"><value>Time</value></data>
+  <data name="Events_Col_Round" xml:space="preserve"><value>Round</value></data>
+  <data name="Events_Col_Distance" xml:space="preserve"><value>Distance</value></data>
+  <data name="Events_Col_AgeGroup" xml:space="preserve"><value>Age group</value></data>
+  <data name="Events_Col_Lanes" xml:space="preserve"><value>Lanes</value></data>
+  <data name="Events_Col_Status" xml:space="preserve"><value>Status</value></data>
+
+  <data name="WindowMode_Create" xml:space="preserve"><value>Create</value></data>
+  <data name="WindowMode_Edit" xml:space="preserve"><value>Edit</value></data>
+  <data name="Validation_ErrorFallback" xml:space="preserve"><value>Validation error</value></data>
+
+  <data name="StartTimes_WindowTitle" xml:space="preserve"><value>Start time calculation</value></data>
+  <data name="StartTimes_Validation_StartTimeRequired" xml:space="preserve"><value>Please specify the start time.</value></data>
+  <data name="StartTimes_Validation_HeatPauseNonNegative" xml:space="preserve"><value>The break between heats cannot be negative.</value></data>
+  <data name="StartTimes_Validation_EventPauseNonNegative" xml:space="preserve"><value>The break between events cannot be negative.</value></data>
+
+  <data name="Heats_DeleteTooltip_Heat" xml:space="preserve"><value>Delete heat</value></data>
+  <data name="Heats_DeleteTooltip_Position" xml:space="preserve"><value>Delete position</value></data>
+
+  <data name="Fixation_SelectedHeatHeader_Format" xml:space="preserve"><value>{0} — Heat {1} of {2} ({3} of {4}) — {5}</value></data>
+  <data name="Fixation_SelectedHeatHeader_NoEvent_Format" xml:space="preserve"><value>Heat {0} of {1} ({2} of {3}) — {4}</value></data>
+
+  <data name="WindowTitle_CreateClub" xml:space="preserve"><value>Create club</value></data>
+  <data name="WindowTitle_EditClub" xml:space="preserve"><value>Edit team</value></data>
+  <data name="WindowTitle_CreateAthlete" xml:space="preserve"><value>Create athlete</value></data>
+  <data name="WindowTitle_EditAthlete" xml:space="preserve"><value>Edit athlete</value></data>
+  <data name="WindowTitle_CreateEvent" xml:space="preserve"><value>Create event</value></data>
+  <data name="WindowTitle_EditEvent" xml:space="preserve"><value>Edit event</value></data>
+  <data name="WindowTitle_CreateEntry" xml:space="preserve"><value>Create entry</value></data>
+  <data name="WindowTitle_EditEntry" xml:space="preserve"><value>Edit entry</value></data>
+  <data name="WindowTitle_CreateHeat" xml:space="preserve"><value>Create heat</value></data>
+  <data name="WindowTitle_EditHeat" xml:space="preserve"><value>Edit heat</value></data>
+  <data name="WindowTitle_CreateSwimStyle" xml:space="preserve"><value>Create distance</value></data>
+  <data name="WindowTitle_EditSwimStyle" xml:space="preserve"><value>Edit distance</value></data>
+  <data name="WindowTitle_CreateAgeGroup" xml:space="preserve"><value>Create age group</value></data>
+  <data name="WindowTitle_EditAgeGroup" xml:space="preserve"><value>Edit age group</value></data>
+
+  <data name="Common_NoneParen" xml:space="preserve"><value>(None)</value></data>
+  <data name="Common_PersonalParen" xml:space="preserve"><value>(Personal)</value></data>
+
+  <data name="HeatAlloc_WindowTitle" xml:space="preserve"><value>Heat allocation parameters</value></data>
+  <data name="HeatAlloc_Validation_MinHeatSize" xml:space="preserve"><value>Minimum heat size must be at least 1.</value></data>
+
+  <data name="Heat_Validation_EventRequired" xml:space="preserve"><value>An event must be selected to create a heat.</value></data>
+  <data name="Heat_Validation_MinHeatNumber" xml:space="preserve"><value>Heat number must be at least 1.</value></data>
+  <data name="Heat_Validation_MaxPositionsFormat" xml:space="preserve"><value>A heat cannot have more than {0} positions (lanes {1}-{2}).</value></data>
+
+  <data name="Clubs_Col_Name" xml:space="preserve"><value>Name</value></data>
+  <data name="Clubs_Col_Athletes" xml:space="preserve"><value>Athletes</value></data>
+  <data name="Clubs_Col_Entries" xml:space="preserve"><value>Entries</value></data>
+  <data name="Clubs_Col_Relays" xml:space="preserve"><value>Relays</value></data>
+  <data name="Clubs_Col_Points" xml:space="preserve"><value>Points</value></data>
+  <data name="Athletes_Col_FirstName" xml:space="preserve"><value>First name</value></data>
+  <data name="Athletes_Col_LastName" xml:space="preserve"><value>Last name</value></data>
+  <data name="Athletes_Col_Gender" xml:space="preserve"><value>Gender</value></data>
+  <data name="Athletes_Col_BirthYear" xml:space="preserve"><value>Birth year</value></data>
+  <data name="Athletes_Col_Category" xml:space="preserve"><value>Category</value></data>
+  <data name="Athletes_Col_Team" xml:space="preserve"><value>Club</value></data>
+
+  <data name="SwimStyles_Col_Name" xml:space="preserve"><value>Name</value></data>
+  <data name="SwimStyles_Col_Distance" xml:space="preserve"><value>Distance</value></data>
+  <data name="SwimStyles_Col_Stroke" xml:space="preserve"><value>Stroke</value></data>
+
+  <data name="AgeGroups_Col_Name" xml:space="preserve"><value>Name</value></data>
+  <data name="AgeGroups_Col_Gender" xml:space="preserve"><value>Gender</value></data>
+  <data name="AgeGroups_Col_BirthYearFrom" xml:space="preserve"><value>Birth year from</value></data>
+  <data name="AgeGroups_Col_BirthYearTo" xml:space="preserve"><value>Birth year to</value></data>
+
+  <data name="Heats_GroupHeader_Format" xml:space="preserve"><value>Heat {0} of {1} ({2} of {3}) | {4} | {5}</value></data>
+
+  <data name="Common_Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Common_Save" xml:space="preserve"><value>Save</value></data>
+  <data name="Common_Add" xml:space="preserve"><value>Add</value></data>
+  <data name="Common_Auto" xml:space="preserve"><value>Auto</value></data>
+  <data name="Common_SearchPlaceholder" xml:space="preserve"><value>Search...</value></data>
+  <data name="Common_All" xml:space="preserve"><value>All</value></data>
+  <data name="Common_Min" xml:space="preserve"><value>Min</value></data>
+  <data name="Common_Max" xml:space="preserve"><value>Max</value></data>
+  <data name="Common_AbsoluteMin" xml:space="preserve"><value>Birth year from</value></data>
+  <data name="Common_AbsoluteMax" xml:space="preserve"><value>Birth year to</value></data>
+  <data name="Common_Individual" xml:space="preserve"><value>Individual</value></data>
+  <data name="Common_NoTime" xml:space="preserve"><value>N.T.</value></data>
+  <data name="Common_Ok" xml:space="preserve"><value>OK</value></data>
+
+  <data name="Window_Minimize" xml:space="preserve"><value>Minimize</value></data>
+  <data name="Window_Restore" xml:space="preserve"><value>Restore</value></data>
+  <data name="Window_Close" xml:space="preserve"><value>Close</value></data>
+
+  <data name="App_Title" xml:space="preserve"><value>SwimDoc</value></data>
+  <data name="Common_Men" xml:space="preserve"><value>Men</value></data>
+  <data name="Common_Women" xml:space="preserve"><value>Women</value></data>
+  <data name="Common_Mixed" xml:space="preserve"><value>Mixed</value></data>
+
+  <data name="Tabs_Athletes" xml:space="preserve"><value>Athletes</value></data>
+  <data name="Tabs_Entries" xml:space="preserve"><value>Entries</value></data>
+  <data name="Tabs_Heats" xml:space="preserve"><value>Heats</value></data>
+  <data name="Tabs_Results" xml:space="preserve"><value>Results</value></data>
+  <data name="Tabs_Fixation" xml:space="preserve"><value>Fixation</value></data>
+  <data name="Tabs_Heat" xml:space="preserve"><value>Heat</value></data>
+  <data name="Tabs_Events" xml:space="preserve"><value>Events</value></data>
+
+  <data name="Field_Name" xml:space="preserve"><value>Name</value></data>
+
+  <data name="Heat_Field_Number" xml:space="preserve"><value>Heat number</value></data>
+  <data name="Heat_Field_StartTime" xml:space="preserve"><value>Start time</value></data>
+  <data name="Heat_Field_Status" xml:space="preserve"><value>Status</value></data>
+  <data name="Heat_Col_Lane" xml:space="preserve"><value>Lane</value></data>
+  <data name="Heat_Col_Entry" xml:space="preserve"><value>Entry</value></data>
+
+  <data name="StartTimes_Field_StartTime" xml:space="preserve"><value>Start time</value></data>
+  <data name="StartTimes_Field_HeatPauseMinutes" xml:space="preserve"><value>Break between heats (min)</value></data>
+  <data name="StartTimes_Field_EventPauseMinutes" xml:space="preserve"><value>Break between events (min)</value></data>
+
+  <data name="Event_Field_Order" xml:space="preserve"><value>Order</value></data>
+  <data name="Event_Field_Date" xml:space="preserve"><value>Date</value></data>
+  <data name="Event_Field_Time" xml:space="preserve"><value>Time</value></data>
+  <data name="Event_Field_SwimStyle" xml:space="preserve"><value>Distance</value></data>
+  <data name="Event_Field_AgeGroup" xml:space="preserve"><value>Age group</value></data>
+  <data name="Event_Field_Course" xml:space="preserve"><value>Pool length</value></data>
+  <data name="Event_Field_Round" xml:space="preserve"><value>Round</value></data>
+  <data name="Event_Field_PreviousEvent" xml:space="preserve"><value>Previous event</value></data>
+  <data name="Event_Field_RoundParticipantsCount" xml:space="preserve"><value>Participants count</value></data>
+  <data name="Event_Field_AvailableLanes" xml:space="preserve"><value>Available lanes</value></data>
+
+  <data name="LoadPrev_Field_PreviousEvent" xml:space="preserve"><value>Previous event</value></data>
+  <data name="LoadPrev_Field_CurrentEvent" xml:space="preserve"><value>Current event</value></data>
+
+  <data name="Entry_Tab_Individual" xml:space="preserve"><value>Individual entry</value></data>
+  <data name="Entry_Tab_Relay" xml:space="preserve"><value>Relay</value></data>
+  <data name="Entry_Field_Athlete" xml:space="preserve"><value>Athlete</value></data>
+  <data name="Entry_Field_Event" xml:space="preserve"><value>Event</value></data>
+  <data name="Entry_Field_EntryTime" xml:space="preserve"><value>Entry time</value></data>
+  <data name="Entry_Field_Scoring" xml:space="preserve"><value>Scoring</value></data>
+  <data name="Entry_Field_Club" xml:space="preserve"><value>Club</value></data>
+  <data name="Entry_Field_RelayNumber" xml:space="preserve"><value>Number</value></data>
+
+  <data name="Reports_Include_EntryList" xml:space="preserve"><value>Entry list</value></data>
+  <data name="Reports_Include_StartList" xml:space="preserve"><value>Start list</value></data>
+  <data name="Reports_Include_FinishList" xml:space="preserve"><value>Results list</value></data>
+  <data name="Reports_Field_OutputFile" xml:space="preserve"><value>Output file</value></data>
+
+  <data name="HeatAlloc_Field_Order" xml:space="preserve"><value>Heat order</value></data>
+  <data name="HeatAlloc_Order_WeakToStrong" xml:space="preserve"><value>From slow to fast</value></data>
+  <data name="HeatAlloc_Order_StrongToWeak" xml:space="preserve"><value>From fast to slow</value></data>
+  <data name="HeatAlloc_Field_MinHeatSize" xml:space="preserve"><value>Minimum per heat</value></data>
+  <data name="Common_Delete" xml:space="preserve"><value>Delete</value></data>
+  <data name="Common_Allocate" xml:space="preserve"><value>Allocate</value></data>
+  <data name="Common_Reform" xml:space="preserve"><value>Reform</value></data>
+
+  <data name="Confirm_Title_Delete" xml:space="preserve"><value>Delete</value></data>
+  <data name="Confirm_Title_HeatAllocation" xml:space="preserve"><value>Heat allocation</value></data>
+
+  <data name="Common_Entry_Accusative_Singular" xml:space="preserve"><value>entry</value></data>
+  <data name="Common_Entry_Accusative_Few" xml:space="preserve"><value>entries</value></data>
+  <data name="Common_Entry_Accusative_Many" xml:space="preserve"><value>entries</value></data>
+
+  <data name="Confirm_DeleteOfficialResults_MessageFormat" xml:space="preserve"><value>This will affect {0} {1} with official results. The results will be lost. Continue?</value></data>
+  <data name="Confirm_HeatAllocationOfficialResults_MessageFormat" xml:space="preserve"><value>This distance has {0} {1} with official results. Allocating heats will delete existing heats and create new ones. The results will be lost. Continue?</value></data>
+
+  <data name="SwimStyle_Field_Stroke" xml:space="preserve"><value>Stroke</value></data>
+  <data name="SwimStyle_Field_Distance" xml:space="preserve"><value>Distance</value></data>
+  <data name="SwimStyle_Field_RelayCount" xml:space="preserve"><value>Relay swimmers</value></data>
+
+  <data name="Athlete_Field_FirstName" xml:space="preserve"><value>First name</value></data>
+  <data name="Athlete_Field_LastName" xml:space="preserve"><value>Last name</value></data>
+  <data name="Athlete_Field_Gender" xml:space="preserve"><value>Gender</value></data>
+  <data name="Athlete_Field_BirthYear" xml:space="preserve"><value>Birth year</value></data>
+  <data name="Athlete_Field_Category" xml:space="preserve"><value>Category</value></data>
+  <data name="Athlete_Field_Club" xml:space="preserve"><value>Club</value></data>
+
+  <data name="Events_AllocateHeats" xml:space="preserve"><value>Generate heats</value></data>
+  <data name="Events_GenerateReports" xml:space="preserve"><value>Generate report</value></data>
+  <data name="Events_CalculateStartTimes" xml:space="preserve"><value>Calculate start times</value></data>
+
+  <data name="Heats_Create" xml:space="preserve"><value>Create heat</value></data>
+  <data name="Heats_Edit" xml:space="preserve"><value>Edit heat</value></data>
+  <data name="Heats_Refresh" xml:space="preserve"><value>Refresh</value></data>
+  <data name="Heats_Col_Lane" xml:space="preserve"><value>Lane</value></data>
+  <data name="Heats_Col_Participant" xml:space="preserve"><value>Participant</value></data>
+  <data name="Heats_Col_BirthYear" xml:space="preserve"><value>Birth year</value></data>
+  <data name="Heats_Col_Team" xml:space="preserve"><value>Club</value></data>
+  <data name="Heats_Col_EntryTime" xml:space="preserve"><value>Entry time</value></data>
+  <data name="Heats_Col_Result" xml:space="preserve"><value>Result</value></data>
+
+  <data name="Results_Col_Event" xml:space="preserve"><value>Event</value></data>
+  <data name="Results_Col_Participant" xml:space="preserve"><value>Participant</value></data>
+  <data name="Results_Col_Team" xml:space="preserve"><value>Club</value></data>
+  <data name="Results_Col_Place" xml:space="preserve"><value>Place</value></data>
+  <data name="Results_Col_Result" xml:space="preserve"><value>Result</value></data>
+  <data name="Results_Col_Points" xml:space="preserve"><value>Points</value></data>
+
+  <data name="Fixation_Refresh" xml:space="preserve"><value>Refresh</value></data>
+  <data name="Fixation_Col_Lane" xml:space="preserve"><value>Lane</value></data>
+  <data name="Fixation_Col_Participant" xml:space="preserve"><value>Participant</value></data>
+  <data name="Fixation_Col_BirthYear" xml:space="preserve"><value>Birth year</value></data>
+  <data name="Fixation_Col_Club" xml:space="preserve"><value>Club</value></data>
+  <data name="Fixation_Col_EntryTime" xml:space="preserve"><value>Entry time</value></data>
+  <data name="Fixation_Col_Status" xml:space="preserve"><value>Status</value></data>
+  <data name="Fixation_Col_Result" xml:space="preserve"><value>Result</value></data>
+  <data name="Fixation_Col_Points" xml:space="preserve"><value>Points</value></data>
+  <data name="Fixation_Col_Comment" xml:space="preserve"><value>Comment</value></data>
+  <data name="Fixation_Comment_Tooltip" xml:space="preserve"><value>Saved to Comment</value></data>
+
+  <data name="Enum_HeatStatus_NOT_STARTED" xml:space="preserve"><value>Not started</value></data>
+  <data name="Enum_HeatStatus_UNOFFICIAL" xml:space="preserve"><value>Unofficial</value></data>
+  <data name="Enum_HeatStatus_OFFICIAL" xml:space="preserve"><value>Official</value></data>
+
+  <data name="Enum_SwimEventStatus_EMPTY" xml:space="preserve"><value>Empty</value></data>
+  <data name="Enum_SwimEventStatus_ENTRY" xml:space="preserve"><value>Entries applied</value></data>
+  <data name="Enum_SwimEventStatus_NOT_STARTED" xml:space="preserve"><value>Heats allocated</value></data>
+  <data name="Enum_SwimEventStatus_RUNNING" xml:space="preserve"><value>Running</value></data>
+  <data name="Enum_SwimEventStatus_OFFICIAL" xml:space="preserve"><value>Official</value></data>
+
+  <data name="Enum_EventRound_PRE" xml:space="preserve"><value>Preliminary</value></data>
+  <data name="Enum_EventRound_SOP" xml:space="preserve"><value>Swim-off preliminary</value></data>
+  <data name="Enum_EventRound_SEM" xml:space="preserve"><value>Semifinal</value></data>
+  <data name="Enum_EventRound_SOS" xml:space="preserve"><value>Swim-off semifinal</value></data>
+  <data name="Enum_EventRound_FIN" xml:space="preserve"><value>Final</value></data>
+
+  <data name="Enum_EntryStatus_ENTRY" xml:space="preserve"><value>Out of events</value></data>
+  <data name="Enum_EntryStatus_EVENT" xml:space="preserve"><value>On event</value></data>
+  <data name="Enum_EntryStatus_HEAT" xml:space="preserve"><value>In heat</value></data>
+  <data name="Enum_EntryStatus_FINISH" xml:space="preserve"><value>Finished</value></data>
+  <data name="Enum_EntryStatus_DSQ" xml:space="preserve"><value>Disqualified</value></data>
+  <data name="Enum_EntryStatus_DNS" xml:space="preserve"><value>Did not start</value></data>
+  <data name="Enum_EntryStatus_DNF" xml:space="preserve"><value>Did not finish</value></data>
+  <data name="Enum_ImportFileStatus_Summary" xml:space="preserve"><value> </value></data>
+
+  <data name="Enum_Gender_Male" xml:space="preserve"><value>Men</value></data>
+  <data name="Enum_Gender_Female" xml:space="preserve"><value>Women</value></data>
+  <data name="Enum_Gender_Mixed" xml:space="preserve"><value>Mixed</value></data>
+
+  <data name="Enum_Stroke_Fly" xml:space="preserve"><value>Butterfly</value></data>
+  <data name="Enum_Stroke_Back" xml:space="preserve"><value>Backstroke</value></data>
+  <data name="Enum_Stroke_Breast" xml:space="preserve"><value>Breaststroke</value></data>
+  <data name="Enum_Stroke_Free" xml:space="preserve"><value>Freestyle</value></data>
+  <data name="Enum_Stroke_Medley" xml:space="preserve"><value>Medley</value></data>
+
+  <data name="Enum_Course_SCM" xml:space="preserve"><value>SCM (25m)</value></data>
+  <data name="Enum_Course_LCM" xml:space="preserve"><value>LCM (50m)</value></data>
+
+  <data name="Enum_Category_NoCategory" xml:space="preserve"><value>-</value></data>
+  <data name="Enum_Category_IMoS" xml:space="preserve"><value>IMoS</value></data>
+  <data name="Enum_Category_MoS" xml:space="preserve"><value>MoS</value></data>
+  <data name="Enum_Category_CMoS" xml:space="preserve"><value>CMoS</value></data>
+  <data name="Enum_Category_FirstAdult" xml:space="preserve"><value>I</value></data>
+  <data name="Enum_Category_SecondAdult" xml:space="preserve"><value>II</value></data>
+  <data name="Enum_Category_ThirdAdult" xml:space="preserve"><value>III</value></data>
+  <data name="Enum_Category_FirstJunior" xml:space="preserve"><value>I jr.</value></data>
+  <data name="Enum_Category_SecondJunior" xml:space="preserve"><value>II jr.</value></data>
+</root>
+

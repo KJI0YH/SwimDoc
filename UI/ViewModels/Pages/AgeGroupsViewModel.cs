@@ -1,9 +1,10 @@
 using System.ComponentModel;
-using BizLogic.Helpers;
 using DataLayer.EfClasses;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.AgeGroupService;
+using UI.Helpers;
+using UI.Resources;
 using UI.Services;
 using UI.ViewModels.Pages.Data;
 using UI.Views.Windows.AddEdit;
@@ -24,35 +25,47 @@ public class AgeGroupsViewModel : DataViewModel<AgeGroup, int?>
         AutoGenerateColumns = false;
         ColumnConfigurations.Clear();
 
-        ColumnConfigurations.Add(new ColumnConfiguration<AgeGroup>("DisplayName", "Название", 400,
+        ColumnConfigurations.Add(new ColumnConfiguration<AgeGroup>(".", Strings.AgeGroups_Col_Name, 400,
             (query, direction) =>
             {
                 return direction == ListSortDirection.Ascending
                     ? query.OrderBy(ag => ag.Name)
                     : query.OrderByDescending(ag => ag.Name);
-            }));
-        ColumnConfigurations.Add(new ColumnConfiguration<AgeGroup>("Gender", "Пол", 100));
-        ColumnConfigurations.Add(new ColumnConfiguration<AgeGroup>("DisplayBirthYearMax", "Год рождения от", 150,
-            (query, direction) =>
-            {
-                return direction == ListSortDirection.Ascending
-                    ? query.OrderBy(ag => ag.BirthYearMax)
-                    : query.OrderByDescending(ag => ag.BirthYearMax);
-            }));
-        ColumnConfigurations.Add(new ColumnConfiguration<AgeGroup>("DisplayBirthYearMin", "Год рождения до", 150,
+            })
+        {
+            Converter = EntityDisplayConverter.Instance,
+            ConverterParameter = EntityDisplayConverter.AgeGroupKind
+        });
+        ColumnConfigurations.Add(new ColumnConfiguration<AgeGroup>("Gender", Strings.AgeGroups_Col_Gender, 100));
+        ColumnConfigurations.Add(new ColumnConfiguration<AgeGroup>("BirthYearMin", Strings.AgeGroups_Col_BirthYearFrom, 150,
             (query, direction) =>
             {
                 return direction == ListSortDirection.Ascending
                     ? query.OrderBy(ag => ag.BirthYearMin)
                     : query.OrderByDescending(ag => ag.BirthYearMin);
-            }));
+            })
+        {
+            Converter = new BirthYearBoundConverter(),
+            ConverterParameter = BirthYearBoundConverter.Min
+        });
+        ColumnConfigurations.Add(new ColumnConfiguration<AgeGroup>("BirthYearMax", Strings.AgeGroups_Col_BirthYearTo, 150,
+            (query, direction) =>
+            {
+                return direction == ListSortDirection.Ascending
+                    ? query.OrderBy(ag => ag.BirthYearMax)
+                    : query.OrderByDescending(ag => ag.BirthYearMax);
+            })
+        {
+            Converter = new BirthYearBoundConverter(),
+            ConverterParameter = BirthYearBoundConverter.Max
+        });
     }
 
     protected override IQueryable<AgeGroup> ApplySearch(IQueryable<AgeGroup> query)
     {
         if (string.IsNullOrWhiteSpace(SearchText))
             return query;
-        if (EnumHelper.TryGetEnumByDescriptionContains(SearchText, out Gender gender))
+        if (Strings.TryFindEnumByDisplayContains(SearchText, out Gender gender))
             return query.Where(ag => ag.Gender == gender);
 
         if (int.TryParse((string?)SearchText, out var year))
