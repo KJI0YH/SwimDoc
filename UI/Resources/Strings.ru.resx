@@ -111,6 +111,30 @@
   <data name="Import_EventCurrent" xml:space="preserve"><value>Текущее событие</value></data>
   <data name="Import_CreatedEntries" xml:space="preserve"><value>Создано заявок</value></data>
 
+  <data name="Operation_Col_Event" xml:space="preserve"><value>Событие</value></data>
+  <data name="Operation_Col_HeatsCreated" xml:space="preserve"><value>Создано заплывов</value></data>
+  <data name="Operation_Finished_Success_Header" xml:space="preserve"><value>Операция завершена</value></data>
+  <data name="Operation_Finished_WithWarnings_Header" xml:space="preserve"><value>Операция завершена с предупреждениями</value></data>
+  <data name="Operation_Finished_WithErrors_Header" xml:space="preserve"><value>Операция завершена с ошибками</value></data>
+  <data name="Operation_Finished_AllSkipped_Header" xml:space="preserve"><value>Операция не выполнена</value></data>
+  <data name="Operation_Canceled_MessageFormat" xml:space="preserve"><value>Прервано после {0}/{1}</value></data>
+  <data name="Operation_HeatAllocation_Header" xml:space="preserve"><value>Формирование заплывов</value></data>
+  <data name="Operation_HeatAllocation_Preparing_MessageFormat" xml:space="preserve"><value>Подготовка {0} событий</value></data>
+  <data name="Operation_HeatAllocation_Processing_MessageFormat" xml:space="preserve"><value>Формирование заплывов: {0} ({1}/{2})</value></data>
+  <data name="Operation_HeatAllocation_Finished_MessageFormat" xml:space="preserve"><value>Обработано {0}/{1} событий</value></data>
+  <data name="Operation_HeatAllocation_Canceled_Header" xml:space="preserve"><value>Формирование заплывов прервано</value></data>
+  <data name="HeatAllocation_Warning_HeatsReallocated" xml:space="preserve"><value>Существующие заплывы удалены и сформированы заново</value></data>
+  <data name="HeatAllocation_Warning_NoEntriesForEvent" xml:space="preserve"><value>Нет заявок на эту дистанцию</value></data>
+  <data name="HeatAllocation_Error_DatabaseLocked" xml:space="preserve"><value>База данных занята. Завершите другие операции и повторите попытку.</value></data>
+  <data name="Operation_StartTimes_Header" xml:space="preserve"><value>Расчёт времени старта</value></data>
+  <data name="Operation_StartTimes_Running_Message" xml:space="preserve"><value>Расчёт времени старта…</value></data>
+  <data name="Operation_StartTimes_Finished_MessageFormat" xml:space="preserve"><value>Время старта рассчитано для {0} событий</value></data>
+  <data name="Operation_StartTimes_Canceled_Header" xml:space="preserve"><value>Расчёт времени старта прерван</value></data>
+  <data name="Operation_Reports_Header" xml:space="preserve"><value>Формирование отчётов</value></data>
+  <data name="Operation_Reports_Running_Message" xml:space="preserve"><value>Формирование отчётов…</value></data>
+  <data name="Operation_Reports_Finished_MessageFormat" xml:space="preserve"><value>Отчёты сохранены: {0}</value></data>
+  <data name="Operation_Reports_Canceled_Header" xml:space="preserve"><value>Формирование отчётов прервано</value></data>
+
   <data name="Filters_Clear" xml:space="preserve"><value>Очистить фильтры</value></data>
   <data name="Filters_Round" xml:space="preserve"><value>Этап</value></data>
   <data name="Filters_Distance" xml:space="preserve"><value>Дистанция</value></data>
@@ -190,6 +214,13 @@
   <data name="Enum_ImportFileStatus_CompletedWithWarnings" xml:space="preserve"><value>Обработан с предупреждениями</value></data>
   <data name="Enum_ImportFileStatus_Failed" xml:space="preserve"><value>Сбой</value></data>
   <data name="Enum_ImportFileStatus_Canceled" xml:space="preserve"><value>Отменён</value></data>
+  <data name="Enum_OperationItemStatus_Pending" xml:space="preserve"><value>В очереди</value></data>
+  <data name="Enum_OperationItemStatus_Processing" xml:space="preserve"><value>В обработке</value></data>
+  <data name="Enum_OperationItemStatus_Completed" xml:space="preserve"><value>Обработан</value></data>
+  <data name="Enum_OperationItemStatus_CompletedWithWarnings" xml:space="preserve"><value>Обработан с предупреждениями</value></data>
+  <data name="Enum_OperationItemStatus_Failed" xml:space="preserve"><value>Сбой</value></data>
+  <data name="Enum_OperationItemStatus_Canceled" xml:space="preserve"><value>Отменён</value></data>
+  <data name="Enum_OperationItemStatus_Skipped" xml:space="preserve"><value>Пропущен</value></data>
   <data name="Events_Col_Order" xml:space="preserve"><value>Порядок</value></data>
   <data name="Events_Col_Date" xml:space="preserve"><value>Дата</value></data>
   <data name="Events_Col_Time" xml:space="preserve"><value>Время</value></data>

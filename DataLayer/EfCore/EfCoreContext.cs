@@ -6,6 +6,9 @@ namespace DataLayer.EfCore;
 
 public sealed class EfCoreContext : DbContext
 {
+    private static readonly object TriggerInitLock = new();
+    private static string? _triggersInitializedForConnection;
+
     public DbSet<AgeGroup> AgeGroups { get; set; }
     public DbSet<Athlete> Athletes { get; set; }
     public DbSet<Club> Clubs { get; set; }
@@ -21,6 +24,7 @@ public sealed class EfCoreContext : DbContext
     {
         Database.SetConnectionString(databaseConnection?.CurrentConnection());
         Database.EnsureCreated();
+        ConfigureSqliteConcurrency();
         EnsureTriggersCreated();
     }
 
@@ -36,7 +40,27 @@ public sealed class EfCoreContext : DbContext
         base.OnModelCreating(modelBuilder);
     }
 
+    private void ConfigureSqliteConcurrency()
+    {
+        Database.ExecuteSqlRaw("PRAGMA journal_mode=WAL;");
+        Database.ExecuteSqlRaw("PRAGMA busy_timeout=10000;");
+    }
+
     private void EnsureTriggersCreated()
+    {
+        var connectionString = Database.GetConnectionString();
+        lock (TriggerInitLock)
+        {
+            if (connectionString == _triggersInitializedForConnection)
+                return;
+
+            CreateTriggers();
+
+            _triggersInitializedForConnection = connectionString;
+        }
+    }
+
+    private void CreateTriggers()
     {
         // When EF sets SwimEventId=NULL (e.g., DeleteBehavior.SetNull), ensure entry status returns to ENTRY.
         // Recreate to apply to already created DBs.

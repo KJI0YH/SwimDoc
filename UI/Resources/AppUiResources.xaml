@@ -49,6 +49,13 @@
         <Setter Property="FontSize" Value="{StaticResource SwimDocFontSizeBody}" />
     </Style>
 
+    <Style x:Key="SwimDocAccentProgressBarStyle" TargetType="ProgressBar">
+        <Setter Property="Height" Value="6" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Foreground" Value="{DynamicResource SystemAccentColorPrimaryBrush}" />
+        <Setter Property="Background" Value="{DynamicResource ControlStrokeColorDefaultBrush}" />
+    </Style>
+
     <Style x:Key="CaptionTextBlockStyle"
            TargetType="TextBlock"
            BasedOn="{StaticResource {x:Type TextBlock}}">

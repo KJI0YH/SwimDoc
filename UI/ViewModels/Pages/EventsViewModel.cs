@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
+using System.Windows;
 using BizLogic.HeatLogic;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -31,9 +32,7 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, int?>
     protected override PagingPage PagingSettingsPage => PagingPage.Events;
 
     private readonly IEventService _eventService;
-    private readonly IHeatService _heatService;
     private readonly IAddEditWindowFactory _windowFactory;
-    private readonly IReportExportService _reportExportService;
 
     [ObservableProperty] private ObservableCollection<EventFilterOption<int>> _distanceFilterOptions = new();
     [ObservableProperty] private ObservableCollection<EventFilterOption<Stroke>> _strokeFilterOptions = new();
@@ -48,17 +47,10 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, int?>
     public string StatusFilterText => GetFilterText(StatusFilterOptions, Strings.Filters_Status);
     public string RoundFilterText => GetFilterText(RoundFilterOptions, Strings.Filters_Round);
 
-    public EventsViewModel(IEventService eventService)
-        : this(eventService, App.Current.Services.GetRequiredService<IHeatService>())
-    {
-    }
-
-    public EventsViewModel(IEventService eventService, IHeatService heatService) : base(eventService)
+    public EventsViewModel(IEventService eventService) : base(eventService)
     {
         _eventService = eventService;
         _windowFactory = App.Current.Services.GetRequiredService<IAddEditWindowFactory>();
-        _heatService = heatService;
-        _reportExportService = App.Current.Services.GetRequiredService<IReportExportService>();
         PropertyChanged += OnViewModelPropertyChanged;
         InitializeFilterOptions();
         SubscribeFilterOptions();
@@ -300,23 +292,34 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, int?>
             return;
 
         var deleteConfirmation = App.Current.Services.GetRequiredService<IConfirmDialogService>();
+        var events = SelectedItems.OrderBy(swimEvent => swimEvent.Order).ToList();
 
-        foreach (var swimEvent in SelectedItems)
-        {
-            if (!await deleteConfirmation.ConfirmHeatReformIfOfficialResultsExistAsync(swimEvent.Id))
-                continue;
+        await using var batch = new HeatAllocationBatchSession(result.HeatOrder, result.MinHeatSize);
+        var runResult = await RunMultiItemOperationAsync(
+            Strings.Operation_HeatAllocation_Header,
+            Strings.Operation_HeatAllocation_Preparing_MessageFormat,
+            Strings.Operation_HeatAllocation_Processing_MessageFormat,
+            Strings.Operation_HeatAllocation_Finished_MessageFormat,
+            Strings.Operation_HeatAllocation_Canceled_Header,
+            events,
+            async (swimEvent, ct) =>
+            {
+                ct.ThrowIfCancellationRequested();
 
-            var parameters = new HeatAllocationParameters(swimEvent.Id, result.HeatOrder, result.MinHeatSize);
-            _heatService.AllocateEntriesToHeats(parameters);
-        }
+                var confirmed = await Application.Current.Dispatcher.InvokeAsync(
+                    () => deleteConfirmation.ConfirmHeatReformIfOfficialResultsExistAsync(swimEvent.Id));
 
-        _ = LoadDataAsync();
+                if (!await confirmed)
+                    return OperationItemOutcome.Skipped();
+
+                ct.ThrowIfCancellationRequested();
+                return batch.AllocateEvent(swimEvent.Id);
+            });
+
+        await LoadDataAsync();
     }
 
-    private bool CanAllocateHeats()
-    {
-        return SelectedItems.Count > 0;
-    }
+    private bool CanAllocateHeats() => SelectedItems.Count > 0 && !IsOperationRunning;
 
     [RelayCommand(CanExecute = nameof(CanGenerateReports))]
     private async Task GenerateReports()
@@ -337,23 +340,53 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, int?>
             IncludeFinishList = result.IncludeFinishList
         };
 
-        try
-        {
-            _reportExportService.ExportToExcel(options);
-        }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
-        {
-            var dialogs = App.Current.Services.GetRequiredService<IErrorDialogService>();
-            await dialogs.ShowErrorAsync(
-                title: Strings.Dialog_Error_SaveReport_Title,
-                message: Strings.Dialog_Error_FileBusyOrUnavailable);
-        }
+        await RunSingleOperationAsync(
+            Strings.Operation_Reports_Header,
+            Strings.Operation_Reports_Running_Message,
+            string.Format(Strings.Operation_Reports_Finished_MessageFormat, Path.GetFileName(result.OutputFilePath)),
+            Strings.Operation_Reports_Canceled_Header,
+            async ct =>
+            {
+                var tempPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}.xlsx");
+                try
+                {
+                    var tempOptions = new ReportExportOptions
+                    {
+                        SwimEventIds = options.SwimEventIds,
+                        OutputFilePath = tempPath,
+                        IncludeEntryList = options.IncludeEntryList,
+                        IncludeStartList = options.IncludeStartList,
+                        IncludeFinishList = options.IncludeFinishList
+                    };
+
+                    using var scope = App.Current.Services.CreateScope();
+                    scope.ServiceProvider.GetRequiredService<IReportExportService>()
+                        .ExportToExcel(tempOptions);
+
+                    ct.ThrowIfCancellationRequested();
+
+                    if (File.Exists(options.OutputFilePath))
+                        File.Delete(options.OutputFilePath);
+
+                    File.Move(tempPath, options.OutputFilePath);
+                    return OperationItemOutcome.Success();
+                }
+                catch (OperationCanceledException)
+                {
+                    if (File.Exists(tempPath))
+                        File.Delete(tempPath);
+                    throw;
+                }
+                catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+                {
+                    if (File.Exists(tempPath))
+                        File.Delete(tempPath);
+                    return OperationItemOutcome.Failed([Strings.Dialog_Error_FileBusyOrUnavailable]);
+                }
+            });
     }
 
-    private bool CanGenerateReports()
-    {
-        return SelectedItems.Count > 0;
-    }
+    private bool CanGenerateReports() => SelectedItems.Count > 0 && !IsOperationRunning;
 
     [RelayCommand(CanExecute = nameof(CanCalculateStartTimes))]
     private async Task CalculateStartTimesAsync()
@@ -370,9 +403,21 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, int?>
             .Select(swimEvent => swimEvent.Id)
             .ToList();
 
-        await _eventService.CalculateStartTimesAsync(swimEventIds, result.ToParameters());
+        await RunSingleOperationAsync(
+            Strings.Operation_StartTimes_Header,
+            Strings.Operation_StartTimes_Running_Message,
+            string.Format(Strings.Operation_StartTimes_Finished_MessageFormat, swimEventIds.Count),
+            Strings.Operation_StartTimes_Canceled_Header,
+            async ct =>
+            {
+                using var scope = App.Current.Services.CreateScope();
+                await scope.ServiceProvider.GetRequiredService<IEventService>()
+                    .CalculateStartTimesAsync(swimEventIds, result.ToParameters(), ct);
+                return OperationItemOutcome.Success();
+            });
+
         await LoadDataAsync();
     }
 
-    private bool CanCalculateStartTimes() => SelectedItems.Count > 0;
+    private bool CanCalculateStartTimes() => SelectedItems.Count > 0 && !IsOperationRunning;
 }

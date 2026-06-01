@@ -45,7 +45,7 @@ public partial class MainWindow : FluentWindow
 
     private void OnPageNavigationRequested(Type pageType)
     {
-        Dispatcher.Invoke(() => NavigationView.Navigate(pageType));
+        Dispatcher.BeginInvoke(() => NavigationView.Navigate(pageType));
     }
 
     private void MinimizeButton_Click(object sender, RoutedEventArgs e)

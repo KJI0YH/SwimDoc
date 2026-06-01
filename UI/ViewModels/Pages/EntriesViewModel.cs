@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Windows.Data;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.IO;
@@ -27,7 +28,7 @@ namespace UI.ViewModels.Pages;
 public partial class EntriesViewModel(
     IEntryService entryService,
     IEntryDocumentReaderService entryDocumentReaderService)
-    : DataViewModel<Entry, int?>(entryService)
+    : DataViewModel<Entry, int?>(entryService), INavigationAware
 {
     protected override PagingPage PagingSettingsPage => PagingPage.Entries;
 
@@ -69,7 +70,9 @@ public partial class EntriesViewModel(
         App.Current.Services.GetRequiredService<IAddEditWindowFactory>();
 
     private CancellationTokenSource? _importCts;
+    private volatile bool _suppressImportUiUpdates;
     [ObservableProperty] private ObservableCollection<EntriesFile> _importFiles = new();
+    [ObservableProperty] private ICollectionView? _importFilesView;
     [ObservableProperty] private string _importHeader = string.Empty;
     [ObservableProperty] private string _importMessage = string.Empty;
     [ObservableProperty] private int _importProcessedFiles;
@@ -124,10 +127,16 @@ public partial class EntriesViewModel(
 
         _summaryRow.FileName = Strings.Import_Summary_Total;
         _summaryRow.FullPath = string.Format(Strings.Import_Summary_FilesCountFormat, ImportSummaryFilesCount);
+        _summaryRow.ClubsScanned = dataFiles.Sum(f => f.ClubsScanned);
+        _summaryRow.ClubsWithErrors = dataFiles.Sum(f => f.ClubsWithErrors);
         _summaryRow.ClubsAdded = ImportSummaryClubsAdded;
         _summaryRow.ClubsUpdated = ImportSummaryClubsUpdated;
+        _summaryRow.AthletesScanned = dataFiles.Sum(f => f.AthletesScanned);
+        _summaryRow.AthletesWithErrors = dataFiles.Sum(f => f.AthletesWithErrors);
         _summaryRow.AthletesAdded = ImportSummaryAthletesAdded;
         _summaryRow.AthletesUpdated = ImportSummaryAthletesUpdated;
+        _summaryRow.EntriesScanned = dataFiles.Sum(f => f.EntriesScanned);
+        _summaryRow.EntriesWithErrors = dataFiles.Sum(f => f.EntriesWithErrors);
         _summaryRow.EntriesAdded = ImportSummaryEntriesAdded;
         _summaryRow.EntriesUpdated = ImportSummaryEntriesUpdated;
         _summaryRow.WarningsCount = ImportSummaryWarningsCount;
@@ -135,7 +144,15 @@ public partial class EntriesViewModel(
         _summaryRow.Warnings = Array.Empty<string>();
         _summaryRow.Errors = Array.Empty<string>();
         _summaryRow.IsDetailsOpen = false;
-        _summaryRow.Status = ImportFileStatus.Summary;
+        _summaryRow.Status = ImportFileStatus.Pending;
+
+        if (ImportFilesView is ListCollectionView listView)
+            listView.Refresh();
+    }
+
+    partial void OnImportFilesChanged(ObservableCollection<EntriesFile> value)
+    {
+        ImportFilesView = ImportFilesViewHelper.CreateView(value);
     }
 
     protected override void InitializeColumns()
@@ -563,12 +580,27 @@ public partial class EntriesViewModel(
     partial void OnEventImportErrorsChanged(ObservableCollection<string> value) =>
         OnPropertyChanged(nameof(HasEventImportDetails));
 
+    public void OnNavigatedTo(object? parameter)
+    {
+        ResetFilterOptions();
+        EnsureFilterOptionsInitialized();
+        _ = LoadDataAsync();
+    }
+
+    public void OnNavigatedFrom()
+    {
+        _suppressImportUiUpdates = true;
+        if (IsImportRunning)
+            _importCts?.Cancel();
+    }
+
     private async Task StartImportAsync(string[] files)
     {
         if (files.Length == 0) return;
 
         _importCts?.Cancel();
         _importCts = new CancellationTokenSource();
+        _suppressImportUiUpdates = false;
 
         ImportBarKind = EntriesImportBarKind.File;
         EventImportErrors.Clear();
@@ -585,90 +617,200 @@ public partial class EntriesViewModel(
         ImportMessage = string.Format(Strings.Import_File_Preparing_MessageFormat, ImportTotalFiles);
         CancelImportCommand.NotifyCanExecuteChanged();
 
+        var importCanceled = false;
+        var token = _importCts.Token;
+
         try
         {
-            foreach (var file in filesToImport)
+            await Task.Run(async () =>
             {
-                _importCts.Token.ThrowIfCancellationRequested();
-
-                file.Status = ImportFileStatus.Processing;
-                ImportMessage = string.Format(
-                    Strings.Import_File_Processing_MessageFormat,
-                    file.FileName,
-                    ImportProcessedFiles + 1,
-                    ImportTotalFiles);
-
-                try
+                foreach (var file in filesToImport)
                 {
-                    var (documents, stats) =
-                        await Task.Run<(IReadOnlyList<EntryDocument> documents, EntryImportStats stats)>(
-                            () => entryDocumentReaderService.ReadWithStats(file.FullPath),
-                            _importCts.Token);
+                    token.ThrowIfCancellationRequested();
 
-                    file.ClubsAdded = stats.ClubsAdded;
-                    file.ClubsUpdated = stats.ClubsUpdated;
-                    file.AthletesAdded = stats.AthletesAdded;
-                    file.AthletesUpdated = stats.AthletesUpdated;
-                    file.EntriesAdded = stats.EntriesAdded;
-                    file.EntriesUpdated = stats.EntriesUpdated;
-                    file.Warnings = documents.SelectMany(d => d.Warnings).ToArray();
-                    file.Errors = documents.SelectMany(d => d.Errors).ToArray();
-                    file.WarningsCount = file.Warnings.Count;
-                    file.ErrorsCount = file.Errors.Count;
+                    if (!_suppressImportUiUpdates)
+                    {
+                        await DispatcherUiHelper.RunOnUiAsync(() =>
+                        {
+                            file.Status = ImportFileStatus.Processing;
+                            ImportMessage = string.Format(
+                                Strings.Import_File_Processing_MessageFormat,
+                                file.FileName,
+                                ImportProcessedFiles + 1,
+                                ImportTotalFiles);
+                        }).ConfigureAwait(false);
+                    }
 
-                    var hasErrors = documents.Any(d => (d.Errors?.Count ?? 0) > 0);
-                    var hasWarnings = documents.Any(d => (d.Warnings?.Count ?? 0) > 0);
-                    file.Status = hasErrors
-                        ? ImportFileStatus.Failed
-                        : hasWarnings
-                            ? ImportFileStatus.CompletedWithWarnings
-                            : ImportFileStatus.Completed;
+                    await using var batch = new EntryImportBatchSession();
+                    try
+                    {
+                        var (documents, stats) = batch.ImportFile(file.FullPath, token);
 
-                    RecalculateImportSummary();
+                        if (!_suppressImportUiUpdates)
+                        {
+                            await DispatcherUiHelper.RunOnUiAsync(() =>
+                            {
+                                ApplyImportStats(file, documents, stats);
+                                file.Status = ResolveImportFileStatus(documents);
+                                RecalculateImportSummary();
+                                ImportProcessedFiles++;
+                            }).ConfigureAwait(false);
+                        }
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        if (!_suppressImportUiUpdates)
+                        {
+                            await DispatcherUiHelper.RunOnUiAsync(() =>
+                            {
+                                file.Status = ImportFileStatus.Canceled;
+                                MarkUnfinishedImportFilesCanceled(filesToImport);
+                                ImportProcessedFiles++;
+                            }).ConfigureAwait(false);
+                        }
+
+                        throw;
+                    }
+                    catch (Exception)
+                    {
+                        if (!_suppressImportUiUpdates)
+                        {
+                            await DispatcherUiHelper.RunOnUiAsync(() =>
+                            {
+                                file.Status = ImportFileStatus.Failed;
+                                ImportProcessedFiles++;
+                            }).ConfigureAwait(false);
+                        }
+                    }
                 }
-                catch (OperationCanceledException)
-                {
-                    file.Status = ImportFileStatus.Canceled;
-                    throw;
-                }
-                catch (Exception ex)
-                {
-                    file.Status = ImportFileStatus.Failed;
-                }
-                finally
-                {
-                    ImportProcessedFiles++;
-                }
-            }
+            }, token).ConfigureAwait(true);
         }
         catch (OperationCanceledException)
         {
+            importCanceled = true;
             ImportHeader = Strings.Import_File_Canceled_Header;
-            return;
+            ImportMessage = string.Format(
+                Strings.Operation_Canceled_MessageFormat,
+                ImportProcessedFiles,
+                ImportTotalFiles);
         }
         finally
         {
-            ImportMessage = string.Format(
-                Strings.Import_File_Finished_MessageFormat,
-                ImportProcessedFiles,
-                ImportTotalFiles);
-            IsImportRunning = false;
-            CancelImportCommand.NotifyCanExecuteChanged();
-            RecalculateImportSummary();
+            if (!_suppressImportUiUpdates)
+            {
+                if (!importCanceled)
+                {
+                    ImportMessage = string.Format(
+                        Strings.Import_File_Finished_MessageFormat,
+                        ImportProcessedFiles,
+                        ImportTotalFiles);
+                }
+
+                IsImportRunning = false;
+                CancelImportCommand.NotifyCanExecuteChanged();
+                RecalculateImportSummary();
+            }
         }
 
-        await LoadDataAsync();
+        if (!importCanceled && !_suppressImportUiUpdates)
+            await LoadDataAsync();
+    }
+
+    private static void ApplyImportStats(
+        EntriesFile file,
+        IReadOnlyList<EntryDocument> documents,
+        EntryImportStats stats)
+    {
+        file.ClubsScanned = stats.ClubsScanned;
+        file.ClubsWithErrors = stats.ClubsWithErrors;
+        file.ClubsAdded = stats.ClubsAdded;
+        file.ClubsUpdated = stats.ClubsUpdated;
+        file.AthletesScanned = stats.AthletesScanned;
+        file.AthletesWithErrors = stats.AthletesWithErrors;
+        file.AthletesAdded = stats.AthletesAdded;
+        file.AthletesUpdated = stats.AthletesUpdated;
+        file.EntriesScanned = stats.EntriesScanned;
+        file.EntriesWithErrors = stats.EntriesWithErrors;
+        file.EntriesAdded = stats.EntriesAdded;
+        file.EntriesUpdated = stats.EntriesUpdated;
+        file.Warnings = documents.SelectMany(d => d.Warnings).ToArray();
+        file.Errors = documents.SelectMany(d => d.Errors).ToArray();
+        file.WarningsCount = file.Warnings.Count;
+        file.ErrorsCount = file.Errors.Count;
+    }
+
+    private static ImportFileStatus ResolveImportFileStatus(IReadOnlyList<EntryDocument> documents)
+    {
+        var hasErrors = documents.Any(d => d.Errors.Count > 0);
+        var hasWarnings = documents.Any(d => d.Warnings.Count > 0);
+        return hasErrors
+            ? ImportFileStatus.Failed
+            : hasWarnings
+                ? ImportFileStatus.CompletedWithWarnings
+                : ImportFileStatus.Completed;
+    }
+
+    private static void MarkUnfinishedImportFilesCanceled(IEnumerable<EntriesFile> files)
+    {
+        foreach (var file in files)
+        {
+            if (file.IsSummaryRow)
+                continue;
+
+            if (file.Status is ImportFileStatus.Pending or ImportFileStatus.Processing)
+                file.Status = ImportFileStatus.Canceled;
+        }
     }
 
     public partial class EntriesFile : ObservableObject
     {
-        [ObservableProperty] private int _athletesAdded;
-        [ObservableProperty] private int _athletesUpdated;
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(AthletesStatsDisplay))]
+        private int _athletesAdded;
 
-        [ObservableProperty] private int _clubsAdded;
-        [ObservableProperty] private int _clubsUpdated;
-        [ObservableProperty] private int _entriesAdded;
-        [ObservableProperty] private int _entriesUpdated;
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(AthletesStatsDisplay))]
+        private int _athletesScanned;
+
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(AthletesStatsDisplay))]
+        private int _athletesUpdated;
+
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(AthletesStatsDisplay))]
+        private int _athletesWithErrors;
+
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(ClubsStatsDisplay))]
+        private int _clubsAdded;
+
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(ClubsStatsDisplay))]
+        private int _clubsScanned;
+
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(ClubsStatsDisplay))]
+        private int _clubsUpdated;
+
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(ClubsStatsDisplay))]
+        private int _clubsWithErrors;
+
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(EntriesStatsDisplay))]
+        private int _entriesAdded;
+
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(EntriesStatsDisplay))]
+        private int _entriesScanned;
+
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(EntriesStatsDisplay))]
+        private int _entriesUpdated;
+
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(EntriesStatsDisplay))]
+        private int _entriesWithErrors;
         [ObservableProperty] private IReadOnlyList<string> _errors = Array.Empty<string>();
         [ObservableProperty] private int _errorsCount;
 
@@ -676,16 +818,34 @@ public partial class EntriesViewModel(
         [ObservableProperty] private string _fullPath;
 
         [ObservableProperty] private bool _isDetailsOpen;
-        [ObservableProperty] private bool _isSummaryRow;
 
-        [ObservableProperty] private ImportFileStatus _status = ImportFileStatus.Pending;
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(StatusText))]
+        private bool _isSummaryRow;
+
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(StatusText))]
+        private ImportFileStatus _status = ImportFileStatus.Pending;
+
         [ObservableProperty] private IReadOnlyList<string> _warnings = Array.Empty<string>();
         [ObservableProperty] private int _warningsCount;
+
+        public string StatusText =>
+            IsSummaryRow ? string.Empty : Strings.GetEnumDisplay(Status);
+
+        public string ClubsStatsDisplay => FormatPersistedCount(ClubsAdded, ClubsUpdated);
+
+        public string AthletesStatsDisplay => FormatPersistedCount(AthletesAdded, AthletesUpdated);
+
+        public string EntriesStatsDisplay => FormatPersistedCount(EntriesAdded, EntriesUpdated);
 
         public EntriesFile(string fileName, string fullPath)
         {
             FileName = fileName;
             FullPath = fullPath;
         }
+
+        private static string FormatPersistedCount(int added, int updated) =>
+            (added + updated).ToString(CultureInfo.CurrentCulture);
     }
 }

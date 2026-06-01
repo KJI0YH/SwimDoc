@@ -19,10 +19,10 @@ public class RunnerWriteDb<TIn, TOut>
         _actionClass = actionClass;
     }
 
-    public TOut RunAction(TIn dataIn)
+    public TOut RunAction(TIn dataIn, bool saveChanges = true)
     {
         var result = _actionClass.Action(dataIn);
-        if (!HasErrors)
+        if (saveChanges && !HasErrors)
             _context.SaveChanges();
         return result;
     }

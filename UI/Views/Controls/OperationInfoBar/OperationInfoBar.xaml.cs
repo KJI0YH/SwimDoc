@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -6,51 +5,20 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
-using UI.Helpers;
-using UI.ViewModels.Pages;
 
-namespace UI.Views.Controls.ImportInfoBar;
+namespace UI.Views.Controls.OperationInfoBar;
 
-public partial class ImportInfoBar : UserControl
+public partial class OperationInfoBar : UserControl
 {
     private static readonly BooleanToVisibilityConverter BoolToVis = new();
 
-    public ImportInfoBar()
+    public OperationInfoBar()
     {
         InitializeComponent();
     }
 
-    private void FilesGrid_Sorting(object sender, DataGridSortingEventArgs e)
+    private void ItemsGrid_LoadingRow(object sender, DataGridRowEventArgs e)
     {
-        e.Handled = true;
-        if (e.Column is not DataGridColumn column)
-            return;
-
-        var sortProperty = column.SortMemberPath;
-        if (string.IsNullOrEmpty(sortProperty) && column is DataGridBoundColumn boundColumn)
-            sortProperty = (boundColumn.Binding as Binding)?.Path.Path;
-
-        if (string.IsNullOrEmpty(sortProperty))
-            return;
-
-        var direction = column.SortDirection != ListSortDirection.Ascending
-            ? ListSortDirection.Ascending
-            : ListSortDirection.Descending;
-        column.SortDirection = direction;
-
-        if (DataContext is not EntriesViewModel viewModel)
-            return;
-
-        if (viewModel.ImportFilesView is not ListCollectionView listView)
-            return;
-
-        ImportFilesViewHelper.ApplySort(listView, sortProperty, direction);
-    }
-
-    private void FilesGrid_LoadingRow(object sender, DataGridRowEventArgs e)
-    {
-        // Keep default row visuals (hover/selection) by avoiding RowStyle;
-        // bind details visibility per item instead.
         BindingOperations.SetBinding(
             e.Row,
             DataGridRow.DetailsVisibilityProperty,
@@ -60,14 +28,14 @@ public partial class ImportInfoBar : UserControl
             });
     }
 
-    private void FilesGrid_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    private void ItemsGrid_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        if (FilesGrid == null) return;
+        if (ItemsGrid == null) return;
 
         if (IsClickInsideRowDetails(e.OriginalSource as DependencyObject))
             return;
 
-        var row = ItemsControl.ContainerFromElement(FilesGrid, e.OriginalSource as DependencyObject) as DataGridRow;
+        var row = ItemsControl.ContainerFromElement(ItemsGrid, e.OriginalSource as DependencyObject) as DataGridRow;
         if (row == null) return;
 
         var (warnings, errors) = GetWarningsAndErrorsCount(row.Item);
@@ -86,10 +54,6 @@ public partial class ImportInfoBar : UserControl
         if (item is null) return;
 
         var type = item.GetType();
-        var isSummaryRowProp = type.GetProperty("IsSummaryRow");
-        if (isSummaryRowProp?.GetValue(item) is bool isSummary && isSummary)
-            return;
-
         var prop = type.GetProperty("IsDetailsOpen");
         if (prop?.PropertyType != typeof(bool) || !prop.CanRead || !prop.CanWrite) return;
 
@@ -112,7 +76,6 @@ public partial class ImportInfoBar : UserControl
 
     private static DependencyObject? GetParentSafe(DependencyObject current)
     {
-        // VisualTreeHelper throws for non-Visuals (e.g. Run/TextElement).
         if (current is Visual or Visual3D)
             return VisualTreeHelper.GetParent(current);
 

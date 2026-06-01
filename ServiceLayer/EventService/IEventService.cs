@@ -13,7 +13,8 @@ public interface IEventService : ICrudService<SwimEvent, int?>
 
     Task CalculateStartTimesAsync(
         IReadOnlyList<int> swimEventIds,
-        StartTimeCalculationParameters parameters);
+        StartTimeCalculationParameters parameters,
+        CancellationToken cancellationToken = default);
     
     Task<List<SwimEvent>> GetIndividualEventsAsync();
     Task<List<SwimEvent>> GetRelayEventsAsync();

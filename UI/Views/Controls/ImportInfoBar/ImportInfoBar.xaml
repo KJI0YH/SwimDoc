@@ -16,6 +16,13 @@
         <helpers:EnumDescriptionConverter x:Key="EnumDescription" />
         <helpers:RectHeightConverter x:Key="RectHeight" />
         <helpers:LocalizedStringFormatConverter x:Key="LocFormat" />
+        <Style x:Key="ImportStatsCellTextStyle" TargetType="TextBlock">
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="TextAlignment" Value="Center" />
+        </Style>
+        <Style x:Key="ImportStatsColumnHeaderStyle" TargetType="DataGridColumnHeader">
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+        </Style>
     </UserControl.Resources>
 
     <!-- Bottom overlay import status (does not shift content) -->
@@ -79,14 +86,14 @@
                 <StackPanel>
                     <TextBlock Text="{Binding ImportHeader}" FontWeight="SemiBold" />
                     <TextBlock Text="{Binding ImportMessage}" Opacity="0.8" />
-                    <ProgressBar Height="6"
-                                 Margin="0,8,0,0"
+                    <ProgressBar Margin="0,8,0,0"
                                  IsIndeterminate="{Binding IsImportRunning}"
                                  Minimum="0"
                                  Maximum="{Binding ImportTotalFiles}"
                                  Value="{Binding ImportProcessedFiles}">
                         <ProgressBar.Style>
-                            <Style TargetType="ProgressBar">
+                            <Style TargetType="ProgressBar"
+                                   BasedOn="{StaticResource SwimDocAccentProgressBarStyle}">
                                 <Setter Property="Visibility" Value="Visible" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding IsFileImportBar}" Value="False">
@@ -121,7 +128,7 @@
                         <ScrollViewer DockPanel.Dock="Top"
                                       VerticalScrollBarVisibility="Auto"
                                       HorizontalScrollBarVisibility="Disabled">
-                            <ui:DataGrid ItemsSource="{Binding ImportFiles}"
+                            <ui:DataGrid ItemsSource="{Binding ImportFilesView}"
                                       AutoGenerateColumns="False"
                                       CanUserDeleteRows="False"
                                       IsReadOnly="True"
@@ -129,6 +136,7 @@
                                       RowDetailsVisibilityMode="Visible"
                                       PreviewMouseLeftButtonDown="FilesGrid_PreviewMouseLeftButtonDown"
                                       LoadingRow="FilesGrid_LoadingRow"
+                                      Sorting="FilesGrid_Sorting"
                                       x:Name="FilesGrid">
                                 <ui:DataGrid.RowStyle>
                                     <Style TargetType="DataGridRow"
@@ -247,44 +255,22 @@
                                     <DataGridTextColumn Header="{loc:Loc Import_Col_File}" Binding="{Binding FileName}" Width="150" />
                                     <DataGridTextColumn Header="{loc:Loc Import_Col_Path}" Binding="{Binding FullPath}" Width="*" />
                                     <DataGridTextColumn Header="{loc:Loc Import_Col_Status}" Width="180"
-                                                        Binding="{Binding Status, Converter={StaticResource EnumDescription}}" />
-                                    <DataGridTemplateColumn Header="{loc:Loc Import_Col_Clubs}" Width="100">
-                                        <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <TextBlock HorizontalAlignment="Center" TextAlignment="Center">
-                                                    <Run Text="{Binding ClubsAdded}" />
-                                                    <Run Text="/" />
-                                                    <Run Text="{Binding ClubsUpdated}" />
-                                                </TextBlock>
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellTemplate>
-                                    </DataGridTemplateColumn>
+                                                        Binding="{Binding StatusText}" />
+                                    <DataGridTextColumn Header="{loc:Loc Import_Col_Clubs}" Width="130"
+                                                        Binding="{Binding ClubsStatsDisplay}"
+                                                        ElementStyle="{StaticResource ImportStatsCellTextStyle}"
+                                                        HeaderStyle="{StaticResource ImportStatsColumnHeaderStyle}" />
+                                    <DataGridTextColumn Header="{loc:Loc Import_Col_Athletes}" Width="150"
+                                                        Binding="{Binding AthletesStatsDisplay}"
+                                                        ElementStyle="{StaticResource ImportStatsCellTextStyle}"
+                                                        HeaderStyle="{StaticResource ImportStatsColumnHeaderStyle}" />
+                                    <DataGridTextColumn Header="{loc:Loc Import_Col_Entries}" Width="130"
+                                                        Binding="{Binding EntriesStatsDisplay}"
+                                                        ElementStyle="{StaticResource ImportStatsCellTextStyle}"
+                                                        HeaderStyle="{StaticResource ImportStatsColumnHeaderStyle}" />
 
-                                    <DataGridTemplateColumn Header="{loc:Loc Import_Col_Athletes}" Width="130">
-                                        <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <TextBlock HorizontalAlignment="Center" TextAlignment="Center">
-                                                    <Run Text="{Binding AthletesAdded}" />
-                                                    <Run Text="/" />
-                                                    <Run Text="{Binding AthletesUpdated}" />
-                                                </TextBlock>
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellTemplate>
-                                    </DataGridTemplateColumn>
-
-                                    <DataGridTemplateColumn Header="{loc:Loc Import_Col_Entries}" Width="90">
-                                        <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <TextBlock HorizontalAlignment="Center" TextAlignment="Center">
-                                                    <Run Text="{Binding EntriesAdded}" />
-                                                    <Run Text="/" />
-                                                    <Run Text="{Binding EntriesUpdated}" />
-                                                </TextBlock>
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellTemplate>
-                                    </DataGridTemplateColumn>
-
-                                    <DataGridTemplateColumn Header="{loc:Loc Import_Col_Warnings}" Width="170">
+                                    <DataGridTemplateColumn Header="{loc:Loc Import_Col_Warnings}" Width="170"
+                                                            HeaderStyle="{StaticResource ImportStatsColumnHeaderStyle}">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
                                                 <TextBlock HorizontalAlignment="Center" TextAlignment="Center">
@@ -294,7 +280,8 @@
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
 
-                                    <DataGridTemplateColumn Header="{loc:Loc Import_Col_Errors}" Width="100">
+                                    <DataGridTemplateColumn Header="{loc:Loc Import_Col_Errors}" Width="100"
+                                                            HeaderStyle="{StaticResource ImportStatsColumnHeaderStyle}">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
                                                 <TextBlock HorizontalAlignment="Center" TextAlignment="Center">

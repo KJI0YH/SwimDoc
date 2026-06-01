@@ -49,43 +49,57 @@ public class EventService(EfCoreContext dbContext, IBaseTimeRepository baseTimeR
 
     public async Task CalculateStartTimesAsync(
         IReadOnlyList<int> swimEventIds,
-        StartTimeCalculationParameters parameters)
+        StartTimeCalculationParameters parameters,
+        CancellationToken cancellationToken = default)
     {
         if (swimEventIds.Count == 0)
             return;
 
-        var events = await dbContext.SwimEvents
-            .Where(swimEvent => swimEventIds.Contains(swimEvent.Id))
-            .Include(swimEvent => swimEvent.Entries)
-            .Include(swimEvent => swimEvent.Heats.OrderBy(heat => heat.Order))
-            .ThenInclude(heat => heat.Positions)
-            .ThenInclude(position => position.Entry)
-            .Include(swimEvent => swimEvent.SwimStyle)
-            .Include(swimEvent => swimEvent.AgeGroup)
-            .OrderBy(swimEvent => swimEvent.Order)
-            .ToListAsync();
-
-        var currentTime = parameters.StartTime;
-
-        foreach (var swimEvent in events)
+        await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
+        try
         {
-            swimEvent.Time = currentTime;
-            foreach (var heat in swimEvent.Heats)
+            var events = await dbContext.SwimEvents
+                .Where(swimEvent => swimEventIds.Contains(swimEvent.Id))
+                .Include(swimEvent => swimEvent.Entries)
+                .Include(swimEvent => swimEvent.Heats.OrderBy(heat => heat.Order))
+                .ThenInclude(heat => heat.Positions)
+                .ThenInclude(position => position.Entry)
+                .Include(swimEvent => swimEvent.SwimStyle)
+                .Include(swimEvent => swimEvent.AgeGroup)
+                .OrderBy(swimEvent => swimEvent.Order)
+                .ToListAsync(cancellationToken);
+
+            var currentTime = parameters.StartTime;
+
+            foreach (var swimEvent in events)
             {
-                heat.DayTime = currentTime;
-                var slowestHeatTime = heat.Positions.Max(position => position.Entry.EntryTime) ??
-                                      swimEvent.Entries.Max(entry => entry.EntryTime) ??
-                                      (int)Math.Truncate(baseTimeRepository.GetBaseTime(swimEvent.Course,
-                                          swimEvent.SwimStyle.Distance,
-                                          swimEvent.SwimStyle.Stroke, swimEvent.SwimStyle.RelayCount,
-                                          swimEvent.AgeGroup.Gender) * 1.5);
-                currentTime = currentTime.Add(TimeSpan.FromMilliseconds(slowestHeatTime * 10));
-                currentTime = currentTime.Add(parameters.HeatPause);
+                cancellationToken.ThrowIfCancellationRequested();
+
+                swimEvent.Time = currentTime;
+                foreach (var heat in swimEvent.Heats)
+                {
+                    heat.DayTime = currentTime;
+                    var slowestHeatTime = heat.Positions.Max(position => position.Entry.EntryTime) ??
+                                          swimEvent.Entries.Max(entry => entry.EntryTime) ??
+                                          (int)Math.Truncate(baseTimeRepository.GetBaseTime(swimEvent.Course,
+                                              swimEvent.SwimStyle.Distance,
+                                              swimEvent.SwimStyle.Stroke, swimEvent.SwimStyle.RelayCount,
+                                              swimEvent.AgeGroup.Gender) * 1.5);
+                    currentTime = currentTime.Add(TimeSpan.FromMilliseconds(slowestHeatTime * 10));
+                    currentTime = currentTime.Add(parameters.HeatPause);
+                }
+
+                currentTime = currentTime.Add(parameters.EventPause);
             }
 
-            currentTime = currentTime.Add(parameters.EventPause);
+            cancellationToken.ThrowIfCancellationRequested();
+            await dbContext.SaveChangesAsync(cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
         }
-
-        await dbContext.SaveChangesAsync();
+        catch
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            throw;
+        }
     }
 }

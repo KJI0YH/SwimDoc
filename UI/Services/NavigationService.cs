@@ -77,6 +77,9 @@ public class NavigationService(IServiceProvider serviceProvider) : INavigationSe
             return;
         }
 
+        if (_currentViewModel is INavigationAware leaving)
+            leaving.OnNavigatedFrom();
+
         if (_currentViewModel != null)
             _navigationHistory.Push(_currentViewModel);
 
@@ -93,6 +96,9 @@ public class NavigationService(IServiceProvider serviceProvider) : INavigationSe
     {
         if (!CanGoBack)
             return;
+
+        if (_currentViewModel is INavigationAware leaving)
+            leaving.OnNavigatedFrom();
 
         var previousViewModel = _navigationHistory.Pop();
         CurrentViewModel = previousViewModel;

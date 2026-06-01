@@ -192,6 +192,30 @@ public static class Strings
     public static string Import_File_Canceled_Header => Get(nameof(Import_File_Canceled_Header));
     public static string Import_File_Finished_MessageFormat => Get(nameof(Import_File_Finished_MessageFormat));
 
+    public static string Operation_Col_Event => Get(nameof(Operation_Col_Event));
+    public static string Operation_Col_HeatsCreated => Get(nameof(Operation_Col_HeatsCreated));
+    public static string Operation_Finished_Success_Header => Get(nameof(Operation_Finished_Success_Header));
+    public static string Operation_Finished_WithWarnings_Header => Get(nameof(Operation_Finished_WithWarnings_Header));
+    public static string Operation_Finished_WithErrors_Header => Get(nameof(Operation_Finished_WithErrors_Header));
+    public static string Operation_Finished_AllSkipped_Header => Get(nameof(Operation_Finished_AllSkipped_Header));
+    public static string Operation_Canceled_MessageFormat => Get(nameof(Operation_Canceled_MessageFormat));
+    public static string Operation_HeatAllocation_Header => Get(nameof(Operation_HeatAllocation_Header));
+    public static string Operation_HeatAllocation_Preparing_MessageFormat => Get(nameof(Operation_HeatAllocation_Preparing_MessageFormat));
+    public static string Operation_HeatAllocation_Processing_MessageFormat => Get(nameof(Operation_HeatAllocation_Processing_MessageFormat));
+    public static string Operation_HeatAllocation_Finished_MessageFormat => Get(nameof(Operation_HeatAllocation_Finished_MessageFormat));
+    public static string Operation_HeatAllocation_Canceled_Header => Get(nameof(Operation_HeatAllocation_Canceled_Header));
+    public static string HeatAllocation_Warning_HeatsReallocated => Get(nameof(HeatAllocation_Warning_HeatsReallocated));
+    public static string HeatAllocation_Warning_NoEntriesForEvent => Get(nameof(HeatAllocation_Warning_NoEntriesForEvent));
+    public static string HeatAllocation_Error_DatabaseLocked => Get(nameof(HeatAllocation_Error_DatabaseLocked));
+    public static string Operation_StartTimes_Header => Get(nameof(Operation_StartTimes_Header));
+    public static string Operation_StartTimes_Running_Message => Get(nameof(Operation_StartTimes_Running_Message));
+    public static string Operation_StartTimes_Finished_MessageFormat => Get(nameof(Operation_StartTimes_Finished_MessageFormat));
+    public static string Operation_StartTimes_Canceled_Header => Get(nameof(Operation_StartTimes_Canceled_Header));
+    public static string Operation_Reports_Header => Get(nameof(Operation_Reports_Header));
+    public static string Operation_Reports_Running_Message => Get(nameof(Operation_Reports_Running_Message));
+    public static string Operation_Reports_Finished_MessageFormat => Get(nameof(Operation_Reports_Finished_MessageFormat));
+    public static string Operation_Reports_Canceled_Header => Get(nameof(Operation_Reports_Canceled_Header));
+
     public static string Dialog_Error_SaveReport_Title => Get(nameof(Dialog_Error_SaveReport_Title));
     public static string Dialog_Error_FileBusyOrUnavailable => Get(nameof(Dialog_Error_FileBusyOrUnavailable));
     public static string Dialog_Error_FileBusyOrUnavailableWithDetailsFormat => Get(nameof(Dialog_Error_FileBusyOrUnavailableWithDetailsFormat));

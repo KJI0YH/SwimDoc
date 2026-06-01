@@ -21,14 +21,22 @@ public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbCo
         new HeatAllocationAction(new HeatAllocationDbAccess(dbContext)),
         dbContext);
 
-    public HeatAllocationOutDto AllocateEntriesToHeats(HeatAllocationParameters parameters)
+    public HeatAllocationOutDto AllocateEntriesToHeats(HeatAllocationParameters parameters, bool saveChanges = true)
     {
-        var swimEvent = dbContext.SwimEvents.AsNoTracking()
-            .FirstOrDefault(swimEvent => swimEvent.Id == parameters.SwimEventId);
-        if (swimEvent is null) throw new EntityNotFoundException($"No such swim event: {parameters.SwimEventId}");
-        var dataIn = new HeatAllocationInDto(parameters, swimEvent);
-        var result = _runner.RunAction(dataIn);
-        return _runner.HasErrors ? throw new HeatAllocationException(_runner.Errors) : result;
+        try
+        {
+            var swimEvent = dbContext.SwimEvents.AsNoTracking()
+                .FirstOrDefault(swimEvent => swimEvent.Id == parameters.SwimEventId);
+            if (swimEvent is null) throw new EntityNotFoundException($"No such swim event: {parameters.SwimEventId}");
+            var dataIn = new HeatAllocationInDto(parameters, swimEvent);
+            var result = _runner.RunAction(dataIn, saveChanges);
+            return _runner.HasErrors ? throw new HeatAllocationException(_runner.Errors) : result;
+        }
+        finally
+        {
+            if (saveChanges)
+                dbContext.ChangeTracker.Clear();
+        }
     }
 
     public async Task DeleteSwimEventHeatsAsync(int swimEventId)

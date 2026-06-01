@@ -14,16 +14,19 @@ public class HeatAllocationAction(IHeatAllocationDbAccess dbAccess) :
 
     public HeatAllocationOutDto Action(HeatAllocationInDto dataIn)
     {
+        _warnings = [];
+        _errors = [];
+
         if (dbAccess.IsHeatsAllocated(dataIn.SwimEventId))
         {
-            _warnings.Add($"Heats were reallocated");
+            _warnings.Add(HeatAllocationMessageKeys.HeatsReallocated);
             dbAccess.DeleteExistedHeats(dataIn.SwimEventId);
         }
 
         var entries = new BufferedCollection<Entry>(dbAccess.GetOrderedEntriesByEventId(dataIn.SwimEventId));
         if (entries.Count == 0)
         {
-            _warnings.Add($"There are no entries for this swim event");
+            _warnings.Add(HeatAllocationMessageKeys.NoEntriesForEvent);
             return new HeatAllocationOutDto([], _warnings, _errors);
         }
 

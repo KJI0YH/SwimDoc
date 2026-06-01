@@ -111,6 +111,30 @@
   <data name="Import_EventCurrent" xml:space="preserve"><value>Current event</value></data>
   <data name="Import_CreatedEntries" xml:space="preserve"><value>Entries created</value></data>
 
+  <data name="Operation_Col_Event" xml:space="preserve"><value>Event</value></data>
+  <data name="Operation_Col_HeatsCreated" xml:space="preserve"><value>Heats created</value></data>
+  <data name="Operation_Finished_Success_Header" xml:space="preserve"><value>Operation completed</value></data>
+  <data name="Operation_Finished_WithWarnings_Header" xml:space="preserve"><value>Operation completed with warnings</value></data>
+  <data name="Operation_Finished_WithErrors_Header" xml:space="preserve"><value>Operation completed with errors</value></data>
+  <data name="Operation_Finished_AllSkipped_Header" xml:space="preserve"><value>Operation not performed</value></data>
+  <data name="Operation_Canceled_MessageFormat" xml:space="preserve"><value>Stopped after {0}/{1}</value></data>
+  <data name="Operation_HeatAllocation_Header" xml:space="preserve"><value>Heat allocation</value></data>
+  <data name="Operation_HeatAllocation_Preparing_MessageFormat" xml:space="preserve"><value>Preparing {0} events</value></data>
+  <data name="Operation_HeatAllocation_Processing_MessageFormat" xml:space="preserve"><value>Allocating heats: {0} ({1}/{2})</value></data>
+  <data name="Operation_HeatAllocation_Finished_MessageFormat" xml:space="preserve"><value>Processed {0}/{1} events</value></data>
+  <data name="Operation_HeatAllocation_Canceled_Header" xml:space="preserve"><value>Heat allocation canceled</value></data>
+  <data name="HeatAllocation_Warning_HeatsReallocated" xml:space="preserve"><value>Existing heats were removed and reallocated</value></data>
+  <data name="HeatAllocation_Warning_NoEntriesForEvent" xml:space="preserve"><value>There are no entries for this event</value></data>
+  <data name="HeatAllocation_Error_DatabaseLocked" xml:space="preserve"><value>The database is busy. Close other operations and try again.</value></data>
+  <data name="Operation_StartTimes_Header" xml:space="preserve"><value>Start time calculation</value></data>
+  <data name="Operation_StartTimes_Running_Message" xml:space="preserve"><value>Calculating start times…</value></data>
+  <data name="Operation_StartTimes_Finished_MessageFormat" xml:space="preserve"><value>Start times calculated for {0} events</value></data>
+  <data name="Operation_StartTimes_Canceled_Header" xml:space="preserve"><value>Start time calculation canceled</value></data>
+  <data name="Operation_Reports_Header" xml:space="preserve"><value>Report generation</value></data>
+  <data name="Operation_Reports_Running_Message" xml:space="preserve"><value>Generating reports…</value></data>
+  <data name="Operation_Reports_Finished_MessageFormat" xml:space="preserve"><value>Reports saved: {0}</value></data>
+  <data name="Operation_Reports_Canceled_Header" xml:space="preserve"><value>Report generation canceled</value></data>
+
   <data name="Filters_Clear" xml:space="preserve"><value>Clear filters</value></data>
   <data name="Filters_Round" xml:space="preserve"><value>Round</value></data>
   <data name="Filters_Distance" xml:space="preserve"><value>Distance</value></data>
@@ -190,6 +214,13 @@
   <data name="Enum_ImportFileStatus_CompletedWithWarnings" xml:space="preserve"><value>Completed with warnings</value></data>
   <data name="Enum_ImportFileStatus_Failed" xml:space="preserve"><value>Failed</value></data>
   <data name="Enum_ImportFileStatus_Canceled" xml:space="preserve"><value>Canceled</value></data>
+  <data name="Enum_OperationItemStatus_Pending" xml:space="preserve"><value>Pending</value></data>
+  <data name="Enum_OperationItemStatus_Processing" xml:space="preserve"><value>Processing</value></data>
+  <data name="Enum_OperationItemStatus_Completed" xml:space="preserve"><value>Completed</value></data>
+  <data name="Enum_OperationItemStatus_CompletedWithWarnings" xml:space="preserve"><value>Completed with warnings</value></data>
+  <data name="Enum_OperationItemStatus_Failed" xml:space="preserve"><value>Failed</value></data>
+  <data name="Enum_OperationItemStatus_Canceled" xml:space="preserve"><value>Canceled</value></data>
+  <data name="Enum_OperationItemStatus_Skipped" xml:space="preserve"><value>Skipped</value></data>
   <data name="Events_Col_Order" xml:space="preserve"><value>Order</value></data>
   <data name="Events_Col_Date" xml:space="preserve"><value>Date</value></data>
   <data name="Events_Col_Time" xml:space="preserve"><value>Time</value></data>

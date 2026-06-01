@@ -10,12 +10,14 @@
              xmlns:eventFilterComboBox="clr-namespace:UI.Views.Controls.EventFilterComboBox"
              xmlns:helpers="clr-namespace:UI.Helpers"
              xmlns:loc="clr-namespace:UI.Localization"
+             xmlns:operationInfoBar="clr-namespace:UI.Views.Controls.OperationInfoBar"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <helpers:BoolToVisibilityConverter x:Key="BoolToVis" />
     </UserControl.Resources>
-    <dataView:DefaultDataView>
+    <Grid>
+        <dataView:DefaultDataView>
         <dataView:DefaultDataView.Toolbar>
             <StackPanel>
                 <WrapPanel Margin="0,0,0,4"
@@ -93,5 +95,11 @@
         <dataView:DefaultDataView.MainContent>
             <dataGridView:DataGridView />
         </dataView:DefaultDataView.MainContent>
-    </dataView:DefaultDataView>
+        </dataView:DefaultDataView>
+
+        <operationInfoBar:OperationInfoBar Margin="10"
+                                           VerticalAlignment="Bottom"
+                                           HorizontalAlignment="Stretch"
+                                           Panel.ZIndex="1000" />
+    </Grid>
 </UserControl>

@@ -45,30 +45,43 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
     [GeneratedRegex(@"(?:\d{1,}\D)?[0-5]\d\D\d{2}")]
     private static partial Regex EntryTimeRegex();
 
-    public IReadOnlyList<EntryDocument> Action(string dataIn)
+    public IReadOnlyList<EntryDocument> Action(string dataIn) => Action(dataIn, CancellationToken.None);
+
+    public IReadOnlyList<EntryDocument> Action(string dataIn, CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         if (!File.Exists(dataIn)) throw new FileNotFoundException($"File not found: {dataIn}");
         using var package = new ExcelPackage(dataIn);
         var workBook = package.Workbook;
-        return workBook.Worksheets
+        var worksheets = workBook.Worksheets
             .Where(worksheet =>
                 !SettingsWorksheetNames.Contains(worksheet.Name?.Trim() ?? string.Empty, StringComparer.OrdinalIgnoreCase))
-            .Select(ReadClubEntry).ToList();
+            .ToList();
+
+        var documents = new List<EntryDocument>(worksheets.Count);
+        foreach (var worksheet in worksheets)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            documents.Add(ReadClubEntry(worksheet, cancellationToken));
+        }
+
+        return documents;
     }
 
-    private EntryDocument ReadClubEntry(ExcelWorksheet workSheet)
+    private EntryDocument ReadClubEntry(ExcelWorksheet workSheet, CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         _warnings = [];
         _errors = [];
-        var athleteHeaders = FindHeaders(workSheet, FIRSTNAME_HEADER, LASTNAME_HEADER, BIRTH_YEAR_HEADER, GENDER_HEADER, CATEGORY_HEADER);
-        var clubHeaders = FindHeaders(workSheet, CLUB_NAME_HEADER);
-        var swimStyleHeaders = FindSwimStyles(workSheet);
+        var athleteHeaders = FindHeaders(workSheet, cancellationToken, FIRSTNAME_HEADER, LASTNAME_HEADER, BIRTH_YEAR_HEADER, GENDER_HEADER, CATEGORY_HEADER);
+        var clubHeaders = FindHeaders(workSheet, cancellationToken, CLUB_NAME_HEADER);
+        var swimStyleHeaders = FindSwimStyles(workSheet, cancellationToken);
         _warnings.AddRange(CheckHeaders(workSheet, athleteHeaders, CATEGORY_HEADER));
         _warnings.AddRange(CheckHeaders(workSheet, clubHeaders, CLUB_NAME_HEADER));
         _errors.AddRange(CheckHeaders(workSheet, athleteHeaders, FIRSTNAME_HEADER, LASTNAME_HEADER, BIRTH_YEAR_HEADER,
             GENDER_HEADER));
         if (_errors.Count != 0) return EntryDocument.OfError(_warnings, _errors);
-        var athletes = ReadAthletes(workSheet, athleteHeaders, swimStyleHeaders);
+        var athletes = ReadAthletes(workSheet, athleteHeaders, swimStyleHeaders, cancellationToken);
         var club = ReadClub(workSheet, clubHeaders);
         if (club is null)
         {
@@ -79,12 +92,17 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
         return EntryDocument.OfClub(club, _warnings, _errors);
     }
 
-    private static Dictionary<string, ExcelCellAddress?> FindHeaders(ExcelWorksheet workSheet, params string[] canonicalHeaders)
+    private static Dictionary<string, ExcelCellAddress?> FindHeaders(
+        ExcelWorksheet workSheet,
+        CancellationToken cancellationToken,
+        params string[] canonicalHeaders)
     {
         var headersCols = canonicalHeaders.ToDictionary<string, string, ExcelCellAddress?>(k => k, v => null);
         var usedCells = workSheet.Cells.Where(cell => !string.IsNullOrEmpty(cell.Text));
+        var scannedCells = 0;
         foreach (var cell in usedCells)
         {
+            ThrowIfCancellationRequested(cancellationToken, ref scannedCells);
             if (!headersCols.ContainsValue(null)) break;
             foreach (var canonical in canonicalHeaders)
             {
@@ -112,8 +130,9 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
         return null;
     }
 
-    private Dictionary<int, SwimStyle> FindSwimStyles(ExcelWorksheet workSheet)
+    private Dictionary<int, SwimStyle> FindSwimStyles(ExcelWorksheet workSheet, CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         Dictionary<int, SwimStyle> swimStyles = new();
         var strokeHeaders = ButterflyNames
             .Concat(BackstrokeNames)
@@ -129,6 +148,7 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
         var strokeRow = startCell.Row;
         for (var col = startCol; col <= endCol; col++)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             var distanceText = workSheet.Cells[distanceRow, col].Text;
             if (string.IsNullOrWhiteSpace(distanceText)) continue;
             if (!int.TryParse(distanceText, out var distance))
@@ -193,8 +213,11 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
         return false;
     }
 
-    private List<Athlete> ReadAthletes(ExcelWorksheet workSheet, Dictionary<string, ExcelCellAddress?> athleteHeaders,
-        Dictionary<int, SwimStyle> swimStyleHeaders)
+    private List<Athlete> ReadAthletes(
+        ExcelWorksheet workSheet,
+        Dictionary<string, ExcelCellAddress?> athleteHeaders,
+        Dictionary<int, SwimStyle> swimStyleHeaders,
+        CancellationToken cancellationToken)
     {
         List<Athlete> athletes = [];
         var fromRowAthlete = athleteHeaders.First(pair => pair.Key == FIRSTNAME_HEADER).Value!.Row + 1;
@@ -202,6 +225,7 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
         var toRowAthlete = workSheet.Dimension.End.Row;
         for (var row = fromRowAthlete; row <= toRowAthlete; row++)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             var hasErrors = false;
             var firstName = workSheet.Cells[row, athleteHeaders[FIRSTNAME_HEADER]!.Column].Text;
             if (string.IsNullOrWhiteSpace(firstName))
@@ -252,6 +276,7 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
             var entries = new List<Entry>();
             foreach (var col in entryCols)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 var entry = dbAccess.GetOrAddEntry(athlete, swimStyleHeaders[col],
                     workSheet.Cells[row, col].Style.Fill.PatternType == ExcelFillStyle.None,
                     EntryTimeRegex().IsMatch(workSheet.Cells[row, col].Text)
@@ -302,5 +327,11 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
     private string MessageLocation(string worksheetName, int? row, int? col)
     {
         return $"'{worksheetName}'[{row ?? '?'}:{col ?? '?'}]";
+    }
+
+    private static void ThrowIfCancellationRequested(CancellationToken cancellationToken, ref int counter, int interval = 32)
+    {
+        if (++counter % interval == 0)
+            cancellationToken.ThrowIfCancellationRequested();
     }
 }

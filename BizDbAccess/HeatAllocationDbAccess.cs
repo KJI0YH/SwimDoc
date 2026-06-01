@@ -43,15 +43,14 @@ public class HeatAllocationDbAccess(EfCoreContext context) : IHeatAllocationDbAc
     {
         // Heats can be reallocated even after results were entered.
         // Entries remain; reset official result fields before bulk-deleting heats.
-        var entriesWithOfficialResults = context.Entries
+        // Use bulk updates so SQLite triggers (heat reorder, swim event status) do not
+        // leave stale tracked entities that cause DbUpdateConcurrencyException on SaveChanges.
+        context.Entries
             .Where(e => e.SwimEventId == swimEventId && e.Status >= EntryStatus.FINISH)
-            .ToList();
-
-        foreach (var entry in entriesWithOfficialResults)
-        {
-            entry.ClearHeatResultData();
-            entry.Status = EntryStatus.EVENT;
-        }
+            .ExecuteUpdate(setters => setters
+                .SetProperty(e => e.FinishTime, (int?)null)
+                .SetProperty(e => e.Points, (int?)null)
+                .SetProperty(e => e.Status, EntryStatus.EVENT));
 
         context.Heats
             .Where(heat => heat.SwimEventId == swimEventId)
