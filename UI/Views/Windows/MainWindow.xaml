@@ -13,6 +13,7 @@
                  xmlns:dataGridView="clr-namespace:UI.Views.Controls.DataGridView"
                  mc:Ignorable="d"
                  Title="{loc:Loc App_Title}"
+                 Icon="pack://application:,,,/Assets/AppIcon.ico"
                  WindowState="Maximized"
                  WindowBackdropType="Mica"
                  WindowCornerPreference="Round"
