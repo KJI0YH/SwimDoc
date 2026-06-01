@@ -262,9 +262,10 @@ public class HeatsByAthleteViewModel : HeatsViewModel
                     (hp.Entry.Relay != null && hp.Entry.Relay.Positions.Any(p => p.AthleteId == _athleteId.Value))))
                 .ToList();
             var heatsTotal = HeatService.GetTotalHeats();
+            var swimEvent = SelectedSwimEvent;
             var heatPositionViews = heatsForAthlete.SelectMany(h =>
                 h.Positions.Select(p =>
-                    new HeatPositionView(p, h.Number, heatsInEvent, h.Order, heatsTotal, h.Status, h.DisplayDayTime)));
+                    new HeatPositionView(p, swimEvent, h.Number, heatsInEvent, h.Order, heatsTotal, h.Status, h.DisplayDayTime)));
             HeatPositions = new ObservableCollection<HeatPositionView>(heatPositionViews);
             UpdateHeatPaging(heatsForAthlete.Count, resetPage: false);
         }
@@ -605,9 +606,10 @@ public class HeatByEntryIdViewModel : HeatsViewModel
                 .Where(heat => heat.Positions.Any(hp => hp.EntryId == _entryId.Value))
                 .ToList();
             var heatsTotal = HeatService.GetTotalHeats();
+            var swimEvent = SelectedSwimEvent;
             var heatPositionViews = heatsForEntry.SelectMany(h =>
                 h.Positions.Select(p =>
-                    new HeatPositionView(p, h.Number, heatsInEvent, h.Order, heatsTotal, h.Status, h.DisplayDayTime)));
+                    new HeatPositionView(p, swimEvent, h.Number, heatsInEvent, h.Order, heatsTotal, h.Status, h.DisplayDayTime)));
             HeatPositions = new ObservableCollection<HeatPositionView>(heatPositionViews);
             SelectedHeatPosition = heatPositionViews.FirstOrDefault(p => p.Entry.Id == _entryId.Value);
             UpdateHeatPaging(heatsForEntry.Count, resetPage: false);

@@ -18,6 +18,7 @@
         Background="Transparent">
     <Window.Resources>
         <helpers:EnumDescriptionConverter x:Key="EnumDescriptionConverter" />
+        <helpers:BoolToVisibilityConverter x:Key="BoolToVis" />
     </Window.Resources>
 
     <addEditView:AddEditWindowView Width="520">
@@ -109,11 +110,21 @@
                     <DataGridTemplateColumn Header="{loc:Loc Heat_Col_Lane}" Width="130">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <ui:NumberBox Value="{Binding Lane, UpdateSourceTrigger=PropertyChanged}"
-                                              Minimum="{Binding DataContext.LaneMin, RelativeSource={RelativeSource AncestorType=Window}}"
-                                              Maximum="{Binding DataContext.LaneMax, RelativeSource={RelativeSource AncestorType=Window}}"
+                                <Grid>
+                                    <ui:NumberBox Value="{Binding Lane, UpdateSourceTrigger=PropertyChanged}"
+                                                  Minimum="{Binding DataContext.LaneMin, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                  Maximum="{Binding DataContext.LaneMax, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                  IsEnabled="{Binding DataContext.CanEditFields, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                  Visibility="{Binding DataContext.UsesCustomLaneNames, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVis}, ConverterParameter=Invert}"
+                                                  Margin="2" />
+                                    <ComboBox ItemsSource="{Binding DataContext.AvailableLanes, RelativeSource={RelativeSource AncestorType=Window}}"
+                                              SelectedValue="{Binding Lane, UpdateSourceTrigger=PropertyChanged}"
+                                              SelectedValuePath="Lane"
+                                              DisplayMemberPath="Display"
                                               IsEnabled="{Binding DataContext.CanEditFields, RelativeSource={RelativeSource AncestorType=Window}}"
+                                              Visibility="{Binding DataContext.UsesCustomLaneNames, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVis}}"
                                               Margin="2" />
+                                </Grid>
                             </DataTemplate>
 
                         </DataGridTemplateColumn.CellTemplate>

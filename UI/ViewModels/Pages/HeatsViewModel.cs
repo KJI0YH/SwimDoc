@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Windows.Data;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DataLayer;
 using DataLayer.EfClasses;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -255,9 +256,11 @@ public partial class HeatsViewModel(
                 heats = await HeatService.GetHeatsByEventIdPagedAsync(eventId, HeatCurrentPage, HeatPageSize);
             }
 
+            var swimEvent = SelectedSwimEvent;
             var heatPositionViews = heats.SelectMany(h =>
                 h.Positions.Select(p => new HeatPositionView(
                     p,
+                    swimEvent,
                     h.Number,
                     heatsInEvent,
                     h.Order,
@@ -489,6 +492,7 @@ public partial class HeatsViewModel(
 
 public sealed class HeatPositionView(
     HeatPosition heatPosition,
+    SwimEvent? swimEvent,
     int heatNumber,
     int heatsInEvent,
     int heatOrder,
@@ -512,6 +516,10 @@ public sealed class HeatPositionView(
         heatDayTime,
         heatStatus);
     public int Lane => HeatPosition.Lane;
+
+    public string DisplayLane => swimEvent is not null
+        ? SwimEventLaneNames.GetLaneDisplay(swimEvent, HeatPosition.Lane)
+        : HeatPosition.Lane.ToString();
     public string Participant => HeatPosition.Entry.DisplayParticipantName;
     public int? YearOfBirth => HeatPosition.Entry.Athlete?.YearOfBirth;
     public string Club => HeatPosition.Entry.DisplayParticipantClubName;

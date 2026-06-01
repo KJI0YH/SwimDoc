@@ -202,20 +202,30 @@
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0"
                            Text="{loc:Loc Event_Field_AvailableLanes}"
-                           VerticalAlignment="Center"
-                           Margin="0,0,10,0" />
-                <UniformGrid Grid.Column="1" Columns="2">
-                    <ui:NumberBox
-                        Minimum="0"
-                        PlaceholderText="{loc:Loc Common_Min}"
-                        Value="{Binding LaneMin, UpdateSourceTrigger=PropertyChanged}"
-                        Margin="0,2,2,2" />
-                    <ui:NumberBox
-                        Minimum="{Binding LaneMin, UpdateSourceTrigger=PropertyChanged}"
-                        PlaceholderText="{loc:Loc Common_Max}"
-                        Value="{Binding LaneMax, UpdateSourceTrigger=PropertyChanged}"
-                        Margin="2,2,0,2" />
-                </UniformGrid>
+                           VerticalAlignment="Top"
+                           Margin="0,4,10,0" />
+                <TabControl Grid.Column="1"
+                            SelectedIndex="{Binding LaneTabIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            Margin="0,2,0,2">
+                    <TabItem Header="{loc:Loc Event_Lanes_Tab_Range}">
+                        <UniformGrid Columns="2" Margin="4">
+                            <ui:NumberBox Minimum="0"
+                                          PlaceholderText="{loc:Loc Common_Min}"
+                                          Value="{Binding LaneMin, UpdateSourceTrigger=PropertyChanged}"
+                                          Margin="0,0,2,0" />
+                            <ui:NumberBox Minimum="{Binding LaneMin, UpdateSourceTrigger=PropertyChanged}"
+                                          PlaceholderText="{loc:Loc Common_Max}"
+                                          Value="{Binding LaneMax, UpdateSourceTrigger=PropertyChanged}"
+                                          Margin="2,0,0,0" />
+                        </UniformGrid>
+                    </TabItem>
+                    <TabItem Header="{loc:Loc Event_Lanes_Tab_Custom}">
+                        <ui:TextBox PlaceholderText="{loc:Loc Event_Field_CustomLaneNames_Placeholder}"
+                                    Text="{Binding CustomLaneNames, UpdateSourceTrigger=PropertyChanged}"
+                                    AcceptsReturn="False"
+                                    Margin="4" />
+                    </TabItem>
+                </TabControl>
             </Grid>
         </StackPanel>
     </addEditView:AddEditWindowView>

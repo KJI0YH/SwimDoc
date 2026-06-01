@@ -61,10 +61,15 @@ public partial class AddEditViewModel<TEntity, TKey> : ViewModelBase, IWindowRes
         }
     }
 
+    protected virtual bool ValidateBeforeSave() => true;
+
     [RelayCommand]
     private async Task SaveAsync()
     {
         ValidationErrors.Clear();
+        if (!ValidateBeforeSave())
+            return;
+
         ImmutableList<ValidationResult> errors;
 
         if (IsAdd)

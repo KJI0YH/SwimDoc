@@ -349,6 +349,11 @@ public static class Strings
     public static string Event_Field_PreviousEvent => Get(nameof(Event_Field_PreviousEvent));
     public static string Event_Field_RoundParticipantsCount => Get(nameof(Event_Field_RoundParticipantsCount));
     public static string Event_Field_AvailableLanes => Get(nameof(Event_Field_AvailableLanes));
+    public static string Event_Lanes_Tab_Range => Get(nameof(Event_Lanes_Tab_Range));
+    public static string Event_Lanes_Tab_Custom => Get(nameof(Event_Lanes_Tab_Custom));
+    public static string Event_Validation_CustomLaneNamesRequired => Get(nameof(Event_Validation_CustomLaneNamesRequired));
+    public static string Event_Field_CustomLaneNames => Get(nameof(Event_Field_CustomLaneNames));
+    public static string Event_Field_CustomLaneNames_Placeholder => Get(nameof(Event_Field_CustomLaneNames_Placeholder));
 
     public static string LoadPrev_Field_PreviousEvent => Get(nameof(LoadPrev_Field_PreviousEvent));
     public static string LoadPrev_Field_CurrentEvent => Get(nameof(LoadPrev_Field_CurrentEvent));

@@ -23,5 +23,7 @@ public class SwimEventConfiguration : IEntityTypeConfiguration<SwimEvent>
             .WithOne(e => e.NextSwimEvent)
             .HasForeignKey<SwimEvent>(e => e.PreviousSwimEventId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Property(e => e.CustomLaneNames).HasMaxLength(500);
     }
 }

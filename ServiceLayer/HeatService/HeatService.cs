@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using BizDbAccess;
 using BizLogic.HeatLogic;
 using BizLogic.HeatLogic.Concrete;
+using DataLayer;
 using DataLayer.EfClasses;
 using DataLayer.EfCore;
 using DataLayer.QueryObjects;
@@ -25,7 +26,7 @@ public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbCo
         var swimEvent = dbContext.SwimEvents.AsNoTracking()
             .FirstOrDefault(swimEvent => swimEvent.Id == parameters.SwimEventId);
         if (swimEvent is null) throw new EntityNotFoundException($"No such swim event: {parameters.SwimEventId}");
-        var dataIn = new HeatAllocationInDto(parameters, swimEvent.LaneMin, swimEvent.LaneMax);
+        var dataIn = new HeatAllocationInDto(parameters, swimEvent);
         var result = _runner.RunAction(dataIn);
         return _runner.HasErrors ? throw new HeatAllocationException(_runner.Errors) : result;
     }
@@ -194,14 +195,16 @@ public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbCo
             errors.Add(new ValidationResult("Номер заплыва должен быть не меньше 1.", [nameof(Heat.Number)]));
 
         var positions = heat.Positions?.ToList() ?? [];
-        var maxPositions = swimEvent.LaneMax - swimEvent.LaneMin + 1;
+        var maxPositions = SwimEventLaneNames.GetLaneCount(swimEvent);
         if (positions.Count > maxPositions)
             errors.Add(new ValidationResult(
-                $"В заплыве может быть не более {maxPositions} позиций (дорожки {swimEvent.LaneMin}-{swimEvent.LaneMax}).",
+                $"В заплыве может быть не более {maxPositions} позиций (дорожки {SwimEventLaneNames.FormatLanesSummary(swimEvent)}).",
                 [nameof(Heat.Positions)]));
         var duplicateLanes = positions.GroupBy(position => position.Lane).Where(g => g.Count() > 1).Select(g => g.Key);
         foreach (var lane in duplicateLanes)
-            errors.Add(new ValidationResult($"Дорожка {lane} указана более одного раза.", [nameof(HeatPosition.Lane)]));
+            errors.Add(new ValidationResult(
+                $"Дорожка {SwimEventLaneNames.GetLaneDisplay(swimEvent, lane)} указана более одного раза.",
+                [nameof(HeatPosition.Lane)]));
 
         var duplicateEntries = positions.GroupBy(position => position.EntryId).Where(g => g.Count() > 1)
             .Select(g => g.Key);
@@ -211,9 +214,9 @@ public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbCo
 
         foreach (var position in positions)
         {
-            if (position.Lane < swimEvent.LaneMin || position.Lane > swimEvent.LaneMax)
+            if (!SwimEventLaneNames.IsLaneInRange(swimEvent, position.Lane))
                 errors.Add(new ValidationResult(
-                    $"Дорожка {position.Lane} вне диапазона {swimEvent.LaneMin}-{swimEvent.LaneMax}.",
+                    $"Дорожка {SwimEventLaneNames.GetLaneDisplay(swimEvent, position.Lane)} вне диапазона {SwimEventLaneNames.FormatLanesSummary(swimEvent)}.",
                     [nameof(HeatPosition.Lane)]));
 
             var entryExists = dbContext.Entries.Any(entry =>

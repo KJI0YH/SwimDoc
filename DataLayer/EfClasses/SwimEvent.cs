@@ -19,7 +19,7 @@ public class SwimEvent : IValidatableObject
     public int? RoundParticipantsCount { get; set; }
     public required int LaneMin { get; set; }
     public required int LaneMax { get; set; }
-
+    public string? CustomLaneNames { get; set; }
     public int AgeGroupId { get; set; }
     public AgeGroup AgeGroup { get; set; }
 
@@ -37,7 +37,7 @@ public class SwimEvent : IValidatableObject
     public string DisplayName =>
         $"#{Order} {EnumDisplay.GetDescription(Round)} {SwimStyle.DisplayName} {AgeGroup.DisplayName}";
 
-    public string DisplayLanes => $"{LaneMin}-{LaneMax}";
+    public string DisplayLanes => SwimEventLaneNames.FormatLanesSummary(this);
 
     public string DisplayDate => Date.ToShortDateString();
 
@@ -66,8 +66,16 @@ public class SwimEvent : IValidatableObject
         if (RoundParticipantsCount is <= 0)
             yield return new ValidationResult("Round participants count must be greater than zero",
                 [nameof(RoundParticipantsCount)]);
-        if (LaneMin > LaneMax)
+        var customLanes = SwimEventLaneNames.Parse(CustomLaneNames);
+        if (customLanes.Count > 0)
+        {
+            if (customLanes.Count != customLanes.Distinct(StringComparer.OrdinalIgnoreCase).Count())
+                yield return new ValidationResult("Custom lane names must be unique", [nameof(CustomLaneNames)]);
+        }
+        else if (LaneMin > LaneMax)
+        {
             yield return new ValidationResult("Invalid lane range");
+        }
         if (PreviousSwimEvent is not null && Round <= PreviousSwimEvent.Round)
             yield return new ValidationResult("Invalid round order");
     }

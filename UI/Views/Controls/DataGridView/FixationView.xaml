@@ -82,7 +82,7 @@
                           IsReadOnly="False"
                           RowStyle="{StaticResource DataGridRowLightBlueWhenSelectedStyle}">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="{loc:Loc Fixation_Col_Lane}" Binding="{Binding Lane}" IsReadOnly="True" Width="80" />
+                        <DataGridTextColumn Header="{loc:Loc Fixation_Col_Lane}" Binding="{Binding DisplayLane}" IsReadOnly="True" Width="80" />
                         <DataGridTextColumn Header="{loc:Loc Fixation_Col_Participant}" Binding="{Binding ParticipantName}" IsReadOnly="True"
                                             Width="*" />
                         <DataGridTextColumn Header="{loc:Loc Fixation_Col_BirthYear}" Binding="{Binding YearOfBirth}" IsReadOnly="True" Width="120"/>

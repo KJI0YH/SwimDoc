@@ -225,7 +225,7 @@
 
   <data name="Heat_Validation_EventRequired" xml:space="preserve"><value>Для создания заплыва необходимо выбрать событие.</value></data>
   <data name="Heat_Validation_MinHeatNumber" xml:space="preserve"><value>Номер заплыва должен быть не меньше 1.</value></data>
-  <data name="Heat_Validation_MaxPositionsFormat" xml:space="preserve"><value>В заплыве может быть не более {0} позиций (дорожки {1}-{2}).</value></data>
+  <data name="Heat_Validation_MaxPositionsFormat" xml:space="preserve"><value>В заплыве может быть не более {0} позиций (дорожки {1}).</value></data>
 
   <data name="Clubs_Col_Name" xml:space="preserve"><value>Название</value></data>
   <data name="Clubs_Col_Athletes" xml:space="preserve"><value>Спортсмены</value></data>
@@ -300,6 +300,11 @@
   <data name="Event_Field_PreviousEvent" xml:space="preserve"><value>Предыдущее событие</value></data>
   <data name="Event_Field_RoundParticipantsCount" xml:space="preserve"><value>Количество участников</value></data>
   <data name="Event_Field_AvailableLanes" xml:space="preserve"><value>Доступные дорожки</value></data>
+  <data name="Event_Lanes_Tab_Range" xml:space="preserve"><value>Диапазон</value></data>
+  <data name="Event_Lanes_Tab_Custom" xml:space="preserve"><value>Свои названия</value></data>
+  <data name="Event_Validation_CustomLaneNamesRequired" xml:space="preserve"><value>Укажите хотя бы одно название дорожки через запятую.</value></data>
+  <data name="Event_Field_CustomLaneNames" xml:space="preserve"><value>Названия дорожек</value></data>
+  <data name="Event_Field_CustomLaneNames_Placeholder" xml:space="preserve"><value>Напр. 1,2,3,4,5,6 или 1л,1п,2л,2п (через запятую)</value></data>
 
   <data name="LoadPrev_Field_PreviousEvent" xml:space="preserve"><value>Предыдущее событие</value></data>
   <data name="LoadPrev_Field_CurrentEvent" xml:space="preserve"><value>Текущее событие</value></data>

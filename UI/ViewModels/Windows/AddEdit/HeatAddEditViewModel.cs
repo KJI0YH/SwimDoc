@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DataLayer;
 using DataLayer.EfClasses;
 using Microsoft.EntityFrameworkCore;
 using ServiceLayer.EntryService;
@@ -26,6 +27,7 @@ public partial class HeatAddEditViewModel(
     private readonly bool _isAdd = id is null or 0;
     private int? _contextEventId;
     private Heat _entity = new() { Positions = [] };
+    private SwimEvent? _swimEvent;
 
     [ObservableProperty] private ObservableCollection<string> _validationErrors = new();
     [ObservableProperty] private ObservableCollection<HeatPositionEditorRow> _positionRows = new();
@@ -35,7 +37,14 @@ public partial class HeatAddEditViewModel(
     [ObservableProperty] private int _laneMin = 1;
     [ObservableProperty] private int _laneMax = 1;
 
-    public int MaxPositionCount => LaneMax - LaneMin + 1;
+    public ObservableCollection<LaneSlot> AvailableLanes { get; } = new();
+
+    public bool UsesCustomLaneNames =>
+        _swimEvent is not null && SwimEventLaneNames.HasCustomLaneNames(_swimEvent);
+
+    public int MaxPositionCount => _swimEvent is not null
+        ? SwimEventLaneNames.GetLaneCount(_swimEvent)
+        : LaneMax - LaneMin + 1;
     public int MinHeatNumber => 1;
 
     public bool HasErrors => ValidationErrors.Count > 0;
@@ -192,8 +201,11 @@ public partial class HeatAddEditViewModel(
             .ToList();
         if (filledRows.Count > MaxPositionCount)
         {
+            var lanesSummary = _swimEvent is not null
+                ? SwimEventLaneNames.FormatLanesSummary(_swimEvent)
+                : $"{LaneMin}-{LaneMax}";
             ValidationErrors.Add(
-                string.Format(Strings.Heat_Validation_MaxPositionsFormat, MaxPositionCount, LaneMin, LaneMax));
+                string.Format(Strings.Heat_Validation_MaxPositionsFormat, MaxPositionCount, lanesSummary));
             return;
         }
 
@@ -241,12 +253,21 @@ public partial class HeatAddEditViewModel(
             .FirstOrDefaultAsync(se => se.Id == _contextEventId.Value);
 
         SwimEventDisplayName = EntityDisplayFormatter.FormatSwimEvent(swimEvent);
+        _swimEvent = swimEvent;
         if (swimEvent is not null)
         {
-            LaneMin = swimEvent.LaneMin;
-            LaneMax = swimEvent.LaneMax;
+            LaneMin = SwimEventLaneNames.GetLaneSlotMin(swimEvent);
+            LaneMax = SwimEventLaneNames.GetLaneSlotMax(swimEvent);
+            AvailableLanes.Clear();
+            foreach (var slot in SwimEventLaneNames.GetLaneSlots(swimEvent))
+                AvailableLanes.Add(slot);
+        }
+        else
+        {
+            AvailableLanes.Clear();
         }
 
+        OnPropertyChanged(nameof(UsesCustomLaneNames));
         OnPropertyChanged(nameof(MaxPositionCount));
         AddPositionRowCommand.NotifyCanExecuteChanged();
     }
@@ -409,20 +430,16 @@ public partial class HeatAddEditViewModel(
 
     private int SuggestNextLane()
     {
-        if (!_contextEventId.HasValue)
+        if (_swimEvent is null)
             return 1;
 
-        var swimEvent = eventService.Query().FirstOrDefault(se => se.Id == _contextEventId.Value);
-        if (swimEvent is null)
-            return 1;
-
-        for (var lane = swimEvent.LaneMin; lane <= swimEvent.LaneMax; lane++)
+        foreach (var slot in SwimEventLaneNames.GetLaneSlots(_swimEvent))
         {
-            if (PositionRows.All(row => row.Lane != lane))
-                return lane;
+            if (PositionRows.All(row => row.Lane != slot.Lane))
+                return slot.Lane;
         }
 
-        return swimEvent.LaneMin;
+        return SwimEventLaneNames.GetLaneSlotMin(_swimEvent);
     }
 
     private void UpdateDayTime(int? hour, int? minute)

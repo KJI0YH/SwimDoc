@@ -1,4 +1,5 @@
-﻿using DataLayer.EfCore;
+﻿using DataLayer;
+using DataLayer.EfCore;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System.Drawing;
@@ -82,7 +83,8 @@ public class StartListReportExcel(EfCoreContext dbContext) : BaseReportExcel(dbC
                     var entry = position.Entry;
                     var athlete = entry.Athlete;
 
-                    worksheet.Cells[row, colLane].Value = position.Lane;
+                    worksheet.Cells[row, colLane].Value =
+                        SwimEventLaneNames.GetLaneDisplay(swimEvent, position.Lane);
                     worksheet.Cells[row, colParticipant].Value = athlete?.DisplayName ?? "(нет данных)";
                     worksheet.Cells[row, colBirthYear].Value = athlete?.YearOfBirth;
                     worksheet.Cells[row, colTeam].Value = athlete?.DisplayClubName ?? "(Лично)";

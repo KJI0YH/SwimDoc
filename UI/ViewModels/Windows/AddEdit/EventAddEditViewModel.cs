@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DataLayer;
 using DataLayer.EfClasses;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -35,6 +36,11 @@ public partial class EventAddViewModel(
     [ObservableProperty] private SearchableItem? _selectedSwimStyle;
 
     [ObservableProperty] private ObservableCollection<SearchableItem> _swimStyles = new();
+
+    [ObservableProperty] private int _laneTabIndex;
+
+    private string? _savedCustomLaneNames;
+    private bool _isSyncingLaneTab;
 
     public IReadOnlyList<string> HourOptions { get; } = CreateTimePartOptions(24);
     public IReadOnlyList<string> MinuteOptions { get; } = CreateTimePartOptions(60);
@@ -205,7 +211,18 @@ public partial class EventAddViewModel(
         }
     }
 
-    
+    public string? CustomLaneNames
+    {
+        get => Entity.CustomLaneNames;
+        set
+        {
+            Entity.CustomLaneNames = string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+            if (LaneTabIndex == 1)
+                _savedCustomLaneNames = Entity.CustomLaneNames;
+            OnPropertyChanged();
+        }
+    }
+
     public Array CourseValues => Enum.GetValues<Course>();
     public Array EventRoundValues => Enum.GetValues<EventRound>();
 
@@ -256,6 +273,59 @@ public partial class EventAddViewModel(
                 SelectedSwimStyle = Enumerable.FirstOrDefault<SearchableItem>(SwimStyles, item =>
                     item.Value is SwimStyle ss && ss.Id == _contextSwimStyleId.Value);
         }
+
+        InitializeLaneTab();
+    }
+
+    protected override bool ValidateBeforeSave()
+    {
+        if (LaneTabIndex == 1)
+        {
+            if (string.IsNullOrWhiteSpace(Entity.CustomLaneNames))
+            {
+                ValidationErrors.Add(Strings.Event_Validation_CustomLaneNamesRequired);
+                return false;
+            }
+        }
+        else
+            Entity.CustomLaneNames = null;
+
+        return true;
+    }
+
+    partial void OnLaneTabIndexChanged(int value) => ApplyLaneTabIndex(value);
+
+    private void InitializeLaneTab()
+    {
+        _isSyncingLaneTab = true;
+        try
+        {
+            _savedCustomLaneNames = Entity.CustomLaneNames;
+            LaneTabIndex = SwimEventLaneNames.HasCustomLaneNames(Entity) ? 1 : 0;
+            if (LaneTabIndex == 0)
+                Entity.CustomLaneNames = null;
+            OnPropertyChanged(nameof(CustomLaneNames));
+        }
+        finally
+        {
+            _isSyncingLaneTab = false;
+        }
+    }
+
+    private void ApplyLaneTabIndex(int tabIndex)
+    {
+        if (_isSyncingLaneTab || Entity is null)
+            return;
+
+        if (tabIndex == 0)
+        {
+            _savedCustomLaneNames = Entity.CustomLaneNames;
+            Entity.CustomLaneNames = null;
+        }
+        else
+            Entity.CustomLaneNames = _savedCustomLaneNames;
+
+        OnPropertyChanged(nameof(CustomLaneNames));
     }
 
     partial void OnSelectedAgeGroupChanged(SearchableItem? value)

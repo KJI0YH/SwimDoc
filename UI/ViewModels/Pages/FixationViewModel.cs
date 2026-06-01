@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DataLayer;
 using DataLayer.EfClasses;
 using Microsoft.EntityFrameworkCore;
 using ServiceLayer.EventService;
@@ -300,6 +301,8 @@ public sealed partial class FixationHeatPositionView : ObservableObject
     public int EntryId => Entry.Id;
 
     public int Lane => _position.Lane;
+
+    public string DisplayLane => SwimEventLaneNames.GetLaneDisplay(_swimEvent, Lane);
 
     public string ParticipantName => Entry.DisplayParticipantName;
 

@@ -66,7 +66,7 @@
                     </GroupStyle>
                 </ui:DataGrid.GroupStyle>
                 <ui:DataGrid.Columns>
-                    <DataGridTextColumn Header="{loc:Loc Heats_Col_Lane}" Binding="{Binding Lane}" IsReadOnly="True" Width="90" MinWidth="80" />
+                    <DataGridTextColumn Header="{loc:Loc Heats_Col_Lane}" Binding="{Binding DisplayLane}" IsReadOnly="True" Width="90" MinWidth="80" />
                     <DataGridTextColumn Header="{loc:Loc Heats_Col_Participant}" Binding="{Binding Participant}" IsReadOnly="True"
                                         Width="*" MinWidth="220" />
                     <DataGridTextColumn Header="{loc:Loc Heats_Col_BirthYear}" Binding="{Binding YearOfBirth}" IsReadOnly="True"

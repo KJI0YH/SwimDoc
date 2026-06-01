@@ -225,7 +225,7 @@
 
   <data name="Heat_Validation_EventRequired" xml:space="preserve"><value>An event must be selected to create a heat.</value></data>
   <data name="Heat_Validation_MinHeatNumber" xml:space="preserve"><value>Heat number must be at least 1.</value></data>
-  <data name="Heat_Validation_MaxPositionsFormat" xml:space="preserve"><value>A heat cannot have more than {0} positions (lanes {1}-{2}).</value></data>
+  <data name="Heat_Validation_MaxPositionsFormat" xml:space="preserve"><value>A heat cannot have more than {0} positions (lanes {1}).</value></data>
 
   <data name="Clubs_Col_Name" xml:space="preserve"><value>Name</value></data>
   <data name="Clubs_Col_Athletes" xml:space="preserve"><value>Athletes</value></data>
@@ -303,6 +303,11 @@
   <data name="Event_Field_PreviousEvent" xml:space="preserve"><value>Previous event</value></data>
   <data name="Event_Field_RoundParticipantsCount" xml:space="preserve"><value>Participants count</value></data>
   <data name="Event_Field_AvailableLanes" xml:space="preserve"><value>Available lanes</value></data>
+  <data name="Event_Lanes_Tab_Range" xml:space="preserve"><value>Lane range</value></data>
+  <data name="Event_Lanes_Tab_Custom" xml:space="preserve"><value>Custom names</value></data>
+  <data name="Event_Validation_CustomLaneNamesRequired" xml:space="preserve"><value>Enter at least one lane name separated by commas.</value></data>
+  <data name="Event_Field_CustomLaneNames" xml:space="preserve"><value>Custom lane names</value></data>
+  <data name="Event_Field_CustomLaneNames_Placeholder" xml:space="preserve"><value>e.g. 1,2,3,4,5,6 or 1L,1R,2L,2R (comma-separated)</value></data>
 
   <data name="LoadPrev_Field_PreviousEvent" xml:space="preserve"><value>Previous event</value></data>
   <data name="LoadPrev_Field_CurrentEvent" xml:space="preserve"><value>Current event</value></data>
