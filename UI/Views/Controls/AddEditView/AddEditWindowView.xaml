@@ -20,11 +20,15 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="0"
-                       Text="{Binding WindowTitle}"
-                       FontSize="{StaticResource SwimDocFontSizeSubtitle}"
-                       FontWeight="Bold"
-                       Margin="0,0,0,15" />
+            <Border Grid.Row="0"
+                    Background="Transparent"
+                    Cursor="SizeAll"
+                    Margin="0,0,0,15"
+                    MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                <TextBlock Text="{Binding WindowTitle}"
+                           FontSize="{StaticResource SwimDocFontSizeSubtitle}"
+                           FontWeight="Bold" />
+            </Border>
 
             <ContentControl Grid.Row="1"
                             Content="{Binding EditorContent, RelativeSource={RelativeSource AncestorType=UserControl}}"

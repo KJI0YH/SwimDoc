@@ -314,6 +314,7 @@ public static class Strings
     public static string Common_Ok => Get(nameof(Common_Ok));
 
     public static string Window_Minimize => Get(nameof(Window_Minimize));
+    public static string Window_Maximize => Get(nameof(Window_Maximize));
     public static string Window_Restore => Get(nameof(Window_Restore));
     public static string Window_Close => Get(nameof(Window_Close));
 

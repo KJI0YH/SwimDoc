@@ -368,6 +368,8 @@
         <Setter Property="SelectionUnit" Value="FullRow" />
         <Setter Property="CanUserAddRows" Value="False" />
         <Setter Property="RowHeaderWidth" Value="0" />
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
+        <Setter Property="helpers:DataGridHorizontalScrollHelper.IsEnabled" Value="True" />
     </Style>
 
     <Style TargetType="{x:Type ui:DataGrid}"
@@ -379,6 +381,8 @@
         <Setter Property="SelectionUnit" Value="FullRow" />
         <Setter Property="CanUserAddRows" Value="False" />
         <Setter Property="RowHeaderWidth" Value="0" />
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
+        <Setter Property="helpers:DataGridHorizontalScrollHelper.IsEnabled" Value="True" />
         <Setter Property="TextColumnElementStyle" Value="{StaticResource SwimDocDataGridTextColumnElementStyle}" />
         <Setter Property="TextColumnEditingElementStyle" Value="{StaticResource SwimDocDataGridTextColumnEditingElementStyle}" />
     </Style>

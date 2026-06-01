@@ -1,5 +1,8 @@
 using System.Windows;
+using System.Windows.Input;
 using Microsoft.Extensions.DependencyInjection;
+using UI.Helpers;
+using UI.Resources;
 using UI.Services;
 using UI.Views.Pages;
 using Wpf.Ui.Controls;
@@ -50,9 +53,20 @@ public partial class MainWindow : FluentWindow
         WindowState = WindowState.Minimized;
     }
 
+    private void TitleBar_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (WindowDragHelper.IsInteractiveChrome(e.OriginalSource as DependencyObject))
+            return;
+
+        WindowDragHelper.HandleDrag(this, e, ToggleMaximizeRestore);
+    }
+
+    private void ToggleMaximizeRestore() =>
+        WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
+
     private void RestoreButton_Click(object sender, RoutedEventArgs e)
     {
-        WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
+        ToggleMaximizeRestore();
         UpdateRestoreButtonIcon();
     }
 
@@ -63,11 +77,14 @@ public partial class MainWindow : FluentWindow
 
     private void UpdateRestoreButtonIcon()
     {
-        if (RestoreButton == null) return;
+        if (RestoreButton == null)
+            return;
 
-        RestoreButton.Content = WindowState == WindowState.Maximized
+        var isMaximized = WindowState == WindowState.Maximized;
+        RestoreButton.Content = isMaximized
             ? new SymbolIcon { Symbol = SymbolRegular.SquareMultiple24 }
             : new SymbolIcon { Symbol = SymbolRegular.Square24 };
+        RestoreButton.ToolTip = isMaximized ? Strings.Window_Restore : Strings.Window_Maximize;
     }
 
     public void ShowModalOverlay()

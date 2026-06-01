@@ -106,7 +106,9 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Grid Grid.Row="0">
+        <Grid Grid.Row="0"
+              Background="Transparent"
+              PreviewMouseLeftButtonDown="TitleBar_PreviewMouseLeftButtonDown">
             <Menu VerticalAlignment="Center">
                 <MenuItem Header="{loc:Loc Menu_Competition}">
                     <MenuItem Header="{loc:Loc Menu_Create}"
@@ -128,7 +130,6 @@
                 <Button x:Name="RestoreButton"
                         Style="{StaticResource RestoreWindowControlButtonStyle}"
                         Click="RestoreButton_Click"
-                        ToolTip="{loc:Loc Window_Restore}"
                         Content="{ui:SymbolIcon SquareMultiple24}" />
                 <Button x:Name="CloseButton"
                         Style="{StaticResource CloseWindowControlButtonStyle}"
