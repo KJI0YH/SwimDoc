@@ -13,6 +13,8 @@ namespace UI.ViewModels.Pages;
 
 public class AgeGroupsViewModel : DataViewModel<AgeGroup, int?>
 {
+    protected override PagingPage PagingSettingsPage => PagingPage.AgeGroups;
+
     private readonly IAddEditWindowFactory _windowFactory;
 
     public AgeGroupsViewModel(IAgeGroupService ageGroupService) : base(ageGroupService)

@@ -51,7 +51,7 @@ public partial class DataViewModel<TEntity, TKey> : DataViewModelBase
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ItemsInfo))]
-    private int _pageSize = 30;
+    private int _pageSize;
 
     public string ItemsInfo
     {
@@ -76,12 +76,37 @@ public partial class DataViewModel<TEntity, TKey> : DataViewModelBase
 
     public bool IsPagingEnabled => TotalPages > 0;
 
+    protected virtual bool UsesPaging => true;
+
+    protected virtual PagingPage PagingSettingsPage => PagingPage.Entries;
+
     public DataViewModel(ICrudService<TEntity, TKey> crudService)
     {
         _crudService = crudService;
         _navigationService = App.Current.Services.GetRequiredService<INavigationService>();
+        var pagingSettings = App.Current.Services.GetRequiredService<IPagingSettingsService>();
+        pagingSettings.PageSizeChanged += OnPagingSettingsPageSizeChanged;
+        if (UsesPaging)
+            PageSize = pagingSettings.GetPageSize(PagingSettingsPage);
         InitializeColumns();
         LoadDataCommand.Execute(null);
+    }
+
+    private void OnPagingSettingsPageSizeChanged(PagingPage page)
+    {
+        if (!UsesPaging || page != PagingSettingsPage)
+            return;
+
+        var pagingSettings = App.Current.Services.GetRequiredService<IPagingSettingsService>();
+        var newSize = pagingSettings.GetPageSize(PagingSettingsPage);
+        if (newSize == PageSize)
+            return;
+
+        PageSize = newSize;
+        if (CurrentPage != 0)
+            CurrentPage = 0;
+        else
+            LoadDataCommand.Execute(null);
     }
 
     public override ObservableCollection<ColumnConfiguration> GetColumnConfigurations()
@@ -173,15 +198,26 @@ public partial class DataViewModel<TEntity, TKey> : DataViewModelBase
             TotalItems = await query.CountAsync();
 
             _suppressPageLoad = true;
-            TotalPages = (int)Math.Ceiling(TotalItems / (double)PageSize);
+            if (UsesPaging)
+            {
+                TotalPages = (int)Math.Ceiling(TotalItems / (double)PageSize);
 
-            if (CurrentPage >= TotalPages && TotalPages > 0)
-                CurrentPage = TotalPages - 1;
-            if (TotalPages <= 0 || CurrentPage < 0)
+                if (CurrentPage >= TotalPages && TotalPages > 0)
+                    CurrentPage = TotalPages - 1;
+                if (TotalPages <= 0 || CurrentPage < 0)
+                    CurrentPage = 0;
+            }
+            else
+            {
+                TotalPages = TotalItems > 0 ? 1 : 0;
                 CurrentPage = 0;
+            }
+
             _suppressPageLoad = false;
 
-            query = query.Page(CurrentPage, PageSize);
+            if (UsesPaging)
+                query = query.Page(CurrentPage, PageSize);
+
             var items = await query.ToListAsync();
             Items = new ObservableCollection<TEntity>(items);
             OnPropertyChanged(nameof(ItemsInfo));

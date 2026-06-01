@@ -9,58 +9,6 @@
     <Page.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
         <helpers:AppLanguageDisplayConverter x:Key="AppLanguageDisplayConverter" />
-
-        <Style x:Key="SettingsCardBorderStyle" TargetType="Border">
-            <Setter Property="HorizontalAlignment" Value="Stretch" />
-            <Setter Property="Background" Value="{DynamicResource ControlFillColorDefaultBrush}" />
-            <Setter Property="BorderBrush" Value="{DynamicResource ControlStrokeColorDefaultBrush}" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="CornerRadius" Value="8" />
-            <Setter Property="Padding" Value="20" />
-            <Setter Property="Margin" Value="0,0,0,12" />
-            <Setter Property="Effect">
-                <Setter.Value>
-                    <DropShadowEffect BlurRadius="10" ShadowDepth="1" Opacity="0.08" />
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style x:Key="SettingsNavCardButtonStyle" TargetType="Button">
-            <Setter Property="HorizontalAlignment" Value="Stretch" />
-            <Setter Property="Background" Value="{DynamicResource ControlFillColorDefaultBrush}" />
-            <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
-            <Setter Property="BorderBrush" Value="{DynamicResource ControlStrokeColorDefaultBrush}" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Padding" Value="20" />
-            <Setter Property="Margin" Value="0,0,0,12" />
-            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-            <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="border"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="8"
-                                Padding="{TemplateBinding Padding}">
-                            <Border.Effect>
-                                <DropShadowEffect BlurRadius="10" ShadowDepth="1" Opacity="0.08" />
-                            </Border.Effect>
-                            <ContentPresenter />
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="Background"
-                                        Value="{DynamicResource ControlFillColorSecondaryBrush}" />
-                                <Setter TargetName="border" Property="BorderBrush"
-                                        Value="{DynamicResource AccentFillColorDefaultBrush}" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
     </Page.Resources>
 
     <Grid HorizontalAlignment="Stretch"
@@ -109,22 +57,17 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
-                        <Border Grid.Column="0"
-                                Width="44"
-                                Height="44"
-                                CornerRadius="10"
-                                Background="{StaticResource DataGridSelectedRowBackgroundBrush}"
-                                VerticalAlignment="Center">
-                            <ContentPresenter Content="{ui:SymbolIcon LocalLanguage24}"
-                                              HorizontalAlignment="Center"
-                                              VerticalAlignment="Center" />
+                        <Border Grid.Column="0" Style="{StaticResource SettingsIconBadgeStyle}">
+                            <ui:SymbolIcon Symbol="LocalLanguage24"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" />
                         </Border>
 
                         <StackPanel Grid.Column="1" Margin="16,0,16,0" VerticalAlignment="Center">
                             <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}"
                                        Text="{loc:Loc Language_Label}" />
                             <TextBlock Margin="0,4,0,0"
-                                       Opacity="0.8"
+                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                                        TextWrapping="Wrap"
                                        Text="{loc:Loc Settings_Language_Description}" />
                         </StackPanel>
@@ -144,6 +87,52 @@
                 </Border>
 
                 <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
+                           Text="{loc:Loc Settings_Section_Paging}"
+                           Margin="0,8,0,12" />
+
+                <TextBlock Margin="0,0,0,12"
+                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                           TextWrapping="Wrap"
+                           Text="{loc:Loc Settings_Paging_Description}" />
+
+                <ItemsControl ItemsSource="{Binding PagingSettings}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Style="{StaticResource SettingsCardBorderStyle}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <Border Grid.Column="0" Style="{StaticResource SettingsIconBadgeStyle}">
+                                        <ui:SymbolIcon Symbol="{Binding IconSymbol}"
+                                                       HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center" />
+                                    </Border>
+
+                                    <StackPanel Grid.Column="1"
+                                                Margin="16,0,16,0"
+                                                VerticalAlignment="Center">
+                                        <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}"
+                                                   Text="{Binding Title}" />
+                                        <TextBlock Margin="0,4,0,0"
+                                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                                   TextWrapping="Wrap"
+                                                   Text="{Binding Description}" />
+                                    </StackPanel>
+
+                                    <ui:NumberBox Grid.Column="2"
+                                                  Style="{StaticResource SwimDocSettingsNumberBoxStyle}"
+                                                  Value="{Binding PageSize, UpdateSourceTrigger=PropertyChanged}" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
                            Text="{loc:Loc Settings_Section_Files}"
                            Margin="0,8,0,12" />
 
@@ -156,21 +145,18 @@
                         </Grid.ColumnDefinitions>
 
                         <Border Grid.Column="0"
-                                Width="44"
-                                Height="44"
-                                CornerRadius="10"
-                                Background="{StaticResource DataGridSelectedRowBackgroundBrush}"
+                                Style="{StaticResource SettingsIconBadgeStyle}"
                                 VerticalAlignment="Top">
-                            <ContentPresenter Content="{ui:SymbolIcon DocumentArrowRight24}"
-                                              HorizontalAlignment="Center"
-                                              VerticalAlignment="Center" />
+                            <ui:SymbolIcon Symbol="DocumentArrowRight24"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" />
                         </Border>
 
                         <StackPanel Grid.Column="1" Margin="16,0,16,0">
                             <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}"
                                        Text="{loc:Loc Templates_EntryDoc_Title}" />
                             <TextBlock Margin="0,4,0,0"
-                                       Opacity="0.8"
+                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                                        TextWrapping="Wrap"
                                        Text="{loc:Loc Templates_EntryDoc_Subtitle}" />
                         </StackPanel>
@@ -180,9 +166,9 @@
                                 Padding="16,8"
                                 Command="{Binding DownloadEntryDocumentTemplateCommand}">
                             <StackPanel Orientation="Horizontal">
-                                <ContentControl Content="{ui:SymbolIcon ArrowDownload24}"
-                                                Margin="0,0,8,0"
-                                                VerticalAlignment="Center" />
+                                <ui:SymbolIcon Symbol="ArrowDownload24"
+                                               Margin="0,0,8,0"
+                                               VerticalAlignment="Center" />
                                 <TextBlock Text="{loc:Loc Templates_Download}" VerticalAlignment="Center" />
                             </StackPanel>
                         </Button>
@@ -202,29 +188,24 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
-                        <Border Grid.Column="0"
-                                Width="44"
-                                Height="44"
-                                CornerRadius="10"
-                                Background="{StaticResource DataGridSelectedRowBackgroundBrush}"
-                                VerticalAlignment="Center">
-                            <ContentPresenter Content="{ui:SymbolIcon Timer24}"
-                                              HorizontalAlignment="Center"
-                                              VerticalAlignment="Center" />
+                        <Border Grid.Column="0" Style="{StaticResource SettingsIconBadgeStyle}">
+                            <ui:SymbolIcon Symbol="Timer24"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" />
                         </Border>
 
                         <StackPanel Grid.Column="1" Margin="16,0,16,0" VerticalAlignment="Center">
                             <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}"
                                        Text="{loc:Loc Settings_Tab_BaseTime}" />
                             <TextBlock Margin="0,4,0,0"
-                                       Opacity="0.8"
+                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                                        TextWrapping="Wrap"
                                        Text="{loc:Loc Settings_BaseTimes_Description}" />
                         </StackPanel>
 
-                        <ContentControl Grid.Column="2"
-                                        VerticalAlignment="Center"
-                                        Content="{ui:SymbolIcon ChevronRight24}" />
+                        <ui:SymbolIcon Grid.Column="2"
+                                       Symbol="ChevronRight24"
+                                       VerticalAlignment="Center" />
                     </Grid>
                 </Button>
             </StackPanel>

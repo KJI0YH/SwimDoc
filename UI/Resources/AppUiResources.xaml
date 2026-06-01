@@ -153,6 +153,79 @@
     <SolidColorBrush x:Key="ResultPlaceBronzeBrush" Color="#FFFFE4C4" />
     <SolidColorBrush x:Key="SwimDocDataGridHorizontalLineBrush" Color="#FFE0E0E0" />
 
+    <!-- Settings hub cards (shared with SettingsPage). -->
+    <Style x:Key="SettingsCardBorderStyle" TargetType="Border">
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="Background" Value="{DynamicResource ControlFillColorDefaultBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ControlStrokeColorDefaultBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Padding" Value="20" />
+        <Setter Property="Margin" Value="0,0,0,12" />
+        <Setter Property="Effect">
+            <Setter.Value>
+                <DropShadowEffect BlurRadius="10" ShadowDepth="1" Opacity="0.08" />
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="SettingsIconBadgeStyle" TargetType="Border">
+        <Setter Property="Width" Value="44" />
+        <Setter Property="Height" Value="44" />
+        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="Background" Value="{StaticResource DataGridSelectedRowBackgroundBrush}" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <Style x:Key="SettingsNavCardButtonStyle" TargetType="Button">
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="Background" Value="{DynamicResource ControlFillColorDefaultBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ControlStrokeColorDefaultBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="20" />
+        <Setter Property="Margin" Value="0,0,0,12" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="border"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="8"
+                            Padding="{TemplateBinding Padding}">
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="10" ShadowDepth="1" Opacity="0.08" />
+                        </Border.Effect>
+                        <ContentPresenter />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background"
+                                    Value="{DynamicResource ControlFillColorSecondaryBrush}" />
+                            <Setter TargetName="border" Property="BorderBrush"
+                                    Value="{DynamicResource AccentFillColorDefaultBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="SwimDocSettingsNumberBoxStyle"
+           TargetType="ui:NumberBox"
+           BasedOn="{StaticResource {x:Type ui:NumberBox}}">
+        <Setter Property="Width" Value="132" />
+        <Setter Property="Minimum" Value="1" />
+        <Setter Property="Maximum" Value="500" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="HorizontalAlignment" Value="Right" />
+        <Setter Property="SpinButtonPlacementMode" Value="Inline" />
+        <Setter Property="ClearButtonEnabled" Value="False" />
+    </Style>
+
     <!-- Compact text in read-only columns. -->
     <Style x:Key="SwimDocDataGridTextColumnElementStyle" TargetType="TextBlock">
         <Setter Property="FontSize" Value="{StaticResource SwimDocFontSizeBody}" />

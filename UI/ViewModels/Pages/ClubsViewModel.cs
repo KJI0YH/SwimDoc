@@ -13,6 +13,8 @@ namespace UI.ViewModels.Pages;
 
 public class ClubsViewModel : DataViewModel<Club, int?>
 {
+    protected override PagingPage PagingSettingsPage => PagingPage.Clubs;
+
     private readonly IAddEditWindowFactory _windowFactory;
 
     public ClubsViewModel(IClubService clubService, IAthleteService athleteService) : base(clubService)

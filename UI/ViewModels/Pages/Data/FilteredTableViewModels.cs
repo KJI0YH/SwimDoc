@@ -229,6 +229,8 @@ public class HeatsByAthleteViewModel : HeatsViewModel
 {
     private int? _athleteId;
 
+    protected override bool UsesHeatPaging => false;
+
     public HeatsByAthleteViewModel(IEventService eventService, IHeatService heatService,
         INavigationService navigationService) : base(eventService, heatService, navigationService)
     {
@@ -264,6 +266,7 @@ public class HeatsByAthleteViewModel : HeatsViewModel
                 h.Positions.Select(p =>
                     new HeatPositionView(p, h.Number, heatsInEvent, h.Order, heatsTotal, h.Status, h.DisplayDayTime)));
             HeatPositions = new ObservableCollection<HeatPositionView>(heatPositionViews);
+            UpdateHeatPaging(heatsForAthlete.Count, resetPage: false);
         }
         finally
         {
@@ -571,6 +574,8 @@ public class HeatByEntryIdViewModel : HeatsViewModel
 {
     private int? _entryId;
 
+    protected override bool UsesHeatPaging => false;
+
     public HeatByEntryIdViewModel(IEventService eventService, IHeatService heatService,
         INavigationService navigationService) : base(eventService, heatService, navigationService)
     {
@@ -587,6 +592,7 @@ public class HeatByEntryIdViewModel : HeatsViewModel
         if (SelectedSwimEvent?.Id is not int eventId || !_entryId.HasValue)
         {
             HeatPositions = [];
+            UpdateHeatPaging(0);
             return;
         }
 
@@ -604,6 +610,7 @@ public class HeatByEntryIdViewModel : HeatsViewModel
                     new HeatPositionView(p, h.Number, heatsInEvent, h.Order, heatsTotal, h.Status, h.DisplayDayTime)));
             HeatPositions = new ObservableCollection<HeatPositionView>(heatPositionViews);
             SelectedHeatPosition = heatPositionViews.FirstOrDefault(p => p.Entry.Id == _entryId.Value);
+            UpdateHeatPaging(heatsForEntry.Count, resetPage: false);
         }
         finally
         {

@@ -74,6 +74,9 @@ public static class Strings
     public static string Settings_Section_Competition => Get(nameof(Settings_Section_Competition));
     public static string Settings_Language_Description => Get(nameof(Settings_Language_Description));
     public static string Settings_BaseTimes_Description => Get(nameof(Settings_BaseTimes_Description));
+    public static string Settings_Section_Paging => Get(nameof(Settings_Section_Paging));
+    public static string Settings_Paging_Description => Get(nameof(Settings_Paging_Description));
+    public static string Settings_Paging_PageSize => Get(nameof(Settings_Paging_PageSize));
     public static string Common_Back => Get(nameof(Common_Back));
     public static string BaseTimes_WorldAquaticsPoints => Get(nameof(BaseTimes_WorldAquaticsPoints));
     public static string BaseTimes_WorldAquaticsPoints_Tooltip => Get(nameof(BaseTimes_WorldAquaticsPoints_Tooltip));

@@ -18,6 +18,8 @@ public sealed partial class SettingsViewModel : ObservableObject
     public ObservableCollection<AppLanguage> AvailableLanguages { get; } =
         new([AppLanguage.Russian, AppLanguage.English]);
 
+    public ObservableCollection<PagingSettingItemViewModel> PagingSettings { get; }
+
     public BaseTimesSettingsViewModel BaseTimes { get; }
 
     [ObservableProperty] private AppLanguage _selectedLanguage;
@@ -26,12 +28,16 @@ public sealed partial class SettingsViewModel : ObservableObject
     public SettingsViewModel(
         IEntryDocumentTemplateService entryDocumentTemplateService,
         ILocalizationService localizationService,
+        IPagingSettingsService pagingSettingsService,
         BaseTimesSettingsViewModel baseTimesSettingsViewModel)
     {
         _entryDocumentTemplateService = entryDocumentTemplateService;
         _localizationService = localizationService;
         BaseTimes = baseTimesSettingsViewModel;
         _selectedLanguage = localizationService.CurrentLanguage;
+        PagingSettings = new ObservableCollection<PagingSettingItemViewModel>(
+            PagingSettingsService.NavigationOrder
+                .Select(page => new PagingSettingItemViewModel(pagingSettingsService, page)));
     }
 
     partial void OnSelectedLanguageChanged(AppLanguage value)

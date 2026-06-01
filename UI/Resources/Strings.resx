@@ -37,6 +37,9 @@
   <data name="Settings_Section_Competition" xml:space="preserve"><value>Competition</value></data>
   <data name="Settings_Language_Description" xml:space="preserve"><value>Interface language. Applied immediately.</value></data>
   <data name="Settings_BaseTimes_Description" xml:space="preserve"><value>World Aquatics Points Base Times.</value></data>
+  <data name="Settings_Section_Paging" xml:space="preserve"><value>Pagination</value></data>
+  <data name="Settings_Paging_Description" xml:space="preserve"><value>Number of items loaded per page for each list. Applied immediately.</value></data>
+  <data name="Settings_Paging_PageSize" xml:space="preserve"><value>Page size</value></data>
   <data name="Common_Back" xml:space="preserve"><value>Back</value></data>
   <data name="BaseTimes_WorldAquaticsPoints" xml:space="preserve"><value>World Aquatics Points</value></data>
   <data name="BaseTimes_WorldAquaticsPoints_Tooltip" xml:space="preserve"><value>Open World Aquatics base times and points table (worldaquatics.com)</value></data>

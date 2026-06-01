@@ -15,50 +15,7 @@
     </UserControl.Resources>
     <dataView:DefaultDataView>
         <dataView:DefaultDataView.Toolbar>
-            <DockPanel LastChildFill="True">
-                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
-                    <Button Content="{ui:SymbolIcon Add24}"
-                            Command="{Binding CreateHeatCommand}"
-                            ToolTip="{loc:Loc Heats_Create}"
-                            Margin="5"
-                            Padding="9" />
-                    <Button Content="{ui:SymbolIcon Edit24}"
-                            Command="{Binding EditHeatCommand}"
-                            ToolTip="{loc:Loc Heats_Edit}"
-                            Margin="5"
-                            Padding="9" />
-                    <Button Content="{ui:SymbolIcon Delete24}"
-                            Command="{Binding DeleteSelectedCommand}"
-                            ToolTip="{Binding DeleteToolTip}"
-                            Margin="5"
-                            Padding="9" />
-                    <Button Content="{ui:SymbolIcon ArrowClockwise24}"
-                            Command="{Binding RefreshHeatsCommand}"
-                            ToolTip="{loc:Loc Heats_Refresh}"
-                            Margin="5"
-                            Padding="9" />
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
-                    <ComboBox helpers:ComboBoxAutoWidthHelper.Enable="True"
-                              ItemsSource="{Binding SwimEventOptions}"
-                              SelectedValue="{Binding SelectedSwimEvent}"
-                              SelectedValuePath="Value"
-                              Margin="0,5,6,5" />
-                    <Button Content="{ui:SymbolIcon ArrowPrevious24}"
-                            Command="{Binding GoToPrevEventCommand}"
-                            Padding="9"
-                            Margin="5" />
-                    <Button Content="{ui:SymbolIcon ArrowNext24}"
-                            Command="{Binding GoToNextEventCommand}"
-                            Padding="9"
-                            Margin="5" />
-                </StackPanel>
-                <ui:TextBox VerticalAlignment="Center"
-                            Icon="{ui:SymbolIcon Search24}"
-                            Margin="5"
-                            MinWidth="280"
-                            Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
-            </DockPanel>
+            <toolbar:HeatsToolbar />
         </dataView:DefaultDataView.Toolbar>
         <dataView:DefaultDataView.MainContent>
             <ui:DataGrid ItemsSource="{Binding HeatPositionsView}"

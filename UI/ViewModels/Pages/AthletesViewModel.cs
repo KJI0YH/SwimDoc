@@ -12,6 +12,8 @@ namespace UI.ViewModels.Pages;
 
 public class AthletesViewModel : DataViewModel<Athlete, int?>
 {
+    protected override PagingPage PagingSettingsPage => PagingPage.Athletes;
+
     private readonly IAthleteService _athleteService;
     private readonly IAddEditWindowFactory _windowFactory;
 

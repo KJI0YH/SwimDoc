@@ -37,6 +37,9 @@
   <data name="Settings_Section_Competition" xml:space="preserve"><value>Соревнование</value></data>
   <data name="Settings_Language_Description" xml:space="preserve"><value>Язык интерфейса. Применяется сразу.</value></data>
   <data name="Settings_BaseTimes_Description" xml:space="preserve"><value>Эталонное время World Aquatics для рассчёта очков</value></data>
+  <data name="Settings_Section_Paging" xml:space="preserve"><value>Пагинация</value></data>
+  <data name="Settings_Paging_Description" xml:space="preserve"><value>Количество элементов на странице для каждого списка. Применяется сразу.</value></data>
+  <data name="Settings_Paging_PageSize" xml:space="preserve"><value>Размер страницы</value></data>
   <data name="Common_Back" xml:space="preserve"><value>Назад</value></data>
   <data name="BaseTimes_WorldAquaticsPoints" xml:space="preserve"><value>World Aquatics Points</value></data>
   <data name="BaseTimes_WorldAquaticsPoints_Tooltip" xml:space="preserve"><value>Открыть таблицу базовых времён и очков World Aquatics (worldaquatics.com)</value></data>

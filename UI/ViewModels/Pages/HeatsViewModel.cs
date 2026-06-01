@@ -27,11 +27,22 @@ public partial class HeatsViewModel(
     private readonly IAddEditWindowFactory _windowFactory =
         App.Current.Services.GetRequiredService<IAddEditWindowFactory>();
 
+    private readonly IPagingSettingsService _pagingSettings =
+        App.Current.Services.GetRequiredService<IPagingSettingsService>();
+
     protected IHeatService HeatService { get; } = heatService;
+
+    private int HeatPageSize => _pagingSettings.GetPageSize(PagingPage.Heats);
+
+    protected virtual bool UsesHeatPaging => true;
+
+    protected override bool UsesPaging => false;
 
     [ObservableProperty] ObservableCollection<HeatPositionView> _heatPositions = new();
 
     private bool _searchHandlerAttached;
+    private bool _suppressHeatPageLoad;
+    private bool _heatPagingSubscribed;
 
     private void EnsureSearchHandlerAttached()
     {
@@ -42,8 +53,29 @@ public partial class HeatsViewModel(
         PropertyChanged += (_, e) =>
         {
             if (e.PropertyName == nameof(SearchText))
+            {
+                ResetHeatPaging();
                 _ = LoadHeatPositionsAsync();
+            }
         };
+    }
+
+    private void EnsureHeatPagingSubscription()
+    {
+        if (_heatPagingSubscribed)
+            return;
+
+        _heatPagingSubscribed = true;
+        _pagingSettings.PageSizeChanged += OnHeatPagingSettingsChanged;
+    }
+
+    private void OnHeatPagingSettingsChanged(PagingPage page)
+    {
+        if (page != PagingPage.Heats)
+            return;
+
+        ResetHeatPaging();
+        _ = LoadHeatPositionsAsync();
     }
 
     [ObservableProperty] private SwimEvent? _selectedSwimEvent;
@@ -57,10 +89,39 @@ public partial class HeatsViewModel(
     [NotifyPropertyChangedFor(nameof(DeleteToolTip))]
     private bool _isWholeHeatSelected;
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HeatsItemsInfo))]
+    private int _heatCurrentPage;
+
+    [ObservableProperty] private ObservableCollection<int> _heatPageOptions = new();
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HeatsItemsInfo), nameof(IsHeatPagingEnabled))]
+    private int _heatTotalPages;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HeatsItemsInfo))]
+    private int _heatTotalItems;
+
     private ObservableCollection<HeatPositionView>? _heatPositionsGroupedSource;
 
     public string DeleteToolTip => IsWholeHeatSelected ? Strings.Heats_DeleteTooltip_Heat : Strings.Heats_DeleteTooltip_Position;
     private ListCollectionView? _heatPositionsGroupedView;
+
+    public string HeatsItemsInfo
+    {
+        get
+        {
+            if (HeatTotalItems <= 0)
+                return string.Format(Strings.Paging_ItemsInfo_EmptyFormat, HeatTotalItems);
+
+            var from = HeatCurrentPage * HeatPageSize + 1;
+            var to = Math.Min(HeatTotalItems, HeatCurrentPage * HeatPageSize + HeatPageSize);
+            return string.Format(Strings.Paging_ItemsInfo_RangeFormat, from, to, HeatTotalItems);
+        }
+    }
+
+    public bool IsHeatPagingEnabled => HeatTotalPages > 0;
 
     public ICollectionView HeatPositionsView
     {
@@ -86,16 +147,16 @@ public partial class HeatsViewModel(
     protected override void OnItemsLoaded(IReadOnlyList<SwimEvent> items)
     {
         EnsureSearchHandlerAttached();
+        EnsureHeatPagingSubscription();
 
         if (items.Count == 0)
         {
             SelectedSwimEvent = null;
             SwimEventOptions = [];
             HeatPositions = [];
+            UpdateHeatPaging(0);
             return;
         }
-
-        SelectedSwimEvent ??= items.OrderBy(e => e.Order).FirstOrDefault();
 
         SwimEventOptions = new ObservableCollection<SearchableItem>(
             items.Select(e => new SearchableItem
@@ -103,6 +164,11 @@ public partial class HeatsViewModel(
                 Value = e,
                 DisplayText = EntityDisplayFormatter.FormatSwimEvent(e)
             }));
+
+        if (SelectedSwimEvent is not null && items.Any(e => e.Id == SelectedSwimEvent.Id))
+            return;
+
+        SelectedSwimEvent ??= items.OrderBy(e => e.Order).FirstOrDefault();
     }
 
     public Task RefreshAsync() => LoadHeatPositionsAsync();
@@ -117,6 +183,7 @@ public partial class HeatsViewModel(
     partial void OnSelectedSwimEventChanged(SwimEvent? value)
     {
         CreateHeatCommand.NotifyCanExecuteChanged();
+        ResetHeatPaging();
         _ = LoadHeatPositionsAsync();
     }
 
@@ -131,20 +198,63 @@ public partial class HeatsViewModel(
         OnPropertyChanged(nameof(HeatPositionsView));
     }
 
+    partial void OnHeatCurrentPageChanged(int value)
+    {
+        GoToFirstHeatPageCommand.NotifyCanExecuteChanged();
+        GoToPreviousHeatPageCommand.NotifyCanExecuteChanged();
+        GoToNextHeatPageCommand.NotifyCanExecuteChanged();
+        GoToLastHeatPageCommand.NotifyCanExecuteChanged();
+        OnPropertyChanged(nameof(HeatsItemsInfo));
+
+        if (!_suppressHeatPageLoad)
+            _ = LoadHeatPositionsAsync();
+    }
+
+    partial void OnHeatTotalPagesChanged(int value)
+    {
+        GoToFirstHeatPageCommand.NotifyCanExecuteChanged();
+        GoToPreviousHeatPageCommand.NotifyCanExecuteChanged();
+        GoToNextHeatPageCommand.NotifyCanExecuteChanged();
+        GoToLastHeatPageCommand.NotifyCanExecuteChanged();
+
+        HeatPageOptions = value > 0
+            ? new ObservableCollection<int>(Enumerable.Range(1, value))
+            : new ObservableCollection<int>();
+    }
+
     protected virtual async Task LoadHeatPositionsAsync()
     {
         if (SelectedSwimEvent?.Id is not int eventId)
         {
             HeatPositions = [];
+            UpdateHeatPaging(0);
             return;
         }
 
         IsLoading = true;
         try
         {
-            var heats = await HeatService.GetHeatsByEventIdAsync(eventId);
-            var heatsInEvent = heats.Count;
+            var heatsInEvent = HeatService.GetTotalHeatsInEvent(eventId);
             var heatsTotal = HeatService.GetTotalHeats();
+            List<Heat> heats;
+
+            if (!UsesHeatPaging || !string.IsNullOrWhiteSpace(SearchText))
+            {
+                heats = await HeatService.GetHeatsByEventIdAsync(eventId);
+                UpdateHeatPaging(heatsInEvent, resetPage: false);
+            }
+            else
+            {
+                UpdateHeatPaging(heatsInEvent, resetPage: false);
+                if (heatsInEvent == 0)
+                {
+                    HeatPositions = [];
+                    return;
+                }
+
+                heats = await HeatService.GetHeatsByEventIdPagedAsync(eventId, HeatCurrentPage, HeatPageSize);
+            }
+
             var heatPositionViews = heats.SelectMany(h =>
                 h.Positions.Select(p => new HeatPositionView(
                     p,
@@ -154,6 +264,7 @@ public partial class HeatsViewModel(
                     heatsTotal,
                     h.Status,
                     h.DisplayDayTime)));
+
             HeatPositions = new ObservableCollection<HeatPositionView>(
                 FilterHeatPositions(heatPositionViews));
         }
@@ -162,6 +273,51 @@ public partial class HeatsViewModel(
             IsLoading = false;
         }
     }
+
+    private void ResetHeatPaging()
+    {
+        if (HeatCurrentPage == 0)
+            return;
+
+        _suppressHeatPageLoad = true;
+        HeatCurrentPage = 0;
+        _suppressHeatPageLoad = false;
+    }
+
+    protected void UpdateHeatPaging(int totalHeats, bool resetPage = true)
+    {
+        _suppressHeatPageLoad = true;
+        HeatTotalItems = totalHeats;
+        HeatTotalPages = totalHeats > 0 ? (int)Math.Ceiling(totalHeats / (double)HeatPageSize) : 0;
+
+        if (resetPage)
+            HeatCurrentPage = 0;
+        else if (HeatCurrentPage >= HeatTotalPages && HeatTotalPages > 0)
+            HeatCurrentPage = HeatTotalPages - 1;
+
+        _suppressHeatPageLoad = false;
+        OnPropertyChanged(nameof(HeatsItemsInfo));
+    }
+
+    [RelayCommand(CanExecute = nameof(CanGoToFirstHeatPage))]
+    private void GoToFirstHeatPage() => HeatCurrentPage = 0;
+
+    private bool CanGoToFirstHeatPage() => HeatCurrentPage > 0;
+
+    [RelayCommand(CanExecute = nameof(CanGoToPreviousHeatPage))]
+    private void GoToPreviousHeatPage() => HeatCurrentPage--;
+
+    private bool CanGoToPreviousHeatPage() => HeatCurrentPage > 0;
+
+    [RelayCommand(CanExecute = nameof(CanGoToNextHeatPage))]
+    private void GoToNextHeatPage() => HeatCurrentPage++;
+
+    private bool CanGoToNextHeatPage() => HeatTotalPages > 0 && HeatCurrentPage < HeatTotalPages - 1;
+
+    [RelayCommand(CanExecute = nameof(CanGoToLastHeatPage))]
+    private void GoToLastHeatPage() => HeatCurrentPage = HeatTotalPages - 1;
+
+    private bool CanGoToLastHeatPage() => HeatTotalPages > 0 && HeatCurrentPage < HeatTotalPages - 1;
 
     [RelayCommand(CanExecute = nameof(CanCreateHeat))]
     private void CreateHeat() => ShowHeatAddEditDialog();
@@ -245,7 +401,9 @@ public partial class HeatsViewModel(
     [RelayCommand]
     private void GoToNextEvent()
     {
-        if (Items.Count == 0) return;
+        if (Items.Count == 0)
+            return;
+
         var idx = SelectedSwimEvent is null ? -1 : Items.IndexOf(SelectedSwimEvent);
         var nextIdx = (idx + 1) % Items.Count;
         SelectedSwimEvent = Items[nextIdx];
@@ -254,10 +412,13 @@ public partial class HeatsViewModel(
     [RelayCommand]
     private void GoToPrevEvent()
     {
-        if (Items.Count == 0) return;
+        if (Items.Count == 0)
+            return;
+
         var idx = SelectedSwimEvent is null ? 1 : Items.IndexOf(SelectedSwimEvent);
         var prevIdx = idx - 1;
-        if (prevIdx < 0) prevIdx += Items.Count;
+        if (prevIdx < 0)
+            prevIdx += Items.Count;
         SelectedSwimEvent = Items[prevIdx];
     }
 

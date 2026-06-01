@@ -118,6 +118,7 @@ public partial class App : Application
         services.AddTransient<IConfirmDialogService, ConfirmDialogService>();
         services.AddTransient<IErrorDialogService, ErrorDialogService>();
         services.AddSingleton<ILocalizationService, LocalizationService>();
+        services.AddSingleton<IPagingSettingsService, PagingSettingsService>();
 
         services.AddTransient<IAgeGroupService, AgeGroupService>();
         services.AddTransient<IAthleteService, AthleteService>();

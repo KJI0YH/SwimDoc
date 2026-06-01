@@ -5,6 +5,7 @@ using BizLogic.HeatLogic;
 using BizLogic.HeatLogic.Concrete;
 using DataLayer.EfClasses;
 using DataLayer.EfCore;
+using DataLayer.QueryObjects;
 using Microsoft.EntityFrameworkCore;
 using ServiceLayer.BizRunners;
 using ServiceLayer.Crud;
@@ -232,9 +233,14 @@ public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbCo
         return errors.ToImmutableList();
     }
 
-    public Task<List<Heat>> GetHeatsByEventIdAsync(int eventId)
-    {
-        return dbContext.Heats
+    public Task<List<Heat>> GetHeatsByEventIdAsync(int eventId) =>
+        HeatsByEventQuery(eventId).ToListAsync();
+
+    public Task<List<Heat>> GetHeatsByEventIdPagedAsync(int eventId, int page, int pageSize) =>
+        HeatsByEventQuery(eventId).Page(page, pageSize).ToListAsync();
+
+    private IQueryable<Heat> HeatsByEventQuery(int eventId) =>
+        dbContext.Heats
             .AsNoTracking()
             .Where(heat => heat.SwimEventId == eventId)
             .OrderBy(heat => heat.Number)
@@ -257,9 +263,7 @@ public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbCo
             .ThenInclude(entry => entry.SwimStyle)
             .Include(heat => heat.Positions.OrderBy(hp => hp.Lane))
             .ThenInclude(hp => hp.Entry)
-            .ThenInclude(entry => entry.SwimEvent)
-            .ToListAsync();
-    }
+            .ThenInclude(entry => entry.SwimEvent);
     
     public async Task ApproveHeatAsync(Heat incomingHeat)
     {

@@ -13,6 +13,8 @@ namespace UI.ViewModels.Pages;
 
 public class SwimStylesViewModel : DataViewModel<SwimStyle, int?>
 {
+    protected override PagingPage PagingSettingsPage => PagingPage.SwimStyles;
+
     private readonly IAddEditWindowFactory _windowFactory;
 
     public SwimStylesViewModel(ISwimStyleService swimStyleService) : base(swimStyleService)

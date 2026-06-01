@@ -28,6 +28,8 @@ namespace UI.ViewModels.Pages;
 
 public partial class EventsViewModel : DataViewModel<SwimEvent, int?>
 {
+    protected override PagingPage PagingSettingsPage => PagingPage.Events;
+
     private readonly IEventService _eventService;
     private readonly IHeatService _heatService;
     private readonly IAddEditWindowFactory _windowFactory;

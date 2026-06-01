@@ -29,6 +29,8 @@ public partial class EntriesViewModel(
     IEntryDocumentReaderService entryDocumentReaderService)
     : DataViewModel<Entry, int?>(entryService)
 {
+    protected override PagingPage PagingSettingsPage => PagingPage.Entries;
+
     private const int SlowestTimeRank = int.MaxValue;
     private bool _filterOptionsInitialized;
     private bool _cultureSubscribed;
