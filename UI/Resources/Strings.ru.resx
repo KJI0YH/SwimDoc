@@ -24,6 +24,18 @@
   <data name="Nav_SwimStyles" xml:space="preserve"><value>Дистанции</value></data>
   <data name="Nav_Settings" xml:space="preserve"><value>Настройки</value></data>
   <data name="Nav_About" xml:space="preserve"><value>О программе</value></data>
+  <data name="About_Version_Format" xml:space="preserve"><value>Версия {0}</value></data>
+  <data name="About_Section_Author" xml:space="preserve"><value>Автор</value></data>
+  <data name="About_Author_Name" xml:space="preserve"><value>Алексей Крыжановский</value></data>
+  <data name="About_Author_Location" xml:space="preserve"><value>Минск, Беларусь</value></data>
+  <data name="About_Copyright_Text" xml:space="preserve"><value>© 2026 Алексей Крыжановский. Все права защищены.</value></data>
+  <data name="About_Section_Support" xml:space="preserve"><value>Контакты и обратная связь</value></data>
+  <data name="About_Support_Description" xml:space="preserve"><value>Вопросы, предложения или сообщения об ошибках — напишите на почту или оставьте обращение на GitHub.</value></data>
+  <data name="About_Section_License" xml:space="preserve"><value>Лицензия</value></data>
+  <data name="About_License_Text" xml:space="preserve"><value>Программа предоставляется «как есть», без каких-либо гарантий. Сторонние библиотеки распространяются на условиях их собственных лицензий. Исходный код и условия использования опубликованы в репозитории проекта на GitHub.</value></data>
+  <data name="About_Action_GitHub_Repository" xml:space="preserve"><value>GitHub</value></data>
+  <data name="About_Action_Email" xml:space="preserve"><value>Написать на почту</value></data>
+  <data name="About_Action_GitHub" xml:space="preserve"><value>Сообщить об ошибке</value></data>
 
   <data name="Menu_Competition" xml:space="preserve"><value>Соревнование</value></data>
   <data name="Menu_Create" xml:space="preserve"><value>Создать</value></data>

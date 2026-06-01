@@ -61,6 +61,18 @@ public static class Strings
     public static string Nav_SwimStyles => Get(nameof(Nav_SwimStyles));
     public static string Nav_Settings => Get(nameof(Nav_Settings));
     public static string Nav_About => Get(nameof(Nav_About));
+    public static string About_Version_Format => Get(nameof(About_Version_Format));
+    public static string About_Section_Author => Get(nameof(About_Section_Author));
+    public static string About_Author_Name => Get(nameof(About_Author_Name));
+    public static string About_Author_Location => Get(nameof(About_Author_Location));
+    public static string About_Copyright_Text => Get(nameof(About_Copyright_Text));
+    public static string About_Section_Support => Get(nameof(About_Section_Support));
+    public static string About_Support_Description => Get(nameof(About_Support_Description));
+    public static string About_Section_License => Get(nameof(About_Section_License));
+    public static string About_License_Text => Get(nameof(About_License_Text));
+    public static string About_Action_GitHub_Repository => Get(nameof(About_Action_GitHub_Repository));
+    public static string About_Action_Email => Get(nameof(About_Action_Email));
+    public static string About_Action_GitHub => Get(nameof(About_Action_GitHub));
 
     public static string Menu_Competition => Get(nameof(Menu_Competition));
     public static string Menu_Create => Get(nameof(Menu_Create));

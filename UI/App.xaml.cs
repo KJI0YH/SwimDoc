@@ -32,9 +32,11 @@ using EventDetailsViewModel = UI.ViewModels.Pages.EventDetailsViewModel;
 using EventsViewModel = UI.ViewModels.Pages.EventsViewModel;
 using HeatsViewModel = UI.ViewModels.Pages.HeatsViewModel;
 using ResultsViewModel = UI.ViewModels.Pages.ResultsViewModel;
+using AboutViewModel = UI.ViewModels.Pages.AboutViewModel;
 using SettingsViewModel = UI.ViewModels.Pages.SettingsViewModel;
 using MainViewModel = UI.ViewModels.Windows.MainViewModel;
 using SwimStyleDetailsViewModel = UI.ViewModels.Pages.SwimStyleDetailsViewModel;
+using AboutPage = UI.Views.Pages.AboutPage;
 using SettingsPage = UI.Views.Pages.SettingsPage;
 
 namespace UI;
@@ -136,6 +138,7 @@ public partial class App : Application
     {
         services.AddSingleton<CompetitionSelectionViewModel>();
         services.AddTransient<MainViewModel>();
+        services.AddTransient<AboutViewModel>();
         services.AddTransient<SettingsViewModel>();
         services.AddTransient<BaseTimesSettingsViewModel>();
         services.AddTransient<EventsViewModel>();
@@ -171,5 +174,6 @@ public partial class App : Application
         services.AddTransient<AgeGroupDetailsPage>();
         services.AddTransient<SwimStyleDetailsPage>();
         services.AddTransient<SettingsPage>();
+        services.AddTransient<AboutPage>();
     }
 }

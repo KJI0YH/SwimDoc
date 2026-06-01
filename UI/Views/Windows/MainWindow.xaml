@@ -202,8 +202,9 @@
                     TargetPageType="{x:Type pages:SettingsPage}" />
                 <ui:NavigationViewItem
                     Content="{loc:Loc Nav_About}"
-                    Tag="Settings"
-                    Icon="{ui:SymbolIcon Info24}" />
+                    Tag="About"
+                    Icon="{ui:SymbolIcon Info24}"
+                    TargetPageType="{x:Type pages:AboutPage}" />
             </ui:NavigationView.FooterMenuItems>
         </ui:NavigationView>
         <Border x:Name="ModalOverlay"
