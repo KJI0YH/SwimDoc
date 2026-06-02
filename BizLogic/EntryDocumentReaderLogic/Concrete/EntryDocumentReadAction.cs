@@ -1,9 +1,11 @@
 using System.Diagnostics.Contracts;
 using System.IO.Pipes;
+using System.Globalization;
 using System.Text.RegularExpressions;
 using BizDbAccess;
 using BizLogic.GenericInterfaces;
 using BizLogic.Helpers;
+using BizLogic.Resources;
 using DataLayer.EfClasses;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
@@ -50,7 +52,8 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
     public IReadOnlyList<EntryDocument> Action(string dataIn, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        if (!File.Exists(dataIn)) throw new FileNotFoundException($"File not found: {dataIn}");
+        if (!File.Exists(dataIn))
+            throw new FileNotFoundException(string.Format(CultureInfo.CurrentUICulture, EntryImportStrings.FileNotFound_Format, dataIn));
         using var package = new ExcelPackage(dataIn);
         var workBook = package.Workbook;
         var worksheets = workBook.Worksheets
@@ -153,7 +156,10 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
             if (string.IsNullOrWhiteSpace(distanceText)) continue;
             if (!int.TryParse(distanceText, out var distance))
             {
-                _warnings.Add($"Не удалось обработать дистанцию: {MessageLocation(workSheet.Name, distanceRow, col)}");
+                _warnings.Add(string.Format(
+                    CultureInfo.CurrentUICulture,
+                    EntryImportStrings.DistanceParseFailed_Format,
+                    MessageLocation(workSheet.Name, distanceRow, col)));
                 continue;
             }
 
@@ -161,7 +167,10 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
             if (string.IsNullOrWhiteSpace(strokeText)) continue;
             if (!TryParseStroke(strokeText, out var style))
             {
-                _warnings.Add($"Не удалось обработать стиль: {MessageLocation(workSheet.Name, strokeRow, col)}");
+                _warnings.Add(string.Format(
+                    CultureInfo.CurrentUICulture,
+                    EntryImportStrings.StrokeParseFailed_Format,
+                    MessageLocation(workSheet.Name, strokeRow, col)));
                 continue;
             }
 
@@ -180,8 +189,10 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
         {
             if (foundHeads.TryGetValue(header, out var cell) && cell is null)
             {
-                errors.Add(
-                    $"Заголовок \"{header}\" не найден: {MessageLocation(workSheet.Name, cell?.Row, cell?.Column)}");
+                errors.Add(string.Format(
+                    CultureInfo.CurrentUICulture,
+                    EntryImportStrings.HeaderNotFound_Format,
+                    header));
             }
         }
 
@@ -231,7 +242,10 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
             if (string.IsNullOrWhiteSpace(firstName))
             {
                 _errors.Add(
-                    $"Некорректное имя спортсмена: {MessageLocation(workSheet.Name, row, athleteHeaders[FIRSTNAME_HEADER]!.Column)}");
+                    string.Format(
+                        CultureInfo.CurrentUICulture,
+                        EntryImportStrings.AthleteFirstNameInvalid_Format,
+                        MessageLocation(workSheet.Name, row, athleteHeaders[FIRSTNAME_HEADER]!.Column)));
                 hasErrors = true;
             }
 
@@ -239,7 +253,10 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
             if (string.IsNullOrWhiteSpace(lastName))
             {
                 _errors.Add(
-                    $"Некорректная фамилия спортсмена: {MessageLocation(workSheet.Name, row, athleteHeaders[LASTNAME_HEADER]!.Column)}");
+                    string.Format(
+                        CultureInfo.CurrentUICulture,
+                        EntryImportStrings.AthleteLastNameInvalid_Format,
+                        MessageLocation(workSheet.Name, row, athleteHeaders[LASTNAME_HEADER]!.Column)));
                 hasErrors = true;
             }
 
@@ -247,14 +264,20 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
                     out var yearOfBirth))
             {
                 _errors.Add(
-                    $"Некорректный год рождения спортсмена: {MessageLocation(workSheet.Name, row, athleteHeaders[BIRTH_YEAR_HEADER]!.Column)}");
+                    string.Format(
+                        CultureInfo.CurrentUICulture,
+                        EntryImportStrings.AthleteBirthYearInvalid_Format,
+                        MessageLocation(workSheet.Name, row, athleteHeaders[BIRTH_YEAR_HEADER]!.Column)));
                 hasErrors = true;
             }
 
             if (!TryParseGender(workSheet.Cells[row, athleteHeaders[GENDER_HEADER]!.Column].Text, out var gender))
             {
                 _errors.Add(
-                    $"Некорректный пол спортсмена: {MessageLocation(workSheet.Name, row, athleteHeaders[GENDER_HEADER]!.Column)}");
+                    string.Format(
+                        CultureInfo.CurrentUICulture,
+                        EntryImportStrings.AthleteGenderInvalid_Format,
+                        MessageLocation(workSheet.Name, row, athleteHeaders[GENDER_HEADER]!.Column)));
                 hasErrors = true;
             }
 
@@ -262,7 +285,10 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
                     workSheet.Cells[row, athleteHeaders[CATEGORY_HEADER]!.Column]!.Text, out var category))
             {
                 _errors.Add(
-                    $"Некорректный разряд спортсмена: {MessageLocation(workSheet.Name, row, athleteHeaders[CATEGORY_HEADER]!.Column)}");
+                    string.Format(
+                        CultureInfo.CurrentUICulture,
+                        EntryImportStrings.AthleteCategoryInvalid_Format,
+                        MessageLocation(workSheet.Name, row, athleteHeaders[CATEGORY_HEADER]!.Column)));
                 category = Category.NoCategory;
             }
 
@@ -307,7 +333,10 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
         }
         if (string.IsNullOrWhiteSpace(clubName))
         {
-            _warnings.Add($"Имя клуба не найдено, спортсмены добавлены в личный зачёт: {MessageLocation(workSheet.Name, null, null)}");
+            _warnings.Add(string.Format(
+                CultureInfo.CurrentUICulture,
+                EntryImportStrings.ClubNameNotFound_PersonalScoring_Format,
+                MessageLocation(workSheet.Name, null, null)));
             return null;
         }
 

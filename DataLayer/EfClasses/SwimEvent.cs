@@ -1,6 +1,8 @@
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using DataLayer;
 using DataLayer.EfCore;
+using DataLayer.Resources;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataLayer.EfClasses;
@@ -53,30 +55,37 @@ public class SwimEvent : IValidatableObject
         var existedEvent = currContext.SwimEvents.FirstOrDefault(swimEvent =>
             swimEvent.SwimStyleId == SwimStyleId && swimEvent.AgeGroupId == AgeGroupId && swimEvent.Round == Round);
         if (existedOrderDate is not null && currContext.Entry(this).State == EntityState.Added)
-            yield return new ValidationResult($"Swim event with order {Order} on date {Date} already exists");
+            yield return new ValidationResult(string.Format(
+                CultureInfo.CurrentUICulture,
+                ValidationStrings.SwimEvent_OrderAndDateAlreadyExists_Format,
+                Order,
+                Date));
         if (existedEvent is not null && currContext.Entry(this).State == EntityState.Added &&
             existedEvent.SwimStyleId == SwimStyleId &&
             existedEvent.AgeGroupId == AgeGroupId &&
             existedEvent.Round == Round)
-            yield return new ValidationResult($"Swim event with this swim style, age group, round already exists");
+            yield return new ValidationResult(ValidationStrings.SwimEvent_AlreadyExists_ByStyleAgeGroupRound);
         if (SwimStyleId is 0)
-            yield return new ValidationResult($"Swim style is not selected");
+            yield return new ValidationResult(ValidationStrings.SwimEvent_SwimStyleNotSelected);
         if (AgeGroupId is 0)
-            yield return new ValidationResult($"Age group is not selected");
+            yield return new ValidationResult(ValidationStrings.SwimEvent_AgeGroupNotSelected);
         if (RoundParticipantsCount is <= 0)
-            yield return new ValidationResult("Round participants count must be greater than zero",
+            yield return new ValidationResult(
+                ValidationStrings.SwimEvent_RoundParticipantsCountMustBeGreaterThanZero,
                 [nameof(RoundParticipantsCount)]);
         var customLanes = SwimEventLaneNames.Parse(CustomLaneNames);
         if (customLanes.Count > 0)
         {
             if (customLanes.Count != customLanes.Distinct(StringComparer.OrdinalIgnoreCase).Count())
-                yield return new ValidationResult("Custom lane names must be unique", [nameof(CustomLaneNames)]);
+                yield return new ValidationResult(
+                    ValidationStrings.SwimEvent_CustomLaneNamesMustBeUnique,
+                    [nameof(CustomLaneNames)]);
         }
         else if (LaneMin > LaneMax)
         {
-            yield return new ValidationResult("Invalid lane range");
+            yield return new ValidationResult(ValidationStrings.SwimEvent_InvalidLaneRange);
         }
         if (PreviousSwimEvent is not null && Round <= PreviousSwimEvent.Round)
-            yield return new ValidationResult("Invalid round order");
+            yield return new ValidationResult(ValidationStrings.SwimEvent_InvalidRoundOrder);
     }
 }

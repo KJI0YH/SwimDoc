@@ -39,5 +39,19 @@
   <data name="Stroke_Breast" xml:space="preserve"><value>Брасс</value></data>
   <data name="Stroke_Free" xml:space="preserve"><value>Вольный стиль</value></data>
   <data name="Stroke_Medley" xml:space="preserve"><value>Комплексное плавание</value></data>
+
+  <data name="Entries_Example_FirstName" xml:space="preserve"><value>Имя</value></data>
+  <data name="Entries_Example_LastName" xml:space="preserve"><value>Фамилия</value></data>
+  <data name="Entries_Example_Category" xml:space="preserve"><value>МС</value></data>
+
+  <data name="Category_IMoS" xml:space="preserve"><value>МСМК</value></data>
+  <data name="Category_MoS" xml:space="preserve"><value>МС</value></data>
+  <data name="Category_CMoS" xml:space="preserve"><value>КМС</value></data>
+  <data name="Category_FirstAdult" xml:space="preserve"><value>I</value></data>
+  <data name="Category_SecondAdult" xml:space="preserve"><value>II</value></data>
+  <data name="Category_ThirdAdult" xml:space="preserve"><value>III</value></data>
+  <data name="Category_FirstJunior" xml:space="preserve"><value>I юн.</value></data>
+  <data name="Category_SecondJunior" xml:space="preserve"><value>II юн.</value></data>
+  <data name="Category_NoCategory" xml:space="preserve"><value>-</value></data>
 </root>
 

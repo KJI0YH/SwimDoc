@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <data name="FileNotFound_Format" xml:space="preserve"><value>File not found: {0}</value></data>
+  <data name="HeaderNotFound_Format" xml:space="preserve"><value>Header "{0}" not found.</value></data>
+  <data name="ClubNameNotFound_PersonalScoring_Format" xml:space="preserve"><value>Club name not found. Athletes were imported as individual entries: {0}</value></data>
+
+  <data name="DistanceParseFailed_Format" xml:space="preserve"><value>Could not parse distance: {0}</value></data>
+  <data name="StrokeParseFailed_Format" xml:space="preserve"><value>Could not parse stroke: {0}</value></data>
+
+  <data name="AthleteFirstNameInvalid_Format" xml:space="preserve"><value>Invalid athlete first name: {0}</value></data>
+  <data name="AthleteLastNameInvalid_Format" xml:space="preserve"><value>Invalid athlete last name: {0}</value></data>
+  <data name="AthleteBirthYearInvalid_Format" xml:space="preserve"><value>Invalid athlete birth year: {0}</value></data>
+  <data name="AthleteGenderInvalid_Format" xml:space="preserve"><value>Invalid athlete gender: {0}</value></data>
+  <data name="AthleteCategoryInvalid_Format" xml:space="preserve"><value>Invalid athlete category: {0}</value></data>
+</root>
+

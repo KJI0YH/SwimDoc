@@ -1,9 +1,11 @@
 using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using DataLayer.EfClasses;
 using DataLayer.EfCore;
 using Microsoft.EntityFrameworkCore;
 using ServiceLayer.Crud;
+using ServiceLayer.Resources;
 
 namespace ServiceLayer.EntryService;
 
@@ -145,19 +147,25 @@ public class EntryService(EfCoreContext dbContext) : CrudService<Entry, int?>(db
             .AsNoTracking()
             .FirstOrDefaultAsync(e => e.Id == targetEventId, cancellationToken);
         if (targetEvent is null)
-            throw new InvalidOperationException($"Событие с Id {targetEventId} не найдено.");
+            throw new InvalidOperationException(string.Format(
+                CultureInfo.CurrentUICulture,
+                ServiceErrorStrings.Entry_Copy_EventNotFound_Format,
+                targetEventId));
 
         if (targetEvent.RoundParticipantsCount is null or <= 0)
-            throw new InvalidOperationException("Для текущего события не задано количество участников раунда.");
+            throw new InvalidOperationException(ServiceErrorStrings.Entry_Copy_RoundParticipantsCountMissing);
 
         var previousEvent = await dbContext.SwimEvents
             .AsNoTracking()
             .FirstOrDefaultAsync(e => e.Id == previousEventId, cancellationToken);
         if (previousEvent is null)
-            throw new InvalidOperationException($"Событие с Id {previousEventId} не найдено.");
+            throw new InvalidOperationException(string.Format(
+                CultureInfo.CurrentUICulture,
+                ServiceErrorStrings.Entry_Copy_EventNotFound_Format,
+                previousEventId));
 
         if (previousEvent.Status != SwimEventStatus.OFFICIAL)
-            throw new InvalidOperationException("Предыдущее событие должно быть в статусе OFFICIAL.");
+            throw new InvalidOperationException(ServiceErrorStrings.Entry_Copy_PreviousEventMustBeOfficial);
 
         var orderedEntries = await GetEntriesByEventIdOrderByFinishTimeAsync(previousEventId);
         var finishers = orderedEntries
@@ -166,7 +174,7 @@ public class EntryService(EfCoreContext dbContext) : CrudService<Entry, int?>(db
 
         var selectedSources = SelectQualifiersByFinishTime(finishers, targetEvent.RoundParticipantsCount.Value);
         if (selectedSources.Count == 0)
-            throw new InvalidOperationException("В предыдущем событии нет финишировавших участников с временем.");
+            throw new InvalidOperationException(ServiceErrorStrings.Entry_Copy_NoFinishersWithTime);
 
         var created = new List<Entry>();
         var errors = new List<ValidationResult>();

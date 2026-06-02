@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <data name="SwimEvent_OrderAndDateAlreadyExists_Format" xml:space="preserve"><value>Событие с порядком {0} на дату {1} уже существует.</value></data>
+  <data name="SwimEvent_AlreadyExists_ByStyleAgeGroupRound" xml:space="preserve"><value>Событие с выбранными дистанцией, возрастной группой и раундом уже существует.</value></data>
+  <data name="SwimEvent_SwimStyleNotSelected" xml:space="preserve"><value>Не выбрана дистанция.</value></data>
+  <data name="SwimEvent_AgeGroupNotSelected" xml:space="preserve"><value>Не выбрана возрастная группа.</value></data>
+  <data name="SwimEvent_RoundParticipantsCountMustBeGreaterThanZero" xml:space="preserve"><value>Количество участников раунда должно быть больше нуля.</value></data>
+  <data name="SwimEvent_CustomLaneNamesMustBeUnique" xml:space="preserve"><value>Названия дорожек должны быть уникальными.</value></data>
+  <data name="SwimEvent_InvalidLaneRange" xml:space="preserve"><value>Некорректный диапазон дорожек.</value></data>
+  <data name="SwimEvent_InvalidRoundOrder" xml:space="preserve"><value>Некорректный порядок раундов.</value></data>
+
+  <data name="SwimStyle_AlreadyExists_Format" xml:space="preserve"><value>Дистанция {0} уже существует.</value></data>
+  <data name="SwimStyle_DistanceMustBeGreaterThanZero" xml:space="preserve"><value>Дистанция должна быть больше нуля.</value></data>
+
+  <data name="AgeGroup_InvalidYearRange" xml:space="preserve"><value>Некорректный диапазон годов рождения.</value></data>
+  <data name="AgeGroup_AlreadyExists" xml:space="preserve"><value>Такая возрастная группа уже существует.</value></data>
+
+  <data name="Athlete_FirstNameCannotBeEmpty" xml:space="preserve"><value>Имя не может быть пустым.</value></data>
+  <data name="Athlete_LastNameCannotBeEmpty" xml:space="preserve"><value>Фамилия не может быть пустой.</value></data>
+  <data name="Athlete_GenderCannotBeMixed" xml:space="preserve"><value>Пол не может быть «Смешанная».</value></data>
+  <data name="Athlete_YearOfBirthInvalid" xml:space="preserve"><value>Некорректный год рождения.</value></data>
+
+  <data name="Club_NameCannotBeEmpty" xml:space="preserve"><value>Название команды не может быть пустым.</value></data>
+
+  <data name="Entry_ParticipantMustBeProvided" xml:space="preserve"><value>Не указан участник.</value></data>
+  <data name="Entry_SwimStyleMustBeProvided" xml:space="preserve"><value>Не указана дистанция.</value></data>
+  <data name="Entry_AlreadyExists" xml:space="preserve"><value>Такая заявка уже существует.</value></data>
+  <data name="Entry_InvalidParticipant" xml:space="preserve"><value>Некорректный участник.</value></data>
+  <data name="Entry_AthleteNotInAgeGroup" xml:space="preserve"><value>Участник не соответствует выбранной возрастной группе.</value></data>
+  <data name="Entry_SwimEventMustBeIndividual" xml:space="preserve"><value>Событие должно быть личным.</value></data>
+  <data name="Entry_SwimEventMustBeRelay" xml:space="preserve"><value>Событие должно быть эстафетным.</value></data>
+
+  <data name="HeatPosition_HeatDoesNotExist" xml:space="preserve"><value>Заплыв не существует.</value></data>
+  <data name="HeatPosition_LaneOutOfRange_Format" xml:space="preserve"><value>Дорожка {0} вне диапазона.</value></data>
+  <data name="HeatPosition_LaneAlreadyBusy_Format" xml:space="preserve"><value>Дорожка {0} в заплыве {1} уже занята.</value></data>
+  <data name="HeatPosition_EntryAlreadyExists_Format" xml:space="preserve"><value>Заявка с Id {0} уже существует.</value></data>
+</root>
+

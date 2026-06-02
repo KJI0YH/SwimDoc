@@ -479,5 +479,8 @@
   <data name="Enum_Category_ThirdAdult" xml:space="preserve"><value>III</value></data>
   <data name="Enum_Category_FirstJunior" xml:space="preserve"><value>I jr.</value></data>
   <data name="Enum_Category_SecondJunior" xml:space="preserve"><value>II jr.</value></data>
+  <data name="Col_Comment" xml:space="preserve">
+    <value>Comment</value>
+  </data>
 </root>
 

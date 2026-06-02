@@ -1,6 +1,8 @@
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using DataLayer;
 using DataLayer.EfCore;
+using DataLayer.Resources;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataLayer.EfClasses;
@@ -25,8 +27,13 @@ public class SwimStyle : IValidatableObject
         var existed = currContext.SwimStyles.FirstOrDefault(ss =>
             ss.Stroke == Stroke && ss.Distance == Distance && ss.RelayCount == RelayCount);
         if (existed is not null && currContext.Entry(this).State == EntityState.Added)
-            yield return new ValidationResult($"Swim style {DisplayName} already exists");
+            yield return new ValidationResult(string.Format(
+                CultureInfo.CurrentUICulture,
+                ValidationStrings.SwimStyle_AlreadyExists_Format,
+                DisplayName));
         if (Distance <= 0)
-            yield return new ValidationResult("Distance must be greater than zero", [nameof(Distance)]);
+            yield return new ValidationResult(
+                ValidationStrings.SwimStyle_DistanceMustBeGreaterThanZero,
+                [nameof(Distance)]);
     }
 }

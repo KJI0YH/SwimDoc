@@ -2,6 +2,8 @@
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System.Drawing;
+using BizLogic.Helpers;
+using BizLogic.Resources;
 
 namespace BizLogic.ReportGenerator.Concrete.Excel;
 
@@ -10,7 +12,7 @@ public class EntryListReportExcel(EfCoreContext dbContext) : BaseReportExcel(dbC
     public override void AddWorksheet(ExcelPackage package, List<int> swimEventIds)
     {
         var swimEvents = DbAccess.GetSwimEventsWithEntries(swimEventIds);
-        var worksheet = package.Workbook.Worksheets.Add("Заявочный протокол");
+        var worksheet = package.Workbook.Worksheets.Add(ReportExcelStrings.Sheet_EntryList);
         RenderToWorksheet(worksheet, swimEvents);
     }
 
@@ -43,16 +45,16 @@ public class EntryListReportExcel(EfCoreContext dbContext) : BaseReportExcel(dbC
 
             var titleRange = worksheet.Cells[row, colNo, row, tableLastCol];
             titleRange.Merge = true;
-            titleRange.Value = swimEvent.DisplayName;
+            titleRange.Value = LocalizedEntityDisplayFormatter.FormatSwimEvent(swimEvent);
             titleRange.Style.Font.Bold = true;
             titleRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             row += 1;
             
-            worksheet.Cells[row, colNo].Value = "№";
-            worksheet.Cells[row, colParticipant].Value = "Участник";
-            worksheet.Cells[row, colBirthYear].Value = "Год рождения";
-            worksheet.Cells[row, colTeam].Value = "Команда";
-            worksheet.Cells[row, colEntryTime].Value = "Время";
+            worksheet.Cells[row, colNo].Value = ReportExcelStrings.Col_No;
+            worksheet.Cells[row, colParticipant].Value = ReportExcelStrings.Col_Participant;
+            worksheet.Cells[row, colBirthYear].Value = ReportExcelStrings.Col_BirthYear;
+            worksheet.Cells[row, colTeam].Value = ReportExcelStrings.Col_Team;
+            worksheet.Cells[row, colEntryTime].Value = ReportExcelStrings.Col_Time;
 
             var headerRange = worksheet.Cells[row, colNo, row, tableLastCol];
             headerRange.Style.Font.Bold = true;
@@ -82,9 +84,9 @@ public class EntryListReportExcel(EfCoreContext dbContext) : BaseReportExcel(dbC
                     prevPlace = place;
                 }
 
-                worksheet.Cells[row, colParticipant].Value = athlete?.DisplayName ?? "(нет данных)";
+                worksheet.Cells[row, colParticipant].Value = athlete?.DisplayName ?? ReportExcelStrings.Value_NoneParen;
                 worksheet.Cells[row, colBirthYear].Value = athlete?.YearOfBirth;
-                worksheet.Cells[row, colTeam].Value = athlete?.DisplayClubName ?? "(Лично)";
+                worksheet.Cells[row, colTeam].Value = athlete?.Club?.Name ?? ReportExcelStrings.Value_PersonalParen;
                 worksheet.Cells[row, colEntryTime].Value = entry.DisplayEntryTime;
 
                 var dataRange = worksheet.Cells[row, colNo, row, tableLastCol];

@@ -7,112 +7,110 @@
              xmlns:loc="clr-namespace:UI.Localization"
              mc:Ignorable="d"
              d:DesignHeight="500" d:DesignWidth="830">
-    <UserControl.Resources>
-        <Style x:Key="StartCardButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="{DynamicResource ControlFillColorDefaultBrush}" />
-            <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
-            <Setter Property="BorderBrush" Value="{DynamicResource ControlStrokeColorDefaultBrush}" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Padding" Value="40,36" />
-            <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="border"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="8"
-                                Padding="{TemplateBinding Padding}">
-                            <Border.Effect>
-                                <DropShadowEffect BlurRadius="12" ShadowDepth="2" Opacity="0.12" />
-                            </Border.Effect>
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="Background"
-                                        Value="{DynamicResource ControlFillColorSecondaryBrush}" />
-                                <Setter TargetName="border" Property="BorderBrush"
-                                        Value="{DynamicResource AccentFillColorDefaultBrush}" />
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="border" Property="Opacity" Value="0.95" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-    </UserControl.Resources>
-    <Grid Margin="60,40">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
+    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Disabled"
+                  Padding="24">
+        <StackPanel MaxWidth="720"
+                    HorizontalAlignment="Center">
+            <Border Width="96"
+                    Height="96"
+                    CornerRadius="22"
+                    Margin="0,16,0,20"
+                    HorizontalAlignment="Center">
+                <Border.Background>
+                    <SolidColorBrush Color="#FF1565C0" />
+                </Border.Background>
+                <ui:SymbolIcon Symbol="SwimmingPool24"
+                               Foreground="White"
+                               FontSize="52"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center" />
+            </Border>
 
-        <!-- Header -->
-        <StackPanel Grid.Row="0" Margin="0,0,0,48">
-            <TextBlock Text="SwimDoc"
-                       FontSize="{StaticResource SwimDocFontSizeDisplay}"
-                       FontWeight="SemiBold"
-                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                       Margin="0,0,0,8" />
-            <TextBlock Text="{loc:Loc CompetitionSelection_Subtitle}"
-                       Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+            <TextBlock Style="{StaticResource TitleLargeTextBlockStyle}"
+                       Text="{loc:Loc App_Title}"
+                       HorizontalAlignment="Center"
+                       TextAlignment="Center" />
+            <TextBlock Margin="0,6,0,28"
+                       HorizontalAlignment="Center"
+                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                       TextWrapping="Wrap"
+                       TextAlignment="Center"
+                       Text="{loc:Loc CompetitionSelection_Subtitle}" />
+
+            <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
+                       Text="{loc:Loc Menu_Competition}"
+                       Margin="0,0,0,12" />
+
+            <Border Style="{StaticResource SettingsCardBorderStyle}"
+                    Margin="0,0,0,12">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" Style="{StaticResource SettingsIconBadgeStyle}">
+                        <ui:SymbolIcon Symbol="AddCircle24"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" />
+                    </Border>
+
+                    <StackPanel Grid.Column="1"
+                                Margin="16,0,16,0"
+                                VerticalAlignment="Center">
+                        <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}"
+                                   Text="{loc:Loc CompetitionSelection_Create}" />
+                        <TextBlock Margin="0,4,0,0"
+                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                   TextWrapping="Wrap"
+                                   Text="Ctrl+N" />
+                    </StackPanel>
+
+                    <ui:Button Grid.Column="2"
+                               Appearance="Primary"
+                               VerticalAlignment="Center"
+                               Padding="16,8"
+                               Command="{Binding CreateNewCommand}"
+                               Content="{loc:Loc Menu_Create}" />
+                </Grid>
+            </Border>
+
+            <Border Style="{StaticResource SettingsCardBorderStyle}"
+                    Margin="0,0,0,28">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" Style="{StaticResource SettingsIconBadgeStyle}">
+                        <ui:SymbolIcon Symbol="FolderOpen24"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" />
+                    </Border>
+
+                    <StackPanel Grid.Column="1"
+                                Margin="16,0,16,0"
+                                VerticalAlignment="Center">
+                        <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}"
+                                   Text="{loc:Loc CompetitionSelection_Open}" />
+                        <TextBlock Margin="0,4,0,0"
+                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                   TextWrapping="Wrap"
+                                   Text="Ctrl+O" />
+                    </StackPanel>
+
+                    <ui:Button Grid.Column="2"
+                               Appearance="Primary"
+                               VerticalAlignment="Center"
+                               Padding="16,8"
+                               Command="{Binding OpenExistingCommand}"
+                               Content="{loc:Loc Menu_Open}" />
+                </Grid>
+            </Border>
         </StackPanel>
-
-        <!-- Action cards -->
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="32" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-
-            <!-- Create new competition card -->
-            <Button Grid.Column="0"
-                    HorizontalAlignment="Stretch"
-                    VerticalAlignment="Stretch"
-                    Style="{StaticResource StartCardButtonStyle}"
-                    Command="{Binding CreateNewCommand}">
-                <Button.Content>
-                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center"
-                                MinWidth="200" MinHeight="180">
-                        <Viewbox Width="64" Height="64" Margin="0,0,0,20">
-                            <ContentControl Foreground="{DynamicResource AccentFillColorDefaultBrush}"
-                                            HorizontalAlignment="Center"
-                                            Content="{ui:SymbolIcon AddCircle24}" />
-                        </Viewbox>
-                        <TextBlock Text="{loc:Loc CompetitionSelection_Create}"
-                                   FontWeight="SemiBold"
-                                   HorizontalAlignment="Center"
-                                   Margin="0,0,0,8" />
-                    </StackPanel>
-                </Button.Content>
-            </Button>
-
-            <!-- Open existing competition card -->
-            <Button Grid.Column="2"
-                    HorizontalAlignment="Stretch"
-                    VerticalAlignment="Stretch"
-                    Style="{StaticResource StartCardButtonStyle}"
-                    Command="{Binding OpenExistingCommand}">
-                <Button.Content>
-                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center"
-                                MinWidth="200" MinHeight="180">
-                        <Viewbox Width="64" Height="64" Margin="0,0,0,20">
-                            <ContentControl Foreground="{DynamicResource AccentFillColorDefaultBrush}"
-                                            HorizontalAlignment="Center"
-                                            Content="{ui:SymbolIcon FolderOpen24}" />
-                        </Viewbox>
-                        <TextBlock Text="{loc:Loc CompetitionSelection_Open}"
-                                   FontWeight="SemiBold"
-                                   HorizontalAlignment="Center"
-                                   Margin="0,0,0,8" />
-                    </StackPanel>
-                </Button.Content>
-            </Button>
-        </Grid>
-    </Grid>
+    </ScrollViewer>
 </UserControl>

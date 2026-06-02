@@ -263,7 +263,10 @@ public partial class EventAddViewModel(
         {
             Date = DateOnly.FromDateTime(DateTime.Today);
             Order = eventService.GetNextOrderNumber();
-            (LaneMin, LaneMax) = eventService.GetPreviousLanes();
+            var previousLanes = eventService.GetPreviousLaneSettings();
+            (LaneMin, LaneMax) = (previousLanes.min, previousLanes.max);
+            CustomLaneNames = previousLanes.customLaneNames;
+            Course = eventService.GetPreviousCourse();
             Time = eventService.GetPreviousTime();
             SelectedPreviousSwimEvent = Enumerable.FirstOrDefault<SearchableItem>(PreviousSwimEvents, item => item.Value == null);
             if (_contextAgeGroupId.HasValue)

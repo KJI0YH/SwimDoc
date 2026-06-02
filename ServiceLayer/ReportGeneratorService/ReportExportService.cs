@@ -1,6 +1,7 @@
 using BizLogic.ReportGenerator.Concrete.Excel;
 using DataLayer.EfCore;
 using OfficeOpenXml;
+using ServiceLayer.Resources;
 
 namespace ServiceLayer.ReportGeneratorService;
 
@@ -9,13 +10,13 @@ public sealed class ReportExportService(EfCoreContext dbContext) : IReportExport
     public void ExportToExcel(ReportExportOptions options)
     {
         if (options.SwimEventIds.Count == 0)
-            throw new ArgumentException("No swim events selected.", nameof(options));
+            throw new ArgumentException(ServiceErrorStrings.ReportExport_NoSwimEventsSelected, nameof(options));
         if (string.IsNullOrWhiteSpace(options.OutputFilePath))
-            throw new ArgumentException("Output file path is empty.", nameof(options));
+            throw new ArgumentException(ServiceErrorStrings.ReportExport_OutputPathEmpty, nameof(options));
 
         var any = options.IncludeEntryList || options.IncludeStartList || options.IncludeFinishList;
         if (!any)
-            throw new ArgumentException("No reports selected.", nameof(options));
+            throw new ArgumentException(ServiceErrorStrings.ReportExport_NoReportsSelected, nameof(options));
 
         using var package = new ExcelPackage();
 

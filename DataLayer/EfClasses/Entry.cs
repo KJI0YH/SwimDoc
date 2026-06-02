@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using DataLayer.Resources;
 using DataLayer.EfCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -83,20 +84,20 @@ public class Entry : IValidatableObject
 
 
         if (athlete is null && relay is null)
-            yield return new ValidationResult("Participant must be provided");
+            yield return new ValidationResult(ValidationStrings.Entry_ParticipantMustBeProvided);
         if (swimStyle is null)
-            yield return new ValidationResult("Swim style must be provided");
+            yield return new ValidationResult(ValidationStrings.Entry_SwimStyleMustBeProvided);
         if (existed is not null && currContext.Entry(this).State == EntityState.Added)
-            yield return new ValidationResult($"Entry already exists");
+            yield return new ValidationResult(ValidationStrings.Entry_AlreadyExists);
         if (athlete is not null && relay is not null)
-            yield return new ValidationResult("Invalid participant");
+            yield return new ValidationResult(ValidationStrings.Entry_InvalidParticipant);
         if (athlete is not null && swimEvent is not null && !ageGroup.Contains(athlete.YearOfBirth, athlete.Gender) ||
             relay is not null && swimEvent is not null &&
             relayAthletes.Any(a => !ageGroup.Contains(a.YearOfBirth, a.Gender)))
-            yield return new ValidationResult($"Athlete can not to be added to this age group");
+            yield return new ValidationResult(ValidationStrings.Entry_AthleteNotInAgeGroup);
         if (swimStyle is not null && swimStyle.IsRelay && athlete is not null)
-            yield return new ValidationResult("Swim event must be individual");
+            yield return new ValidationResult(ValidationStrings.Entry_SwimEventMustBeIndividual);
         if (swimStyle is not null && swimStyle.IsIndividual && relay is not null)
-            yield return new ValidationResult("Swim event must be relay");
+            yield return new ValidationResult(ValidationStrings.Entry_SwimEventMustBeRelay);
     }
 }

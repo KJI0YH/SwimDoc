@@ -9,6 +9,10 @@ public interface IEventService : ICrudService<SwimEvent, int?>
     
     (int min, int max) GetPreviousLanes();
 
+    (int min, int max, string? customLaneNames) GetPreviousLaneSettings();
+
+    Course GetPreviousCourse();
+
     TimeOnly? GetPreviousTime();
 
     Task CalculateStartTimesAsync(

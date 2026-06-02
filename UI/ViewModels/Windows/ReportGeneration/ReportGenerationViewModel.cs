@@ -18,9 +18,9 @@ public sealed class ReportGenerationResult(bool entry, bool start, bool finish, 
 
 public partial class ReportGenerationViewModel : ViewModelBase, IWindowResult
 {
-    [ObservableProperty] private bool _includeEntryList = true;
-    [ObservableProperty] private bool _includeStartList = true;
-    [ObservableProperty] private bool _includeFinishList = true;
+    [ObservableProperty] private bool _includeEntryList = false;
+    [ObservableProperty] private bool _includeStartList = false;
+    [ObservableProperty] private bool _includeFinishList = false;
     [ObservableProperty] private string _outputFilePath = string.Empty;
     [ObservableProperty] private ObservableCollection<string> _validationErrors = [];
 

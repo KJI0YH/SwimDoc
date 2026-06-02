@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using DataLayer;
 using DataLayer.EfCore;
+using DataLayer.Resources;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataLayer.EfClasses;
@@ -39,7 +40,9 @@ public class AgeGroup : IValidatableObject
         var currContext = validationContext.GetService(typeof(DbContext)) as EfCoreContext;
         if (BirthYearMin.HasValue && BirthYearMax.HasValue && BirthYearMin.Value > BirthYearMax.Value)
         {
-            yield return new ValidationResult("Invalid year range", [nameof(BirthYearMin), nameof(BirthYearMax)]);
+            yield return new ValidationResult(
+                ValidationStrings.AgeGroup_InvalidYearRange,
+                [nameof(BirthYearMin), nameof(BirthYearMax)]);
         }
 
         var existed = currContext?.AgeGroups
@@ -48,7 +51,7 @@ public class AgeGroup : IValidatableObject
                                         ageGroup.BirthYearMax == BirthYearMax);
         if (existed != null && currContext.Entry(this).State == EntityState.Added)
         {
-            yield return new ValidationResult("Age group already exists", [nameof(AgeGroup)]);
+            yield return new ValidationResult(ValidationStrings.AgeGroup_AlreadyExists, [nameof(AgeGroup)]);
         }
     }
 }

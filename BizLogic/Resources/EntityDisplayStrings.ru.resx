@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <data name="SwimStyle_DisplayName_Format" xml:space="preserve"><value>{0}{1}м {2}</value></data>
+  <data name="SwimEvent_DisplayName_Format" xml:space="preserve"><value>#{0} {1} {2} {3}</value></data>
+  <data name="AgeGroup_DisplayName_Format" xml:space="preserve"><value>{0} {1}</value></data>
+  <data name="AgeGroup_YearRange_Open" xml:space="preserve"><value>абсолютного</value></data>
+  <data name="AgeGroup_YearRange_OpenWithSuffix" xml:space="preserve"><value>абсолютного г.р.</value></data>
+  <data name="AgeGroup_YearRange_WithSuffix_Format" xml:space="preserve"><value>{0} г.р.</value></data>
+  <data name="AgeGroup_YearRange_OlderThan" xml:space="preserve"><value>старше</value></data>
+  <data name="AgeGroup_YearRange_YoungerThan" xml:space="preserve"><value>моложе</value></data>
+
+  <data name="Enum_EventRound_PRE" xml:space="preserve"><value>Предварительный</value></data>
+  <data name="Enum_EventRound_SOP" xml:space="preserve"><value>Переплыв предварительный</value></data>
+  <data name="Enum_EventRound_SEM" xml:space="preserve"><value>Полуфинал</value></data>
+  <data name="Enum_EventRound_SOS" xml:space="preserve"><value>Переплыв полуфинал</value></data>
+  <data name="Enum_EventRound_FIN" xml:space="preserve"><value>Финал</value></data>
+
+  <data name="Enum_Stroke_Fly" xml:space="preserve"><value>Баттерфляй</value></data>
+  <data name="Enum_Stroke_Back" xml:space="preserve"><value>На спине</value></data>
+  <data name="Enum_Stroke_Breast" xml:space="preserve"><value>Брасс</value></data>
+  <data name="Enum_Stroke_Free" xml:space="preserve"><value>Вольный стиль</value></data>
+  <data name="Enum_Stroke_Medley" xml:space="preserve"><value>Комплексное плавание</value></data>
+
+  <data name="Enum_Gender_Male" xml:space="preserve"><value>Мужчины</value></data>
+  <data name="Enum_Gender_Female" xml:space="preserve"><value>Женщины</value></data>
+  <data name="Enum_Gender_Mixed" xml:space="preserve"><value>Смешанная</value></data>
+</root>
+

@@ -60,11 +60,11 @@ public sealed class EntryDocumentTemplateService : IEntryDocumentTemplateService
         ws.Cells["F3"].Value = TemplateStrings.Stroke_Free;
 
         // Example row (as in reference)
-        ws.Cells["A4"].Value = "Имя";
-        ws.Cells["B4"].Value = "Фамилия";
+        ws.Cells["A4"].Value = TemplateStrings.Entries_Example_FirstName;
+        ws.Cells["B4"].Value = TemplateStrings.Entries_Example_LastName;
         ws.Cells["C4"].Value = 2000;
         ws.Cells["D4"].Value = TemplateStrings.Gender_Male;
-        ws.Cells["E4"].Value = "МС";
+        ws.Cells["E4"].Value = TemplateStrings.Entries_Example_Category;
         ws.Cells["F4"].Style.Numberformat.Format = "@";
         ws.Cells["F4"].Value = "19.90";
 
@@ -124,15 +124,15 @@ public sealed class EntryDocumentTemplateService : IEntryDocumentTemplateService
         ws.Cells["A2"].Value = TemplateStrings.Gender_Male;
         ws.Cells["A3"].Value = TemplateStrings.Gender_Female;
 
-        ws.Cells["B2"].Value = "МСМК";
-        ws.Cells["B3"].Value = "МС";
-        ws.Cells["B4"].Value = "КМС";
-        ws.Cells["B5"].Value = "I";
-        ws.Cells["B6"].Value = "II";
-        ws.Cells["B7"].Value = "III";
-        ws.Cells["B8"].Value = "I юн.";
-        ws.Cells["B9"].Value = "II юн.";
-        ws.Cells["B10"].Value = "-";
+        ws.Cells["B2"].Value = TemplateStrings.Category_IMoS;
+        ws.Cells["B3"].Value = TemplateStrings.Category_MoS;
+        ws.Cells["B4"].Value = TemplateStrings.Category_CMoS;
+        ws.Cells["B5"].Value = TemplateStrings.Category_FirstAdult;
+        ws.Cells["B6"].Value = TemplateStrings.Category_SecondAdult;
+        ws.Cells["B7"].Value = TemplateStrings.Category_ThirdAdult;
+        ws.Cells["B8"].Value = TemplateStrings.Category_FirstJunior;
+        ws.Cells["B9"].Value = TemplateStrings.Category_SecondJunior;
+        ws.Cells["B10"].Value = TemplateStrings.Category_NoCategory;
 
         ws.Cells["C2"].Value = 50;
         ws.Cells["C3"].Value = 100;

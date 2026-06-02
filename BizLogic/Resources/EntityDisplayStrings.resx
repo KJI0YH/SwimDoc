@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <data name="SwimStyle_DisplayName_Format" xml:space="preserve"><value>{0}{1}m {2}</value></data>
+  <data name="SwimEvent_DisplayName_Format" xml:space="preserve"><value>#{0} {1} {2} {3}</value></data>
+  <data name="AgeGroup_DisplayName_Format" xml:space="preserve"><value>{0} {1}</value></data>
+  <data name="AgeGroup_YearRange_Open" xml:space="preserve"><value>open age</value></data>
+  <data name="AgeGroup_YearRange_OpenWithSuffix" xml:space="preserve"><value>open age</value></data>
+  <data name="AgeGroup_YearRange_WithSuffix_Format" xml:space="preserve"><value>{0}</value></data>
+  <data name="AgeGroup_YearRange_OlderThan" xml:space="preserve"><value>older</value></data>
+  <data name="AgeGroup_YearRange_YoungerThan" xml:space="preserve"><value>younger</value></data>
+
+  <data name="Enum_EventRound_PRE" xml:space="preserve"><value>Preliminary</value></data>
+  <data name="Enum_EventRound_SOP" xml:space="preserve"><value>Swim-off preliminary</value></data>
+  <data name="Enum_EventRound_SEM" xml:space="preserve"><value>Semifinal</value></data>
+  <data name="Enum_EventRound_SOS" xml:space="preserve"><value>Swim-off semifinal</value></data>
+  <data name="Enum_EventRound_FIN" xml:space="preserve"><value>Final</value></data>
+
+  <data name="Enum_Stroke_Fly" xml:space="preserve"><value>Butterfly</value></data>
+  <data name="Enum_Stroke_Back" xml:space="preserve"><value>Backstroke</value></data>
+  <data name="Enum_Stroke_Breast" xml:space="preserve"><value>Breaststroke</value></data>
+  <data name="Enum_Stroke_Free" xml:space="preserve"><value>Freestyle</value></data>
+  <data name="Enum_Stroke_Medley" xml:space="preserve"><value>Medley</value></data>
+
+  <data name="Enum_Gender_Male" xml:space="preserve"><value>Men</value></data>
+  <data name="Enum_Gender_Female" xml:space="preserve"><value>Women</value></data>
+  <data name="Enum_Gender_Mixed" xml:space="preserve"><value>Mixed</value></data>
+</root>
+

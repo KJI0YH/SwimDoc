@@ -39,5 +39,19 @@ public static class TemplateStrings
     public static string Stroke_Breast => Get(nameof(Stroke_Breast));
     public static string Stroke_Free => Get(nameof(Stroke_Free));
     public static string Stroke_Medley => Get(nameof(Stroke_Medley));
+
+    public static string Entries_Example_FirstName => Get(nameof(Entries_Example_FirstName));
+    public static string Entries_Example_LastName => Get(nameof(Entries_Example_LastName));
+    public static string Entries_Example_Category => Get(nameof(Entries_Example_Category));
+
+    public static string Category_IMoS => Get(nameof(Category_IMoS));
+    public static string Category_MoS => Get(nameof(Category_MoS));
+    public static string Category_CMoS => Get(nameof(Category_CMoS));
+    public static string Category_FirstAdult => Get(nameof(Category_FirstAdult));
+    public static string Category_SecondAdult => Get(nameof(Category_SecondAdult));
+    public static string Category_ThirdAdult => Get(nameof(Category_ThirdAdult));
+    public static string Category_FirstJunior => Get(nameof(Category_FirstJunior));
+    public static string Category_SecondJunior => Get(nameof(Category_SecondJunior));
+    public static string Category_NoCategory => Get(nameof(Category_NoCategory));
 }
 

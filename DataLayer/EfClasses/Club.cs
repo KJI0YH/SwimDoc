@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using DataLayer.Resources;
 
 namespace DataLayer.EfClasses;
 
@@ -23,7 +24,7 @@ public class Club : IValidatableObject
     {
         if (Name is null or "")
         {
-            yield return new ValidationResult("Club name cannot be empty", [nameof(Name)]);
+            yield return new ValidationResult(ValidationStrings.Club_NameCannotBeEmpty, [nameof(Name)]);
         }
     }
 }

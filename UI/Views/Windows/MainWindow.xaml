@@ -190,7 +190,7 @@
                                        IsEnabled="{Binding IsCompetitionSelected}" />
                 <ui:NavigationViewItem Content="{loc:Loc Nav_SwimStyles}"
                                        Tag="SwimStyles"
-                                       Icon="{ui:SymbolIcon Accessibility24}"
+                                       Icon="{ui:SymbolIcon Water24}"
                                        TargetPageType="{x:Type pages:SwimStylesPage}"
                                        IsEnabled="{Binding IsCompetitionSelected}" />
             </ui:NavigationView.MenuItems>

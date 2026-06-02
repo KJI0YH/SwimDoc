@@ -3,6 +3,7 @@ using DataLayer.EfCore;
 using Microsoft.EntityFrameworkCore;
 using ServiceLayer.BaseTimeRepository;
 using ServiceLayer.Crud;
+using DataLayer;
 
 namespace ServiceLayer.EventService;
 
@@ -22,9 +23,27 @@ public class EventService(EfCoreContext dbContext, IBaseTimeRepository baseTimeR
         return swimEvent is null ? (0, 0) : (swimEvent.LaneMin, swimEvent.LaneMax);
     }
 
+    public (int min, int max, string? customLaneNames) GetPreviousLaneSettings()
+    {
+        var swimEvent = dbContext.SwimEvents
+            .OrderByDescending(se => se.Order)
+            .Select(se => new { se.LaneMin, se.LaneMax, se.CustomLaneNames })
+            .FirstOrDefault();
+
+        return swimEvent is null ? (0, 0, null) : (swimEvent.LaneMin, swimEvent.LaneMax, swimEvent.CustomLaneNames);
+    }
+
     public TimeOnly? GetPreviousTime()
     {
         return dbContext.SwimEvents.OrderByDescending(se => se.Order).FirstOrDefault()?.Time;
+    }
+
+    public Course GetPreviousCourse()
+    {
+        return dbContext.SwimEvents
+            .OrderByDescending(se => se.Order)
+            .Select(se => (Course?)se.Course)
+            .FirstOrDefault() ?? Course.LCM;
     }
 
     public Task<List<SwimEvent>> GetIndividualEventsAsync()

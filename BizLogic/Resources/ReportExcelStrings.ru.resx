@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <data name="Sheet_EntryList" xml:space="preserve"><value>Заявочный протокол</value></data>
+  <data name="Sheet_StartList" xml:space="preserve"><value>Стартовый протокол</value></data>
+  <data name="Sheet_FinishList" xml:space="preserve"><value>Финишный протокол</value></data>
+
+  <data name="Col_No" xml:space="preserve"><value>№</value></data>
+  <data name="Col_Lane" xml:space="preserve"><value>Дорожка</value></data>
+  <data name="Col_Participant" xml:space="preserve"><value>Участник</value></data>
+  <data name="Col_BirthYear" xml:space="preserve"><value>Год рождения</value></data>
+  <data name="Col_Team" xml:space="preserve"><value>Команда</value></data>
+  <data name="Col_Time" xml:space="preserve"><value>Время</value></data>
+  <data name="Col_Points" xml:space="preserve"><value>Очки</value></data>
+
+  <data name="Value_NoneParen" xml:space="preserve"><value>(нет данных)</value></data>
+  <data name="Value_PersonalParen" xml:space="preserve"><value>(Лично)</value></data>
+
+  <data name="HeatTitle_Format" xml:space="preserve"><value>Заплыв {0} из {1} ({2} из {3})</value></data>
+  <data name="Col_Comment" xml:space="preserve">
+    <value>Примечание</value>
+  </data>
+</root>
+

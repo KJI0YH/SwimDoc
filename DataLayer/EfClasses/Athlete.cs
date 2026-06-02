@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using DataLayer.Resources;
 
 namespace DataLayer.EfClasses;
 
@@ -24,22 +25,22 @@ public class Athlete : IValidatableObject
     {
         if (string.IsNullOrWhiteSpace(FirstName))
         {
-            yield return new ValidationResult("First name cannot be empty", [nameof(FirstName)]);
+            yield return new ValidationResult(ValidationStrings.Athlete_FirstNameCannotBeEmpty, [nameof(FirstName)]);
         }
 
         if (string.IsNullOrWhiteSpace(LastName))
         {
-            yield return new ValidationResult("Last name cannot be empty", [nameof(LastName)]);
+            yield return new ValidationResult(ValidationStrings.Athlete_LastNameCannotBeEmpty, [nameof(LastName)]);
         }
 
         if (Gender == Gender.Mixed)
         {
-            yield return new ValidationResult("Gender cannot be mixed", [nameof(Gender)]);
+            yield return new ValidationResult(ValidationStrings.Athlete_GenderCannotBeMixed, [nameof(Gender)]);
         }
 
         if (YearOfBirth <= 1900)
         {
-            yield return new ValidationResult("Year of birth is invalid", [nameof(YearOfBirth)]);
+            yield return new ValidationResult(ValidationStrings.Athlete_YearOfBirthInvalid, [nameof(YearOfBirth)]);
         }
     }
 }
