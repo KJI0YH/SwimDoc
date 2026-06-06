@@ -41,6 +41,12 @@ public class Entry : IValidatableObject
             ? Relay.Club.Name
             : string.Empty;
 
+    public string DisplayParticipantBirthYear => Athlete is not null
+        ? Athlete.YearOfBirth.ToString()
+        : Relay is not null
+            ? string.Join(", ", Relay.Positions.OrderBy(p => p.Order).Select(p => p.Athlete.YearOfBirth))
+            : string.Empty;
+
     public string DisplayEntryTime => EntryTime == null
         ? "N.T."
         : (EntryTime / 6000 == 0 ? "" : $"{EntryTime / 6000}:")

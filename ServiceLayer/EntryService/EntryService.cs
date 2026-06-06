@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
+using BizLogic.Helpers;
 using DataLayer.EfClasses;
 using DataLayer.EfCore;
 using Microsoft.EntityFrameworkCore;
@@ -136,6 +137,71 @@ public class EntryService(EfCoreContext dbContext) : CrudService<Entry, int?>(db
             .OrderBy(e => e.Status > EntryStatus.FINISH ? 1 : 0)
             .ThenBy(e => e.Status == EntryStatus.FINISH ? (e.FinishTime ?? int.MaxValue) : int.MaxValue)
             .ToListAsync();
+    }
+
+    public async Task<CombinedResultsData> GetCombinedResultsByAgeGroupAsync(int ageGroupId)
+    {
+        var events = await dbContext.SwimEvents
+            .AsNoTracking()
+            .Where(se => se.AgeGroupId == ageGroupId && se.SwimStyle.RelayCount == 0)
+            .Include(se => se.SwimStyle)
+            .OrderBy(se => se.Order)
+            .ToListAsync();
+
+        if (events.Count == 0)
+            return new CombinedResultsData([], []);
+
+        var eventIds = events.Select(se => se.Id).ToList();
+        var entries = await dbContext.Entries
+            .AsNoTracking()
+            .Where(e => e.SwimEventId != null && eventIds.Contains(e.SwimEventId.Value))
+            .Where(e => e.AthleteId != null)
+            .Include(e => e.Athlete!)
+            .ThenInclude(a => a.Club)
+            .ToListAsync();
+
+        var eventColumns = events
+            .Select(se => new CombinedResultsEventColumn(
+                se.Id,
+                LocalizedEntityDisplayFormatter.FormatSwimStyle(se.SwimStyle),
+                entries.Any(entry => entry.SwimEventId == se.Id && entry.Scoring)))
+            .ToList();
+
+        var athletes = entries
+            .GroupBy(e => e.AthleteId!.Value)
+            .Select(group =>
+            {
+                var athlete = group.First().Athlete!;
+                var pointsByEventId = new Dictionary<int, int?>();
+                var scoringByEventId = new Dictionary<int, bool>();
+
+                foreach (var swimEvent in events)
+                {
+                    var entry = group.FirstOrDefault(e => e.SwimEventId == swimEvent.Id);
+                    if (entry is null)
+                        continue;
+
+                    pointsByEventId[swimEvent.Id] = entry.Points;
+                    scoringByEventId[swimEvent.Id] = entry.Scoring;
+                }
+
+                var totalPoints = group.Where(e => e.Scoring).Sum(e => e.Points ?? 0);
+                var isInOfficialStandings = group.Any(e => e.Scoring);
+
+                return new CombinedResultsAthleteRow(
+                    athlete,
+                    pointsByEventId,
+                    scoringByEventId,
+                    totalPoints,
+                    isInOfficialStandings);
+            })
+            .OrderByDescending(row => row.IsInOfficialStandings)
+            .ThenByDescending(row => row.TotalPoints)
+            .ThenBy(row => row.Athlete.LastName)
+            .ThenBy(row => row.Athlete.FirstName)
+            .ToList();
+
+        return new CombinedResultsData(eventColumns, athletes);
     }
 
     public async Task<(List<Entry> Created, IReadOnlyList<ValidationResult> Errors)> CopyEntriesFromPreviousEventAsync(

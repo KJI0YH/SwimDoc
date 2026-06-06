@@ -64,7 +64,6 @@ public sealed partial class BaseTimesSettingsViewModel : ObservableObject
         var men = _baseTimeRepository.GetBaseTime(course, spec.Distance, spec.Stroke, spec.RelayCount, Gender.Male);
         var women = _baseTimeRepository.GetBaseTime(course, spec.Distance, spec.Stroke, spec.RelayCount, Gender.Female);
         return new BaseTimeTableRowViewModel(
-            _baseTimeRepository,
             course,
             spec.Distance,
             spec.Stroke,
@@ -77,7 +76,6 @@ public sealed partial class BaseTimesSettingsViewModel : ObservableObject
     {
         var mixed = _baseTimeRepository.GetBaseTime(course, spec.Distance, spec.Stroke, spec.RelayCount, Gender.Mixed);
         return new MixedRelayRowViewModel(
-            _baseTimeRepository,
             course,
             spec.Distance,
             spec.Stroke,
@@ -113,6 +111,8 @@ public sealed partial class BaseTimesSettingsViewModel : ObservableObject
         ScmMixedRelayRows = new ObservableCollection<MixedRelayRowViewModel>(ScmMixedRelayRows);
         LcmMixedRelayRows = new ObservableCollection<MixedRelayRowViewModel>(LcmMixedRelayRows);
     }
+
+    public void ReloadFromRepository() => LoadRows();
 
     [RelayCommand]
     private static void OpenWorldAquaticsPoints()
@@ -157,7 +157,6 @@ public sealed partial class BaseTimesSettingsViewModel : ObservableObject
 
 public sealed partial class BaseTimeTableRowViewModel : ObservableObject
 {
-    private readonly IBaseTimeRepository _repository;
     private bool _suppressSync;
 
     public Course Course { get; }
@@ -186,7 +185,6 @@ public sealed partial class BaseTimeTableRowViewModel : ObservableObject
     [ObservableProperty] private int? _womenBaseTimeHundredths;
 
     public BaseTimeTableRowViewModel(
-        IBaseTimeRepository repository,
         Course course,
         int distance,
         Stroke stroke,
@@ -194,7 +192,6 @@ public sealed partial class BaseTimeTableRowViewModel : ObservableObject
         int menHundredthsFromStore,
         int womenHundredthsFromStore)
     {
-        _repository = repository;
         Course = course;
         Distance = distance;
         Stroke = stroke;
@@ -218,7 +215,6 @@ public sealed partial class BaseTimeTableRowViewModel : ObservableObject
         _suppressSync = true;
         try { MenSecondsText = BaseTimeHundredthsText.FormatSecondsField(parsed); }
         finally { _suppressSync = false; }
-        _repository.SetBaseTime(Course, Distance, Stroke, RelayCount, Gender.Male, parsed ?? 0);
     }
 
     partial void OnWomenBaseTimeTextChanged(string value)
@@ -230,7 +226,6 @@ public sealed partial class BaseTimeTableRowViewModel : ObservableObject
         _suppressSync = true;
         try { WomenSecondsText = BaseTimeHundredthsText.FormatSecondsField(parsed); }
         finally { _suppressSync = false; }
-        _repository.SetBaseTime(Course, Distance, Stroke, RelayCount, Gender.Female, parsed ?? 0);
     }
 
     partial void OnMenSecondsTextChanged(string value)
@@ -245,7 +240,6 @@ public sealed partial class BaseTimeTableRowViewModel : ObservableObject
             MenBaseTimeText = BaseTimeHundredthsText.FormatClock(parsed);
         }
         finally { _suppressSync = false; }
-        _repository.SetBaseTime(Course, Distance, Stroke, RelayCount, Gender.Male, parsed ?? 0);
     }
 
     partial void OnWomenSecondsTextChanged(string value)
@@ -260,7 +254,6 @@ public sealed partial class BaseTimeTableRowViewModel : ObservableObject
             WomenBaseTimeText = BaseTimeHundredthsText.FormatClock(parsed);
         }
         finally { _suppressSync = false; }
-        _repository.SetBaseTime(Course, Distance, Stroke, RelayCount, Gender.Female, parsed ?? 0);
     }
 
     partial void OnMenBaseTimeHundredthsChanged(int? value)
@@ -286,7 +279,6 @@ public sealed partial class BaseTimeTableRowViewModel : ObservableObject
 
 public sealed partial class MixedRelayRowViewModel : ObservableObject
 {
-    private readonly IBaseTimeRepository _repository;
     private bool _suppressSync;
 
     public Course Course { get; }
@@ -312,14 +304,12 @@ public sealed partial class MixedRelayRowViewModel : ObservableObject
     [ObservableProperty] private int? _mixedBaseTimeHundredths;
 
     public MixedRelayRowViewModel(
-        IBaseTimeRepository repository,
         Course course,
         int distance,
         Stroke stroke,
         int relayCount,
         int mixedHundredthsFromStore)
     {
-        _repository = repository;
         Course = course;
         Distance = distance;
         Stroke = stroke;
@@ -340,7 +330,6 @@ public sealed partial class MixedRelayRowViewModel : ObservableObject
         _suppressSync = true;
         try { MixedSecondsText = BaseTimeHundredthsText.FormatSecondsField(parsed); }
         finally { _suppressSync = false; }
-        _repository.SetBaseTime(Course, Distance, Stroke, RelayCount, Gender.Mixed, parsed ?? 0);
     }
 
     partial void OnMixedSecondsTextChanged(string value)
@@ -355,7 +344,6 @@ public sealed partial class MixedRelayRowViewModel : ObservableObject
             MixedBaseTimeText = BaseTimeHundredthsText.FormatClock(parsed);
         }
         finally { _suppressSync = false; }
-        _repository.SetBaseTime(Course, Distance, Stroke, RelayCount, Gender.Mixed, parsed ?? 0);
     }
 
     partial void OnMixedBaseTimeHundredthsChanged(int? value)

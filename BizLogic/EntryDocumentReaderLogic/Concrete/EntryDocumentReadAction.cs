@@ -241,7 +241,7 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
             var firstName = workSheet.Cells[row, athleteHeaders[FIRSTNAME_HEADER]!.Column].Text;
             if (string.IsNullOrWhiteSpace(firstName))
             {
-                _errors.Add(
+                _warnings.Add(
                     string.Format(
                         CultureInfo.CurrentUICulture,
                         EntryImportStrings.AthleteFirstNameInvalid_Format,
@@ -252,7 +252,7 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
             var lastName = workSheet.Cells[row, athleteHeaders[LASTNAME_HEADER]!.Column].Text;
             if (string.IsNullOrWhiteSpace(lastName))
             {
-                _errors.Add(
+                _warnings.Add(
                     string.Format(
                         CultureInfo.CurrentUICulture,
                         EntryImportStrings.AthleteLastNameInvalid_Format,
@@ -263,7 +263,7 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
             if (!int.TryParse(workSheet.Cells[row, athleteHeaders[BIRTH_YEAR_HEADER]!.Column].Text,
                     out var yearOfBirth))
             {
-                _errors.Add(
+                _warnings.Add(
                     string.Format(
                         CultureInfo.CurrentUICulture,
                         EntryImportStrings.AthleteBirthYearInvalid_Format,
@@ -273,7 +273,7 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
 
             if (!TryParseGender(workSheet.Cells[row, athleteHeaders[GENDER_HEADER]!.Column].Text, out var gender))
             {
-                _errors.Add(
+                _warnings.Add(
                     string.Format(
                         CultureInfo.CurrentUICulture,
                         EntryImportStrings.AthleteGenderInvalid_Format,
@@ -284,7 +284,7 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
             if (!EnumHelper.TryGetEnumByDescription<Category>(
                     workSheet.Cells[row, athleteHeaders[CATEGORY_HEADER]!.Column]!.Text, out var category))
             {
-                _errors.Add(
+                _warnings.Add(
                     string.Format(
                         CultureInfo.CurrentUICulture,
                         EntryImportStrings.AthleteCategoryInvalid_Format,

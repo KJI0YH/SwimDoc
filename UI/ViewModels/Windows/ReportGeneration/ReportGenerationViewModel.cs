@@ -53,11 +53,27 @@ public partial class ReportGenerationViewModel : ViewModelBase, IWindowResult
             Filter = Strings.Dialog_SaveExcelReports_Filter,
             DefaultExt = Strings.Dialog_SaveExcelReports_DefaultExt,
             AddExtension = true,
-            FileName = Strings.Dialog_SaveExcelReports_DefaultFileName
+            FileName = GetDefaultFileName()
         };
 
         if (dialog.ShowDialog() == true)
             OutputFilePath = dialog.FileName;
+    }
+
+    private string GetDefaultFileName()
+    {
+        var selectedCount = (IncludeEntryList ? 1 : 0) + (IncludeStartList ? 1 : 0) + (IncludeFinishList ? 1 : 0);
+
+        if (selectedCount != 1)
+            return Strings.Dialog_SaveExcelReports_DefaultFileName;
+
+        if (IncludeEntryList)
+            return Strings.Dialog_SaveExcelEntryListReports_DefaultFileName;
+
+        if (IncludeStartList)
+            return Strings.Dialog_SaveExcelStartListReports_DefaultFileName;
+
+        return Strings.Dialog_SaveExcelFinishListReports_DefaultFileName;
     }
 
     [RelayCommand]

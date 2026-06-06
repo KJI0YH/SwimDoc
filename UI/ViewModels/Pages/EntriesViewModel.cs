@@ -166,7 +166,7 @@ public partial class EntriesViewModel(
         AutoGenerateColumns = false;
         ColumnConfigurations.Clear();
 
-        ColumnConfigurations.Add(new ColumnConfiguration<Entry>(".", Strings.Entries_Col_Distance, 400,
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>(".", Strings.Entries_Col_Distance, 380,
             (query, direction) =>
             {
                 return direction == ListSortDirection.Ascending
@@ -188,6 +188,14 @@ public partial class EntriesViewModel(
                     .OrderByDescending<Entry, string>(q,
                         e => e.Athlete != null ? e.Athlete.LastName : e.Relay != null ? e.Relay.Club.Name : null)
                     .ThenByDescending(e => e.Athlete != null ? e.Athlete.FirstName : null)
+                    .ThenByDescending(e => e.Id))));
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("DisplayParticipantBirthYear", Strings.Athletes_Col_BirthYear, 120,
+            (query, direction) => QueryableSortByDirection.Sort(query, direction,
+                q => Queryable
+                    .OrderBy<Entry, int>(q, e => e.Athlete != null ? e.Athlete.YearOfBirth : int.MaxValue)
+                    .ThenBy(e => e.Id),
+                q => Queryable
+                    .OrderByDescending<Entry, int>(q, e => e.Athlete != null ? e.Athlete.YearOfBirth : int.MinValue)
                     .ThenByDescending(e => e.Id))));
         ColumnConfigurations.Add(new ColumnConfiguration<Entry>("DisplayParticipantClubName", Strings.Entries_Col_Team, 200,
             (query, direction) => QueryableSortByDirection.Sort(query, direction,
@@ -243,6 +251,25 @@ public partial class EntriesViewModel(
             .ThenInclude(se => se.AgeGroup)
             .Include(entry => entry.HeatPosition)
             .ThenInclude(heatPosition => heatPosition.Heat);
+    }
+
+    protected override void OpenEntryDetails(Entry entry)
+    {
+        if (!EntryAthleteNavigationHelper.TryGetAthleteId(entry, out var athleteId))
+            return;
+
+        if (entry.HeatPosition is not null)
+        {
+            NavigationService.NavigateTo<AthleteDetailsViewModel>(new AthleteDetailsNavigationParameter
+            {
+                AthleteId = athleteId,
+                FocusEntryId = entry.Id,
+                FocusSwimEventId = entry.SwimEventId
+            });
+            return;
+        }
+
+        NavigationService.NavigateTo<AthleteDetailsViewModel>(athleteId);
     }
 
     protected override IQueryable<Entry> ApplySearch(IQueryable<Entry> query)

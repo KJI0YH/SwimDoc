@@ -13,5 +13,6 @@ public sealed class ReportExportOptions
 public interface IReportExportService
 {
     void ExportToExcel(ReportExportOptions options);
+    void ExportCombinedResultsToExcel(CombinedResultsExportOptions options);
 }
 

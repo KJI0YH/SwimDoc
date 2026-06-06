@@ -177,7 +177,10 @@
   <data name="Dialog_SelectEntryFiles_Filter" xml:space="preserve"><value>Excel (*.xlsx)|*.xlsx|All Files (*.*)|*.*</value></data>
   <data name="Dialog_SaveExcelReports_Filter" xml:space="preserve"><value>Excel (*.xlsx)|*.xlsx|All Files (*.*)|*.*</value></data>
   <data name="Dialog_SaveExcelReports_DefaultExt" xml:space="preserve"><value>xlsx</value></data>
-  <data name="Dialog_SaveExcelReports_DefaultFileName" xml:space="preserve"><value>Reports.xlsx</value></data>
+  <data name="Dialog_SaveExcelReports_DefaultFileName" xml:space="preserve"><value>Отчёты.xlsx</value></data>
+  <data name="Dialog_SaveExcelEntryListReports_DefaultFileName" xml:space="preserve"><value>Заявочный протокол.xlsx</value></data>
+  <data name="Dialog_SaveExcelStartListReports_DefaultFileName" xml:space="preserve"><value>Стартовый протокол.xlsx</value></data>
+  <data name="Dialog_SaveExcelFinishListReports_DefaultFileName" xml:space="preserve"><value>Итоговый протокол.xlsx</value></data>
 
   <data name="Dialog_CompetitionDb_Filter" xml:space="preserve"><value>SQLite Database (*.db)|*.db|SQLite Database (*.sqlite)|*.sqlite|All Files (*.*)|*.*</value></data>
   <data name="Dialog_CompetitionDb_DefaultExt" xml:space="preserve"><value>db</value></data>
@@ -246,7 +249,7 @@
   <data name="Fixation_SelectedHeatHeader_NoEvent_Format" xml:space="preserve"><value>Заплыв {0} из {1} ({2} из {3}) — {4}</value></data>
 
   <data name="WindowTitle_CreateClub" xml:space="preserve"><value>Создание команды</value></data>
-  <data name="WindowTitle_EditClub" xml:space="preserve"><value>Редактирование клуба</value></data>
+  <data name="WindowTitle_EditClub" xml:space="preserve"><value>Редактирование команды</value></data>
   <data name="WindowTitle_CreateAthlete" xml:space="preserve"><value>Создание спортсмена</value></data>
   <data name="WindowTitle_EditAthlete" xml:space="preserve"><value>Редактирование спортсмена</value></data>
   <data name="WindowTitle_CreateEvent" xml:space="preserve"><value>Создание события</value></data>
@@ -281,6 +284,7 @@
   <data name="Athletes_Col_BirthYear" xml:space="preserve"><value>Год рождения</value></data>
   <data name="Athletes_Col_Category" xml:space="preserve"><value>Разряд</value></data>
   <data name="Athletes_Col_Team" xml:space="preserve"><value>Команда</value></data>
+  <data name="Athletes_Col_Points" xml:space="preserve"><value>Очки</value></data>
 
   <data name="SwimStyles_Col_Name" xml:space="preserve"><value>Название</value></data>
   <data name="SwimStyles_Col_Distance" xml:space="preserve"><value>Дистанция</value></data>
@@ -290,6 +294,7 @@
   <data name="AgeGroups_Col_Gender" xml:space="preserve"><value>Пол</value></data>
   <data name="AgeGroups_Col_BirthYearFrom" xml:space="preserve"><value>Год рождения от</value></data>
   <data name="AgeGroups_Col_BirthYearTo" xml:space="preserve"><value>Год рождения до</value></data>
+  <data name="AgeGroups_GenerateCombinedResultsReports" xml:space="preserve"><value>Сгенерировать отчёт по многоборью</value></data>
 
   <data name="Heats_GroupHeader_Format" xml:space="preserve"><value>Заплыв {0} из {1} ({2} из {3}) | {4} | {5}</value></data>
 
@@ -318,6 +323,7 @@
   <data name="Tabs_Entries" xml:space="preserve"><value>Заявки</value></data>
   <data name="Tabs_Heats" xml:space="preserve"><value>Заплывы</value></data>
   <data name="Tabs_Results" xml:space="preserve"><value>Результаты</value></data>
+  <data name="Tabs_CombinedResults" xml:space="preserve"><value>Многоборье</value></data>
   <data name="Tabs_Fixation" xml:space="preserve"><value>Фиксация</value></data>
   <data name="Tabs_Heat" xml:space="preserve"><value>Заплыв</value></data>
   <data name="Tabs_Events" xml:space="preserve"><value>События</value></data>
@@ -366,6 +372,9 @@
   <data name="Reports_Include_StartList" xml:space="preserve"><value>Стартовый протокол</value></data>
   <data name="Reports_Include_FinishList" xml:space="preserve"><value>Итоговый протокол</value></data>
   <data name="Reports_Field_OutputFile" xml:space="preserve"><value>Файл для сохранения</value></data>
+  <data name="Reports_CombinedResults_WindowTitle" xml:space="preserve"><value>Отчёт по многоборью</value></data>
+  <data name="Reports_CombinedResults_SaveDialog_Title" xml:space="preserve"><value>Сохранить отчёт по многоборью</value></data>
+  <data name="Dialog_SaveExcelCombinedResultsReports_DefaultFileName" xml:space="preserve"><value>Многоборье.xlsx</value></data>
 
   <data name="HeatAlloc_Field_Order" xml:space="preserve"><value>Порядок заплывов</value></data>
   <data name="HeatAlloc_Order_WeakToStrong" xml:space="preserve"><value>От медленного к быстрому</value></data>
@@ -394,7 +403,7 @@
   <data name="Athlete_Field_Gender" xml:space="preserve"><value>Пол</value></data>
   <data name="Athlete_Field_BirthYear" xml:space="preserve"><value>Год рождения</value></data>
   <data name="Athlete_Field_Category" xml:space="preserve"><value>Разряд</value></data>
-  <data name="Athlete_Field_Club" xml:space="preserve"><value>Клуб</value></data>
+  <data name="Athlete_Field_Club" xml:space="preserve"><value>Команда</value></data>
 
   <data name="Events_AllocateHeats" xml:space="preserve"><value>Сгенерировать заплывы</value></data>
   <data name="Events_GenerateReports" xml:space="preserve"><value>Сгенерировать отчёт</value></data>
@@ -416,12 +425,13 @@
   <data name="Results_Col_Place" xml:space="preserve"><value>Место</value></data>
   <data name="Results_Col_Result" xml:space="preserve"><value>Результат</value></data>
   <data name="Results_Col_Points" xml:space="preserve"><value>Очки</value></data>
+  <data name="Results_Col_Total" xml:space="preserve"><value>Итого</value></data>
 
   <data name="Fixation_Refresh" xml:space="preserve"><value>Обновить</value></data>
   <data name="Fixation_Col_Lane" xml:space="preserve"><value>Дорожка</value></data>
   <data name="Fixation_Col_Participant" xml:space="preserve"><value>Участник</value></data>
   <data name="Fixation_Col_BirthYear" xml:space="preserve"><value>Год рождения</value></data>
-  <data name="Fixation_Col_Club" xml:space="preserve"><value>Клуб</value></data>
+  <data name="Fixation_Col_Club" xml:space="preserve"><value>Команда</value></data>
   <data name="Fixation_Col_EntryTime" xml:space="preserve"><value>Заявочное</value></data>
   <data name="Fixation_Col_Status" xml:space="preserve"><value>Статус</value></data>
   <data name="Fixation_Col_Result" xml:space="preserve"><value>Результат</value></data>

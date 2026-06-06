@@ -31,11 +31,6 @@
                     ToolTip="{Binding DeleteToolTip}"
                     Margin="5"
                     Padding="9" />
-            <Button Content="{ui:SymbolIcon ArrowClockwise24}"
-                    Command="{Binding RefreshHeatsCommand}"
-                    ToolTip="{loc:Loc Heats_Refresh}"
-                    Margin="5"
-                    Padding="9" />
         </StackPanel>
 
         <ui:TextBox Grid.Column="1"

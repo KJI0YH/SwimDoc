@@ -16,6 +16,7 @@ public partial class AthleteDetailsViewModel : ViewModelBase, INavigationAware
     private readonly HeatsByAthleteViewModel _heatsTable;
     private readonly ResultsByAthleteViewModel _resultsTable;
     [ObservableProperty] private string? _title = string.Empty;
+    [ObservableProperty] private int _selectedTabIndex;
 
     public AthleteDetailsViewModel(
         IEntryService entryService,
@@ -35,11 +36,28 @@ public partial class AthleteDetailsViewModel : ViewModelBase, INavigationAware
 
     public void OnNavigatedTo(object? parameter)
     {
-        if (parameter is not int idValue)
-            return;
+        int athleteId;
+        int? focusEntryId = null;
+        int? focusSwimEventId = null;
 
-        _entriesTable.SetAthleteId(idValue);
-        _heatsTable.SetAthleteId(idValue);
-        _resultsTable.SetAthleteId(idValue);
+        switch (parameter)
+        {
+            case AthleteDetailsNavigationParameter navigation:
+                athleteId = navigation.AthleteId;
+                focusEntryId = navigation.FocusEntryId;
+                focusSwimEventId = navigation.FocusSwimEventId;
+                SelectedTabIndex = navigation.OpenHeatsTab ? 1 : 0;
+                break;
+            case int idValue:
+                athleteId = idValue;
+                SelectedTabIndex = 0;
+                break;
+            default:
+                return;
+        }
+
+        _entriesTable.SetAthleteId(athleteId);
+        _heatsTable.SetAthleteId(athleteId, focusEntryId, focusSwimEventId);
+        _resultsTable.SetAthleteId(athleteId);
     }
 }

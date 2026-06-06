@@ -40,11 +40,20 @@ public class AthletesViewModel : DataViewModel<Athlete, int?>
                     ? query.OrderBy(e => e.Club.Name)
                     : query.OrderByDescending(e => e.Club.Name);
             }));
+        ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("DisplayIndividualPointCount", Strings.Athletes_Col_Points, 80,
+            (query, direction) =>
+            {
+                return direction == ListSortDirection.Ascending
+                    ? query.OrderBy(a => a.Entries.Where(e => e.Scoring).Sum(e => e.Points ?? 0))
+                    : query.OrderByDescending(a => a.Entries.Where(e => e.Scoring).Sum(e => e.Points ?? 0));
+            }));
     }
 
     protected override IQueryable<Athlete> ApplyQuery(IQueryable<Athlete> query)
     {
-        return query.Include(athlete => athlete.Club);
+        return query
+            .Include(athlete => athlete.Club)
+            .Include(athlete => athlete.Entries);
     }
 
     protected override IQueryable<Athlete> ApplySearch(IQueryable<Athlete> query)

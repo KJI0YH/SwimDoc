@@ -24,6 +24,7 @@ public partial class DataViewModel<TEntity, TKey> : DataViewModelBase
 {
     protected readonly ICrudService<TEntity, TKey> _crudService;
     private readonly INavigationService _navigationService;
+    protected INavigationService NavigationService => _navigationService;
     private readonly SemaphoreSlim _loadGate = new(1, 1);
     private bool _suppressPageLoad;
 
@@ -353,7 +354,8 @@ public partial class DataViewModel<TEntity, TKey> : DataViewModelBase
                 _navigationService.NavigateTo<ClubDetailsViewModel>(entityId);
                 break;
             case nameof(Entry):
-                _navigationService.NavigateTo<EntryDetailsViewModel>(entityId);
+                if (SelectedItems[0] is Entry entry)
+                    OpenEntryDetails(entry);
                 break;
             case nameof(SwimEvent):
                 _navigationService.NavigateTo<EventDetailsViewModel>(entityId);
@@ -366,6 +368,9 @@ public partial class DataViewModel<TEntity, TKey> : DataViewModelBase
                 break;
         }
     }
+
+    protected virtual void OpenEntryDetails(Entry entry) =>
+        NavigationService.NavigateTo<EntryDetailsViewModel>(entry.Id);
 
     private bool CanOpenDetails()
     {

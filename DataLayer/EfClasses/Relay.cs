@@ -14,5 +14,5 @@ public class Relay
     public string DisplayName => $"{Club.Name} {(Number.HasValue ? Number : string.Empty)}";
 
     public string DisplayNameWithAthletes =>
-        $"{DisplayName} ({string.Join(", ", Positions.Select(p => p.Athlete.DisplayName))})";
+        $"{DisplayName} ({string.Join(", ", Positions.OrderBy(p => p.Order).Select(p => p.Athlete.DisplayName))})";
 }

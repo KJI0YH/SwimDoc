@@ -16,6 +16,7 @@ public static class ReportExcelStrings
     public static string Sheet_EntryList => Get(nameof(Sheet_EntryList));
     public static string Sheet_StartList => Get(nameof(Sheet_StartList));
     public static string Sheet_FinishList => Get(nameof(Sheet_FinishList));
+    public static string Sheet_CombinedResults => Get(nameof(Sheet_CombinedResults));
 
     public static string Col_No => Get(nameof(Col_No));
     public static string Col_Lane => Get(nameof(Col_Lane));
@@ -24,6 +25,7 @@ public static class ReportExcelStrings
     public static string Col_Team => Get(nameof(Col_Team));
     public static string Col_Time => Get(nameof(Col_Time));
     public static string Col_Points => Get(nameof(Col_Points));
+    public static string Col_Total => Get(nameof(Col_Total));
     public static string Col_Comment => Get(nameof(Col_Comment));
 
     public static string Value_NoneParen => Get(nameof(Value_NoneParen));

@@ -17,7 +17,7 @@
   <data name="Sheet_Settings" xml:space="preserve"><value>Настройки</value></data>
 
   <data name="Entries_Title_A1" xml:space="preserve"><value>Команда</value></data>
-  <data name="Entries_Title_B1" xml:space="preserve"><value>Заявочные команды</value></data>
+  <data name="Entries_Title_B1" xml:space="preserve"><value>Название команды</value></data>
 
   <data name="Entries_Header_FirstName" xml:space="preserve"><value>Имя</value></data>
   <data name="Entries_Header_LastName" xml:space="preserve"><value>Фамилия</value></data>

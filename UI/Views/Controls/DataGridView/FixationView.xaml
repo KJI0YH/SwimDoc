@@ -56,11 +56,6 @@
                             IsEnabled="{Binding CanUnapprove}"
                             Padding="9"
                             Margin="5" />
-                    <Button Content="{ui:SymbolIcon ArrowClockwise24}"
-                            Command="{Binding LoadDataCommand}"
-                            ToolTip="{loc:Loc Fixation_Refresh}"
-                            Margin="0,5,5,5"
-                            Padding="9" />
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="8,5">

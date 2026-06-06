@@ -34,5 +34,6 @@
   <data name="ReportExport_NoSwimEventsSelected" xml:space="preserve"><value>No swim events selected.</value></data>
   <data name="ReportExport_OutputPathEmpty" xml:space="preserve"><value>Output file path is empty.</value></data>
   <data name="ReportExport_NoReportsSelected" xml:space="preserve"><value>No reports selected.</value></data>
+  <data name="ReportExport_NoAgeGroupsSelected" xml:space="preserve"><value>No age groups selected.</value></data>
 </root>
 

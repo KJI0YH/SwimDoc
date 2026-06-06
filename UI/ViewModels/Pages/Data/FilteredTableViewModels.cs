@@ -95,6 +95,63 @@ public class AthletesByClubViewModel : AthletesViewModel
     }
 }
 
+public class AthletesByAgeGroupViewModel : AthletesViewModel
+{
+    private readonly IAgeGroupService _ageGroupService;
+    private readonly IAddEditWindowFactory _windowFactory;
+    private int? _ageGroupId;
+    private bool _ageGroupLoaded;
+    private Gender _ageGroupGender;
+    private int _birthYearMin;
+    private int _birthYearMax;
+
+    public AthletesByAgeGroupViewModel(IAthleteService athleteService, IAgeGroupService ageGroupService)
+        : base(athleteService)
+    {
+        _ageGroupService = ageGroupService;
+        _windowFactory = App.Current.Services.GetRequiredService<IAddEditWindowFactory>();
+    }
+
+    public void SetAgeGroupId(int? ageGroupId)
+    {
+        _ageGroupId = ageGroupId;
+        _ageGroupLoaded = false;
+
+        if (ageGroupId.HasValue)
+        {
+            var ageGroup = _ageGroupService.Query().FirstOrDefault(ag => ag.Id == ageGroupId.Value);
+            if (ageGroup is not null)
+            {
+                _ageGroupGender = ageGroup.Gender;
+                _birthYearMin = ageGroup.BirthYearMin ?? 0;
+                _birthYearMax = ageGroup.BirthYearMax ?? int.MaxValue;
+                _ageGroupLoaded = true;
+            }
+        }
+
+        LoadDataCommand.Execute(null);
+    }
+
+    protected override IQueryable<Athlete> ApplyQuery(IQueryable<Athlete> query)
+    {
+        query = base.ApplyQuery(query);
+        if (!_ageGroupId.HasValue || !_ageGroupLoaded)
+            return query.Where(_ => false);
+
+        return query.Where(a =>
+            a.YearOfBirth >= _birthYearMin &&
+            a.YearOfBirth <= _birthYearMax &&
+            (_ageGroupGender == Gender.Mixed || a.Gender == _ageGroupGender));
+    }
+
+    protected override void ShowAddEditDialog(int? id = default)
+    {
+        var result = _windowFactory.CreateAndShow<AthleteAddEditWindow>(id);
+        if (result == true)
+            _ = LoadDataAsync();
+    }
+}
+
 public class EntriesByAthleteViewModel : EntriesViewModel
 {
     private readonly IAddEditWindowFactory _windowFactory;
@@ -228,6 +285,8 @@ public class EntriesByEventViewModel : EntriesViewModel
 public class HeatsByAthleteViewModel : HeatsViewModel
 {
     private int? _athleteId;
+    private int? _focusEntryId;
+    private int? _focusSwimEventId;
 
     protected override bool UsesHeatPaging => false;
 
@@ -236,11 +295,24 @@ public class HeatsByAthleteViewModel : HeatsViewModel
     {
     }
 
-
-    public void SetAthleteId(int? athleteId)
+    public void SetAthleteId(int? athleteId, int? focusEntryId = null, int? focusSwimEventId = null)
     {
         _athleteId = athleteId;
+        _focusEntryId = focusEntryId;
+        _focusSwimEventId = focusSwimEventId;
         LoadDataCommand.Execute(null);
+    }
+
+    protected override void OnItemsLoaded(IReadOnlyList<SwimEvent> items)
+    {
+        base.OnItemsLoaded(items);
+
+        if (!_focusSwimEventId.HasValue)
+            return;
+
+        var focusEvent = items.FirstOrDefault(e => e.Id == _focusSwimEventId.Value);
+        if (focusEvent is not null)
+            SelectedSwimEvent = focusEvent;
     }
 
     protected override async Task LoadHeatPositionsAsync()
@@ -265,9 +337,17 @@ public class HeatsByAthleteViewModel : HeatsViewModel
             var swimEvent = SelectedSwimEvent;
             var heatPositionViews = heatsForAthlete.SelectMany(h =>
                 h.Positions.Select(p =>
-                    new HeatPositionView(p, swimEvent, h.Number, heatsInEvent, h.Order, heatsTotal, h.Status, h.DisplayDayTime)));
+                    new HeatPositionView(p, swimEvent, h.Number, heatsInEvent, h.Order, heatsTotal, h.Status, h.DisplayDayTime)))
+                .ToList();
             HeatPositions = new ObservableCollection<HeatPositionView>(heatPositionViews);
             UpdateHeatPaging(heatsForAthlete.Count, resetPage: false);
+
+            if (_focusEntryId.HasValue)
+            {
+                SelectedHeatPosition = heatPositionViews.FirstOrDefault(p => p.EntryId == _focusEntryId.Value);
+                _focusEntryId = null;
+                _focusSwimEventId = null;
+            }
         }
         finally
         {
@@ -367,8 +447,9 @@ public class FixationByEventViewModel(
 public class ResultsByEventViewModel(
     IEventService eventService,
     IEntryService entryService,
+    IAgeGroupService ageGroupService,
     INavigationService navigationService)
-    : ResultsViewModel(eventService, entryService, navigationService)
+    : ResultsViewModel(eventService, entryService, ageGroupService, navigationService)
 {
     private int? _eventId;
 
@@ -438,7 +519,7 @@ public partial class ResultsByAthleteViewModel(IEntryService entryService) : Vie
                 var eventResults = ResultsViewModel.BuildResultEntryViews(eventEntries);
                 var athleteResult = ResultsViewModel.FindAthleteResult(eventResults, _athleteId.Value);
                 if (athleteResult is not null)
-                    rows.Add(new ParticipantResultEntryView(athleteResult));
+                    rows.Add(new ParticipantResultEntryView(athleteResult, _athleteId.Value));
             }
 
             Results = new ObservableCollection<ParticipantResultEntryView>(rows);
@@ -695,6 +776,31 @@ public class EventsByAgeGroupViewModel : EventsViewModel
         var result = _windowFactory.CreateAndShow<EventAddEditWindow>(id, context);
         if (result == true)
             _ = LoadDataAsync();
+    }
+}
+
+public class CombinedResultsByAgeGroupViewModel : CombinedResultsViewModel
+{
+    private readonly IAgeGroupService _ageGroupService;
+
+    public CombinedResultsByAgeGroupViewModel(IAgeGroupService ageGroupService, IEntryService entryService)
+        : base(ageGroupService, entryService)
+    {
+        _ageGroupService = ageGroupService;
+    }
+
+    public override bool ShowAgeGroupSelector => false;
+
+    public void SetAgeGroupId(int? ageGroupId)
+    {
+        if (!ageGroupId.HasValue)
+        {
+            SelectedAgeGroup = null;
+            return;
+        }
+
+        SelectedAgeGroup = _ageGroupService.Query()
+            .FirstOrDefault(ageGroup => ageGroup.Id == ageGroupId.Value);
     }
 }
 

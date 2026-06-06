@@ -24,6 +24,7 @@ public partial class EventsViewModel
     protected readonly record struct OperationRunResult(bool Canceled, bool HadFailure);
 
     private CancellationTokenSource? _operationCts;
+    private OperationItem? _operationSummaryRow;
 
     [ObservableProperty] private bool _isOperationBarOpen;
     [ObservableProperty] private bool _isOperationRunning;
@@ -90,8 +91,26 @@ public partial class EventsViewModel
         IsOperationDetailsOpen = false;
         OperationItems.Clear();
         OperationErrors.Clear();
+        _operationSummaryRow = null;
         OnPropertyChanged(nameof(HasOperationDetails));
         OnPropertyChanged(nameof(CanToggleOperationDetails));
+    }
+
+    private void RecalculateOperationSummary()
+    {
+        var dataItems = OperationItems.Where(item => !item.IsSummaryRow).ToList();
+
+        _operationSummaryRow ??= new OperationItem(Strings.Import_Summary_Total) { IsSummaryRow = true };
+        if (!OperationItems.Contains(_operationSummaryRow))
+            OperationItems.Add(_operationSummaryRow);
+
+        _operationSummaryRow.EventName = Strings.Import_Summary_Total;
+        _operationSummaryRow.HeatsCreatedCount = dataItems.Sum(item => item.HeatsCreatedCount ?? 0);
+        _operationSummaryRow.WarningsCount = dataItems.Sum(item => item.WarningsCount);
+        _operationSummaryRow.ErrorsCount = dataItems.Sum(item => item.ErrorsCount);
+        _operationSummaryRow.Warnings = [];
+        _operationSummaryRow.Errors = [];
+        _operationSummaryRow.IsDetailsOpen = false;
     }
 
     public readonly record struct OperationItemOutcome(
@@ -138,6 +157,8 @@ public partial class EventsViewModel
         OperationErrors.Clear();
         OperationItems = new ObservableCollection<OperationItem>(
             events.Select(swimEvent => new OperationItem(EntityDisplayFormatter.FormatSwimEvent(swimEvent))));
+        _operationSummaryRow = null;
+        RecalculateOperationSummary();
 
         OperationTotalItems = events.Count;
         OperationProcessedItems = 0;
@@ -157,7 +178,7 @@ public partial class EventsViewModel
         {
             await Task.Run(async () =>
             {
-                foreach (var (item, swimEvent) in OperationItems.Zip(events))
+                foreach (var (item, swimEvent) in OperationItems.Where(i => !i.IsSummaryRow).Zip(events))
                 {
                     token.ThrowIfCancellationRequested();
 
@@ -179,6 +200,7 @@ public partial class EventsViewModel
                         {
                             ApplyOutcome(item, outcome);
                             OperationProcessedItems++;
+                            RecalculateOperationSummary();
                         });
 
                         hadFailure |= outcome.Status == OperationItemStatus.Failed;
@@ -196,6 +218,7 @@ public partial class EventsViewModel
                             item.Status = OperationItemStatus.Canceled;
                             OperationProcessedItems++;
                             MarkUnfinishedOperationItemsCanceled();
+                            RecalculateOperationSummary();
                         });
                         throw;
                     }
@@ -207,6 +230,7 @@ public partial class EventsViewModel
                             item.Errors = [HeatAllocationMessageLocalizer.Localize(ex.Message)];
                             item.ErrorsCount = 1;
                             OperationProcessedItems++;
+                            RecalculateOperationSummary();
                         });
                         hadFailure = true;
                         break;
@@ -222,6 +246,7 @@ public partial class EventsViewModel
         {
             IsOperationRunning = false;
             CancelOperationCommand.NotifyCanExecuteChanged();
+            RecalculateOperationSummary();
             IsOperationDetailsOpen = HasOperationDetails;
             OnPropertyChanged(nameof(HasOperationDetails));
 
@@ -337,7 +362,7 @@ public partial class EventsViewModel
 
     private void MarkUnfinishedOperationItemsCanceled()
     {
-        foreach (var item in OperationItems)
+        foreach (var item in OperationItems.Where(i => !i.IsSummaryRow))
         {
             if (item.Status is OperationItemStatus.Pending or OperationItemStatus.Processing)
                 item.Status = OperationItemStatus.Canceled;
@@ -388,6 +413,7 @@ public partial class EventsViewModel
 
         [ObservableProperty] private string _eventName;
         [ObservableProperty] private bool _isDetailsOpen;
+        [ObservableProperty] private bool _isSummaryRow;
         [ObservableProperty] private OperationItemStatus _status = OperationItemStatus.Pending;
         [ObservableProperty] private IReadOnlyList<string> _warnings = [];
         [ObservableProperty] private IReadOnlyList<string> _errors = [];
@@ -398,7 +424,16 @@ public partial class EventsViewModel
         public string? HeatsCreatedDisplay =>
             HeatsCreatedCount.HasValue ? HeatsCreatedCount.Value.ToString() : null;
 
+        public string StatusDisplay =>
+            IsSummaryRow ? string.Empty : Strings.GetEnumDisplay(Status);
+
         partial void OnHeatsCreatedCountChanged(int? value) =>
             OnPropertyChanged(nameof(HeatsCreatedDisplay));
+
+        partial void OnStatusChanged(OperationItemStatus value) =>
+            OnPropertyChanged(nameof(StatusDisplay));
+
+        partial void OnIsSummaryRowChanged(bool value) =>
+            OnPropertyChanged(nameof(StatusDisplay));
     }
 }

@@ -16,8 +16,8 @@
   <data name="Sheet_Entries" xml:space="preserve"><value>Entries</value></data>
   <data name="Sheet_Settings" xml:space="preserve"><value>Settings</value></data>
 
-  <data name="Entries_Title_A1" xml:space="preserve"><value>Team</value></data>
-  <data name="Entries_Title_B1" xml:space="preserve"><value>Entry document</value></data>
+  <data name="Entries_Title_A1" xml:space="preserve"><value>Club</value></data>
+  <data name="Entries_Title_B1" xml:space="preserve"><value>Club name</value></data>
 
   <data name="Entries_Header_FirstName" xml:space="preserve"><value>First name</value></data>
   <data name="Entries_Header_LastName" xml:space="preserve"><value>Last name</value></data>

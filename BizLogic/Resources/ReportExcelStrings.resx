@@ -16,6 +16,7 @@
   <data name="Sheet_EntryList" xml:space="preserve"><value>Entry list</value></data>
   <data name="Sheet_StartList" xml:space="preserve"><value>Start list</value></data>
   <data name="Sheet_FinishList" xml:space="preserve"><value>Finish list</value></data>
+  <data name="Sheet_CombinedResults" xml:space="preserve"><value>Combined results</value></data>
 
   <data name="Col_No" xml:space="preserve"><value>No.</value></data>
   <data name="Col_Lane" xml:space="preserve"><value>Lane</value></data>
@@ -24,6 +25,7 @@
   <data name="Col_Team" xml:space="preserve"><value>Club</value></data>
   <data name="Col_Time" xml:space="preserve"><value>Time</value></data>
   <data name="Col_Points" xml:space="preserve"><value>Points</value></data>
+  <data name="Col_Total" xml:space="preserve"><value>Total</value></data>
 
   <data name="Value_NoneParen" xml:space="preserve"><value>(None)</value></data>
   <data name="Value_PersonalParen" xml:space="preserve"><value>(Personal)</value></data>

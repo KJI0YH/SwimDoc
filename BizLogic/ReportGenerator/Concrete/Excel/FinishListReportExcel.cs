@@ -52,8 +52,9 @@ public class FinishListReportExcel(EfCoreContext dbContext) : BaseReportExcel(db
             titleRange.Merge = true;
             titleRange.Value = LocalizedEntityDisplayFormatter.FormatSwimEvent(swimEvent);
             titleRange.Style.Font.Bold = true;
-            titleRange.Style.Font.Size = 14;
             titleRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            if (ReportExcelScoringHelper.IsNonScoringSwimEvent(swimEvent))
+                ReportExcelScoringHelper.ApplyNonScoringFill(titleRange);
             row += 1;
 
             worksheet.Cells[row, colNo].Value = ReportExcelStrings.Col_No;
@@ -75,13 +76,14 @@ public class FinishListReportExcel(EfCoreContext dbContext) : BaseReportExcel(db
             headerRange.Style.WrapText = true;
             row += 1;
 
+            if (swimEvent.Entries.Count == 0)
+                continue;
+
             var place = 1;
             var prevEntry = swimEvent.Entries.First();
             var prevPlace = 1;
             foreach (var entry in swimEvent.Entries)
             {
-                var athlete = entry.Athlete;
-
                 if (prevEntry.FinishTime == entry.FinishTime)
                 {
                     worksheet.Cells[row, colNo].Value = prevPlace;
@@ -92,9 +94,9 @@ public class FinishListReportExcel(EfCoreContext dbContext) : BaseReportExcel(db
                     prevPlace = place;
                 }
 
-                worksheet.Cells[row, colParticipant].Value = athlete?.DisplayName ?? ReportExcelStrings.Value_NoneParen;
-                worksheet.Cells[row, colBirthYear].Value = athlete?.YearOfBirth;
-                worksheet.Cells[row, colTeam].Value = athlete?.Club?.Name ?? ReportExcelStrings.Value_PersonalParen;
+                worksheet.Cells[row, colParticipant].Value = ReportEntryDisplayHelper.GetParticipantName(entry);
+                worksheet.Cells[row, colBirthYear].Value = ReportEntryDisplayHelper.GetBirthYear(entry);
+                worksheet.Cells[row, colTeam].Value = ReportEntryDisplayHelper.GetTeamName(entry);
                 worksheet.Cells[row, colFinishTime].Value = entry.DisplayFinishTime;
                 worksheet.Cells[row, colPoints].Value = entry.Points;
                 worksheet.Cells[row, colComment].Value = entry.Comment;
@@ -104,6 +106,8 @@ public class FinishListReportExcel(EfCoreContext dbContext) : BaseReportExcel(db
                 dataRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
                 dataRange.Style.Border.Left.Style = ExcelBorderStyle.Thin;
                 dataRange.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                if (ReportExcelScoringHelper.IsNonScoringEntry(entry))
+                    ReportExcelScoringHelper.ApplyNonScoringFill(dataRange);
 
                 prevEntry = entry;
                 place++;
@@ -113,7 +117,6 @@ public class FinishListReportExcel(EfCoreContext dbContext) : BaseReportExcel(db
 
         if (worksheet.Dimension is null) return;
 
-        worksheet.View.FreezePanes(2, 1);
         worksheet.Cells[worksheet.Dimension.Address].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
     }
 }

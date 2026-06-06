@@ -49,13 +49,14 @@ public sealed partial class SettingsViewModel : ObservableObject
     [RelayCommand]
     private void OpenBaseTimes()
     {
-        BaseTimes.RefreshDisplayNames();
+        BaseTimes.ReloadFromRepository();
         IsBaseTimesOpen = true;
     }
 
     [RelayCommand]
     private void CloseBaseTimes()
     {
+        BaseTimes.ReloadFromRepository();
         IsBaseTimesOpen = false;
     }
 

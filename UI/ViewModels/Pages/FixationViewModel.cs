@@ -306,7 +306,7 @@ public sealed partial class FixationHeatPositionView : ObservableObject
 
     public string ParticipantName => Entry.DisplayParticipantName;
 
-    public string YearOfBirth => Entry.Athlete?.YearOfBirth.ToString() ?? string.Empty;
+    public string YearOfBirth => Entry.DisplayParticipantBirthYear;
 
     public string Club => Entry.DisplayParticipantClubName;
 

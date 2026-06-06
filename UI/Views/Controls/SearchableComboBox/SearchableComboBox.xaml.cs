@@ -77,11 +77,13 @@ public partial class SearchableComboBox : UserControl
         if (itemsSource == null)
         {
             _itemsView = null;
+            ComboBoxControl.ItemsSource = null;
             return;
         }
 
-        _itemsView = CollectionViewSource.GetDefaultView(itemsSource);
+        _itemsView = new ListCollectionView(itemsSource);
         _itemsView.Filter = FilterItem;
+        ComboBoxControl.ItemsSource = _itemsView;
         _itemsView.Refresh();
     }
 

@@ -16,6 +16,7 @@
   <data name="Sheet_EntryList" xml:space="preserve"><value>Заявочный протокол</value></data>
   <data name="Sheet_StartList" xml:space="preserve"><value>Стартовый протокол</value></data>
   <data name="Sheet_FinishList" xml:space="preserve"><value>Финишный протокол</value></data>
+  <data name="Sheet_CombinedResults" xml:space="preserve"><value>Многоборье</value></data>
 
   <data name="Col_No" xml:space="preserve"><value>№</value></data>
   <data name="Col_Lane" xml:space="preserve"><value>Дорожка</value></data>
@@ -24,6 +25,7 @@
   <data name="Col_Team" xml:space="preserve"><value>Команда</value></data>
   <data name="Col_Time" xml:space="preserve"><value>Время</value></data>
   <data name="Col_Points" xml:space="preserve"><value>Очки</value></data>
+  <data name="Col_Total" xml:space="preserve"><value>Итого</value></data>
 
   <data name="Value_NoneParen" xml:space="preserve"><value>(нет данных)</value></data>
   <data name="Value_PersonalParen" xml:space="preserve"><value>(Лично)</value></data>

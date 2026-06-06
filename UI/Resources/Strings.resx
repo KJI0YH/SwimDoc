@@ -178,6 +178,9 @@
   <data name="Dialog_SaveExcelReports_Filter" xml:space="preserve"><value>Excel (*.xlsx)|*.xlsx|All Files (*.*)|*.*</value></data>
   <data name="Dialog_SaveExcelReports_DefaultExt" xml:space="preserve"><value>xlsx</value></data>
   <data name="Dialog_SaveExcelReports_DefaultFileName" xml:space="preserve"><value>Reports.xlsx</value></data>
+  <data name="Dialog_SaveExcelEntryListReports_DefaultFileName" xml:space="preserve"><value>EntryList.xlsx</value></data>
+  <data name="Dialog_SaveExcelStartListReports_DefaultFileName" xml:space="preserve"><value>StartList.xlsx</value></data>
+  <data name="Dialog_SaveExcelFinishListReports_DefaultFileName" xml:space="preserve"><value>FinishList.xlsx</value></data>
 
   <data name="Dialog_CompetitionDb_Filter" xml:space="preserve"><value>SQLite Database (*.db)|*.db|SQLite Database (*.sqlite)|*.sqlite|All Files (*.*)|*.*</value></data>
   <data name="Dialog_CompetitionDb_DefaultExt" xml:space="preserve"><value>db</value></data>
@@ -246,7 +249,7 @@
   <data name="Fixation_SelectedHeatHeader_NoEvent_Format" xml:space="preserve"><value>Heat {0} of {1} ({2} of {3}) — {4}</value></data>
 
   <data name="WindowTitle_CreateClub" xml:space="preserve"><value>Create club</value></data>
-  <data name="WindowTitle_EditClub" xml:space="preserve"><value>Edit team</value></data>
+  <data name="WindowTitle_EditClub" xml:space="preserve"><value>Edit club</value></data>
   <data name="WindowTitle_CreateAthlete" xml:space="preserve"><value>Create athlete</value></data>
   <data name="WindowTitle_EditAthlete" xml:space="preserve"><value>Edit athlete</value></data>
   <data name="WindowTitle_CreateEvent" xml:space="preserve"><value>Create event</value></data>
@@ -281,6 +284,7 @@
   <data name="Athletes_Col_BirthYear" xml:space="preserve"><value>Birth year</value></data>
   <data name="Athletes_Col_Category" xml:space="preserve"><value>Category</value></data>
   <data name="Athletes_Col_Team" xml:space="preserve"><value>Club</value></data>
+  <data name="Athletes_Col_Points" xml:space="preserve"><value>Points</value></data>
 
   <data name="SwimStyles_Col_Name" xml:space="preserve"><value>Name</value></data>
   <data name="SwimStyles_Col_Distance" xml:space="preserve"><value>Distance</value></data>
@@ -290,6 +294,7 @@
   <data name="AgeGroups_Col_Gender" xml:space="preserve"><value>Gender</value></data>
   <data name="AgeGroups_Col_BirthYearFrom" xml:space="preserve"><value>Birth year from</value></data>
   <data name="AgeGroups_Col_BirthYearTo" xml:space="preserve"><value>Birth year to</value></data>
+  <data name="AgeGroups_GenerateCombinedResultsReports" xml:space="preserve"><value>Generate combined results report</value></data>
 
   <data name="Heats_GroupHeader_Format" xml:space="preserve"><value>Heat {0} of {1} ({2} of {3}) | {4} | {5}</value></data>
 
@@ -321,6 +326,7 @@
   <data name="Tabs_Entries" xml:space="preserve"><value>Entries</value></data>
   <data name="Tabs_Heats" xml:space="preserve"><value>Heats</value></data>
   <data name="Tabs_Results" xml:space="preserve"><value>Results</value></data>
+  <data name="Tabs_CombinedResults" xml:space="preserve"><value>Combined</value></data>
   <data name="Tabs_Fixation" xml:space="preserve"><value>Fixation</value></data>
   <data name="Tabs_Heat" xml:space="preserve"><value>Heat</value></data>
   <data name="Tabs_Events" xml:space="preserve"><value>Events</value></data>
@@ -369,6 +375,9 @@
   <data name="Reports_Include_StartList" xml:space="preserve"><value>Start list</value></data>
   <data name="Reports_Include_FinishList" xml:space="preserve"><value>Results list</value></data>
   <data name="Reports_Field_OutputFile" xml:space="preserve"><value>Output file</value></data>
+  <data name="Reports_CombinedResults_WindowTitle" xml:space="preserve"><value>Combined results report</value></data>
+  <data name="Reports_CombinedResults_SaveDialog_Title" xml:space="preserve"><value>Save combined results report</value></data>
+  <data name="Dialog_SaveExcelCombinedResultsReports_DefaultFileName" xml:space="preserve"><value>CombinedResults.xlsx</value></data>
 
   <data name="HeatAlloc_Field_Order" xml:space="preserve"><value>Heat order</value></data>
   <data name="HeatAlloc_Order_WeakToStrong" xml:space="preserve"><value>From slow to fast</value></data>
@@ -419,6 +428,7 @@
   <data name="Results_Col_Place" xml:space="preserve"><value>Place</value></data>
   <data name="Results_Col_Result" xml:space="preserve"><value>Result</value></data>
   <data name="Results_Col_Points" xml:space="preserve"><value>Points</value></data>
+  <data name="Results_Col_Total" xml:space="preserve"><value>Total</value></data>
 
   <data name="Fixation_Refresh" xml:space="preserve"><value>Refresh</value></data>
   <data name="Fixation_Col_Lane" xml:space="preserve"><value>Lane</value></data>

@@ -174,13 +174,6 @@ public partial class HeatsViewModel(
 
     public Task RefreshAsync() => LoadHeatPositionsAsync();
 
-    [RelayCommand]
-    private async Task RefreshHeatsAsync()
-    {
-        await LoadDataAsync();
-        await RefreshAsync();
-    }
-
     partial void OnSelectedSwimEventChanged(SwimEvent? value)
     {
         CreateHeatCommand.NotifyCanExecuteChanged();

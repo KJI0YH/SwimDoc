@@ -25,6 +25,13 @@ public class ReportGeneratorDbAccess(EfCoreContext context) : IReportGeneratorDb
             .Include(swimEvent => swimEvent.Entries.OrderBy(entry => entry.EntryTime ?? int.MaxValue))
             .ThenInclude(entry => entry.Athlete)
             .ThenInclude(athlete => athlete.Club)
+            .Include(swimEvent => swimEvent.Entries)
+            .ThenInclude(entry => entry.Relay!)
+            .ThenInclude(relay => relay.Club)
+            .Include(swimEvent => swimEvent.Entries)
+            .ThenInclude(entry => entry.Relay!)
+            .ThenInclude(relay => relay.Positions)
+            .ThenInclude(position => position.Athlete)
             .OrderBy(swimEvent => swimEvent.Order)
             .ToList();
     }
@@ -41,6 +48,17 @@ public class ReportGeneratorDbAccess(EfCoreContext context) : IReportGeneratorDb
             .ThenInclude(position => position.Entry)
             .ThenInclude(entry => entry.Athlete)
             .ThenInclude(athlete => athlete.Club)
+            .Include(swimEvent => swimEvent.Heats)
+            .ThenInclude(heat => heat.Positions)
+            .ThenInclude(position => position.Entry)
+            .ThenInclude(entry => entry.Relay!)
+            .ThenInclude(relay => relay.Club)
+            .Include(swimEvent => swimEvent.Heats)
+            .ThenInclude(heat => heat.Positions)
+            .ThenInclude(position => position.Entry)
+            .ThenInclude(entry => entry.Relay!)
+            .ThenInclude(relay => relay.Positions)
+            .ThenInclude(relayPosition => relayPosition.Athlete)
             .OrderBy(swimEvent => swimEvent.Order)
             .ToList();
     }
@@ -55,6 +73,13 @@ public class ReportGeneratorDbAccess(EfCoreContext context) : IReportGeneratorDb
             .Include(swimEvent => swimEvent.Entries.OrderBy(entry => entry.FinishTime ?? int.MaxValue))
             .ThenInclude(entry => entry.Athlete)
             .ThenInclude(athlete => athlete.Club)
+            .Include(swimEvent => swimEvent.Entries)
+            .ThenInclude(entry => entry.Relay!)
+            .ThenInclude(relay => relay.Club)
+            .Include(swimEvent => swimEvent.Entries)
+            .ThenInclude(entry => entry.Relay!)
+            .ThenInclude(relay => relay.Positions)
+            .ThenInclude(position => position.Athlete)
             .OrderBy(swimEvent => swimEvent.Order)
             .ToList();
     }

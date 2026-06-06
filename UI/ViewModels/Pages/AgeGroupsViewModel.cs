@@ -1,17 +1,24 @@
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using DataLayer.EfClasses;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.AgeGroupService;
+using ServiceLayer.ReportGeneratorService;
 using UI.Helpers;
 using UI.Resources;
 using UI.Services;
 using UI.ViewModels.Pages.Data;
+using UI.ViewModels.Windows.CombinedResultsReportGeneration;
 using UI.Views.Windows.AddEdit;
+using CombinedResultsReportGenerationWindow = UI.Views.Windows.CombinedResultsReportGeneration.CombinedResultsReportGenerationWindow;
 
 namespace UI.ViewModels.Pages;
 
-public class AgeGroupsViewModel : DataViewModel<AgeGroup, int?>
+public partial class AgeGroupsViewModel : DataViewModel<AgeGroup, int?>
 {
     protected override PagingPage PagingSettingsPage => PagingPage.AgeGroups;
 
@@ -20,6 +27,13 @@ public class AgeGroupsViewModel : DataViewModel<AgeGroup, int?>
     public AgeGroupsViewModel(IAgeGroupService ageGroupService) : base(ageGroupService)
     {
         _windowFactory = App.Current.Services.GetRequiredService<IAddEditWindowFactory>();
+        PropertyChanged += OnViewModelPropertyChanged;
+    }
+
+    private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(SelectedItems))
+            GenerateCombinedResultsReportsCommand.NotifyCanExecuteChanged();
     }
 
     protected override void InitializeColumns()
@@ -84,4 +98,65 @@ public class AgeGroupsViewModel : DataViewModel<AgeGroup, int?>
         var result = _windowFactory.CreateAndShow<AgeGroupAddEditWindow>(id);
         if (result == true) _ = LoadDataAsync();
     }
+
+    [RelayCommand(CanExecute = nameof(CanGenerateCombinedResultsReports))]
+    private async Task GenerateCombinedResultsReports()
+    {
+        if (SelectedItems.Count == 0)
+            return;
+
+        var window = _windowFactory.CreateAndShowAndReturn<CombinedResultsReportGenerationWindow>();
+        if (window.DataContext is not IWindowResult { Result: CombinedResultsReportGenerationResult result })
+            return;
+
+        var options = new CombinedResultsExportOptions
+        {
+            AgeGroupIds = SelectedItems.Select(ageGroup => ageGroup.Id).ToList(),
+            OutputFilePath = result.OutputFilePath
+        };
+
+        await RunSingleOperationAsync(
+            Strings.Operation_Reports_Header,
+            Strings.Operation_Reports_Running_Message,
+            string.Format(Strings.Operation_Reports_Finished_MessageFormat, Path.GetFileName(result.OutputFilePath)),
+            Strings.Operation_Reports_Canceled_Header,
+            async ct =>
+            {
+                var tempPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}.xlsx");
+                try
+                {
+                    var tempOptions = new CombinedResultsExportOptions
+                    {
+                        AgeGroupIds = options.AgeGroupIds,
+                        OutputFilePath = tempPath
+                    };
+
+                    using var scope = App.Current.Services.CreateScope();
+                    scope.ServiceProvider.GetRequiredService<IReportExportService>()
+                        .ExportCombinedResultsToExcel(tempOptions);
+
+                    ct.ThrowIfCancellationRequested();
+
+                    if (File.Exists(options.OutputFilePath))
+                        File.Delete(options.OutputFilePath);
+
+                    File.Move(tempPath, options.OutputFilePath);
+                    return EventsViewModel.OperationItemOutcome.Success();
+                }
+                catch (OperationCanceledException)
+                {
+                    if (File.Exists(tempPath))
+                        File.Delete(tempPath);
+                    throw;
+                }
+                catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+                {
+                    if (File.Exists(tempPath))
+                        File.Delete(tempPath);
+                    return EventsViewModel.OperationItemOutcome.Failed([Strings.Dialog_Error_FileBusyOrUnavailable]);
+                }
+            });
+    }
+
+    private bool CanGenerateCombinedResultsReports() => SelectedItems.Count > 0 && !IsOperationRunning;
 }

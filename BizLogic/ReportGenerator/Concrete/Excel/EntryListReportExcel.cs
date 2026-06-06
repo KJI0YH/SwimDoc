@@ -48,6 +48,8 @@ public class EntryListReportExcel(EfCoreContext dbContext) : BaseReportExcel(dbC
             titleRange.Value = LocalizedEntityDisplayFormatter.FormatSwimEvent(swimEvent);
             titleRange.Style.Font.Bold = true;
             titleRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            if (ReportExcelScoringHelper.IsNonScoringSwimEvent(swimEvent))
+                ReportExcelScoringHelper.ApplyNonScoringFill(titleRange);
             row += 1;
             
             worksheet.Cells[row, colNo].Value = ReportExcelStrings.Col_No;
@@ -67,13 +69,14 @@ public class EntryListReportExcel(EfCoreContext dbContext) : BaseReportExcel(dbC
             headerRange.Style.WrapText = true;
             row += 1;
             
+            if (swimEvent.Entries.Count == 0)
+                continue;
+
             var place = 1;
             var prevEntry = swimEvent.Entries.First();
             var prevPlace = 1;
             foreach (var entry in swimEvent.Entries)
             {
-                var athlete = entry.Athlete;
-                
                 if (prevEntry.EntryTime == entry.EntryTime)
                 {
                     worksheet.Cells[row, colNo].Value = prevPlace;
@@ -84,9 +87,9 @@ public class EntryListReportExcel(EfCoreContext dbContext) : BaseReportExcel(dbC
                     prevPlace = place;
                 }
 
-                worksheet.Cells[row, colParticipant].Value = athlete?.DisplayName ?? ReportExcelStrings.Value_NoneParen;
-                worksheet.Cells[row, colBirthYear].Value = athlete?.YearOfBirth;
-                worksheet.Cells[row, colTeam].Value = athlete?.Club?.Name ?? ReportExcelStrings.Value_PersonalParen;
+                worksheet.Cells[row, colParticipant].Value = ReportEntryDisplayHelper.GetParticipantName(entry);
+                worksheet.Cells[row, colBirthYear].Value = ReportEntryDisplayHelper.GetBirthYear(entry);
+                worksheet.Cells[row, colTeam].Value = ReportEntryDisplayHelper.GetTeamName(entry);
                 worksheet.Cells[row, colEntryTime].Value = entry.DisplayEntryTime;
 
                 var dataRange = worksheet.Cells[row, colNo, row, tableLastCol];
@@ -94,6 +97,8 @@ public class EntryListReportExcel(EfCoreContext dbContext) : BaseReportExcel(dbC
                 dataRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
                 dataRange.Style.Border.Left.Style = ExcelBorderStyle.Thin;
                 dataRange.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                if (ReportExcelScoringHelper.IsNonScoringEntry(entry))
+                    ReportExcelScoringHelper.ApplyNonScoringFill(dataRange);
 
                 prevEntry = entry;
                 place++;
@@ -103,7 +108,6 @@ public class EntryListReportExcel(EfCoreContext dbContext) : BaseReportExcel(dbC
 
         if (worksheet.Dimension is null) return;
 
-        worksheet.View.FreezePanes(2, 1);
         worksheet.Cells[worksheet.Dimension.Address].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
     }
 }

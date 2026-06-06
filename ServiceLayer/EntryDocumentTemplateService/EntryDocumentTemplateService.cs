@@ -63,10 +63,10 @@ public sealed class EntryDocumentTemplateService : IEntryDocumentTemplateService
         ws.Cells["A4"].Value = TemplateStrings.Entries_Example_FirstName;
         ws.Cells["B4"].Value = TemplateStrings.Entries_Example_LastName;
         ws.Cells["C4"].Value = 2000;
-        ws.Cells["D4"].Value = TemplateStrings.Gender_Male;
+        ws.Cells["D4"].Value = TemplateStrings.Gender_Female;
         ws.Cells["E4"].Value = TemplateStrings.Entries_Example_Category;
         ws.Cells["F4"].Style.Numberformat.Format = "@";
-        ws.Cells["F4"].Value = "19.90";
+        ws.Cells["F4"].Value = "25.99";
 
         // Merges
         ws.Cells["A2:A3"].Merge = true;
@@ -121,8 +121,8 @@ public sealed class EntryDocumentTemplateService : IEntryDocumentTemplateService
         ws.Cells["C1"].Value = TemplateStrings.Settings_Header_Distance;
         ws.Cells["D1"].Value = TemplateStrings.Settings_Header_Stroke;
 
-        ws.Cells["A2"].Value = TemplateStrings.Gender_Male;
-        ws.Cells["A3"].Value = TemplateStrings.Gender_Female;
+        ws.Cells["A2"].Value = TemplateStrings.Gender_Female;
+        ws.Cells["A3"].Value = TemplateStrings.Gender_Male;
 
         ws.Cells["B2"].Value = TemplateStrings.Category_IMoS;
         ws.Cells["B3"].Value = TemplateStrings.Category_MoS;

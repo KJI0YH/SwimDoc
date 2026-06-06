@@ -34,5 +34,6 @@
   <data name="ReportExport_NoSwimEventsSelected" xml:space="preserve"><value>Не выбрано ни одного события.</value></data>
   <data name="ReportExport_OutputPathEmpty" xml:space="preserve"><value>Не указан путь для сохранения файла.</value></data>
   <data name="ReportExport_NoReportsSelected" xml:space="preserve"><value>Не выбран ни один тип отчёта.</value></data>
+  <data name="ReportExport_NoAgeGroupsSelected" xml:space="preserve"><value>Не выбраны возрастные группы.</value></data>
 </root>
 

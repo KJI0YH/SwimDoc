@@ -182,6 +182,9 @@ public static class Strings
     public static string Dialog_SaveExcelReports_Filter => Get(nameof(Dialog_SaveExcelReports_Filter));
     public static string Dialog_SaveExcelReports_DefaultExt => Get(nameof(Dialog_SaveExcelReports_DefaultExt));
     public static string Dialog_SaveExcelReports_DefaultFileName => Get(nameof(Dialog_SaveExcelReports_DefaultFileName));
+    public static string Dialog_SaveExcelEntryListReports_DefaultFileName => Get(nameof(Dialog_SaveExcelEntryListReports_DefaultFileName));
+    public static string Dialog_SaveExcelStartListReports_DefaultFileName => Get(nameof(Dialog_SaveExcelStartListReports_DefaultFileName));
+    public static string Dialog_SaveExcelFinishListReports_DefaultFileName => Get(nameof(Dialog_SaveExcelFinishListReports_DefaultFileName));
 
     public static string Dialog_CompetitionDb_Filter => Get(nameof(Dialog_CompetitionDb_Filter));
     public static string Dialog_CompetitionDb_DefaultExt => Get(nameof(Dialog_CompetitionDb_DefaultExt));
@@ -298,6 +301,7 @@ public static class Strings
     public static string Athletes_Col_BirthYear => Get(nameof(Athletes_Col_BirthYear));
     public static string Athletes_Col_Category => Get(nameof(Athletes_Col_Category));
     public static string Athletes_Col_Team => Get(nameof(Athletes_Col_Team));
+    public static string Athletes_Col_Points => Get(nameof(Athletes_Col_Points));
 
     public static string SwimStyles_Col_Name => Get(nameof(SwimStyles_Col_Name));
     public static string SwimStyles_Col_Distance => Get(nameof(SwimStyles_Col_Distance));
@@ -307,6 +311,7 @@ public static class Strings
     public static string AgeGroups_Col_Gender => Get(nameof(AgeGroups_Col_Gender));
     public static string AgeGroups_Col_BirthYearFrom => Get(nameof(AgeGroups_Col_BirthYearFrom));
     public static string AgeGroups_Col_BirthYearTo => Get(nameof(AgeGroups_Col_BirthYearTo));
+    public static string AgeGroups_GenerateCombinedResultsReports => Get(nameof(AgeGroups_GenerateCombinedResultsReports));
 
     public static string Heats_GroupHeader_Format => Get(nameof(Heats_GroupHeader_Format));
 
@@ -360,6 +365,7 @@ public static class Strings
     public static string Tabs_Entries => Get(nameof(Tabs_Entries));
     public static string Tabs_Heats => Get(nameof(Tabs_Heats));
     public static string Tabs_Results => Get(nameof(Tabs_Results));
+    public static string Tabs_CombinedResults => Get(nameof(Tabs_CombinedResults));
     public static string Tabs_Fixation => Get(nameof(Tabs_Fixation));
     public static string Tabs_Heat => Get(nameof(Tabs_Heat));
     public static string Tabs_Events => Get(nameof(Tabs_Events));
@@ -408,6 +414,9 @@ public static class Strings
     public static string Reports_Include_StartList => Get(nameof(Reports_Include_StartList));
     public static string Reports_Include_FinishList => Get(nameof(Reports_Include_FinishList));
     public static string Reports_Field_OutputFile => Get(nameof(Reports_Field_OutputFile));
+    public static string Reports_CombinedResults_WindowTitle => Get(nameof(Reports_CombinedResults_WindowTitle));
+    public static string Reports_CombinedResults_SaveDialog_Title => Get(nameof(Reports_CombinedResults_SaveDialog_Title));
+    public static string Dialog_SaveExcelCombinedResultsReports_DefaultFileName => Get(nameof(Dialog_SaveExcelCombinedResultsReports_DefaultFileName));
 
     public static string HeatAlloc_Field_Order => Get(nameof(HeatAlloc_Field_Order));
     public static string HeatAlloc_Order_WeakToStrong => Get(nameof(HeatAlloc_Order_WeakToStrong));
@@ -459,6 +468,7 @@ public static class Strings
     public static string Results_Col_Place => Get(nameof(Results_Col_Place));
     public static string Results_Col_Result => Get(nameof(Results_Col_Result));
     public static string Results_Col_Points => Get(nameof(Results_Col_Points));
+    public static string Results_Col_Total => Get(nameof(Results_Col_Total));
 
     public static string Fixation_Refresh => Get(nameof(Fixation_Refresh));
     public static string Fixation_Col_Lane => Get(nameof(Fixation_Col_Lane));

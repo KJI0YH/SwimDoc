@@ -9,7 +9,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <TabControl Grid.Row="1" Margin="5">
+        <TabControl Grid.Row="1" Margin="5" SelectedIndex="{Binding SelectedTabIndex}">
             <TabItem Header="{loc:Loc Tabs_Entries}">
                 <dataGridView:EntriesView DataContext="{Binding EntriesTable}"
                                           ShowImportActions="False" />

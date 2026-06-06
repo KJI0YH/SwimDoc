@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DataLayer.EfClasses;
 using Microsoft.EntityFrameworkCore;
+using ServiceLayer.AgeGroupService;
 using ServiceLayer.EntryService;
 using ServiceLayer.EventService;
 using UI.Helpers;
@@ -16,11 +17,14 @@ namespace UI.ViewModels.Pages;
 public partial class ResultsViewModel(
     IEventService eventService,
     IEntryService entryService,
+    IAgeGroupService ageGroupService,
     INavigationService navigationService) :
     DataViewModel<SwimEvent, int?>(eventService), INavigationAware
 {
     private int? _navigatedEventId;
     private bool _navigatedEventPageAdjusted;
+
+    public CombinedResultsViewModel CombinedResults { get; } = new(ageGroupService, entryService);
 
     [ObservableProperty] private SwimEvent? _selectedSwimEvent;
     [ObservableProperty] private ObservableCollection<SearchableItem> _swimEventOptions = new();
@@ -29,12 +33,27 @@ public partial class ResultsViewModel(
 
     public void OnNavigatedTo(object? parameter)
     {
-        if (parameter is not int eventId)
+        if (parameter is int eventId)
+        {
+            _navigatedEventId = eventId;
+            _navigatedEventPageAdjusted = false;
+            _ = InitializeForEventAsync(eventId);
             return;
+        }
 
-        _navigatedEventId = eventId;
-        _navigatedEventPageAdjusted = false;
-        _ = SelectNavigatedEventAsync(eventId);
+        _ = CombinedResults.InitializeAsync();
+    }
+
+    private async Task InitializeForEventAsync(int eventId)
+    {
+        var swimEvent = await ApplyQuery(eventService.Query())
+            .FirstOrDefaultAsync(se => se.Id == eventId);
+
+        if (swimEvent?.AgeGroupId is int ageGroupId)
+            CombinedResults.SetPreferredAgeGroupId(ageGroupId);
+
+        await CombinedResults.InitializeAsync();
+        await SelectNavigatedEventAsync(eventId);
     }
 
     public Task RefreshAsync() => LoadEntriesAsync();
@@ -189,6 +208,9 @@ public partial class ResultsViewModel(
 
     partial void OnSelectedSwimEventChanged(SwimEvent? value)
     {
+        if (value?.AgeGroupId is int ageGroupId)
+            CombinedResults.TrySelectAgeGroup(ageGroupId);
+
         _ = LoadEntriesAsync();
     }
 
@@ -298,21 +320,33 @@ public sealed class ResultEntryView(int place, Entry entry) : ObservableObject
     public Entry Entry { get; } = entry;
 
     public string ParticipantName => Entry.DisplayParticipantName;
-    public string ParticipantYearOfBirth => Entry.Athlete?.YearOfBirth.ToString() ?? string.Empty;
+    public string ParticipantYearOfBirth => Entry.Athlete?.YearOfBirth.ToString() ?? Entry.DisplayParticipantBirthYear;
     public string ClubName => Entry.DisplayParticipantClubName;
 
     public string ResultText => Entry.DisplayFinishTime;
     public int? Points => Entry.Points;
 }
 
-public sealed class ParticipantResultEntryView(ResultEntryView result) : ObservableObject
+public sealed class ParticipantResultEntryView(ResultEntryView result, int? athleteId = null) : ObservableObject
 {
     public int Place => result.Place;
     public Entry Entry => result.Entry;
 
     public string EventName => EntityDisplayFormatter.FormatEntrySwimName(Entry);
     public string ParticipantName => result.ParticipantName;
+    public string ParticipantYearOfBirth => athleteId is int id
+        ? GetAthleteBirthYear(Entry, id)
+        : result.ParticipantYearOfBirth;
     public string ClubName => result.ClubName;
     public string ResultText => result.ResultText;
     public int? Points => result.Points;
+
+    private static string GetAthleteBirthYear(Entry entry, int athleteId)
+    {
+        if (entry.AthleteId == athleteId)
+            return entry.Athlete?.YearOfBirth.ToString() ?? string.Empty;
+
+        var position = entry.Relay?.Positions.FirstOrDefault(p => p.AthleteId == athleteId);
+        return position?.Athlete.YearOfBirth.ToString() ?? string.Empty;
+    }
 }

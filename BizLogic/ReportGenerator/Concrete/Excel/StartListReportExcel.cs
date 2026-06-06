@@ -51,6 +51,8 @@ public class StartListReportExcel(EfCoreContext dbContext) : BaseReportExcel(dbC
             titleRange.Value = LocalizedEntityDisplayFormatter.FormatSwimEvent(swimEvent);
             titleRange.Style.Font.Bold = true;
             titleRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            if (ReportExcelScoringHelper.IsNonScoringSwimEvent(swimEvent))
+                ReportExcelScoringHelper.ApplyNonScoringFill(titleRange);
             row += 1;
             
             worksheet.Cells[row, colLane].Value = ReportExcelStrings.Col_Lane;
@@ -70,10 +72,16 @@ public class StartListReportExcel(EfCoreContext dbContext) : BaseReportExcel(dbC
             headerRange.Style.WrapText = true;
             row += 1;
             
-            var heatsCount = swimEvents.Sum(se => se.Heats.Count());
+            var heatsCount = swimEvents.Sum(se => se.Heats?.Count ?? 0);
+
+            if (swimEvent.Heats is null)
+                continue;
 
             foreach (var heat in swimEvent.Heats)
             {
+                if (heat.Positions is null)
+                    continue;
+
                 var heatTitleRange = worksheet.Cells[row, colLane, row, tableLastCol];
                 heatTitleRange.Merge = true;
                 heatTitleRange.Value = string.Format(
@@ -89,14 +97,14 @@ public class StartListReportExcel(EfCoreContext dbContext) : BaseReportExcel(dbC
 
                 foreach (var position in heat.Positions)
                 {
-                    var entry = position.Entry;
-                    var athlete = entry.Athlete;
+                    if (position.Entry is not { } entry)
+                        continue;
 
                     worksheet.Cells[row, colLane].Value =
                         SwimEventLaneNames.GetLaneDisplay(swimEvent, position.Lane);
-                    worksheet.Cells[row, colParticipant].Value = athlete?.DisplayName ?? ReportExcelStrings.Value_NoneParen;
-                    worksheet.Cells[row, colBirthYear].Value = athlete?.YearOfBirth;
-                    worksheet.Cells[row, colTeam].Value = athlete?.Club?.Name ?? ReportExcelStrings.Value_PersonalParen;
+                    worksheet.Cells[row, colParticipant].Value = ReportEntryDisplayHelper.GetParticipantName(entry);
+                    worksheet.Cells[row, colBirthYear].Value = ReportEntryDisplayHelper.GetBirthYear(entry);
+                    worksheet.Cells[row, colTeam].Value = ReportEntryDisplayHelper.GetTeamName(entry);
                     worksheet.Cells[row, colEntryTime].Value = entry.DisplayEntryTime;
 
                     var dataRange = worksheet.Cells[row, colLane, row, tableLastCol];
@@ -104,6 +112,8 @@ public class StartListReportExcel(EfCoreContext dbContext) : BaseReportExcel(dbC
                     dataRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
                     dataRange.Style.Border.Left.Style = ExcelBorderStyle.Thin;
                     dataRange.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                    if (ReportExcelScoringHelper.IsNonScoringEntry(entry))
+                        ReportExcelScoringHelper.ApplyNonScoringFill(dataRange);
                     row += 1;
                 }
             }
@@ -111,7 +121,6 @@ public class StartListReportExcel(EfCoreContext dbContext) : BaseReportExcel(dbC
 
         if (worksheet.Dimension is null) return;
 
-        worksheet.View.FreezePanes(2, 1);
         worksheet.Cells[worksheet.Dimension.Address].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
     }
 }

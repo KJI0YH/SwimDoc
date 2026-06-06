@@ -34,5 +34,6 @@ public static class ServiceErrorStrings
     public static string ReportExport_NoSwimEventsSelected => Get(nameof(ReportExport_NoSwimEventsSelected));
     public static string ReportExport_OutputPathEmpty => Get(nameof(ReportExport_OutputPathEmpty));
     public static string ReportExport_NoReportsSelected => Get(nameof(ReportExport_NoReportsSelected));
+    public static string ReportExport_NoAgeGroupsSelected => Get(nameof(ReportExport_NoAgeGroupsSelected));
 }
 

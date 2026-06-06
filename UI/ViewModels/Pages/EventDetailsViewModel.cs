@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using ServiceLayer.AgeGroupService;
 using ServiceLayer.EntryDocumentReaderService;
 using ServiceLayer.EntryService;
 using ServiceLayer.EventService;
@@ -24,12 +25,13 @@ public partial class EventDetailsViewModel : ViewModelBase, INavigationAware
         IEventService eventService,
         IHeatService heatService,
         IPointScoreProvider pointScoreProvider,
+        IAgeGroupService ageGroupService,
         INavigationService navigationService)
     {
         _entriesTable = new EntriesByEventViewModel(entryService, entryDocumentReaderService);
         _heatsTable = new HeatsByEventViewModel(eventService, heatService, navigationService);
         _fixationTable = new FixationByEventViewModel(eventService, heatService, pointScoreProvider, navigationService);
-        _resultsTable = new ResultsByEventViewModel(eventService, entryService, navigationService);
+        _resultsTable = new ResultsByEventViewModel(eventService, entryService, ageGroupService, navigationService);
 
         _fixationTable.EventResultsChanged += eventId =>
         {

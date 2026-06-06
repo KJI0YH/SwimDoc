@@ -131,6 +131,29 @@
                                  PreviewMouseLeftButtonDown="ItemsGrid_PreviewMouseLeftButtonDown"
                                  LoadingRow="ItemsGrid_LoadingRow"
                                  x:Name="ItemsGrid">
+                        <ui:DataGrid.RowStyle>
+                            <Style TargetType="DataGridRow"
+                                   BasedOn="{StaticResource {x:Type DataGridRow}}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsSummaryRow}" Value="True">
+                                        <Setter Property="FontWeight" Value="SemiBold" />
+                                        <Setter Property="Background" Value="#140EA5E9" />
+                                    </DataTrigger>
+                                    <MultiTrigger>
+                                        <MultiTrigger.Conditions>
+                                            <Condition Property="IsMouseOver" Value="True" />
+                                            <Condition Property="IsSelected" Value="False" />
+                                        </MultiTrigger.Conditions>
+                                        <Setter Property="Background"
+                                                Value="{StaticResource DataGridRowHoverBackgroundBrush}" />
+                                    </MultiTrigger>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="Background"
+                                                Value="{StaticResource DataGridSelectedRowBackgroundBrush}" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ui:DataGrid.RowStyle>
                         <ui:DataGrid.RowDetailsTemplate>
                             <DataTemplate>
                                 <StackPanel Margin="10">
@@ -138,6 +161,9 @@
                                         <Style TargetType="StackPanel">
                                             <Setter Property="Visibility" Value="Collapsed" />
                                             <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsSummaryRow}" Value="True">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                </DataTrigger>
                                                 <DataTrigger
                                                     Binding="{Binding WarningsCount, Converter={StaticResource IntGt0}}"
                                                     Value="True">
@@ -222,7 +248,7 @@
                                                 Width="*" />
                             <DataGridTextColumn Header="{loc:Loc Import_Col_Status}"
                                                 Width="200"
-                                                Binding="{Binding Status, Converter={StaticResource EnumDescription}}" />
+                                                Binding="{Binding StatusDisplay}" />
                             <DataGridTextColumn Header="{loc:Loc Operation_Col_HeatsCreated}"
                                                 Binding="{Binding HeatsCreatedDisplay}"
                                                 Width="120"

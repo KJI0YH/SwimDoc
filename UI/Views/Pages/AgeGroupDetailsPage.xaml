@@ -11,8 +11,14 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <TabControl Margin="5" Grid.Row="1">
+            <TabItem Header="{loc:Loc Tabs_Athletes}">
+                <dataGridView:AthletesView DataContext="{Binding AthletesTable}" />
+            </TabItem>
             <TabItem Header="{loc:Loc Tabs_Events}">
                 <dataGridView:EventsView DataContext="{Binding EventsTable}"/>
+            </TabItem>
+            <TabItem Header="{loc:Loc Tabs_CombinedResults}">
+                <dataGridView:CombinedResultsView DataContext="{Binding CombinedResultsTable}" />
             </TabItem>
         </TabControl>
     </Grid>

@@ -31,11 +31,6 @@
                     ToolTip="{loc:Loc Toolbar_Delete}"
                     Margin="5"
                     Padding="9" />
-            <Button Content="{ui:SymbolIcon ArrowClockwise24}"
-                    Command="{Binding LoadDataCommand}"
-                    ToolTip="{loc:Loc Toolbar_Refresh}"
-                    Margin="5"
-                    Padding="9" />
         </StackPanel>
 
         <Button Grid.Column="1"

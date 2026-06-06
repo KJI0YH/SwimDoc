@@ -54,6 +54,10 @@ public partial class OperationInfoBar : UserControl
         if (item is null) return;
 
         var type = item.GetType();
+        var isSummaryRowProp = type.GetProperty("IsSummaryRow");
+        if (isSummaryRowProp?.GetValue(item) is bool isSummary && isSummary)
+            return;
+
         var prop = type.GetProperty("IsDetailsOpen");
         if (prop?.PropertyType != typeof(bool) || !prop.CanRead || !prop.CanWrite) return;
 
