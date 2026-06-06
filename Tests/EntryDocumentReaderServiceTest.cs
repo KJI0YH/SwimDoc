@@ -26,7 +26,7 @@ public class EntryDocumentReaderServiceTest
     public void SetUp()
     {
         var options = new DbContextOptionsBuilder<EfCoreContext>()
-            .UseSqlite()
+            .UseSwimDocSqlite()
             .EnableSensitiveDataLogging()
             .LogTo(Console.WriteLine, LogLevel.Information)
             .Options;

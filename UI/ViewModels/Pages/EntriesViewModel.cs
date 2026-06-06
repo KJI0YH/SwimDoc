@@ -9,6 +9,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DataLayer;
 using DataLayer.EfClasses;
+using DataLayer.EfCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
@@ -284,7 +285,13 @@ public partial class EntriesViewModel(
         if (terms.Length == 0)
             return query;
 
-        return terms.Select(term => $"%{term}%").Aggregate(query, (current, termPattern) => current.Where(e => (e.Athlete != null && (EF.Functions.Like(e.Athlete.FirstName, termPattern) || EF.Functions.Like(e.Athlete.LastName, termPattern))) || (e.Relay != null && EF.Functions.Like(e.Relay.Club.Name, termPattern))));
+        return terms.Aggregate(query, (current, term) =>
+            current.Where(e =>
+                (e.Athlete != null && (
+                    SwimDocDbFunctions.ContainsIgnoreCase(e.Athlete.FirstName, term) ||
+                    SwimDocDbFunctions.ContainsIgnoreCase(e.Athlete.LastName, term))) ||
+                (e.Relay != null && e.Relay.Club != null &&
+                 SwimDocDbFunctions.ContainsIgnoreCase(e.Relay.Club.Name, term))));
     }
 
     private IQueryable<Entry> ApplySelectedFilters(IQueryable<Entry> query)

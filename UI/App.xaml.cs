@@ -75,7 +75,7 @@ public partial class App : Application
     {
         var serviceCollection = new ServiceCollection();
         serviceCollection.AddDbContext<EfCoreContext>(
-            options => options.UseSqlite(),
+            options => options.UseSwimDocSqlite(),
             ServiceLifetime.Transient,
             ServiceLifetime.Singleton);
 

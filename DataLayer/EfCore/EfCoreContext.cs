@@ -37,6 +37,9 @@ public sealed class EfCoreContext : DbContext
         modelBuilder.ApplyConfiguration(new HeatPositionConfiguration());
         modelBuilder.ApplyConfiguration(new RelayConfiguration());
         modelBuilder.ApplyConfiguration(new RelayPositionConfiguration());
+
+        modelBuilder.HasDbFunction(typeof(SwimDocDbFunctions).GetMethod(nameof(SwimDocDbFunctions.ContainsIgnoreCase))!);
+
         base.OnModelCreating(modelBuilder);
     }
 

@@ -468,7 +468,7 @@ public partial class HeatsViewModel(
 
     private static bool Contains(string? value, string term) =>
         !string.IsNullOrEmpty(value) &&
-        value.Contains(term, StringComparison.OrdinalIgnoreCase);
+        value.Contains(term, StringComparison.CurrentCultureIgnoreCase);
 
     private bool CanOpenAthleteDetails() =>
         EntryAthleteNavigationHelper.TryGetAthleteId(SelectedHeatPosition?.Entry, out _);

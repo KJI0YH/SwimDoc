@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using DataLayer.EfClasses;
+using DataLayer.EfCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.AthleteService;
@@ -78,13 +79,12 @@ public class AthletesViewModel : DataViewModel<Athlete, int?>
                 continue;
             }
 
-            var termPattern = $"%{term}%";
             query = query.Where(a =>
-                EF.Functions.Like(a.FirstName, termPattern) ||
-                EF.Functions.Like(a.LastName, termPattern) ||
-                EF.Functions.Like(a.FirstName + " " + a.LastName, termPattern) ||
-                EF.Functions.Like(a.LastName + " " + a.FirstName, termPattern) ||
-                (a.Club != null && EF.Functions.Like(a.Club.Name, termPattern)));
+                SwimDocDbFunctions.ContainsIgnoreCase(a.FirstName, term) ||
+                SwimDocDbFunctions.ContainsIgnoreCase(a.LastName, term) ||
+                SwimDocDbFunctions.ContainsIgnoreCase(a.FirstName + " " + a.LastName, term) ||
+                SwimDocDbFunctions.ContainsIgnoreCase(a.LastName + " " + a.FirstName, term) ||
+                (a.Club != null && SwimDocDbFunctions.ContainsIgnoreCase(a.Club.Name, term)));
         }
 
         return query;

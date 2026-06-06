@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using DataLayer.EfClasses;
+using DataLayer.EfCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.AthleteService;
@@ -74,8 +75,9 @@ public class ClubsViewModel : DataViewModel<Club, int?>
         if (string.IsNullOrWhiteSpace(SearchText))
             return query;
 
+        var term = SearchText.Trim();
         return Queryable.Where(query, club =>
-            EF.Functions.Like(club.Name, $"%{SearchText}%"));
+            SwimDocDbFunctions.ContainsIgnoreCase(club.Name, term));
     }
 
     protected override void ShowAddEditDialog(int? id = default)

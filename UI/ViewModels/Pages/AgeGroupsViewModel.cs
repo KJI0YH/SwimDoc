@@ -4,6 +4,7 @@ using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DataLayer.EfClasses;
+using DataLayer.EfCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.AgeGroupService;
@@ -89,8 +90,9 @@ public partial class AgeGroupsViewModel : DataViewModel<AgeGroup, int?>
                 EF.Functions.Like(ag.BirthYearMin.ToString(), $"%{SearchText}%") ||
                 EF.Functions.Like(ag.BirthYearMax.ToString(), $"%{SearchText}%"));
 
+        var term = SearchText.Trim();
         return Queryable.Where(query, ag =>
-            EF.Functions.Like(ag.Name, $"%{SearchText}%"));
+            SwimDocDbFunctions.ContainsIgnoreCase(ag.Name, term));
     }
 
     protected override void ShowAddEditDialog(int? id = default)
