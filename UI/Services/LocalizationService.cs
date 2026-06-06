@@ -67,8 +67,7 @@ public sealed class LocalizationService : ILocalizationService
         }
         catch
         {
-            // ignore persistence failures; language still applies for current run
+
         }
     }
 }
-

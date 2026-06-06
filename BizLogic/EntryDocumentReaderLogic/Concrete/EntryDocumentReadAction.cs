@@ -323,7 +323,7 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
         if (!clubHeaders.TryGetValue(CLUB_NAME_HEADER, out var colClub)) return null;
         var row = clubHeaders.First(pair => pair.Key == CLUB_NAME_HEADER).Value!.Row;
         var col = colClub!.Column;
-        // Support both formats: either club name in the header cell itself, or in the next column.
+
         var clubName = workSheet.Cells[row, col].Text;
         if (string.Equals(clubName?.Trim(), HeaderAliases[CLUB_NAME_HEADER].First(), StringComparison.OrdinalIgnoreCase) ||
             HeaderAliases[CLUB_NAME_HEADER].Contains(clubName ?? string.Empty, StringComparer.OrdinalIgnoreCase))

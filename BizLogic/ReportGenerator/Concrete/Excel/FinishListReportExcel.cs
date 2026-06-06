@@ -1,4 +1,5 @@
-﻿using DataLayer.EfCore;
+using DataLayer.Display;
+using DataLayer.EfCore;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System.Drawing;
@@ -26,7 +27,7 @@ public class FinishListReportExcel(EfCoreContext dbContext) : BaseReportExcel(db
         const int colPoints = 6;
         const int colComment = 7;
         const int tableLastCol = colComment;
-        
+
         worksheet.Cells.Style.Font.Name = "Calibri";
         worksheet.Cells.Style.Font.Size = 11;
 
@@ -37,7 +38,7 @@ public class FinishListReportExcel(EfCoreContext dbContext) : BaseReportExcel(db
         worksheet.Column(colFinishTime).Width = 10;
         worksheet.Column(colPoints).Width = 10;
         worksheet.Column(colComment).Width = 50;
-        
+
         worksheet.Column(colNo).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
         worksheet.Column(colBirthYear).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
         worksheet.Column(colFinishTime).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
@@ -97,7 +98,7 @@ public class FinishListReportExcel(EfCoreContext dbContext) : BaseReportExcel(db
                 worksheet.Cells[row, colParticipant].Value = ReportEntryDisplayHelper.GetParticipantName(entry);
                 worksheet.Cells[row, colBirthYear].Value = ReportEntryDisplayHelper.GetBirthYear(entry);
                 worksheet.Cells[row, colTeam].Value = ReportEntryDisplayHelper.GetTeamName(entry);
-                worksheet.Cells[row, colFinishTime].Value = entry.DisplayFinishTime;
+                worksheet.Cells[row, colFinishTime].Value = EntryTimeDisplay.FormatFinishTime(entry);
                 worksheet.Cells[row, colPoints].Value = entry.Points;
                 worksheet.Cells[row, colComment].Value = entry.Comment;
 

@@ -18,4 +18,3 @@ public sealed class PointScoreProvider(IBaseTimeRepository baseTimeRepository) :
         return (int)Math.Truncate(1000 * Math.Pow(baseTime / (double)finishTime, 3));
     }
 }
-

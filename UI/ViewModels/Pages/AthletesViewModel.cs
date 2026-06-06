@@ -7,11 +7,12 @@ using ServiceLayer.AthleteService;
 using UI.Resources;
 using UI.Services;
 using UI.ViewModels.Pages.Data;
-using UI.Views.Windows.AddEdit;
+using UI.Models.Rows;
+using UI.Views.Dialogs.Markers.AddEdit;
 
 namespace UI.ViewModels.Pages;
 
-public class AthletesViewModel : DataViewModel<Athlete, int?>
+public class AthletesViewModel : DataViewModel<Athlete, AthleteRowView, int?>
 {
     protected override PagingPage PagingSettingsPage => PagingPage.Athletes;
 
@@ -34,14 +35,14 @@ public class AthletesViewModel : DataViewModel<Athlete, int?>
         ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("Gender", Strings.Athletes_Col_Gender, 90));
         ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("YearOfBirth", Strings.Athletes_Col_BirthYear, 120));
         ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("Category", Strings.Athletes_Col_Category, 100));
-        ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("DisplayClubName", Strings.Athletes_Col_Team, 300,
+        ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("ClubName", Strings.Athletes_Col_Team, 300,
             (query, direction) =>
             {
                 return direction == ListSortDirection.Ascending
                     ? query.OrderBy(e => e.Club.Name)
                     : query.OrderByDescending(e => e.Club.Name);
             }));
-        ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("DisplayIndividualPointCount", Strings.Athletes_Col_Points, 80,
+        ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("PointCount", Strings.Athletes_Col_Points, 80,
             (query, direction) =>
             {
                 return direction == ListSortDirection.Ascending

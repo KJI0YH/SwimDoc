@@ -96,9 +96,9 @@ public sealed class ReportExportService(EfCoreContext dbContext, IEntryService e
 
     private static CombinedResultsReportAthleteRow MapAthleteRow(CombinedResultsAthleteRow row, int? place) =>
         new(
-            row.Athlete.DisplayName,
+            LocalizedEntityDisplayFormatter.FormatAthleteName(row.Athlete),
             row.Athlete.YearOfBirth,
-            row.Athlete.DisplayClubName,
+            LocalizedEntityDisplayFormatter.FormatAthleteClubName(row.Athlete),
             row.PointsByEventId,
             row.ScoringByEventId,
             row.TotalPoints,

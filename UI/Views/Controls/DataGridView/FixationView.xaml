@@ -24,7 +24,7 @@
                               Margin="0,5,6,5" />
                     <ComboBox helpers:ComboBoxAutoWidthHelper.Enable="True"
                               ItemsSource="{Binding EventHeats}"
-                              SelectedItem="{Binding SelectedHeat}"
+                              SelectedItem="{Binding SelectedHeatItem}"
                               DisplayMemberPath="DisplayNumberWithTime"
                               Margin="0,5,6,5" />
                     <Button Content="{ui:SymbolIcon ArrowPrevious24}"

@@ -1,191 +1,125 @@
-using System.Reflection;
 using System.Windows;
 using System.Windows.Threading;
-using UI.Views;
-using UI.Views.Windows;
+using UI.Resources;
+using UI.ViewModels.Dialogs.AddEdit;
+using UI.Views.Controls.AddEditView;
+using Wpf.Ui;
+using Wpf.Ui.Controls;
 
 namespace UI.Services;
 
-public class AddEditWindowFactory : IAddEditWindowFactory
+public class AddEditWindowFactory(IContentDialogService contentDialogService) : IAddEditWindowFactory
 {
-    private static readonly Dictionary<Window, (int Count, double OriginalOpacity)> DimStates = new();
+    private readonly AddEditDialogRegistry _registry = new();
+    private readonly AddEditDialogStack _dialogStack = new(contentDialogService);
 
-    public bool? CreateAndShow<TWindow>(int? id = null) where TWindow : Window
+    public bool? CreateAndShow<TDialog>(int? id = null, NavigationContext? context = null) where TDialog : class
     {
-        return CreateAndShow<TWindow>(id, null);
+        var result = CreateAndShowAndReturn<TDialog>(id, context);
+        return result.DialogResult;
     }
 
-    public bool? CreateAndShow<TWindow>(int? id, AddEditContext? context) where TWindow : Window
+    public AddEditDialogResult CreateAndShowAndReturn<TDialog>(int? id = null, NavigationContext? context = null)
+        where TDialog : class
     {
-        var windowType = typeof(TWindow);
-        var nullableIntType = typeof(int?);
-
-        // Ищем конструктор с параметром int?
-        var constructor = windowType.GetConstructor(
-            BindingFlags.Public | BindingFlags.Instance,
-            null,
-            new[] { nullableIntType },
-            null);
-
-        if (constructor == null)
-        {
-            // Пробуем найти среди всех публичных конструкторов
-            var constructors = windowType.GetConstructors(BindingFlags.Public | BindingFlags.Instance);
-            constructor = constructors.FirstOrDefault(ctor =>
-            {
-                var parameters = ctor.GetParameters();
-                return parameters.Length == 1 && parameters[0].ParameterType == nullableIntType;
-            });
-        }
-
-        if (constructor == null)
-            throw new InvalidOperationException(
-                $"Window type {windowType.Name} does not have a constructor with parameter (int? id).");
-
-        // Создаем экземпляр окна
-        var window = (TWindow)constructor.Invoke([id])
-                     ?? throw new InvalidOperationException($"Failed to create instance of {windowType.Name}.");
-        ApplyContextIfNeeded(window, context);
-        var owner = GetActiveWindow() ?? Application.Current.MainWindow;
-        if (owner != null)
-        {
-            window.Owner = owner;
-            if (owner is MainWindow mainWindow)
-            {
-                mainWindow.ShowModalOverlay();
-                mainWindow.Dispatcher.Invoke(DispatcherPriority.Render, static () => { });
-            }
-            else
-            {
-                PushDim(owner);
-                owner.Dispatcher.Invoke(DispatcherPriority.Render, static () => { });
-            }
-        }
-
-        try
-        {
-            return window.ShowDialog();
-        }
-        finally
-        {
-            if (owner is MainWindow mw)
-                mw.HideModalOverlay();
-            else if (owner != null)
-                PopDim(owner);
-        }
+        return RunSync(() => ShowRegisteredDialogAsync(typeof(TDialog), id, context));
     }
 
-    public TWindow CreateAndShowAndReturn<TWindow>(int? id = null) where TWindow : Window
+    public bool? ShowGenericAddEdit(object? id, object crudService)
     {
-        return CreateAndShowAndReturn<TWindow>(id, null);
+        return RunSync(() => ShowGenericDialogAsync(id, crudService)).DialogResult;
     }
 
-    public TWindow CreateAndShowAndReturn<TWindow>(int? id, AddEditContext? context) where TWindow : Window
+    private async Task<AddEditDialogResult> ShowRegisteredDialogAsync(Type dialogType, int? id, NavigationContext? context)
     {
-        var windowType = typeof(TWindow);
-        var nullableIntType = typeof(int?);
+        if (!_registry.TryGet(dialogType, out var definition))
+            throw new InvalidOperationException($"Dialog type {dialogType.Name} is not registered.");
 
-        var constructor = windowType.GetConstructor(
-            BindingFlags.Public | BindingFlags.Instance,
-            null,
-            [nullableIntType],
-            null);
+        var viewModel = definition.CreateViewModel(id);
+        ApplyContextIfNeeded(viewModel, NavigationContext.Merge(id, context));
+        await InitializeIfNeededAsync(viewModel);
 
-        if (constructor == null)
-        {
-            var constructors = windowType.GetConstructors(BindingFlags.Public | BindingFlags.Instance);
-            constructor = constructors.FirstOrDefault(ctor =>
-            {
-                var parameters = ctor.GetParameters();
-                return parameters.Length == 1 && parameters[0].ParameterType == nullableIntType;
-            });
-        }
+        if (viewModel is EntryViewModel entryViewModel && !entryViewModel.IsInitialized)
+            await entryViewModel.InitializeAsync();
 
-        if (constructor == null)
-            throw new InvalidOperationException(
-                $"Window type {windowType.Name} does not have a constructor with parameter (int? id).");
+        var view = definition.CreateView();
+        view.DataContext = viewModel;
 
-        var window = (TWindow)constructor.Invoke([id])
-                     ?? throw new InvalidOperationException($"Failed to create instance of {windowType.Name}.");
-        ApplyContextIfNeeded(window, context);
-        var owner = GetActiveWindow() ?? Application.Current.MainWindow;
-        if (owner != null)
-        {
-            window.Owner = owner;
-            if (owner is MainWindow mainWindow)
-            {
-                mainWindow.ShowModalOverlay();
-                mainWindow.Dispatcher.Invoke(DispatcherPriority.Render, static () => { });
-            }
-            else
-            {
-                PushDim(owner);
-                owner.Dispatcher.Invoke(DispatcherPriority.Render, static () => { });
-            }
-        }
-
-        try
-        {
-            _ = window.ShowDialog();
-        }
-        finally
-        {
-            if (owner is MainWindow mw)
-                mw.HideModalOverlay();
-            else if (owner != null)
-                PopDim(owner);
-        }
-
-        return window;
+        return await ShowDialogAsync(viewModel, view);
     }
 
-    private static Window? GetActiveWindow()
+    private async Task<AddEditDialogResult> ShowGenericDialogAsync(object? id, object crudService)
     {
-        return Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w.IsActive);
+        var viewModel = _registry.CreateGenericViewModel(id, crudService);
+        await InitializeIfNeededAsync(viewModel);
+
+        var view = _registry.CreateGenericView();
+        view.DataContext = viewModel;
+
+        return await ShowDialogAsync(viewModel, view);
     }
 
-    private static void PushDim(Window owner)
+    private async Task<AddEditDialogResult> ShowDialogAsync(object viewModel, FrameworkElement view)
     {
-        if (DimStates.TryGetValue(owner, out var state))
+        var title = viewModel.GetType().GetProperty("WindowTitle")?.GetValue(viewModel) as string
+                    ?? Strings.WindowMode_Edit;
+
+        var content = new AddEditDialogContent
         {
-            DimStates[owner] = (state.Count + 1, state.OriginalOpacity);
-            return;
-        }
+            DataContext = viewModel,
+            EditorContent = view
+        };
 
-        DimStates[owner] = (1, owner.Opacity);
-        owner.Opacity = 0.75;
+        var dialog = new ContentDialog
+        {
+            Title = title,
+            Content = content,
+            PrimaryButtonText = Strings.Common_Save,
+            CloseButtonText = Strings.Common_Cancel,
+            DefaultButton = ContentDialogButton.Primary
+        };
+
+        var result = await _dialogStack.ShowAsync(dialog, viewModel);
+        return new AddEditDialogResult(ToDialogResult(result), viewModel);
     }
 
-    private static void PopDim(Window owner)
+    private static bool? ToDialogResult(ContentDialogResult result) =>
+        result switch
+        {
+            ContentDialogResult.Primary => true,
+            ContentDialogResult.None => false,
+            _ => null
+        };
+
+    private static async Task InitializeIfNeededAsync(object viewModel)
     {
-        if (!DimStates.TryGetValue(owner, out var state))
+        var initializeAsyncMethod = viewModel.GetType().GetMethod("InitializeAsync", Type.EmptyTypes);
+        if (initializeAsyncMethod == null)
             return;
 
-        if (state.Count <= 1)
-        {
-            owner.Opacity = state.OriginalOpacity;
-            DimStates.Remove(owner);
-            return;
-        }
-
-        DimStates[owner] = (state.Count - 1, state.OriginalOpacity);
+        var task = initializeAsyncMethod.Invoke(viewModel, null) as Task;
+        if (task != null)
+            await task;
     }
 
-    private static void ApplyContextIfNeeded(Window window, AddEditContext? context)
+    private static void ApplyContextIfNeeded(object viewModel, NavigationContext? context)
     {
-        var dataContext = window.DataContext;
-        if (dataContext == null)
+        if (context is null)
             return;
 
-        if (context == null)
-            return;
-
-        if (dataContext is IAddEditContextAware aware)
+        if (viewModel is INavigationContextAware aware)
             aware.ApplyContext(context);
+    }
 
-        // Some add/edit windows initialize view models in constructor.
-        // Re-run initialization after context application to apply filtered lists/defaults.
-        var initializeAsyncMethod = dataContext.GetType().GetMethod("InitializeAsync", Type.EmptyTypes);
-        _ = initializeAsyncMethod?.Invoke(dataContext, null);
+    private static T RunSync<T>(Func<Task<T>> asyncFunc)
+    {
+        var task = asyncFunc();
+        if (task.IsCompletedSuccessfully)
+            return task.Result;
+
+        var frame = new DispatcherFrame();
+        task.ContinueWith(_ => frame.Continue = false, TaskScheduler.Default);
+        Dispatcher.PushFrame(frame);
+        return task.GetAwaiter().GetResult();
     }
 }

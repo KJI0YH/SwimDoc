@@ -1,4 +1,4 @@
-﻿using BizLogic.GenericInterfaces;
+using BizLogic.GenericInterfaces;
 using DataLayer.EfClasses;
 
 namespace BizLogic.EntryDocumentReaderLogic;

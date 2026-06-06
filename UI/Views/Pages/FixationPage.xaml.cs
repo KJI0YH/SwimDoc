@@ -11,4 +11,3 @@ public partial class FixationPage : Page
         DataContext = viewModel;
     }
 }
-

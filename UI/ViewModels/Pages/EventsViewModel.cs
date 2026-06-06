@@ -17,17 +17,18 @@ using UI.Helpers;
 using UI.Resources;
 using UI.Services;
 using UI.ViewModels.Pages.Data;
-using UI.ViewModels.Windows.HeatAllocationParameters;
-using UI.ViewModels.Windows.ReportGeneration;
-using UI.ViewModels.Windows.StartTimeCalculation;
-using UI.Views.Windows.AddEdit;
-using HeatAllocationParametersWindow = UI.Views.Windows.HeatAllocationParameters.HeatAllocationParametersWindow;
-using ReportGenerationWindow = UI.Views.Windows.ReportGeneration.ReportGenerationWindow;
-using StartTimeCalculationWindow = UI.Views.Windows.StartTimeCalculation.StartTimeCalculationWindow;
+using UI.Models.Rows;
+using UI.ViewModels.Dialogs.HeatAllocationParameters;
+using UI.ViewModels.Dialogs.ReportGeneration;
+using UI.ViewModels.Dialogs.StartTimeCalculation;
+using UI.Views.Dialogs.Markers.AddEdit;
+using HeatAllocationParametersWindow = UI.Views.Dialogs.Markers.HeatAllocationParameters.HeatAllocationParametersWindow;
+using ReportGenerationWindow = UI.Views.Dialogs.Markers.ReportGeneration.ReportGenerationWindow;
+using StartTimeCalculationWindow = UI.Views.Dialogs.Markers.StartTimeCalculation.StartTimeCalculationWindow;
 
 namespace UI.ViewModels.Pages;
 
-public partial class EventsViewModel : DataViewModel<SwimEvent, int?>
+public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView, int?>
 {
     protected override PagingPage PagingSettingsPage => PagingPage.Events;
 
@@ -96,14 +97,14 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, int?>
         ColumnConfigurations.Clear();
 
         ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Order", Strings.Events_Col_Order, 80));
-        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("DisplayDate", Strings.Events_Col_Date, 85,
+        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Date", Strings.Events_Col_Date, 85,
             (query, direction) =>
             {
                 return direction == ListSortDirection.Ascending
                     ? query.OrderBy(e => e.Date)
                     : query.OrderByDescending(e => e.Date);
             }));
-        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("DisplayTime", Strings.Events_Col_Time, 57));
+        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Time", Strings.Events_Col_Time, 57));
         ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Round", Strings.Events_Col_Round, 150));
         ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("SwimStyle", Strings.Events_Col_Distance, 300,
             (query, direction) =>
@@ -129,7 +130,7 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, int?>
             Converter = EntityDisplayConverter.Instance,
             ConverterParameter = EntityDisplayConverter.AgeGroupKind
         });
-        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("DisplayLanes", Strings.Events_Col_Lanes, 80,
+        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Lanes", Strings.Events_Col_Lanes, 80,
             (query, direction) =>
             {
                 return direction == ListSortDirection.Ascending
@@ -287,12 +288,12 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, int?>
         if (SelectedItems.Count == 0)
             return;
 
-        var window = _windowFactory.CreateAndShowAndReturn<HeatAllocationParametersWindow>();
-        if (window.DataContext is not IWindowResult { Result: HeatAllocationParametersResult result })
+        var dialog = _windowFactory.CreateAndShowAndReturn<HeatAllocationParametersWindow>();
+        if (dialog.DataContext is not IWindowResult { Result: HeatAllocationParametersResult result })
             return;
 
         var deleteConfirmation = App.Current.Services.GetRequiredService<IConfirmDialogService>();
-        var events = SelectedItems.OrderBy(swimEvent => swimEvent.Order).ToList();
+        var events = SelectedItems.Select(row => row.Entity).OrderBy(swimEvent => swimEvent.Order).ToList();
 
         await using var batch = new HeatAllocationBatchSession(result.HeatOrder, result.MinHeatSize);
         var runResult = await RunMultiItemOperationAsync(
@@ -307,7 +308,9 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, int?>
                 ct.ThrowIfCancellationRequested();
 
                 var confirmed = await Application.Current.Dispatcher.InvokeAsync(
-                    () => deleteConfirmation.ConfirmHeatReformIfOfficialResultsExistAsync(swimEvent.Id));
+                    () => deleteConfirmation.ConfirmHeatReformIfOfficialResultsExistAsync(
+                        swimEvent.Id,
+                        EntityDisplayFormatter.FormatSwimEvent(swimEvent)));
 
                 if (!await confirmed)
                     return OperationItemOutcome.Skipped();
@@ -327,8 +330,8 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, int?>
         if (SelectedItems.Count == 0)
             return;
 
-        var window = _windowFactory.CreateAndShowAndReturn<ReportGenerationWindow>();
-        if (window.DataContext is not IWindowResult { Result: ReportGenerationResult result })
+        var dialog = _windowFactory.CreateAndShowAndReturn<ReportGenerationWindow>();
+        if (dialog.DataContext is not IWindowResult { Result: ReportGenerationResult result })
             return;
 
         var options = new ReportExportOptions
@@ -394,8 +397,8 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, int?>
         if (SelectedItems.Count == 0)
             return;
 
-        var window = _windowFactory.CreateAndShowAndReturn<StartTimeCalculationWindow>();
-        if (window.DataContext is not IWindowResult { Result: StartTimeCalculationResult result })
+        var dialog = _windowFactory.CreateAndShowAndReturn<StartTimeCalculationWindow>();
+        if (dialog.DataContext is not IWindowResult { Result: StartTimeCalculationResult result })
             return;
 
         var swimEventIds = SelectedItems

@@ -54,4 +54,3 @@ public static class TemplateStrings
     public static string Category_SecondJunior => Get(nameof(Category_SecondJunior));
     public static string Category_NoCategory => Get(nameof(Category_NoCategory));
 }
-

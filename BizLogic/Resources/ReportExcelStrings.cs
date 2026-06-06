@@ -33,4 +33,3 @@ public static class ReportExcelStrings
 
     public static string HeatTitle_Format => Get(nameof(HeatTitle_Format));
 }
-

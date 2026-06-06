@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
-using DataLayer;
+using DataLayer.Display;
 using DataLayer.EfCore;
 using DataLayer.Resources;
 using Microsoft.EntityFrameworkCore;
@@ -18,9 +18,6 @@ public class SwimStyle : IValidatableObject
     public ICollection<SwimEvent> Events { get; set; }
     public ICollection<Entry> Entries { get; set; }
 
-    public string DisplayName =>
-        $"{(IsRelay ? RelayCount + "x" : string.Empty)}{Distance}м {EnumDisplay.GetDescription(Stroke)}";
-
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
         var currContext = validationContext.GetService(typeof(DbContext)) as EfCoreContext;
@@ -30,7 +27,7 @@ public class SwimStyle : IValidatableObject
             yield return new ValidationResult(string.Format(
                 CultureInfo.CurrentUICulture,
                 ValidationStrings.SwimStyle_AlreadyExists_Format,
-                DisplayName));
+                SwimStyleDisplay.FormatBasic(this)));
         if (Distance <= 0)
             yield return new ValidationResult(
                 ValidationStrings.SwimStyle_DistanceMustBeGreaterThanZero,

@@ -1,4 +1,4 @@
-﻿using BizDbAccess;
+using BizDbAccess;
 using DataLayer.EfCore;
 using OfficeOpenXml;
 

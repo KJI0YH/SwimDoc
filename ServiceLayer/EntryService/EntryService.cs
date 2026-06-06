@@ -41,11 +41,9 @@ public class EntryService(EfCoreContext dbContext) : CrudService<Entry, int?>(db
             .FirstOrDefaultAsync(hp => hp.EntryId == id, cancellationToken);
         var swimEventIdBeforeUpdate = tracked.SwimEventId;
 
-        // Update entry scalar fields
         dbContext.Entry(tracked).CurrentValues.SetValues(entity);
         ApplyHeatEntryUpdateRules(tracked, preservedStatus, heatPosition, swimEventIdBeforeUpdate);
 
-        // Sync relay fields + positions
         if (tracked.Relay != null)
         {
             if (entity.Relay != null)

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using ServiceLayer.AgeGroupService;
 using ServiceLayer.EntryService;
 using UI.Helpers;
-using UI.Views.Controls.SearchableComboBox;
+using UI.Models;
 
 namespace UI.ViewModels.Pages;
 
@@ -124,9 +124,9 @@ public partial class CombinedResultsViewModel(
         return new CombinedResultRow(
             place,
             athlete.Id,
-            athlete.DisplayName,
+            EntityDisplayFormatter.FormatAthleteName(athlete),
             athlete.YearOfBirth.ToString(),
-            athlete.DisplayClubName,
+            EntityDisplayFormatter.FormatAthleteClubName(athlete),
             athleteRow.TotalPoints,
             athleteRow.PointsByEventId,
             athleteRow.ScoringByEventId,
@@ -164,5 +164,3 @@ public partial class CombinedResultsViewModel(
             SelectedAgeGroup = prevAgeGroup;
     }
 }
-
-public sealed record CombinedResultsEventColumnView(int EventId, string Header);

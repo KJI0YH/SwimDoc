@@ -65,11 +65,12 @@ public class NavigationService(IServiceProvider serviceProvider) : INavigationSe
 
     public void NavigateTo<TViewModel>(object? parameter) where TViewModel : ViewModelBase
     {
+        var context = NavigationContext.Parse(parameter);
         var viewModel = serviceProvider.GetRequiredService<TViewModel>();
-        _navigationParameters[typeof(TViewModel)] = parameter;
+        _navigationParameters[typeof(TViewModel)] = context;
 
         if (viewModel is INavigationAware navigationAware)
-            navigationAware.OnNavigatedTo(parameter);
+            navigationAware.OnNavigatedTo(context);
 
         if (ReferenceEquals(_currentViewModel, viewModel))
         {
@@ -85,6 +86,16 @@ public class NavigationService(IServiceProvider serviceProvider) : INavigationSe
 
         CurrentViewModel = viewModel;
         RequestPageForViewModel<TViewModel>();
+    }
+
+    public void NavigateTo<TViewModel>(NavigationContext context) where TViewModel : ViewModelBase
+    {
+        NavigateTo<TViewModel>((object?)context);
+    }
+
+    public NavigationContext? GetNavigationContext<TViewModel>() where TViewModel : ViewModelBase
+    {
+        return GetNavigationParameter<TViewModel>() as NavigationContext;
     }
 
     public object? GetNavigationParameter<TViewModel>() where TViewModel : ViewModelBase

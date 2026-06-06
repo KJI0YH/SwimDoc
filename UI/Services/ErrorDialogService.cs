@@ -19,4 +19,3 @@ public sealed class ErrorDialogService(IContentDialogService contentDialogServic
         _ = await contentDialogService.ShowAsync(dialog, cancellationToken);
     }
 }
-

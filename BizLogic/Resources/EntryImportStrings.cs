@@ -24,4 +24,3 @@ public static class EntryImportStrings
     public static string AthleteGenderInvalid_Format => Get(nameof(AthleteGenderInvalid_Format));
     public static string AthleteCategoryInvalid_Format => Get(nameof(AthleteCategoryInvalid_Format));
 }
-

@@ -19,9 +19,10 @@ using UI.Helpers;
 using UI.Resources;
 using UI.Services;
 using UI.ViewModels.Pages.Data;
-using UI.ViewModels.Windows.LoadEntriesFromPreviousEvent;
-using UI.Views.Windows.AddEdit;
-using UI.Views.Windows.LoadEntriesFromPreviousEvent;
+using UI.Models.Rows;
+using UI.ViewModels.Dialogs.LoadEntriesFromPreviousEvent;
+using UI.Views.Dialogs.Markers.AddEdit;
+using UI.Views.Dialogs.Markers.LoadEntriesFromPreviousEvent;
 using QueryableSortByDirection = UI.ViewModels.Generic.QueryableSortByDirection;
 
 namespace UI.ViewModels.Pages;
@@ -29,7 +30,7 @@ namespace UI.ViewModels.Pages;
 public partial class EntriesViewModel(
     IEntryService entryService,
     IEntryDocumentReaderService entryDocumentReaderService)
-    : DataViewModel<Entry, int?>(entryService), INavigationAware
+    : DataViewModel<Entry, EntryRowView, int?>(entryService), INavigationAware
 {
     protected override PagingPage PagingSettingsPage => PagingPage.Entries;
 
@@ -49,23 +50,6 @@ public partial class EntriesViewModel(
     public string StrokeFilterText => GetFilterText(StrokeFilterOptions, Strings.Filters_Stroke);
     public string GenderFilterText => GetFilterText(GenderFilterOptions, Strings.Filters_Gender);
     public string StatusFilterText => GetFilterText(StatusFilterOptions, Strings.Filters_Status);
-
-    public enum EntriesImportBarKind
-    {
-        File,
-        Event
-    }
-
-    public enum ImportFileStatus
-    {
-        Summary,
-        Pending,
-        Processing,
-        Completed,
-        CompletedWithWarnings,
-        Failed,
-        Canceled
-    }
 
     private readonly IAddEditWindowFactory _windowFactory =
         App.Current.Services.GetRequiredService<IAddEditWindowFactory>();
@@ -167,18 +151,14 @@ public partial class EntriesViewModel(
         AutoGenerateColumns = false;
         ColumnConfigurations.Clear();
 
-        ColumnConfigurations.Add(new ColumnConfiguration<Entry>(".", Strings.Entries_Col_Distance, 380,
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("SwimName", Strings.Entries_Col_Distance, 380,
             (query, direction) =>
             {
                 return direction == ListSortDirection.Ascending
                     ? query.OrderBy(e => e.SwimEvent != null ? e.SwimEvent.Order : int.MaxValue)
                     : query.OrderByDescending(e => e.SwimEvent != null ? e.SwimEvent.Order : int.MaxValue);
-            })
-        {
-            Converter = EntityDisplayConverter.Instance,
-            ConverterParameter = EntityDisplayConverter.EntrySwimKind
-        });
-        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("DisplayParticipantName", Strings.Entries_Col_Participant, 250,
+            }));
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("ParticipantName", Strings.Entries_Col_Participant, 250,
             (query, direction) => QueryableSortByDirection.Sort(query, direction,
                 q => Queryable
                     .OrderBy<Entry, string>(q,
@@ -190,7 +170,7 @@ public partial class EntriesViewModel(
                         e => e.Athlete != null ? e.Athlete.LastName : e.Relay != null ? e.Relay.Club.Name : null)
                     .ThenByDescending(e => e.Athlete != null ? e.Athlete.FirstName : null)
                     .ThenByDescending(e => e.Id))));
-        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("DisplayParticipantBirthYear", Strings.Athletes_Col_BirthYear, 120,
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("ParticipantBirthYear", Strings.Athletes_Col_BirthYear, 120,
             (query, direction) => QueryableSortByDirection.Sort(query, direction,
                 q => Queryable
                     .OrderBy<Entry, int>(q, e => e.Athlete != null ? e.Athlete.YearOfBirth : int.MaxValue)
@@ -198,7 +178,7 @@ public partial class EntriesViewModel(
                 q => Queryable
                     .OrderByDescending<Entry, int>(q, e => e.Athlete != null ? e.Athlete.YearOfBirth : int.MinValue)
                     .ThenByDescending(e => e.Id))));
-        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("DisplayParticipantClubName", Strings.Entries_Col_Team, 200,
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("ParticipantClubName", Strings.Entries_Col_Team, 200,
             (query, direction) => QueryableSortByDirection.Sort(query, direction,
                 q => Queryable
                     .OrderBy<Entry, string>(q,
@@ -209,13 +189,13 @@ public partial class EntriesViewModel(
                         e => e.Athlete != null ? e.Athlete.Club.Name : e.Relay != null ? e.Relay.Club.Name : null)
                     .ThenByDescending(e => e.Id))));
         ColumnConfigurations.Add(new ColumnConfiguration<Entry>("Status", Strings.Entries_Col_Status, 150));
-        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("DisplayEntryTime", Strings.Entries_Col_EntryTime, 95,
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("EntryTime", Strings.Entries_Col_EntryTime, 95,
             (query, direction) =>
                 direction == ListSortDirection.Ascending
                     ? query.OrderBy(e => e.EntryTime ?? SlowestTimeRank).ThenBy(e => e.Id)
                     : query.OrderByDescending(e => e.EntryTime ?? SlowestTimeRank).ThenByDescending(e => e.Id),
             nameof(Entry.EntryTime)));
-        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("DisplayFinishTime", Strings.Entries_Col_FinishTime, 95 ,
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("FinishTime", Strings.Entries_Col_FinishTime, 95 ,
             (query, direction) =>
                 direction == ListSortDirection.Ascending
                     ? query
@@ -261,12 +241,8 @@ public partial class EntriesViewModel(
 
         if (entry.HeatPosition is not null)
         {
-            NavigationService.NavigateTo<AthleteDetailsViewModel>(new AthleteDetailsNavigationParameter
-            {
-                AthleteId = athleteId,
-                FocusEntryId = entry.Id,
-                FocusSwimEventId = entry.SwimEventId
-            });
+            NavigationService.NavigateTo<AthleteDetailsViewModel>(
+                NavigationContext.ForAthlete(athleteId, entry.Id, entry.SwimEventId));
             return;
         }
 
@@ -494,8 +470,8 @@ public partial class EntriesViewModel(
     [RelayCommand]
     private async Task LoadEntriesFromPreviousEventAsync()
     {
-        var window = _windowFactory.CreateAndShowAndReturn<LoadEntriesFromPreviousEventWindow>();
-        if (window.DataContext is not IWindowResult { Result: LoadEntriesFromPreviousEventResult selection })
+        var dialog = _windowFactory.CreateAndShowAndReturn<LoadEntriesFromPreviousEventWindow>();
+        if (dialog.DataContext is not IWindowResult { Result: LoadEntriesFromPreviousEventResult selection })
             return;
 
         try
@@ -794,92 +770,5 @@ public partial class EntriesViewModel(
             if (file.Status is ImportFileStatus.Pending or ImportFileStatus.Processing)
                 file.Status = ImportFileStatus.Canceled;
         }
-    }
-
-    public partial class EntriesFile : ObservableObject
-    {
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(AthletesStatsDisplay))]
-        private int _athletesAdded;
-
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(AthletesStatsDisplay))]
-        private int _athletesScanned;
-
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(AthletesStatsDisplay))]
-        private int _athletesUpdated;
-
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(AthletesStatsDisplay))]
-        private int _athletesWithErrors;
-
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(ClubsStatsDisplay))]
-        private int _clubsAdded;
-
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(ClubsStatsDisplay))]
-        private int _clubsScanned;
-
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(ClubsStatsDisplay))]
-        private int _clubsUpdated;
-
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(ClubsStatsDisplay))]
-        private int _clubsWithErrors;
-
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(EntriesStatsDisplay))]
-        private int _entriesAdded;
-
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(EntriesStatsDisplay))]
-        private int _entriesScanned;
-
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(EntriesStatsDisplay))]
-        private int _entriesUpdated;
-
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(EntriesStatsDisplay))]
-        private int _entriesWithErrors;
-        [ObservableProperty] private IReadOnlyList<string> _errors = Array.Empty<string>();
-        [ObservableProperty] private int _errorsCount;
-
-        [ObservableProperty] private string _fileName;
-        [ObservableProperty] private string _fullPath;
-
-        [ObservableProperty] private bool _isDetailsOpen;
-
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(StatusText))]
-        private bool _isSummaryRow;
-
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(StatusText))]
-        private ImportFileStatus _status = ImportFileStatus.Pending;
-
-        [ObservableProperty] private IReadOnlyList<string> _warnings = Array.Empty<string>();
-        [ObservableProperty] private int _warningsCount;
-
-        public string StatusText =>
-            IsSummaryRow ? string.Empty : Strings.GetEnumDisplay(Status);
-
-        public string ClubsStatsDisplay => FormatPersistedCount(ClubsAdded, ClubsUpdated);
-
-        public string AthletesStatsDisplay => FormatPersistedCount(AthletesAdded, AthletesUpdated);
-
-        public string EntriesStatsDisplay => FormatPersistedCount(EntriesAdded, EntriesUpdated);
-
-        public EntriesFile(string fileName, string fullPath)
-        {
-            FileName = fileName;
-            FullPath = fullPath;
-        }
-
-        private static string FormatPersistedCount(int added, int updated) =>
-            (added + updated).ToString(CultureInfo.CurrentCulture);
     }
 }

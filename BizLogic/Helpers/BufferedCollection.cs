@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 
 namespace BizLogic.Helpers;
 
@@ -15,7 +15,6 @@ public class BufferedCollection<T> : IEnumerable<T>
     public int Count => _items.Count;
     public bool IsEmpty => Count == 0;
 
-
     public IEnumerable<T> TakeFirst(int count)
     {
         if (count <= 0) return [];
@@ -25,7 +24,6 @@ public class BufferedCollection<T> : IEnumerable<T>
         _items.RemoveRange(0, actualCount);
         return result;
     }
-
 
     public IEnumerable<T> TakeLast(int count)
     {
@@ -37,7 +35,6 @@ public class BufferedCollection<T> : IEnumerable<T>
         return result;
     }
 
-
     public T? TakeFirst()
     {
         if (IsEmpty) return default(T);
@@ -45,7 +42,6 @@ public class BufferedCollection<T> : IEnumerable<T>
         _items.RemoveAt(0);
         return item;
     }
-
 
     public T? TakeLast()
     {
@@ -55,14 +51,12 @@ public class BufferedCollection<T> : IEnumerable<T>
         return item;
     }
 
-
     public IEnumerable<T> TakeAll()
     {
         var result = _items.ToList();
         _items.Clear();
         return result;
     }
-
 
     public IEnumerator<T> GetEnumerator() => _items.GetEnumerator();
 

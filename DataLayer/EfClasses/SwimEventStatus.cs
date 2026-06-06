@@ -1,4 +1,4 @@
-﻿namespace DataLayer.EfClasses;
+namespace DataLayer.EfClasses;
 
 public enum SwimEventStatus
 {

@@ -207,12 +207,6 @@
                     TargetPageType="{x:Type pages:AboutPage}" />
             </ui:NavigationView.FooterMenuItems>
         </ui:NavigationView>
-        <Border x:Name="ModalOverlay"
-                Grid.RowSpan="2"
-                Panel.ZIndex="1000"
-                Background="#80000000"
-                Visibility="Collapsed"
-                IsHitTestVisible="False" />
         <ui:ContentDialogHost x:Name="RootContentDialog"
                               Grid.RowSpan="2"
                               Panel.ZIndex="1001" />

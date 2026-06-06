@@ -36,17 +36,6 @@ public class SwimEvent : IValidatableObject
     public SwimEvent? PreviousSwimEvent { get; set; }
     public SwimEvent? NextSwimEvent { get; set; }
 
-    public string DisplayName =>
-        $"#{Order} {EnumDisplay.GetDescription(Round)} {SwimStyle.DisplayName} {AgeGroup.DisplayName}";
-
-    public string DisplayLanes => SwimEventLaneNames.FormatLanesSummary(this);
-
-    public string DisplayDate => Date.ToShortDateString();
-
-    public string DisplayTime => StartTimeDisplay.Format(Time);
-
-    public string DisplayStatus => Status.ToString();
-
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
         var currContext = validationContext.GetService(typeof(DbContext)) as EfCoreContext;

@@ -13,7 +13,7 @@
 
     <Grid HorizontalAlignment="Stretch"
           VerticalAlignment="Stretch">
-        <!-- Hub -->
+        
         <Grid x:Name="SettingsHubRoot"
               Margin="24,24,24,24"
               HorizontalAlignment="Stretch"
@@ -212,7 +212,7 @@
             </ScrollViewer>
         </Grid>
 
-        <!-- Base times — full content width of the navigation area -->
+        
         <Grid Margin="24,24,24,24"
               HorizontalAlignment="Stretch"
               VerticalAlignment="Stretch">

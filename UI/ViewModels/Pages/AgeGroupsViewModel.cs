@@ -13,13 +13,14 @@ using UI.Helpers;
 using UI.Resources;
 using UI.Services;
 using UI.ViewModels.Pages.Data;
-using UI.ViewModels.Windows.CombinedResultsReportGeneration;
-using UI.Views.Windows.AddEdit;
-using CombinedResultsReportGenerationWindow = UI.Views.Windows.CombinedResultsReportGeneration.CombinedResultsReportGenerationWindow;
+using UI.Models.Rows;
+using UI.ViewModels.Dialogs.CombinedResultsReportGeneration;
+using UI.Views.Dialogs.Markers.AddEdit;
+using CombinedResultsReportGenerationWindow = UI.Views.Dialogs.Markers.CombinedResultsReportGeneration.CombinedResultsReportGenerationWindow;
 
 namespace UI.ViewModels.Pages;
 
-public partial class AgeGroupsViewModel : DataViewModel<AgeGroup, int?>
+public partial class AgeGroupsViewModel : DataViewModel<AgeGroup, AgeGroupRowView, int?>
 {
     protected override PagingPage PagingSettingsPage => PagingPage.AgeGroups;
 
@@ -42,17 +43,13 @@ public partial class AgeGroupsViewModel : DataViewModel<AgeGroup, int?>
         AutoGenerateColumns = false;
         ColumnConfigurations.Clear();
 
-        ColumnConfigurations.Add(new ColumnConfiguration<AgeGroup>(".", Strings.AgeGroups_Col_Name, 400,
+        ColumnConfigurations.Add(new ColumnConfiguration<AgeGroup>("DisplayName", Strings.AgeGroups_Col_Name, 400,
             (query, direction) =>
             {
                 return direction == ListSortDirection.Ascending
                     ? query.OrderBy(ag => ag.Name)
                     : query.OrderByDescending(ag => ag.Name);
-            })
-        {
-            Converter = EntityDisplayConverter.Instance,
-            ConverterParameter = EntityDisplayConverter.AgeGroupKind
-        });
+            }));
         ColumnConfigurations.Add(new ColumnConfiguration<AgeGroup>("Gender", Strings.AgeGroups_Col_Gender, 100));
         ColumnConfigurations.Add(new ColumnConfiguration<AgeGroup>("BirthYearMin", Strings.AgeGroups_Col_BirthYearFrom, 150,
             (query, direction) =>
@@ -107,8 +104,8 @@ public partial class AgeGroupsViewModel : DataViewModel<AgeGroup, int?>
         if (SelectedItems.Count == 0)
             return;
 
-        var window = _windowFactory.CreateAndShowAndReturn<CombinedResultsReportGenerationWindow>();
-        if (window.DataContext is not IWindowResult { Result: CombinedResultsReportGenerationResult result })
+        var dialog = _windowFactory.CreateAndShowAndReturn<CombinedResultsReportGenerationWindow>();
+        if (dialog.DataContext is not IWindowResult { Result: CombinedResultsReportGenerationResult result })
             return;
 
         var options = new CombinedResultsExportOptions
@@ -143,7 +140,7 @@ public partial class AgeGroupsViewModel : DataViewModel<AgeGroup, int?>
                         File.Delete(options.OutputFilePath);
 
                     File.Move(tempPath, options.OutputFilePath);
-                    return EventsViewModel.OperationItemOutcome.Success();
+                    return OperationItemOutcome.Success();
                 }
                 catch (OperationCanceledException)
                 {
@@ -155,7 +152,7 @@ public partial class AgeGroupsViewModel : DataViewModel<AgeGroup, int?>
                 {
                     if (File.Exists(tempPath))
                         File.Delete(tempPath);
-                    return EventsViewModel.OperationItemOutcome.Failed([Strings.Dialog_Error_FileBusyOrUnavailable]);
+                    return OperationItemOutcome.Failed([Strings.Dialog_Error_FileBusyOrUnavailable]);
                 }
             });
     }

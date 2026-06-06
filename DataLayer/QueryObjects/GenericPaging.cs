@@ -1,4 +1,4 @@
-﻿namespace DataLayer.QueryObjects;
+namespace DataLayer.QueryObjects;
 
 public static class GenericPaging
 {

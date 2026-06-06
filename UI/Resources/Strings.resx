@@ -406,7 +406,7 @@
   <data name="Common_Entry_Accusative_Many" xml:space="preserve"><value>entries</value></data>
 
   <data name="Confirm_DeleteOfficialResults_MessageFormat" xml:space="preserve"><value>This will affect {0} {1} with official results. The results will be lost. Continue?</value></data>
-  <data name="Confirm_HeatAllocationOfficialResults_MessageFormat" xml:space="preserve"><value>This distance has {0} {1} with official results. Allocating heats will delete existing heats and create new ones. The results will be lost. Continue?</value></data>
+  <data name="Confirm_HeatAllocationOfficialResults_MessageFormat" xml:space="preserve"><value>Event: {0}&#10;&#10;This distance has {1} {2} with official results. Allocating heats will delete existing heats and create new ones. The results will be lost. Continue?</value></data>
 
   <data name="SwimStyle_Field_Stroke" xml:space="preserve"><value>Stroke</value></data>
   <data name="SwimStyle_Field_Distance" xml:space="preserve"><value>Distance</value></data>

@@ -44,7 +44,7 @@ public static class WindowDragHelper
         }
         catch (InvalidOperationException)
         {
-            // DragMove throws if the mouse button was released before the call.
+
         }
     }
 

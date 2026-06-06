@@ -403,7 +403,7 @@
   <data name="Common_Entry_Accusative_Many" xml:space="preserve"><value>заявок</value></data>
 
   <data name="Confirm_DeleteOfficialResults_MessageFormat" xml:space="preserve"><value>Операция затронет {0} {1} с официальными результатами. Результаты будут потеряны. Продолжить?</value></data>
-  <data name="Confirm_HeatAllocationOfficialResults_MessageFormat" xml:space="preserve"><value>На этой дистанции есть {0} {1} с официальными результатами. Формирование удалит существующие заплывы и создаст новые. Результаты будут потеряны. Продолжить?</value></data>
+  <data name="Confirm_HeatAllocationOfficialResults_MessageFormat" xml:space="preserve"><value>Событие: {0}&#10;&#10;На дистанции есть {1} {2} с официальными результатами. Формирование удалит существующие заплывы и создаст новые. Результаты будут потеряны. Продолжить?</value></data>
 
   <data name="SwimStyle_Field_Stroke" xml:space="preserve"><value>Стиль</value></data>
   <data name="SwimStyle_Field_Distance" xml:space="preserve"><value>Дистанция</value></data>

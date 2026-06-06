@@ -77,5 +77,3 @@ public static class SwimEventLaneNames
         }
     }
 }
-
-public readonly record struct LaneSlot(int Lane, string Display);

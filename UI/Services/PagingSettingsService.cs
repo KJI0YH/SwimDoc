@@ -96,7 +96,7 @@ public sealed class PagingSettingsService : IPagingSettingsService
         }
         catch
         {
-            // keep defaults
+
         }
     }
 
@@ -116,15 +116,10 @@ public sealed class PagingSettingsService : IPagingSettingsService
         }
         catch
         {
-            // ignore persistence failures
+
         }
     }
 
     private static string GetSettingsPath() =>
         Path.Combine(Directory.GetCurrentDirectory(), SettingsFileName);
-
-    private sealed class PagingSettingsDto
-    {
-        public Dictionary<string, int>? PageSizes { get; set; }
-    }
 }

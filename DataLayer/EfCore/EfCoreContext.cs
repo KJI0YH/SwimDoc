@@ -1,4 +1,4 @@
-﻿using DataLayer.EfClasses;
+using DataLayer.EfClasses;
 using DataLayer.EfCore.Configurations;
 using Microsoft.EntityFrameworkCore;
 
@@ -65,8 +65,7 @@ public sealed class EfCoreContext : DbContext
 
     private void CreateTriggers()
     {
-        // When EF sets SwimEventId=NULL (e.g., DeleteBehavior.SetNull), ensure entry status returns to ENTRY.
-        // Recreate to apply to already created DBs.
+
         Database.ExecuteSqlRaw("DROP TRIGGER IF EXISTS trg_entries_after_update_set_entry_status_when_unlinked;");
         Database.ExecuteSqlRaw("""
             CREATE TRIGGER trg_entries_after_update_set_entry_status_when_unlinked
@@ -250,7 +249,6 @@ public sealed class EfCoreContext : DbContext
             END;
             """);
 
-        // Need to recreate trigger when logic changes (existing DBs).
         Database.ExecuteSqlRaw("DROP TRIGGER IF EXISTS trg_heat_positions_after_delete;");
         Database.ExecuteSqlRaw("""
             CREATE TRIGGER trg_heat_positions_after_delete

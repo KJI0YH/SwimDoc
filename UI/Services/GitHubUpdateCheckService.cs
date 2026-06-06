@@ -99,22 +99,4 @@ public sealed class GitHubUpdateCheckService(HttpClient httpClient) : IGitHubUpd
 
         return Version.TryParse(normalized, out version!);
     }
-
-    private sealed class GitHubReleaseResponse
-    {
-        [JsonPropertyName("tag_name")]
-        public string? TagName { get; init; }
-
-        [JsonPropertyName("html_url")]
-        public string? HtmlUrl { get; init; }
-
-        [JsonPropertyName("assets")]
-        public GitHubReleaseAssetResponse[]? Assets { get; init; }
-    }
-
-    private sealed class GitHubReleaseAssetResponse
-    {
-        [JsonPropertyName("browser_download_url")]
-        public string? BrowserDownloadUrl { get; init; }
-    }
 }

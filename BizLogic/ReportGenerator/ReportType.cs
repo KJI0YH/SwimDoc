@@ -1,4 +1,4 @@
-﻿namespace BizLogic.ReportGenerator;
+namespace BizLogic.ReportGenerator;
 
 public enum ReportType
 {

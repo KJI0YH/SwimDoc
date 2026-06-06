@@ -17,13 +17,6 @@ public class Athlete : IValidatableObject
     public ICollection<Entry> Entries { get; set; }
     public ICollection<RelayPosition> RelayPositions { get; set; }
 
-    public string DisplayName => $"{FirstName} {LastName}";
-    
-    public string DisplayClubName => $"{Club?.Name ?? "(Лично)"}";
-
-    public int DisplayIndividualPointCount =>
-        Entries?.Where(e => e.Scoring).Sum(e => e.Points ?? 0) ?? 0;
-
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
         if (string.IsNullOrWhiteSpace(FirstName))

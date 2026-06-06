@@ -1,4 +1,4 @@
-﻿using BizDbAccess;
+using BizDbAccess;
 using BizLogic.GenericInterfaces;
 using BizLogic.Helpers;
 using DataLayer.EfClasses;

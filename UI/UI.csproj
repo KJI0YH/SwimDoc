@@ -85,38 +85,6 @@
             <XamlRuntime>Wpf</XamlRuntime>
             <SubType>Designer</SubType>
         </Page>
-        <Page Update="Views\Windows\AddEdit\AgeGroupAddEditWindow.xaml">
-            <Generator>MSBuild:Compile</Generator>
-        </Page>
-        <Page Update="Views\Windows\AddEdit\AthleteAddEditWindow.xaml">
-            <Generator>MSBuild:Compile</Generator>
-        </Page>
-        <Page Update="Views\Windows\AddEdit\ClubAddEditWindow.xaml">
-            <Generator>MSBuild:Compile</Generator>
-        </Page>
-        <Page Update="Views\Windows\AddEdit\EntryAddEditWindow.xaml">
-            <Generator>MSBuild:Compile</Generator>
-        </Page>
-        <Page Update="Views\Windows\AddEdit\EventAddEditWindow.xaml">
-            <Generator>MSBuild:Compile</Generator>
-        </Page>
-        <Page Update="Views\Windows\AddEdit\SwimStyleAddEditWindow.xaml">
-            <Generator>MSBuild:Compile</Generator>
-        </Page>
-        <Page Update="Views\Windows\AddEdit\HeatAddEditWindow.xaml">
-            <Generator>MSBuild:Compile</Generator>
-        </Page>
-        <Page Update="Views\Windows\AddEdit\GenericAddEditWindow.xaml">
-            <Generator>MSBuild:Compile</Generator>
-            <XamlRuntime>Wpf</XamlRuntime>
-            <SubType>Designer</SubType>
-        </Page>
-        <Page Update="Views\Windows\HeatAllocationParameters\HeatAllocationParametersWindow.xaml">
-            <Generator>MSBuild:Compile</Generator>
-        </Page>
-        <Page Update="Views\Windows\StartTimeCalculation\StartTimeCalculationWindow.xaml">
-            <Generator>MSBuild:Compile</Generator>
-        </Page>
         <Page Update="Views\Controls\ImportInfoBar\ImportInfoBar.xaml">
             <Generator>MSBuild:Compile</Generator>
             <XamlRuntime>Wpf</XamlRuntime>
@@ -163,11 +131,6 @@
             <SubType>Designer</SubType>
         </Page>
         <Page Update="Views\Controls\Toolbar\DefaultToolbar.xaml">
-            <Generator>MSBuild:Compile</Generator>
-            <XamlRuntime>Wpf</XamlRuntime>
-            <SubType>Designer</SubType>
-        </Page>
-        <Page Update="Views\Controls\AddEditView\AddEditWindowView.xaml">
             <Generator>MSBuild:Compile</Generator>
             <XamlRuntime>Wpf</XamlRuntime>
             <SubType>Designer</SubType>

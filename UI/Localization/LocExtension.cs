@@ -31,4 +31,3 @@ public sealed class LocExtension : MarkupExtension
         return binding.ProvideValue(serviceProvider);
     }
 }
-

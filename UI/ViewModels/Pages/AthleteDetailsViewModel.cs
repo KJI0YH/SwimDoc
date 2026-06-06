@@ -36,25 +36,12 @@ public partial class AthleteDetailsViewModel : ViewModelBase, INavigationAware
 
     public void OnNavigatedTo(object? parameter)
     {
-        int athleteId;
-        int? focusEntryId = null;
-        int? focusSwimEventId = null;
+        if (NavigationContext.Parse(parameter) is not { } context || context.ResolveId() is not int athleteId)
+            return;
 
-        switch (parameter)
-        {
-            case AthleteDetailsNavigationParameter navigation:
-                athleteId = navigation.AthleteId;
-                focusEntryId = navigation.FocusEntryId;
-                focusSwimEventId = navigation.FocusSwimEventId;
-                SelectedTabIndex = navigation.OpenHeatsTab ? 1 : 0;
-                break;
-            case int idValue:
-                athleteId = idValue;
-                SelectedTabIndex = 0;
-                break;
-            default:
-                return;
-        }
+        var focusEntryId = context.FocusEntryId;
+        var focusSwimEventId = context.FocusSwimEventId;
+        SelectedTabIndex = context.OpenHeatsTab ? 1 : 0;
 
         _entriesTable.SetAthleteId(athleteId);
         _heatsTable.SetAthleteId(athleteId, focusEntryId, focusSwimEventId);

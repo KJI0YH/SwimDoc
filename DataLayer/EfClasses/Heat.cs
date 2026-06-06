@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using DataLayer;
 using Microsoft.EntityFrameworkCore;
@@ -13,11 +13,6 @@ public class Heat : IValidatableObject
     public HeatStatus Status { get; set; }
     public TimeOnly? DayTime { get; set; }
 
-    public string DisplayDayTime => StartTimeDisplay.Format(DayTime);
-
-    public string DisplayNumberWithTime =>
-        StartTimeDisplay.IsSet(DayTime) ? $"{Number} ({DisplayDayTime})" : Number.ToString();
-
     public int SwimEventId { get; set; }
     public SwimEvent SwimEvent { get; set; }
 
@@ -29,7 +24,7 @@ public class Heat : IValidatableObject
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
         var currContext = validationContext.GetService(typeof(DbContext));
-        //TODO implement validate method
+
         throw new NotImplementedException();
     }
 }

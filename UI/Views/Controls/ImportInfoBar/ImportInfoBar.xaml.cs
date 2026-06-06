@@ -49,8 +49,7 @@ public partial class ImportInfoBar : UserControl
 
     private void FilesGrid_LoadingRow(object sender, DataGridRowEventArgs e)
     {
-        // Keep default row visuals (hover/selection) by avoiding RowStyle;
-        // bind details visibility per item instead.
+
         BindingOperations.SetBinding(
             e.Row,
             DataGridRow.DetailsVisibilityProperty,
@@ -112,7 +111,7 @@ public partial class ImportInfoBar : UserControl
 
     private static DependencyObject? GetParentSafe(DependencyObject current)
     {
-        // VisualTreeHelper throws for non-Visuals (e.g. Run/TextElement).
+
         if (current is Visual or Visual3D)
             return VisualTreeHelper.GetParent(current);
 

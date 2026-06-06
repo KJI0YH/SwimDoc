@@ -12,4 +12,3 @@ public interface IPointScoreProvider
         Gender sex,
         int? finishTimeHundredths);
 }
-

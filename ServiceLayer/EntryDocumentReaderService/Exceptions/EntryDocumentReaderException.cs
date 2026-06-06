@@ -1,4 +1,4 @@
-﻿namespace ServiceLayer.EntryDocumentReaderService.Exceptions;
+namespace ServiceLayer.EntryDocumentReaderService.Exceptions;
 
 public class EntryDocumentReaderException : Exception
 {

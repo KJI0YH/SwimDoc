@@ -11,7 +11,8 @@ using UI.Helpers;
 using UI.Resources;
 using UI.Services;
 using UI.ViewModels.Pages.Data;
-using UI.Views.Controls.SearchableComboBox;
+using UI.Models.Rows;
+using UI.Models;
 
 namespace UI.ViewModels.Pages;
 
@@ -20,16 +21,18 @@ public partial class FixationViewModel(
     IHeatService heatService,
     IPointScoreProvider pointScoreProvider,
     INavigationService navigationService)
-    : DataViewModel<SwimEvent, int?>(eventService)
+    : DataViewModel<SwimEvent, SwimEventRowView, int?>(eventService)
 {
     public event Action<int>? EventResultsChanged;
 
     [ObservableProperty] private SwimEvent? _selectedSwimEvent;
     [ObservableProperty] private ObservableCollection<SearchableItem> _swimEventOptions = new();
 
-    [ObservableProperty] private Heat? _selectedHeat;
+    [ObservableProperty] private HeatListItemView? _selectedHeatItem;
 
-    [ObservableProperty] private ObservableCollection<Heat> _eventHeats = new();
+    [ObservableProperty] private ObservableCollection<HeatListItemView> _eventHeats = new();
+
+    private Heat? SelectedHeat => SelectedHeatItem?.Entity;
 
     [ObservableProperty] private ObservableCollection<FixationHeatPositionView> _fixationHeatPositionViews = new();
 
@@ -55,7 +58,7 @@ public partial class FixationViewModel(
                 heatsInEvent,
                 SelectedHeat.Order,
                 heatsTotal,
-                SelectedHeat.DisplayDayTime);
+                EntityDisplayFormatter.FormatHeatDayTime(SelectedHeat));
         }
     }
 
@@ -76,7 +79,7 @@ public partial class FixationViewModel(
             SelectedSwimEvent = null;
             SwimEventOptions = [];
             EventHeats = [];
-            SelectedHeat = null;
+            SelectedHeatItem = null;
             FixationHeatPositionViews = [];
             return;
         }
@@ -99,7 +102,7 @@ public partial class FixationViewModel(
         OnPropertyChanged(nameof(CanEditHeat));
     }
 
-    partial void OnSelectedHeatChanged(Heat? value)
+    partial void OnSelectedHeatItemChanged(HeatListItemView? value)
     {
         LoadHeatPositions();
         RefreshButtons();
@@ -113,7 +116,7 @@ public partial class FixationViewModel(
         if (SelectedSwimEvent?.Id is not int eventId)
         {
             EventHeats = [];
-            SelectedHeat = null;
+            SelectedHeatItem = null;
             FixationHeatPositionViews = [];
             return;
         }
@@ -121,9 +124,12 @@ public partial class FixationViewModel(
         IsLoading = true;
         try
         {
+            var keepHeatId = SelectedHeat?.Id;
             var heats = await heatService.GetHeatsByEventIdAsync(eventId);
-            EventHeats = new ObservableCollection<Heat>(heats);
-            SelectedHeat = EventHeats.FirstOrDefault();
+            EventHeats = new ObservableCollection<HeatListItemView>(heats.Select(h => new HeatListItemView(h)));
+            SelectedHeatItem = keepHeatId is int id
+                ? EventHeats.FirstOrDefault(h => h.Entity.Id == id) ?? EventHeats.FirstOrDefault()
+                : EventHeats.FirstOrDefault();
         }
         finally
         {
@@ -177,18 +183,16 @@ public partial class FixationViewModel(
         if (SelectedHeat is null) return;
         if (!CanApprove) return;
 
-        var keepHeatId = SelectedHeat.Id;
         try
         {
             await heatService.ApproveHeatAsync(SelectedHeat);
             await LoadEventHeatsAsync();
-            SelectedHeat = EventHeats.FirstOrDefault(h => h.Id == keepHeatId) ?? SelectedHeat;
             if (SelectedSwimEvent?.Id is int eventId)
                 EventResultsChanged?.Invoke(eventId);
         }
         catch
         {
-            // ignored
+
         }
     }
 
@@ -207,7 +211,7 @@ public partial class FixationViewModel(
         }
         catch
         {
-            // ignored
+
         }
     }
 
@@ -215,30 +219,32 @@ public partial class FixationViewModel(
     private void GoToNextEvent()
     {
         if (Items.Count == 0) return;
-        var idx = SelectedSwimEvent is null ? -1 : Items.IndexOf(SelectedSwimEvent);
-        var nextIdx = (idx + 1) % Items.Count;
-        SelectedSwimEvent = Items[nextIdx];
+        var entities = Items.Select(row => row.Entity).ToList();
+        var idx = SelectedSwimEvent is null ? -1 : entities.IndexOf(SelectedSwimEvent);
+        var nextIdx = (idx + 1) % entities.Count;
+        SelectedSwimEvent = entities[nextIdx];
     }
 
     [RelayCommand]
     private void GoToPrevEvent()
     {
         if (Items.Count == 0) return;
-        var idx = SelectedSwimEvent is null ? 1 : Items.IndexOf(SelectedSwimEvent);
-        var prevIdx = idx - 1 + (idx - 1 < 0 ? Items.Count : 0);
-        SelectedSwimEvent = Items[prevIdx];
+        var entities = Items.Select(row => row.Entity).ToList();
+        var idx = SelectedSwimEvent is null ? 1 : entities.IndexOf(SelectedSwimEvent);
+        var prevIdx = idx - 1 + (idx - 1 < 0 ? entities.Count : 0);
+        SelectedSwimEvent = entities[prevIdx];
     }
 
     [RelayCommand]
     private void GoToNextHeat()
     {
         if (EventHeats.Count == 0) return;
-        var idx = SelectedHeat is null ? -1 : EventHeats.IndexOf(SelectedHeat);
+        var idx = SelectedHeatItem is null ? -1 : EventHeats.IndexOf(SelectedHeatItem);
         var nextIdx = (idx + 1);
         if (nextIdx >= EventHeats.Count)
             GoToNextEvent();
         else
-            SelectedHeat = EventHeats[nextIdx];
+            SelectedHeatItem = EventHeats[nextIdx];
     }
 
     [RelayCommand]
@@ -246,12 +252,12 @@ public partial class FixationViewModel(
     {
         if (EventHeats.Count == 0) return;
 
-        var idx = SelectedHeat is null ? 0 : EventHeats.IndexOf(SelectedHeat);
+        var idx = SelectedHeatItem is null ? 0 : EventHeats.IndexOf(SelectedHeatItem);
         var prevIdx = idx - 1;
         if (prevIdx < 0)
             GoToPrevEvent();
         else
-            SelectedHeat = EventHeats[prevIdx];
+            SelectedHeatItem = EventHeats[prevIdx];
     }
 
     partial void OnSelectedFixationPositionChanged(FixationHeatPositionView? value) =>
@@ -267,184 +273,5 @@ public partial class FixationViewModel(
             return;
 
         navigationService.NavigateTo<AthleteDetailsViewModel>(athleteId);
-    }
-}
-
-public sealed partial class FixationHeatPositionView : ObservableObject
-{
-    private readonly HeatPosition _position;
-    private readonly SwimEvent _swimEvent;
-    private readonly IPointScoreProvider _pointScoreProvider;
-    private readonly Action _onChanged;
-    private string _finishTimeText;
-
-    public FixationHeatPositionView(
-        HeatPosition position,
-        SwimEvent swimEvent,
-        Action onChanged,
-        IPointScoreProvider pointScoreProvider)
-    {
-        _position = position;
-        _swimEvent = swimEvent;
-        _onChanged = onChanged;
-        _pointScoreProvider = pointScoreProvider;
-
-        if (Entry.Status < EntryStatus.FINISH)
-            Entry.Status = EntryStatus.FINISH;
-
-        _finishTimeText = FormatTime(Entry.FinishTime);
-        CalculatePoints();
-    }
-
-    public Entry Entry => _position.Entry;
-
-    public int EntryId => Entry.Id;
-
-    public int Lane => _position.Lane;
-
-    public string DisplayLane => SwimEventLaneNames.GetLaneDisplay(_swimEvent, Lane);
-
-    public string ParticipantName => Entry.DisplayParticipantName;
-
-    public string YearOfBirth => Entry.DisplayParticipantBirthYear;
-
-    public string Club => Entry.DisplayParticipantClubName;
-
-    public string EntryTimeDisplay => Entry.DisplayEntryTime;
-
-    public string FinishTimeDisplay => Entry.DisplayFinishTime;
-
-    public int? Points => Entry.Points;
-
-    public IReadOnlyList<EntryStatus> StatusOptions { get; } =
-    [
-        EntryStatus.FINISH,
-        EntryStatus.DSQ,
-        EntryStatus.DNS,
-        EntryStatus.DNF
-    ];
-
-    public EntryStatus SelectedStatus
-    {
-        get => Entry.Status;
-        set
-        {
-            if (Entry.Status == value)
-                return;
-
-            Entry.Status = value;
-
-            OnPropertyChanged();
-            OnPropertyChanged(nameof(FinishTimeDisplay));
-            CalculatePoints();
-            _onChanged();
-        }
-    }
-
-    public string FinishTimeText
-    {
-        get => _finishTimeText;
-        set
-        {
-            var digits = new string((value ?? string.Empty).Where(char.IsDigit).ToArray());
-            var parsed = ParseTimeFromDigits(digits);
-            var formatted = FormatTime(parsed);
-
-            if (_finishTimeText != formatted)
-            {
-                _finishTimeText = formatted;
-                OnPropertyChanged();
-            }
-
-            if (Entry.FinishTime != parsed)
-            {
-                Entry.FinishTime = parsed;
-                OnPropertyChanged(nameof(FinishTimeDisplay));
-                CalculatePoints();
-                _onChanged();
-            }
-        }
-    }
-
-    public string Comment
-    {
-        get => Entry.Comment ?? string.Empty;
-        set
-        {
-            var next = string.IsNullOrWhiteSpace(value) ? null : value;
-            if (Entry.Comment == next)
-                return;
-
-            Entry.Comment = next;
-            OnPropertyChanged();
-            _onChanged();
-        }
-    }
-
-    public bool IsCompleteForApproval() =>
-        Entry.Status switch
-        {
-            EntryStatus.FINISH => Entry.FinishTime.HasValue,
-            EntryStatus.DNS or EntryStatus.DNF or EntryStatus.DSQ => true,
-            _ => false
-        };
-
-    private void CalculatePoints()
-    {
-        var points = 0;
-        if (Entry.Status == EntryStatus.FINISH)
-            points = _pointScoreProvider.CalculatePoints(
-                _swimEvent.Course,
-                _swimEvent.SwimStyle.Distance,
-                _swimEvent.SwimStyle.Stroke,
-                _swimEvent.SwimStyle.RelayCount,
-                _swimEvent.AgeGroup.Gender,
-                Entry.FinishTime);
-        Entry.Points = points;
-        OnPropertyChanged(nameof(Points));
-    }
-
-    private static string FormatTime(int? value)
-    {
-        if (!value.HasValue)
-            return string.Empty;
-
-        var totalHundredths = value.Value;
-        if (totalHundredths < 0)
-            totalHundredths = 0;
-
-        var minutes = totalHundredths / 6000;
-        var seconds = totalHundredths % 6000 / 100;
-        var hundredths = totalHundredths % 100;
-
-        return minutes > 0
-            ? $"{minutes}:{seconds:D2}.{hundredths:D2}"
-            : $"{seconds}.{hundredths:D2}";
-    }
-
-    private static int? ParseTimeFromDigits(string digits)
-    {
-        if (string.IsNullOrWhiteSpace(digits))
-            return null;
-
-        var normalized = digits.TrimStart('0');
-        if (normalized.Length == 0)
-            normalized = "0";
-        if (normalized.Length > 9)
-            normalized = normalized[^9..];
-
-        var padded = normalized.PadLeft(4, '0');
-        var hundredthsPart = padded[^2..];
-        var secondsPart = padded[^4..^2];
-        var minutesPart = padded.Length > 4 ? padded[..^4] : "0";
-
-        if (!int.TryParse(minutesPart, out var minutes))
-            minutes = 0;
-        if (!int.TryParse(secondsPart, out var seconds))
-            seconds = 0;
-        if (!int.TryParse(hundredthsPart, out var hundredths))
-            hundredths = 0;
-
-        return minutes * 6000 + seconds * 100 + hundredths;
     }
 }

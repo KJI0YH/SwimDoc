@@ -4,17 +4,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BizDbAccess;
 
-public interface IHeatAllocationDbAccess
-{
-    ICollection<Entry> GetOrderedEntriesByEventId(int swimEventId);
-    bool IsEventStarted(int swimEventId);
-
-    bool IsHeatsAllocated(int swimEventId);
-
-    void DeleteExistedHeats(int swimEventId);
-    void AddHeats(IEnumerable<Heat> heats);
-}
-
 public class HeatAllocationDbAccess(EfCoreContext context) : IHeatAllocationDbAccess
 {
     public ICollection<Entry> GetOrderedEntriesByEventId(int swimEventId)
@@ -41,10 +30,6 @@ public class HeatAllocationDbAccess(EfCoreContext context) : IHeatAllocationDbAc
 
     public void DeleteExistedHeats(int swimEventId)
     {
-        // Heats can be reallocated even after results were entered.
-        // Entries remain; reset official result fields before bulk-deleting heats.
-        // Use bulk updates so SQLite triggers (heat reorder, swim event status) do not
-        // leave stale tracked entities that cause DbUpdateConcurrencyException on SaveChanges.
         context.Entries
             .Where(e => e.SwimEventId == swimEventId && e.Status >= EntryStatus.FINISH)
             .ExecuteUpdate(setters => setters

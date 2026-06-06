@@ -1,4 +1,4 @@
-﻿namespace BizLogic.HeatLogic;
+namespace BizLogic.HeatLogic;
 
 public enum HeatOrder
 {

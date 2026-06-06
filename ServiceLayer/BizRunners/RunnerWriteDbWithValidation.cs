@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using BizLogic.GenericInterfaces;
 using DataLayer.EfCore;

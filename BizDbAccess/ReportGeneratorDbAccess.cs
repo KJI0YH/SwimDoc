@@ -4,15 +4,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BizDbAccess;
 
-public interface IReportGeneratorDbAccess
-{
-    ICollection<SwimEvent> GetSwimEventsWithEntries(List<int> ids);
-
-    ICollection<SwimEvent> GetSwimEventsWithHeats(List<int> ids);
-
-    ICollection<SwimEvent> GetSwimEventsWithResults(List<int> ids);
-}
-
 public class ReportGeneratorDbAccess(EfCoreContext context) : IReportGeneratorDbAccess
 {
     public ICollection<SwimEvent> GetSwimEventsWithEntries(List<int> ids)

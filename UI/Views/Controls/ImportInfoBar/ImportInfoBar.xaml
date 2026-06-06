@@ -25,7 +25,7 @@
         </Style>
     </UserControl.Resources>
 
-    <!-- Bottom overlay import status (does not shift content) -->
+    
     <Border Padding="10"
             CornerRadius="10"
             Background="#F2FFFFFF"
@@ -35,7 +35,7 @@
         </Border.Effect>
 
         <StackPanel>
-            <!-- Compact bar -->
+            
             <DockPanel LastChildFill="True">
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
                     <Button ToolTip="{loc:Loc Import_Details}"
@@ -171,7 +171,7 @@
                                                         <DataTrigger Binding="{Binding IsSummaryRow}" Value="True">
                                                             <Setter Property="Visibility" Value="Collapsed" />
                                                         </DataTrigger>
-                                                        <!-- Show details content if there is at least one warning OR error -->
+                                                        
                                                         <DataTrigger
                                                             Binding="{Binding WarningsCount, Converter={StaticResource IntGt0}}"
                                                             Value="True">

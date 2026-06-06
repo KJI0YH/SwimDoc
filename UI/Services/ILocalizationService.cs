@@ -2,12 +2,6 @@ using System.Globalization;
 
 namespace UI.Services;
 
-public enum AppLanguage
-{
-    English,
-    Russian
-}
-
 public interface ILocalizationService
 {
     AppLanguage CurrentLanguage { get; }
@@ -15,4 +9,3 @@ public interface ILocalizationService
 
     void SetLanguage(AppLanguage language);
 }
-

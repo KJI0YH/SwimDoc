@@ -35,4 +35,3 @@ public sealed class BirthYearBoundConverter : IValueConverter
         return null;
     }
 }
-

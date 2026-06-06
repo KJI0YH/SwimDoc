@@ -1,12 +1,11 @@
-using System.Windows;
-
 namespace UI.Services;
 
 public interface IAddEditWindowFactory
 {
-    bool? CreateAndShow<TWindow>(int? id = null) where TWindow : Window;
-    bool? CreateAndShow<TWindow>(int? id, AddEditContext? context) where TWindow : Window;
+    bool? CreateAndShow<TDialog>(int? id = null, NavigationContext? context = null) where TDialog : class;
 
-    TWindow CreateAndShowAndReturn<TWindow>(int? id = null) where TWindow : Window;
-    TWindow CreateAndShowAndReturn<TWindow>(int? id, AddEditContext? context) where TWindow : Window;
+    AddEditDialogResult CreateAndShowAndReturn<TDialog>(int? id = null, NavigationContext? context = null)
+        where TDialog : class;
+
+    bool? ShowGenericAddEdit(object? id, object crudService);
 }

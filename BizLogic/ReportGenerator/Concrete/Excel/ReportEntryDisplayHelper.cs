@@ -8,7 +8,7 @@ internal static class ReportEntryDisplayHelper
     public static string GetParticipantName(Entry entry)
     {
         if (entry.Athlete is not null)
-            return entry.Athlete.DisplayName;
+            return FormatAthleteName(entry.Athlete);
 
         if (entry.Relay is not null)
             return GetRelayParticipantName(entry.Relay);
@@ -41,7 +41,7 @@ internal static class ReportEntryDisplayHelper
         var numberPart = relay.Number.HasValue ? $" {relay.Number}" : string.Empty;
         var athleteNames = relay.Positions?
             .OrderBy(position => position.Order)
-            .Select(position => position.Athlete?.DisplayName)
+            .Select(position => position.Athlete is null ? null : FormatAthleteName(position.Athlete))
             .Where(name => !string.IsNullOrWhiteSpace(name))
             .ToList() ?? [];
 
@@ -62,4 +62,7 @@ internal static class ReportEntryDisplayHelper
 
         return years.Count == 0 ? null : string.Join(", ", years);
     }
+
+    private static string FormatAthleteName(Athlete athlete) =>
+        $"{athlete.FirstName} {athlete.LastName}";
 }

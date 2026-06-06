@@ -1,5 +1,6 @@
 using System.Globalization;
 using BizLogic.Resources;
+using ReportExcelStrings = BizLogic.Resources.ReportExcelStrings;
 using DataLayer;
 using DataLayer.EfClasses;
 
@@ -50,6 +51,12 @@ public static class LocalizedEntityDisplayFormatter
             yearPart);
     }
 
+    public static string FormatAthleteName(Athlete? athlete) =>
+        athlete is null ? string.Empty : $"{athlete.FirstName} {athlete.LastName}";
+
+    public static string FormatAthleteClubName(Athlete? athlete) =>
+        athlete?.Club?.Name ?? ReportExcelStrings.Value_PersonalParen;
+
     public static string FormatSwimEvent(SwimEvent? swimEvent)
     {
         if (swimEvent == null)
@@ -83,4 +90,3 @@ public static class LocalizedEntityDisplayFormatter
         return $"{minLabel}-{maxLabel}";
     }
 }
-

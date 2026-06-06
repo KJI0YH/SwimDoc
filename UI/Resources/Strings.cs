@@ -493,4 +493,3 @@ public static class Strings
     public static string Fixation_Col_Comment => Get(nameof(Fixation_Col_Comment));
     public static string Fixation_Comment_Tooltip => Get(nameof(Fixation_Comment_Tooltip));
 }
-

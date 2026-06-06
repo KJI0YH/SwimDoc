@@ -1,4 +1,4 @@
-﻿namespace DataLayer.EfCore;
+namespace DataLayer.EfCore;
 
 public interface IDatabaseConnection
 {

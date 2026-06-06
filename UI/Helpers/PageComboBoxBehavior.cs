@@ -101,4 +101,3 @@ public static class PageComboBoxBehavior
         comboBox.Text = clampedOneBased.ToString(CultureInfo.CurrentCulture);
     }
 }
-

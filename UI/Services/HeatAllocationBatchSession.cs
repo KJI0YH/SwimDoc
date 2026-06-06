@@ -8,9 +8,6 @@ using UI.ViewModels.Pages;
 
 namespace UI.Services;
 
-/// <summary>
-/// Allocates heats per event using a single DbContext. Each event runs in its own transaction.
-/// </summary>
 public sealed class HeatAllocationBatchSession : IAsyncDisposable
 {
     private readonly IServiceScope _scope = App.Current.Services.CreateScope();
@@ -24,11 +21,11 @@ public sealed class HeatAllocationBatchSession : IAsyncDisposable
         _heatOrder = heatOrder;
         _minHeatSize = minHeatSize;
         _dbContext = _scope.ServiceProvider.GetRequiredService<EfCoreContext>();
-        // DbContext is Transient: heat allocation must use the same instance as this session.
+
         _heatService = new HeatService(_dbContext);
     }
 
-    public EventsViewModel.OperationItemOutcome AllocateEvent(int swimEventId)
+    public OperationItemOutcome AllocateEvent(int swimEventId)
     {
         var parameters = new HeatAllocationParameters(swimEventId, _heatOrder, _minHeatSize);
         using var transaction = _dbContext.Database.BeginTransaction();

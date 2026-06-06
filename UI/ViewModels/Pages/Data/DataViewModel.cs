@@ -14,13 +14,12 @@ using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.Crud;
 using UI.Resources;
 using UI.Services;
-using UI.Views.Windows;
-using UI.Views.Windows.AddEdit;
-
+using UI.Models.Rows;
 namespace UI.ViewModels.Pages.Data;
 
-public partial class DataViewModel<TEntity, TKey> : DataViewModelBase
+public partial class DataViewModel<TEntity, TRowView, TKey> : DataViewModelBase
     where TEntity : class
+    where TRowView : IEntityRowView<TEntity>
 {
     protected readonly ICrudService<TEntity, TKey> _crudService;
     private readonly INavigationService _navigationService;
@@ -34,13 +33,13 @@ public partial class DataViewModel<TEntity, TKey> : DataViewModelBase
 
     [ObservableProperty] private bool _isLoading;
 
-    [ObservableProperty] private ObservableCollection<TEntity> _items = new();
+    [ObservableProperty] private ObservableCollection<TRowView> _items = new();
 
     [ObservableProperty] private string _searchText = string.Empty;
 
-    [ObservableProperty] private TEntity? _selectedItem;
+    [ObservableProperty] private TRowView? _selectedItem;
 
-    [ObservableProperty] private ObservableCollection<TEntity> _selectedItems = new();
+    [ObservableProperty] private ObservableCollection<TRowView> _selectedItems = new();
 
     [ObservableProperty] private string _sortColumn = string.Empty;
 
@@ -125,7 +124,10 @@ public partial class DataViewModel<TEntity, TKey> : DataViewModelBase
         AutoGenerateColumns = true;
     }
 
-    partial void OnSelectedItemsChanged(ObservableCollection<TEntity> value)
+    protected virtual TRowView CreateRowView(TEntity entity) =>
+        (TRowView)Activator.CreateInstance(typeof(TRowView), entity)!;
+
+    partial void OnSelectedItemsChanged(ObservableCollection<TRowView> value)
     {
         EditItemCommand.NotifyCanExecuteChanged();
         DeleteItemCommand.NotifyCanExecuteChanged();
@@ -134,14 +136,14 @@ public partial class DataViewModel<TEntity, TKey> : DataViewModelBase
 
     public override void SyncSelectedItemsFromGrid(IList? gridSelection)
     {
-        var list = new List<TEntity>();
+        var list = new List<TRowView>();
         if (gridSelection != null)
             foreach (var item in gridSelection)
-                if (item is TEntity e)
-                    list.Add(e);
+                if (item is TRowView row)
+                    list.Add(row);
 
-        SelectedItems = new ObservableCollection<TEntity>(list);
-        SelectedItem = list.Count == 1 ? list[0] : null;
+        SelectedItems = new ObservableCollection<TRowView>(list);
+        SelectedItem = list.Count == 1 ? list[0] : default;
     }
 
     partial void OnSearchTextChanged(string value)
@@ -151,7 +153,7 @@ public partial class DataViewModel<TEntity, TKey> : DataViewModelBase
         else
             CurrentPage = 0;
     }
-    
+
     partial void OnCurrentPageChanged(int value)
     {
         GoToFirstPageCommand.NotifyCanExecuteChanged();
@@ -219,10 +221,10 @@ public partial class DataViewModel<TEntity, TKey> : DataViewModelBase
             if (UsesPaging)
                 query = query.Page(CurrentPage, PageSize);
 
-            var items = await query.ToListAsync();
-            Items = new ObservableCollection<TEntity>(items);
+            var entities = await query.ToListAsync();
+            Items = new ObservableCollection<TRowView>(entities.Select(CreateRowView));
             OnPropertyChanged(nameof(ItemsInfo));
-            OnItemsLoaded(items);
+            OnItemsLoaded(entities);
         }
         finally
         {
@@ -245,7 +247,7 @@ public partial class DataViewModel<TEntity, TKey> : DataViewModelBase
     protected virtual void EditItem()
     {
         if (SelectedItems.Count != 1) return;
-        var id = GetEntityId(SelectedItems[0]);
+        var id = GetEntityId(SelectedItems[0].Entity);
         ShowAddEditDialog(id);
     }
 
@@ -257,12 +259,12 @@ public partial class DataViewModel<TEntity, TKey> : DataViewModelBase
         try
         {
             var keys = SelectedItems
-                .Select(GetEntityId)
+                .Select(row => GetEntityId(row.Entity))
                 .Distinct()
                 .ToList();
 
             var ids = SelectedItems
-                .Select(GetEntityIntId)
+                .Select(row => GetEntityIntId(row.Entity))
                 .Distinct()
                 .ToList();
 
@@ -279,7 +281,7 @@ public partial class DataViewModel<TEntity, TKey> : DataViewModelBase
         }
         catch (Exception)
         {
-            // ignored
+
         }
     }
 
@@ -337,7 +339,8 @@ public partial class DataViewModel<TEntity, TKey> : DataViewModelBase
         if (SelectedItems.Count != 1)
             return;
 
-        var id = GetEntityId(SelectedItems[0]);
+        var entity = SelectedItems[0].Entity;
+        var id = GetEntityId(entity);
         if (id == null)
             return;
 
@@ -348,29 +351,29 @@ public partial class DataViewModel<TEntity, TKey> : DataViewModelBase
         switch (entityName)
         {
             case nameof(Athlete):
-                _navigationService.NavigateTo<AthleteDetailsViewModel>(entityId);
+                _navigationService.NavigateTo<AthleteDetailsViewModel>(NavigationContext.ForId(entityId));
                 break;
             case nameof(Club):
-                _navigationService.NavigateTo<ClubDetailsViewModel>(entityId);
+                _navigationService.NavigateTo<ClubDetailsViewModel>(NavigationContext.ForId(entityId));
                 break;
             case nameof(Entry):
-                if (SelectedItems[0] is Entry entry)
+                if (entity is Entry entry)
                     OpenEntryDetails(entry);
                 break;
             case nameof(SwimEvent):
-                _navigationService.NavigateTo<EventDetailsViewModel>(entityId);
+                _navigationService.NavigateTo<EventDetailsViewModel>(NavigationContext.ForId(entityId));
                 break;
             case nameof(AgeGroup):
-                _navigationService.NavigateTo<AgeGroupDetailsViewModel>(entityId);
+                _navigationService.NavigateTo<AgeGroupDetailsViewModel>(NavigationContext.ForId(entityId));
                 break;
             case nameof(SwimStyle):
-                _navigationService.NavigateTo<SwimStyleDetailsViewModel>(entityId);
+                _navigationService.NavigateTo<SwimStyleDetailsViewModel>(NavigationContext.ForId(entityId));
                 break;
         }
     }
 
     protected virtual void OpenEntryDetails(Entry entry) =>
-        NavigationService.NavigateTo<EntryDetailsViewModel>(entry.Id);
+        NavigationService.NavigateTo<EntryDetailsViewModel>(NavigationContext.ForId(entry.Id));
 
     private bool CanOpenDetails()
     {
@@ -439,39 +442,9 @@ public partial class DataViewModel<TEntity, TKey> : DataViewModelBase
 
     protected virtual void ShowAddEditDialog(TKey? id = default)
     {
-        var window = new GenericAddEditWindow(id, _crudService);
-        var owner = Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w.IsActive) ??
-                    Application.Current.MainWindow;
-        if (owner != null)
-        {
-            window.Owner = owner;
-            if (owner is MainWindow mainWindow)
-            {
-                mainWindow.ShowModalOverlay();
-                mainWindow.Dispatcher.Invoke(DispatcherPriority.Render, static () => { });
-            }
-            else
-            {
-                var originalOpacity = owner.Opacity;
-                owner.Opacity = 0.75;
-                owner.Dispatcher.Invoke(DispatcherPriority.Render, static () => { });
-                window.Closed += (_, _) => owner.Opacity = originalOpacity;
-            }
-        }
-
-        window.Closed += async (s, e) =>
-        {
-            if (window.DialogResult == true) await LoadDataAsync();
-        };
-        try
-        {
-            window.ShowDialog();
-        }
-        finally
-        {
-            if (owner is MainWindow mw)
-                mw.HideModalOverlay();
-        }
+        var factory = App.Current.Services.GetRequiredService<IAddEditWindowFactory>();
+        if (factory.ShowGenericAddEdit(id, _crudService) == true)
+            _ = LoadDataAsync();
     }
 
     protected virtual TKey GetEntityId(TEntity entity)

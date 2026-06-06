@@ -31,6 +31,7 @@ public partial class SearchableComboBox : UserControl
 
     private bool _isSearchActive;
     private bool _isSyncingSelection;
+    private bool _isOpeningDropDownForSearch;
 
     private ICollectionView? _itemsView;
     private string _searchText = string.Empty;
@@ -38,6 +39,7 @@ public partial class SearchableComboBox : UserControl
     public SearchableComboBox()
     {
         InitializeComponent();
+        Loaded += (_, _) => HookEditableTextBox();
     }
 
     public ObservableCollection<SearchableItem>? ItemsSource
@@ -110,7 +112,6 @@ public partial class SearchableComboBox : UserControl
         if (ReferenceEquals(value1, value2)) return true;
         if (value1.Equals(value2)) return true;
 
-        // Пытаемся сравнить по Id, если объекты имеют свойство Id
         var idProperty1 = value1.GetType().GetProperty("Id", BindingFlags.Public | BindingFlags.Instance);
         var idProperty2 = value2.GetType().GetProperty("Id", BindingFlags.Public | BindingFlags.Instance);
 
@@ -135,7 +136,8 @@ public partial class SearchableComboBox : UserControl
 
     private void ComboBoxControl_OnPreviewKeyDown(object sender, KeyEventArgs e)
     {
-        if (e.Key is Key.Back or Key.Delete) _isSearchActive = true;
+        if (e.Key is Key.Back or Key.Delete)
+            BeginSearch(clearSelection: ComboBoxControl.SelectedItem != null);
 
         if (e.Key == Key.Enter)
         {
@@ -146,11 +148,17 @@ public partial class SearchableComboBox : UserControl
 
     private void ComboBoxControl_OnPreviewTextInput(object sender, TextCompositionEventArgs e)
     {
-        _isSearchActive = true;
+        BeginSearch(clearSelection: ComboBoxControl.SelectedItem != null);
     }
 
     private void ComboBoxControl_OnDropDownOpened(object sender, EventArgs e)
     {
+        if (_isOpeningDropDownForSearch)
+        {
+            _isOpeningDropDownForSearch = false;
+            return;
+        }
+
         _isSearchActive = false;
         _searchText = string.Empty;
         _itemsView?.Refresh();
@@ -161,10 +169,56 @@ public partial class SearchableComboBox : UserControl
         if (_itemsView == null) return;
         if (!_isSearchActive) return;
 
-        _searchText = ComboBoxControl.Text ?? string.Empty;
+        var typedText = ComboBoxControl.Text ?? string.Empty;
+        _searchText = typedText;
         _itemsView.Refresh();
 
-        if (ComboBoxControl.IsKeyboardFocusWithin) ComboBoxControl.IsDropDownOpen = true;
+        if (!ComboBoxControl.IsKeyboardFocusWithin)
+            return;
+
+        _isOpeningDropDownForSearch = true;
+        ComboBoxControl.IsDropDownOpen = true;
+        RestoreEditableText(typedText);
+    }
+
+    private void BeginSearch(bool clearSelection)
+    {
+        _isSearchActive = true;
+
+        if (!clearSelection)
+            return;
+
+        _isSyncingSelection = true;
+        ComboBoxControl.SelectedItem = null;
+        SelectedItem = null;
+        _isSyncingSelection = false;
+    }
+
+    private void HookEditableTextBox()
+    {
+        if (GetEditableTextBox() is not { } textBox)
+            return;
+
+        textBox.GotFocus += (_, _) =>
+        {
+            if (_isSearchActive)
+                RestoreEditableText(ComboBoxControl.Text ?? string.Empty);
+        };
+    }
+
+    private TextBox? GetEditableTextBox() =>
+        ComboBoxControl.Template?.FindName("PART_EditableTextBox", ComboBoxControl) as TextBox;
+
+    private void RestoreEditableText(string text)
+    {
+        if (GetEditableTextBox() is not { } textBox)
+            return;
+
+        if (textBox.Text != text)
+            textBox.Text = text;
+
+        textBox.CaretIndex = text.Length;
+        textBox.SelectionLength = 0;
     }
 
     private bool FilterItem(object obj)

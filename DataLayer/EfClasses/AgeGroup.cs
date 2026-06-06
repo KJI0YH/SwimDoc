@@ -16,18 +16,6 @@ public class AgeGroup : IValidatableObject
 
     public ICollection<SwimEvent> Events { get; set; }
 
-    public string DisplayName =>
-        !string.IsNullOrWhiteSpace(Name) ? Name : $"{EnumDisplay.GetDescription(Gender)} {YearRange} г.р.";
-
-    private string YearRange => BirthYearMin == null && BirthYearMax == null
-        ? "абсолютного"
-        : BirthYearMin == BirthYearMax
-            ? $"{BirthYearMin}"
-            : $"{DisplayBirthYearMin}-{DisplayBirthYearMax}";
-
-    public string DisplayBirthYearMin => BirthYearMin.HasValue ? $"{BirthYearMin}" : "старше";
-    public string DisplayBirthYearMax => BirthYearMax.HasValue ? $"{BirthYearMax}" : "моложе";
-
     public bool Contains(int year, Gender gender)
     {
         return (Gender == Gender.Mixed || Gender == gender) &&

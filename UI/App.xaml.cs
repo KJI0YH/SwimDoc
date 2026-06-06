@@ -84,7 +84,6 @@ public partial class App : Application
         ConfigureViewModels(serviceCollection);
         var provider = serviceCollection.BuildServiceProvider();
 
-        // Bind localization provider to culture changes (for dynamic XAML updates).
         var localization = provider.GetRequiredService<ILocalizationService>();
         LocalizationProvider.Instance.Culture = CultureInfo.CurrentUICulture;
         localization.CultureChanged += culture => LocalizationProvider.Instance.Culture = culture;

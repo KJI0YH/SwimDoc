@@ -27,41 +27,6 @@ public class Entry : IValidatableObject
     public SwimEvent? SwimEvent { get; set; }
     public HeatPosition? HeatPosition { get; set; }
 
-    public string DisplaySwimName => SwimEvent is not null ? SwimEvent.DisplayName : SwimStyle.DisplayName;
-
-    public string DisplayParticipantName => Athlete is not null
-        ? Athlete.DisplayName
-        : Relay is not null
-            ? Relay.DisplayNameWithAthletes
-            : string.Empty;
-
-    public string DisplayParticipantClubName => Athlete is not null
-        ? Athlete.DisplayClubName
-        : Relay is not null
-            ? Relay.Club.Name
-            : string.Empty;
-
-    public string DisplayParticipantBirthYear => Athlete is not null
-        ? Athlete.YearOfBirth.ToString()
-        : Relay is not null
-            ? string.Join(", ", Relay.Positions.OrderBy(p => p.Order).Select(p => p.Athlete.YearOfBirth))
-            : string.Empty;
-
-    public string DisplayEntryTime => EntryTime == null
-        ? "N.T."
-        : (EntryTime / 6000 == 0 ? "" : $"{EntryTime / 6000}:")
-          + $"{((EntryTime % 6000) / 100):D2}."
-          + $"{(EntryTime % 100):D2}";
-
-    public string DisplayFinishTime => Status switch
-    {
-        EntryStatus.FINISH => (FinishTime / 6000 == 0 ? "" : $"{FinishTime / 6000}:")
-                              + $"{((FinishTime % 6000) / 100):D2}."
-                              + $"{(FinishTime % 100):D2}",
-        EntryStatus.DNF or EntryStatus.DNS or EntryStatus.DSQ => Status.ToString(),
-        _ => ""
-    };
-
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
         var currContext = validationContext.GetService(typeof(DbContext)) as EfCoreContext;
@@ -87,7 +52,6 @@ public class Entry : IValidatableObject
             ? null
             : currContext.AgeGroups.AsNoTracking()
                 .FirstOrDefault(ag => ag.Id == swimEvent.AgeGroupId));
-
 
         if (athlete is null && relay is null)
             yield return new ValidationResult(ValidationStrings.Entry_ParticipantMustBeProvided);

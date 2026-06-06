@@ -8,11 +8,12 @@ using ServiceLayer.ClubService;
 using UI.Resources;
 using UI.Services;
 using UI.ViewModels.Pages.Data;
-using UI.Views.Windows.AddEdit;
+using UI.Models.Rows;
+using UI.Views.Dialogs.Markers.AddEdit;
 
 namespace UI.ViewModels.Pages;
 
-public class ClubsViewModel : DataViewModel<Club, int?>
+public class ClubsViewModel : DataViewModel<Club, ClubRowView, int?>
 {
     protected override PagingPage PagingSettingsPage => PagingPage.Clubs;
 
@@ -29,7 +30,7 @@ public class ClubsViewModel : DataViewModel<Club, int?>
         ColumnConfigurations.Clear();
 
         ColumnConfigurations.Add(new ColumnConfiguration<Club>("Name", Strings.Clubs_Col_Name, 300));
-        ColumnConfigurations.Add(new ColumnConfiguration<Club>("DisplayAthleteCount", Strings.Clubs_Col_Athletes, 150,
+        ColumnConfigurations.Add(new ColumnConfiguration<Club>("AthleteCount", Strings.Clubs_Col_Athletes, 150,
             (query, direction) =>
             {
                 return direction == ListSortDirection.Ascending
@@ -37,21 +38,21 @@ public class ClubsViewModel : DataViewModel<Club, int?>
                     : query.OrderByDescending(club => club.Athletes.Count);
             }));
 
-        ColumnConfigurations.Add(new ColumnConfiguration<Club>("DisplayEntryCount", Strings.Clubs_Col_Entries, 150,
+        ColumnConfigurations.Add(new ColumnConfiguration<Club>("EntryCount", Strings.Clubs_Col_Entries, 150,
             (query, direction) =>
             {
                 return direction == ListSortDirection.Ascending
                     ? query.OrderBy(club => club.Athletes.Sum(a => a.Entries.Count))
                     : query.OrderByDescending(club => club.Athletes.Sum(a => a.Entries.Count));
             }));
-        ColumnConfigurations.Add(new ColumnConfiguration<Club>("DisplayRelayCount", Strings.Clubs_Col_Relays, 150,
+        ColumnConfigurations.Add(new ColumnConfiguration<Club>("RelayCount", Strings.Clubs_Col_Relays, 150,
             (query, direction) =>
             {
                 return direction == ListSortDirection.Ascending
                     ? query.OrderBy(club => club.Relays.Count)
                     : query.OrderByDescending(club => club.Relays.Count);
             }));
-        ColumnConfigurations.Add(new ColumnConfiguration<Club>("DisplayPointCount", Strings.Clubs_Col_Points, 150,
+        ColumnConfigurations.Add(new ColumnConfiguration<Club>("PointCount", Strings.Clubs_Col_Points, 150,
             (query, direction) =>
             {
                 return direction == ListSortDirection.Ascending
@@ -60,7 +61,6 @@ public class ClubsViewModel : DataViewModel<Club, int?>
                         club.Athletes.Sum(a => a.Entries.Where(e => e.Scoring).Sum(e => e.Points)));
             }));
     }
-
 
     protected override IQueryable<Club> ApplyQuery(IQueryable<Club> query)
     {

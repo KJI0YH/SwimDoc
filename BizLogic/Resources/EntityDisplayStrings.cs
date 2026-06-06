@@ -22,4 +22,3 @@ public static class EntityDisplayStrings
     public static string AgeGroup_YearRange_OlderThan => Get(nameof(AgeGroup_YearRange_OlderThan));
     public static string AgeGroup_YearRange_YoungerThan => Get(nameof(AgeGroup_YearRange_YoungerThan));
 }
-

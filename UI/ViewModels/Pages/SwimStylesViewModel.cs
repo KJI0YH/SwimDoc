@@ -7,11 +7,12 @@ using UI.Helpers;
 using UI.Resources;
 using UI.Services;
 using UI.ViewModels.Pages.Data;
-using UI.Views.Windows.AddEdit;
+using UI.Models.Rows;
+using UI.Views.Dialogs.Markers.AddEdit;
 
 namespace UI.ViewModels.Pages;
 
-public class SwimStylesViewModel : DataViewModel<SwimStyle, int?>
+public class SwimStylesViewModel : DataViewModel<SwimStyle, SwimStyleRowView, int?>
 {
     protected override PagingPage PagingSettingsPage => PagingPage.SwimStyles;
 
@@ -28,18 +29,14 @@ public class SwimStylesViewModel : DataViewModel<SwimStyle, int?>
         AutoGenerateColumns = false;
         ColumnConfigurations.Clear();
 
-        ColumnConfigurations.Add(new ColumnConfiguration<SwimStyle>(".", Strings.SwimStyles_Col_Name, 300,
+        ColumnConfigurations.Add(new ColumnConfiguration<SwimStyle>("DisplayName", Strings.SwimStyles_Col_Name, 300,
             (query, direction) =>
             {
                 return direction == ListSortDirection.Ascending
                     ? query.OrderBy(e => e.Distance).ThenBy(e => e.Stroke).ThenBy(e => e.RelayCount)
                     : query.OrderByDescending(e => e.Distance).ThenByDescending(e => e.Stroke)
                         .ThenBy(e => e.RelayCount);
-            })
-        {
-            Converter = EntityDisplayConverter.Instance,
-            ConverterParameter = EntityDisplayConverter.SwimStyleKind
-        });
+            }));
         ColumnConfigurations.Add(new ColumnConfiguration<SwimStyle>("Distance", Strings.SwimStyles_Col_Distance, 150));
         ColumnConfigurations.Add(new ColumnConfiguration<SwimStyle>("Stroke", Strings.SwimStyles_Col_Stroke, 200));
     }

@@ -8,5 +8,6 @@ public interface IConfirmDialogService
 
     Task<bool> ConfirmHeatReformIfOfficialResultsExistAsync(
         int swimEventId,
+        string eventDisplayName,
         CancellationToken cancellationToken = default);
 }

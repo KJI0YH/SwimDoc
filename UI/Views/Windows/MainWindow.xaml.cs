@@ -35,8 +35,8 @@ public partial class MainWindow : FluentWindow
     private void NavigationView_OnLoaded(object sender, RoutedEventArgs e)
     {
         NavigationView.SetServiceProvider(App.Current.Services);
+        NavigationView.BackRequested += OnNavigationBackRequested;
 
-        // NavigationViewContentPresenter is assigned in OnApplyTemplate, which can run after Loaded.
         Dispatcher.BeginInvoke(() => NavigationView.Navigate(typeof(CompetitionSelectionPage)), System.Windows.Threading.DispatcherPriority.Loaded);
 
         var navigationService = App.Current.Services.GetRequiredService<INavigationService>();
@@ -46,6 +46,16 @@ public partial class MainWindow : FluentWindow
     private void OnPageNavigationRequested(Type pageType)
     {
         Dispatcher.BeginInvoke(() => NavigationView.Navigate(pageType));
+    }
+
+    private void OnNavigationBackRequested(object sender, RoutedEventArgs e)
+    {
+        var navigationService = App.Current.Services.GetRequiredService<INavigationService>();
+        if (!navigationService.CanGoBack)
+            return;
+
+        navigationService.GoBack();
+        e.Handled = true;
     }
 
     private void MinimizeButton_Click(object sender, RoutedEventArgs e)
@@ -87,13 +97,4 @@ public partial class MainWindow : FluentWindow
         RestoreButton.ToolTip = isMaximized ? Strings.Window_Restore : Strings.Window_Maximize;
     }
 
-    public void ShowModalOverlay()
-    {
-        ModalOverlay.Visibility = Visibility.Visible;
-    }
-
-    public void HideModalOverlay()
-    {
-        ModalOverlay.Visibility = Visibility.Collapsed;
-    }
 }

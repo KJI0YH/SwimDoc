@@ -10,7 +10,8 @@ using ServiceLayer.EventService;
 using UI.Helpers;
 using UI.Services;
 using UI.ViewModels.Pages.Data;
-using UI.Views.Controls.SearchableComboBox;
+using UI.Models.Rows;
+using UI.Models;
 
 namespace UI.ViewModels.Pages;
 
@@ -19,7 +20,7 @@ public partial class ResultsViewModel(
     IEntryService entryService,
     IAgeGroupService ageGroupService,
     INavigationService navigationService) :
-    DataViewModel<SwimEvent, int?>(eventService), INavigationAware
+    DataViewModel<SwimEvent, SwimEventRowView, int?>(eventService), INavigationAware
 {
     private int? _navigatedEventId;
     private bool _navigatedEventPageAdjusted;
@@ -33,7 +34,7 @@ public partial class ResultsViewModel(
 
     public void OnNavigatedTo(object? parameter)
     {
-        if (parameter is int eventId)
+        if (NavigationContext.Parse(parameter)?.ResolveId() is int eventId)
         {
             _navigatedEventId = eventId;
             _navigatedEventPageAdjusted = false;
@@ -134,7 +135,7 @@ public partial class ResultsViewModel(
         await EnsureNavigatedEventVisibleAsync(eventId, swimEvent);
 
         if (Items.FirstOrDefault(e => e.Id == eventId) is { } listed)
-            SelectedSwimEvent = listed;
+            SelectedSwimEvent = listed.Entity;
 
         ClearNavigatedEvent();
     }
@@ -152,8 +153,8 @@ public partial class ResultsViewModel(
 
         if (Items.All(e => e.Id != eventId))
         {
-            Items = new ObservableCollection<SwimEvent>(
-                Items.Append(swimEvent).OrderBy(e => e.Order));
+            Items = new ObservableCollection<SwimEventRowView>(
+                Items.Append(new SwimEventRowView(swimEvent)).OrderBy(e => e.Order));
         }
     }
 
@@ -188,11 +189,11 @@ public partial class ResultsViewModel(
 
             if (Items.All(e => e.Id != eventId))
             {
-                var merged = Items.Append(swimEvent).OrderBy(e => e.Order).ToList();
-                Items = new ObservableCollection<SwimEvent>(merged);
+                var merged = Items.Append(new SwimEventRowView(swimEvent)).OrderBy(e => e.Order).ToList();
+                Items = new ObservableCollection<SwimEventRowView>(merged);
             }
 
-            SelectedSwimEvent = Items.First(e => e.Id == eventId);
+            SelectedSwimEvent = Items.First(e => e.Id == eventId).Entity;
         }
         finally
         {
@@ -281,9 +282,9 @@ public partial class ResultsViewModel(
         if (Items.Count == 0)
             return;
 
-        var idx = SelectedSwimEvent is null ? -1 : Items.IndexOf(SelectedSwimEvent);
+        var idx = SelectedSwimEvent is null ? -1 : Items.ToList().FindIndex(row => row.Id == SelectedSwimEvent.Id);
         var nextIdx = Math.Min(idx + 1, Items.Count - 1);
-        SelectedSwimEvent = Items[nextIdx];
+        SelectedSwimEvent = Items[nextIdx].Entity;
     }
 
     [RelayCommand]
@@ -292,10 +293,10 @@ public partial class ResultsViewModel(
         if (Items.Count == 0)
             return;
 
-        var idx = SelectedSwimEvent is null ? 0 : Items.IndexOf(SelectedSwimEvent);
+        var idx = SelectedSwimEvent is null ? 0 : Items.ToList().FindIndex(row => row.Id == SelectedSwimEvent.Id);
         if (idx < 0) idx = 0;
         var prevIdx = Math.Max(idx - 1, 0);
-        SelectedSwimEvent = Items[prevIdx];
+        SelectedSwimEvent = Items[prevIdx].Entity;
     }
 
     partial void OnSelectedResultEntryChanged(ResultEntryView? value) =>
@@ -311,42 +312,5 @@ public partial class ResultsViewModel(
             return;
 
         navigationService.NavigateTo<AthleteDetailsViewModel>(athleteId);
-    }
-}
-
-public sealed class ResultEntryView(int place, Entry entry) : ObservableObject
-{
-    public int Place { get; } = place;
-    public Entry Entry { get; } = entry;
-
-    public string ParticipantName => Entry.DisplayParticipantName;
-    public string ParticipantYearOfBirth => Entry.Athlete?.YearOfBirth.ToString() ?? Entry.DisplayParticipantBirthYear;
-    public string ClubName => Entry.DisplayParticipantClubName;
-
-    public string ResultText => Entry.DisplayFinishTime;
-    public int? Points => Entry.Points;
-}
-
-public sealed class ParticipantResultEntryView(ResultEntryView result, int? athleteId = null) : ObservableObject
-{
-    public int Place => result.Place;
-    public Entry Entry => result.Entry;
-
-    public string EventName => EntityDisplayFormatter.FormatEntrySwimName(Entry);
-    public string ParticipantName => result.ParticipantName;
-    public string ParticipantYearOfBirth => athleteId is int id
-        ? GetAthleteBirthYear(Entry, id)
-        : result.ParticipantYearOfBirth;
-    public string ClubName => result.ClubName;
-    public string ResultText => result.ResultText;
-    public int? Points => result.Points;
-
-    private static string GetAthleteBirthYear(Entry entry, int athleteId)
-    {
-        if (entry.AthleteId == athleteId)
-            return entry.Athlete?.YearOfBirth.ToString() ?? string.Empty;
-
-        var position = entry.Relay?.Positions.FirstOrDefault(p => p.AthleteId == athleteId);
-        return position?.Athlete.YearOfBirth.ToString() ?? string.Empty;
     }
 }

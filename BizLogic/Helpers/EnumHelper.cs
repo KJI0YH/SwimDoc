@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 
 namespace BizLogic.Helpers;
 
@@ -21,7 +21,7 @@ public static class EnumHelper
         enumValue = default(T);
         return false;
     }
-    
+
     public static bool TryGetEnumByDescriptionContains<T>(string desc, out T enumValue) where T : struct
     {
         if (!typeof(T).IsEnum)

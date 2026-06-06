@@ -10,19 +10,6 @@ namespace UI.ViewModels.Pages;
 
 public partial class EventsViewModel
 {
-    public enum OperationItemStatus
-    {
-        Pending,
-        Processing,
-        Completed,
-        CompletedWithWarnings,
-        Failed,
-        Canceled,
-        Skipped
-    }
-
-    protected readonly record struct OperationRunResult(bool Canceled, bool HadFailure);
-
     private CancellationTokenSource? _operationCts;
     private OperationItem? _operationSummaryRow;
 
@@ -111,30 +98,6 @@ public partial class EventsViewModel
         _operationSummaryRow.Warnings = [];
         _operationSummaryRow.Errors = [];
         _operationSummaryRow.IsDetailsOpen = false;
-    }
-
-    public readonly record struct OperationItemOutcome(
-        OperationItemStatus Status,
-        IReadOnlyList<string> Warnings,
-        IReadOnlyList<string> Errors,
-        int? HeatsCreatedCount = null)
-    {
-        public static OperationItemOutcome Success(int? heatsCreatedCount = null) =>
-            new(OperationItemStatus.Completed, [], [], heatsCreatedCount);
-
-        public static OperationItemOutcome WithWarnings(
-            IReadOnlyList<string> warnings,
-            int? heatsCreatedCount = null) =>
-            new(OperationItemStatus.CompletedWithWarnings, warnings, [], heatsCreatedCount);
-
-        public static OperationItemOutcome Failed(
-            IReadOnlyList<string> errors,
-            IReadOnlyList<string>? warnings = null,
-            int? heatsCreatedCount = null) =>
-            new(OperationItemStatus.Failed, warnings ?? [], errors, heatsCreatedCount);
-
-        public static OperationItemOutcome Skipped() =>
-            new(OperationItemStatus.Skipped, [], [], null);
     }
 
     private async Task<OperationRunResult> RunMultiItemOperationAsync(
@@ -405,35 +368,5 @@ public partial class EventsViewModel
                 .Cast<string>());
 
         return OperationItemOutcome.Failed(errors);
-    }
-
-    public partial class OperationItem : ObservableObject
-    {
-        public OperationItem(string eventName) => EventName = eventName;
-
-        [ObservableProperty] private string _eventName;
-        [ObservableProperty] private bool _isDetailsOpen;
-        [ObservableProperty] private bool _isSummaryRow;
-        [ObservableProperty] private OperationItemStatus _status = OperationItemStatus.Pending;
-        [ObservableProperty] private IReadOnlyList<string> _warnings = [];
-        [ObservableProperty] private IReadOnlyList<string> _errors = [];
-        [ObservableProperty] private int _warningsCount;
-        [ObservableProperty] private int _errorsCount;
-        [ObservableProperty] private int? _heatsCreatedCount;
-
-        public string? HeatsCreatedDisplay =>
-            HeatsCreatedCount.HasValue ? HeatsCreatedCount.Value.ToString() : null;
-
-        public string StatusDisplay =>
-            IsSummaryRow ? string.Empty : Strings.GetEnumDisplay(Status);
-
-        partial void OnHeatsCreatedCountChanged(int? value) =>
-            OnPropertyChanged(nameof(HeatsCreatedDisplay));
-
-        partial void OnStatusChanged(OperationItemStatus value) =>
-            OnPropertyChanged(nameof(StatusDisplay));
-
-        partial void OnIsSummaryRowChanged(bool value) =>
-            OnPropertyChanged(nameof(StatusDisplay));
     }
 }

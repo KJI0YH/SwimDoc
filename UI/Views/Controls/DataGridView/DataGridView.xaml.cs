@@ -10,6 +10,7 @@ using DataLayer.EfClasses;
 using UI.Helpers;
 using UI.ViewModels;
 using UI.ViewModels.Pages.Data;
+using UI.Models.Rows;
 using Wpf.Ui.Controls;
 using DataGrid = System.Windows.Controls.DataGrid;
 
@@ -17,7 +18,7 @@ namespace UI.Views.Controls.DataGridView;
 
 public partial class DataGridView : UserControl
 {
-    /// <summary>Light blue fill for selected entry rows (readable with default text color).</summary>
+
     private static readonly SolidColorBrush EntrySelectedRowBackground = CreateEntrySelectedRowBackground();
     private static readonly SolidColorBrush EntryHoverRowBackground = CreateEntryHoverRowBackground();
 
@@ -214,7 +215,7 @@ public partial class DataGridView : UserControl
 
     private static void ApplyDataGridRowStyle(DataGrid dataGrid, DataViewModelBase viewModel)
     {
-        if (ItemsEntityType(viewModel) == typeof(Entry) &&
+        if (IsEntryItemsGrid(viewModel) &&
             dataGrid.TryFindResource("DataGridRowLightBlueWhenSelectedStyle") is Style entryRowStyle)
         {
             dataGrid.RowStyle = entryRowStyle;
@@ -222,6 +223,14 @@ public partial class DataGridView : UserControl
         }
 
         dataGrid.RowStyle = CreateGenericSelectionRowStyle(dataGrid);
+    }
+
+    private static bool IsEntryItemsGrid(DataViewModelBase viewModel)
+    {
+        var rowType = ItemsEntityType(viewModel);
+        return rowType == typeof(Entry)
+               || rowType == typeof(EntryRowView)
+               || rowType is not null && typeof(IEntityRowView<Entry>).IsAssignableFrom(rowType);
     }
 
     private static Style CreateGenericSelectionRowStyle(FrameworkElement lookup)

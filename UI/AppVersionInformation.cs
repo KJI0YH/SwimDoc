@@ -2,7 +2,6 @@ using System.Reflection;
 
 namespace UI;
 
-/// <summary>Display version sourced from <see cref="Version.props"/> at build time (semver only, no git hash).</summary>
 public static class AppVersionInformation
 {
     public static string Display

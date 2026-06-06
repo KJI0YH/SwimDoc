@@ -65,7 +65,7 @@ public partial class AgeGroupsViewModel
         string runningMessage,
         string finishedMessage,
         string canceledHeader,
-        Func<CancellationToken, Task<EventsViewModel.OperationItemOutcome>> process)
+        Func<CancellationToken, Task<OperationItemOutcome>> process)
     {
         _operationCts?.Cancel();
         _operationCts = new CancellationTokenSource();
@@ -94,7 +94,7 @@ public partial class AgeGroupsViewModel
                 {
                     OperationProcessedItems = 1;
 
-                    if (outcome.Status == EventsViewModel.OperationItemStatus.Failed)
+                    if (outcome.Status == OperationItemStatus.Failed)
                     {
                         OperationErrors = new ObservableCollection<string>(outcome.Errors);
                         OperationHeader = Strings.Operation_Finished_WithErrors_Header;

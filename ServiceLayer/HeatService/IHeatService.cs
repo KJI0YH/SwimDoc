@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using BizLogic.HeatLogic;
 using DataLayer.EfClasses;

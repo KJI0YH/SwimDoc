@@ -53,14 +53,11 @@ public sealed class CsvBaseTimeRepository : IBaseTimeRepository
         lock (_ioLock)
         {
             if (!File.Exists(_filePath))
-            {
-                // missing file -> keep defaults (0)
                 return;
-            }
 
             var fileInfo = new FileInfo(_filePath);
             if (fileInfo.Length == 0)
-                return; // empty file -> keep defaults (0)
+                return;
 
             using var sr = new StreamReader(_filePath);
             var config = new CsvConfiguration(CultureInfo.InvariantCulture)
@@ -130,15 +127,5 @@ public sealed class CsvBaseTimeRepository : IBaseTimeRepository
 
         File.Copy(tmp, _filePath, overwrite: true);
         File.Delete(tmp);
-    }
-
-    private sealed class BaseTimeCsvRow
-    {
-        public string course { get; set; } = string.Empty;
-        public int meters { get; set; }
-        public string stroke { get; set; } = string.Empty;
-        public string sex { get; set; } = string.Empty;
-        public int relaycount { get; set; }
-        public int basetime { get; set; }
     }
 }

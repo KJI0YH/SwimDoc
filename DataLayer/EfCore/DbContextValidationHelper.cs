@@ -32,7 +32,6 @@ namespace DataLayer.EfCore
                 var result = context.ExecuteValidation();
                 if (result.Any()) return result;
 
-
                 context.ChangeTracker.AutoDetectChangesEnabled = false;
                 try
                 {

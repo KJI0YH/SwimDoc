@@ -14,8 +14,9 @@ using UI.Helpers;
 using UI.Resources;
 using UI.Services;
 using UI.ViewModels.Pages.Data;
-using UI.Views.Controls.SearchableComboBox;
-using UI.Views.Windows.AddEdit;
+using UI.Models.Rows;
+using UI.Models;
+using UI.Views.Dialogs.Markers.AddEdit;
 
 namespace UI.ViewModels.Pages;
 
@@ -23,7 +24,7 @@ public partial class HeatsViewModel(
     IEventService eventService,
     IHeatService heatService,
     INavigationService navigationService)
-    : DataViewModel<SwimEvent, int?>(eventService)
+    : DataViewModel<SwimEvent, SwimEventRowView, int?>(eventService)
 {
     private readonly IAddEditWindowFactory _windowFactory =
         App.Current.Services.GetRequiredService<IAddEditWindowFactory>();
@@ -259,7 +260,7 @@ public partial class HeatsViewModel(
                     h.Order,
                     heatsTotal,
                     h.Status,
-                    h.DisplayDayTime)));
+                    EntityDisplayFormatter.FormatHeatDayTime(h))));
 
             HeatPositions = new ObservableCollection<HeatPositionView>(
                 FilterHeatPositions(heatPositionViews));
@@ -370,7 +371,7 @@ public partial class HeatsViewModel(
         }
         catch (ValidationException)
         {
-            // ignored
+
         }
     }
 
@@ -387,7 +388,7 @@ public partial class HeatsViewModel(
     protected virtual void ShowHeatAddEditDialog(int? heatId = null)
     {
         var context = SelectedSwimEvent?.Id is int eventId
-            ? new AddEditContext { EventId = eventId }
+            ? new NavigationContext { EventId = eventId }
             : null;
         var result = _windowFactory.CreateAndShow<HeatAddEditWindow>(heatId, context);
         if (result == true)
@@ -400,9 +401,10 @@ public partial class HeatsViewModel(
         if (Items.Count == 0)
             return;
 
-        var idx = SelectedSwimEvent is null ? -1 : Items.IndexOf(SelectedSwimEvent);
-        var nextIdx = (idx + 1) % Items.Count;
-        SelectedSwimEvent = Items[nextIdx];
+        var entities = Items.Select(row => row.Entity).ToList();
+        var idx = SelectedSwimEvent is null ? -1 : entities.IndexOf(SelectedSwimEvent);
+        var nextIdx = (idx + 1) % entities.Count;
+        SelectedSwimEvent = entities[nextIdx];
     }
 
     [RelayCommand]
@@ -411,11 +413,12 @@ public partial class HeatsViewModel(
         if (Items.Count == 0)
             return;
 
-        var idx = SelectedSwimEvent is null ? 1 : Items.IndexOf(SelectedSwimEvent);
+        var entities = Items.Select(row => row.Entity).ToList();
+        var idx = SelectedSwimEvent is null ? 1 : entities.IndexOf(SelectedSwimEvent);
         var prevIdx = idx - 1;
         if (prevIdx < 0)
-            prevIdx += Items.Count;
-        SelectedSwimEvent = Items[prevIdx];
+            prevIdx += entities.Count;
+        SelectedSwimEvent = entities[prevIdx];
     }
 
     partial void OnSelectedHeatPositionChanged(HeatPositionView? value)
@@ -481,41 +484,4 @@ public partial class HeatsViewModel(
 
         navigationService.NavigateTo<AthleteDetailsViewModel>(athleteId);
     }
-}
-
-public sealed class HeatPositionView(
-    HeatPosition heatPosition,
-    SwimEvent? swimEvent,
-    int heatNumber,
-    int heatsInEvent,
-    int heatOrder,
-    int heatsTotal,
-    HeatStatus heatStatus,
-    string heatDayTime)
-{
-    private HeatPosition HeatPosition { get; set; } = heatPosition;
-
-    public Entry Entry => HeatPosition.Entry;
-
-    public int HeatId => HeatPosition.HeatId;
-    public int EntryId => HeatPosition.EntryId;
-    public HeatStatus HeatStatus { get; } = heatStatus;
-    public string HeatGroupHeader => string.Format(
-        Strings.Heats_GroupHeader_Format,
-        heatNumber,
-        heatsInEvent,
-        heatOrder,
-        heatsTotal,
-        heatDayTime,
-        heatStatus);
-    public int Lane => HeatPosition.Lane;
-
-    public string DisplayLane => swimEvent is not null
-        ? SwimEventLaneNames.GetLaneDisplay(swimEvent, HeatPosition.Lane)
-        : HeatPosition.Lane.ToString();
-    public string Participant => HeatPosition.Entry.DisplayParticipantName;
-    public int? YearOfBirth => HeatPosition.Entry.Athlete?.YearOfBirth;
-    public string Club => HeatPosition.Entry.DisplayParticipantClubName;
-    public string EntryTime => HeatPosition.Entry.DisplayEntryTime;
-    public string FinishTime => HeatPosition.Entry.DisplayFinishTime;
 }

@@ -12,7 +12,6 @@ public abstract class DataViewModelBase : ViewModelBase
 
     public abstract void SyncSelectedItemsFromGrid(IList? gridSelection);
 
-    /// <summary>Allows a page to customize the bound <see cref="DataGrid"/> (e.g. column tweaks).</summary>
     public virtual void ConfigureDataGrid(DataGrid dataGrid)
     {
         dataGrid.RowStyle = null;

@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using BizDbAccess;
@@ -303,7 +303,7 @@ public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbCo
             .Include(heat => heat.Positions.OrderBy(hp => hp.Lane))
             .ThenInclude(hp => hp.Entry)
             .ThenInclude(entry => entry.SwimEvent);
-    
+
     public async Task ApproveHeatAsync(Heat incomingHeat)
     {
         ArgumentNullException.ThrowIfNull(incomingHeat);

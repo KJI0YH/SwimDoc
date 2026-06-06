@@ -26,6 +26,7 @@ public class ConfirmDialogService(
 
     public async Task<bool> ConfirmHeatReformIfOfficialResultsExistAsync(
         int swimEventId,
+        string eventDisplayName,
         CancellationToken cancellationToken = default)
     {
         var count = await CountOfficialResultEntriesInEventHeatsAsync(swimEventId, cancellationToken);
@@ -33,7 +34,7 @@ public class ConfirmDialogService(
             count,
             title: Strings.Confirm_Title_HeatAllocation,
             primaryButtonText: Strings.Common_Allocate,
-            content: BuildHeatReformMessage(count),
+            content: BuildHeatReformMessage(eventDisplayName, count),
             cancellationToken);
     }
 
@@ -119,7 +120,7 @@ public class ConfirmDialogService(
             entriesWord);
     }
 
-    private static string BuildHeatReformMessage(int count)
+    private static string BuildHeatReformMessage(string eventDisplayName, int count)
     {
         var entriesWord = count == 1
             ? Strings.Common_Entry_Accusative_Singular
@@ -129,8 +130,8 @@ public class ConfirmDialogService(
 
         return string.Format(
             Strings.Confirm_HeatAllocationOfficialResults_MessageFormat,
+            eventDisplayName,
             count,
             entriesWord);
     }
 }
-

@@ -50,7 +50,7 @@ public partial class EventDetailsViewModel : ViewModelBase, INavigationAware
 
     public void OnNavigatedTo(object? parameter)
     {
-        if (parameter is not int idValue)
+        if (NavigationContext.Parse(parameter)?.ResolveId() is not int idValue)
             return;
 
         _entriesTable.SetEventId(idValue);

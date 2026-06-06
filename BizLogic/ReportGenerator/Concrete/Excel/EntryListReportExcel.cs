@@ -1,4 +1,5 @@
-﻿using DataLayer.EfCore;
+using DataLayer.Display;
+using DataLayer.EfCore;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System.Drawing;
@@ -24,7 +25,7 @@ public class EntryListReportExcel(EfCoreContext dbContext) : BaseReportExcel(dbC
         const int colTeam = 4;
         const int colEntryTime = 5;
         const int tableLastCol = colEntryTime;
-        
+
         worksheet.Cells.Style.Font.Name = "Calibri";
         worksheet.Cells.Style.Font.Size = 11;
 
@@ -33,7 +34,7 @@ public class EntryListReportExcel(EfCoreContext dbContext) : BaseReportExcel(dbC
         worksheet.Column(colBirthYear).Width = 10;
         worksheet.Column(colTeam).Width = 30;
         worksheet.Column(colEntryTime).Width = 10;
-        
+
         worksheet.Column(colNo).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
         worksheet.Column(colBirthYear).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
         worksheet.Column(colEntryTime).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
@@ -51,7 +52,7 @@ public class EntryListReportExcel(EfCoreContext dbContext) : BaseReportExcel(dbC
             if (ReportExcelScoringHelper.IsNonScoringSwimEvent(swimEvent))
                 ReportExcelScoringHelper.ApplyNonScoringFill(titleRange);
             row += 1;
-            
+
             worksheet.Cells[row, colNo].Value = ReportExcelStrings.Col_No;
             worksheet.Cells[row, colParticipant].Value = ReportExcelStrings.Col_Participant;
             worksheet.Cells[row, colBirthYear].Value = ReportExcelStrings.Col_BirthYear;
@@ -68,7 +69,7 @@ public class EntryListReportExcel(EfCoreContext dbContext) : BaseReportExcel(dbC
             headerRange.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
             headerRange.Style.WrapText = true;
             row += 1;
-            
+
             if (swimEvent.Entries.Count == 0)
                 continue;
 
@@ -90,7 +91,7 @@ public class EntryListReportExcel(EfCoreContext dbContext) : BaseReportExcel(dbC
                 worksheet.Cells[row, colParticipant].Value = ReportEntryDisplayHelper.GetParticipantName(entry);
                 worksheet.Cells[row, colBirthYear].Value = ReportEntryDisplayHelper.GetBirthYear(entry);
                 worksheet.Cells[row, colTeam].Value = ReportEntryDisplayHelper.GetTeamName(entry);
-                worksheet.Cells[row, colEntryTime].Value = entry.DisplayEntryTime;
+                worksheet.Cells[row, colEntryTime].Value = EntryTimeDisplay.FormatEntryTime(entry.EntryTime);
 
                 var dataRange = worksheet.Cells[row, colNo, row, tableLastCol];
                 dataRange.Style.Border.Top.Style = ExcelBorderStyle.Thin;

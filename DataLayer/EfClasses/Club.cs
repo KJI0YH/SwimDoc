@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using DataLayer.Resources;
 
 namespace DataLayer.EfClasses;
@@ -11,14 +11,6 @@ public class Club : IValidatableObject
 
     public ICollection<Athlete> Athletes { get; set; }
     public ICollection<Relay> Relays { get; set; }
-    
-    public int DisplayAthleteCount => Athletes.Count;
-    
-    public int DisplayRelayCount => Relays.Count;
-    
-    public int DisplayEntryCount => Athletes.Sum(a => a.Entries.Count);
-
-    public int DisplayPointCount => Athletes.Sum(a => a.Entries.Where(e => e.Scoring).Sum(e => e.Points ?? 0));
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {

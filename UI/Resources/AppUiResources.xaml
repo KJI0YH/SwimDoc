@@ -17,14 +17,14 @@
         <Setter Property="ItemTemplate" Value="{StaticResource EnumComboBoxItemTemplate}" />
     </Style>
 
-    <!-- Typography scale (single source of truth for the app). -->
+    
     <system:Double x:Key="SwimDocFontSizeCaption">16</system:Double>
     <system:Double x:Key="SwimDocFontSizeBody">16</system:Double>
     <system:Double x:Key="SwimDocFontSizeSubtitle">16</system:Double>
     <system:Double x:Key="SwimDocFontSizeTitle">16</system:Double>
     <system:Double x:Key="SwimDocFontSizeDisplay">16</system:Double>
 
-    <!-- Align WPF UI control templates with the app body size. -->
+    
     <system:Double x:Key="ControlContentThemeFontSize">16</system:Double>
     <system:Double x:Key="ContentControlFontSize">16</system:Double>
 
@@ -160,7 +160,51 @@
     <SolidColorBrush x:Key="ResultPlaceBronzeBrush" Color="#FFFFE4C4" />
     <SolidColorBrush x:Key="SwimDocDataGridHorizontalLineBrush" Color="#FFE0E0E0" />
 
-    <!-- Settings hub cards (shared with SettingsPage). -->
+    
+    <Style x:Key="DialogCloseButtonStyle" TargetType="Button">
+        <Setter Property="Width" Value="36" />
+        <Setter Property="Height" Value="36" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="border"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="4">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#14000000" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="DialogFieldLabelStyle" TargetType="TextBlock" BasedOn="{StaticResource BodyTextBlockStyle}">
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Margin" Value="0,0,12,0" />
+        <Setter Property="Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}" />
+    </Style>
+
+    <Style x:Key="DialogFormRowStyle" TargetType="Grid">
+        <Setter Property="Margin" Value="0,6" />
+    </Style>
+
+    <Style x:Key="DialogChromeBorderStyle" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource LayerFillColorDefaultBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ControlStrokeColorDefaultBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+    </Style>
+
     <Style x:Key="SettingsCardBorderStyle" TargetType="Border">
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="Background" Value="{DynamicResource ControlFillColorDefaultBrush}" />
@@ -233,7 +277,7 @@
         <Setter Property="ClearButtonEnabled" Value="False" />
     </Style>
 
-    <!-- Compact text in read-only columns. -->
+    
     <Style x:Key="SwimDocDataGridTextColumnElementStyle" TargetType="TextBlock">
         <Setter Property="FontSize" Value="{StaticResource SwimDocFontSizeBody}" />
         <Setter Property="Padding" Value="4,0" />
@@ -241,7 +285,7 @@
         <Setter Property="TextTrimming" Value="CharacterEllipsis" />
     </Style>
 
-    <!-- Compact editors in generated text columns. -->
+    
     <Style x:Key="SwimDocDataGridTextColumnEditingElementStyle"
            TargetType="TextBox"
            BasedOn="{StaticResource {x:Type TextBox}}">
@@ -252,7 +296,7 @@
         <Setter Property="BorderThickness" Value="1" />
     </Style>
 
-    <!-- Inline editors used in template columns (Fixation, Settings). -->
+    
     <Style x:Key="SwimDocDataGridInlineTextBoxStyle"
            TargetType="ui:TextBox"
            BasedOn="{StaticResource {x:Type ui:TextBox}}">
@@ -414,7 +458,7 @@
         <Setter Property="TextColumnEditingElementStyle" Value="{StaticResource SwimDocDataGridTextColumnEditingElementStyle}" />
     </Style>
 
-    <!-- Entry with Scoring=false: gray idle/hover; selected uses light blue. -->
+    
     <Style x:Key="DataGridRowLightBlueWhenSelectedStyle"
            TargetType="DataGridRow"
            BasedOn="{StaticResource {x:Type DataGridRow}}">
@@ -458,7 +502,7 @@
         </Style.Triggers>
     </Style>
 
-    <!-- Results tables: 1st–3rd place rows in gold, silver, bronze when not selected. -->
+    
     <Style x:Key="DataGridRowResultsPlaceStyle"
            TargetType="DataGridRow"
            BasedOn="{StaticResource DataGridRowLightBlueWhenSelectedStyle}">
