@@ -17,6 +17,7 @@ using ServiceLayer.PointScoreProvider;
 using ServiceLayer.ReportGeneratorService;
 using ServiceLayer.SwimStyleService;
 using System.Globalization;
+using System.Net.Http;
 using UI.Localization;
 using UI.Services;
 using UI.ViewModels.Pages;
@@ -121,6 +122,13 @@ public partial class App : Application
         services.AddTransient<IErrorDialogService, ErrorDialogService>();
         services.AddSingleton<ILocalizationService, LocalizationService>();
         services.AddSingleton<IPagingSettingsService, PagingSettingsService>();
+        services.AddSingleton<IGitHubUpdateCheckService>(_ =>
+        {
+            var httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(15) };
+            httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("SwimDoc-UpdateChecker");
+            httpClient.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
+            return new GitHubUpdateCheckService(httpClient);
+        });
 
         services.AddTransient<IAgeGroupService, AgeGroupService>();
         services.AddTransient<IAthleteService, AthleteService>();

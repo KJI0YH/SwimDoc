@@ -25,6 +25,8 @@
   <data name="Nav_Settings" xml:space="preserve"><value>Настройки</value></data>
   <data name="Nav_About" xml:space="preserve"><value>О программе</value></data>
   <data name="About_Version_Format" xml:space="preserve"><value>Версия {0}</value></data>
+  <data name="About_Section_Version" xml:space="preserve"><value>Версия</value></data>
+  <data name="About_Updates_Description" xml:space="preserve"><value>Сравните установленную версию с последним релизом на GitHub.</value></data>
   <data name="About_Section_Author" xml:space="preserve"><value>Автор</value></data>
   <data name="About_Author_Name" xml:space="preserve"><value>Алексей Крыжановский</value></data>
   <data name="About_Author_Location" xml:space="preserve"><value>Минск, Беларусь</value></data>
@@ -36,6 +38,15 @@
   <data name="About_Action_GitHub_Repository" xml:space="preserve"><value>GitHub</value></data>
   <data name="About_Action_Email" xml:space="preserve"><value>Написать на почту</value></data>
   <data name="About_Action_GitHub" xml:space="preserve"><value>Сообщить об ошибке</value></data>
+  <data name="About_Action_CheckUpdates" xml:space="preserve"><value>Проверить наличие обновлений</value></data>
+  <data name="About_Updates_Title" xml:space="preserve"><value>Обновления</value></data>
+  <data name="About_Updates_Checking" xml:space="preserve"><value>Проверка…</value></data>
+  <data name="About_Updates_UpToDate" xml:space="preserve"><value>У вас установлена актуальная версия ({0}).</value></data>
+  <data name="About_Updates_Available" xml:space="preserve"><value>Доступна версия {0}. Сейчас установлена {1}.</value></data>
+  <data name="About_Updates_Download" xml:space="preserve"><value>Скачать</value></data>
+  <data name="About_Updates_NoReleases" xml:space="preserve"><value>На GitHub пока нет опубликованных релизов.</value></data>
+  <data name="About_Updates_Error" xml:space="preserve"><value>Не удалось проверить обновления. Попробуйте позже или откройте страницу релизов на GitHub.</value></data>
+  <data name="About_Updates_ErrorWithDetails" xml:space="preserve"><value>Не удалось проверить обновления: {0}</value></data>
 
   <data name="Menu_Competition" xml:space="preserve"><value>Соревнование</value></data>
   <data name="Menu_Create" xml:space="preserve"><value>Создать</value></data>

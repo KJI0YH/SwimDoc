@@ -25,6 +25,8 @@
   <data name="Nav_Settings" xml:space="preserve"><value>Settings</value></data>
   <data name="Nav_About" xml:space="preserve"><value>About</value></data>
   <data name="About_Version_Format" xml:space="preserve"><value>Version {0}</value></data>
+  <data name="About_Section_Version" xml:space="preserve"><value>Version</value></data>
+  <data name="About_Updates_Description" xml:space="preserve"><value>Compare your installed version with the latest release on GitHub.</value></data>
   <data name="About_Section_Author" xml:space="preserve"><value>Author</value></data>
   <data name="About_Author_Name" xml:space="preserve"><value>Aliaksei Kryzhanouski</value></data>
   <data name="About_Author_Location" xml:space="preserve"><value>Minsk, Belarus</value></data>
@@ -36,6 +38,15 @@
   <data name="About_Action_GitHub_Repository" xml:space="preserve"><value>GitHub</value></data>
   <data name="About_Action_Email" xml:space="preserve"><value>Send email</value></data>
   <data name="About_Action_GitHub" xml:space="preserve"><value>Report a problem</value></data>
+  <data name="About_Action_CheckUpdates" xml:space="preserve"><value>Check for updates</value></data>
+  <data name="About_Updates_Title" xml:space="preserve"><value>Updates</value></data>
+  <data name="About_Updates_Checking" xml:space="preserve"><value>Checking…</value></data>
+  <data name="About_Updates_UpToDate" xml:space="preserve"><value>You have the latest version ({0}).</value></data>
+  <data name="About_Updates_Available" xml:space="preserve"><value>Version {0} is available. You are running {1}.</value></data>
+  <data name="About_Updates_Download" xml:space="preserve"><value>Download</value></data>
+  <data name="About_Updates_NoReleases" xml:space="preserve"><value>No releases have been published on GitHub yet.</value></data>
+  <data name="About_Updates_Error" xml:space="preserve"><value>Could not check for updates. Please try again later or open the GitHub releases page.</value></data>
+  <data name="About_Updates_ErrorWithDetails" xml:space="preserve"><value>Could not check for updates: {0}</value></data>
 
   <data name="Menu_Competition" xml:space="preserve"><value>Competition</value></data>
   <data name="Menu_Create" xml:space="preserve"><value>Create</value></data>

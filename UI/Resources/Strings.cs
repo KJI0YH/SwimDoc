@@ -62,6 +62,8 @@ public static class Strings
     public static string Nav_Settings => Get(nameof(Nav_Settings));
     public static string Nav_About => Get(nameof(Nav_About));
     public static string About_Version_Format => Get(nameof(About_Version_Format));
+    public static string About_Section_Version => Get(nameof(About_Section_Version));
+    public static string About_Updates_Description => Get(nameof(About_Updates_Description));
     public static string About_Section_Author => Get(nameof(About_Section_Author));
     public static string About_Author_Name => Get(nameof(About_Author_Name));
     public static string About_Author_Location => Get(nameof(About_Author_Location));
@@ -73,6 +75,15 @@ public static class Strings
     public static string About_Action_GitHub_Repository => Get(nameof(About_Action_GitHub_Repository));
     public static string About_Action_Email => Get(nameof(About_Action_Email));
     public static string About_Action_GitHub => Get(nameof(About_Action_GitHub));
+    public static string About_Action_CheckUpdates => Get(nameof(About_Action_CheckUpdates));
+    public static string About_Updates_Title => Get(nameof(About_Updates_Title));
+    public static string About_Updates_Checking => Get(nameof(About_Updates_Checking));
+    public static string About_Updates_UpToDate => Get(nameof(About_Updates_UpToDate));
+    public static string About_Updates_Available => Get(nameof(About_Updates_Available));
+    public static string About_Updates_Download => Get(nameof(About_Updates_Download));
+    public static string About_Updates_NoReleases => Get(nameof(About_Updates_NoReleases));
+    public static string About_Updates_Error => Get(nameof(About_Updates_Error));
+    public static string About_Updates_ErrorWithDetails => Get(nameof(About_Updates_ErrorWithDetails));
 
     public static string Menu_Competition => Get(nameof(Menu_Competition));
     public static string Menu_Create => Get(nameof(Menu_Create));
