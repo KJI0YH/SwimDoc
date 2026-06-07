@@ -31,18 +31,18 @@
             <Button Grid.Column="0"
                     Command="{Binding DataContext.CloseBaseTimesCommand, RelativeSource={RelativeSource AncestorType=Page}}"
                     Padding="8,6"
-                    ToolTip="{loc:Loc Common_Back}">
+                    ToolTip="{loc:Localizastion Common_Back}">
                 <StackPanel Orientation="Horizontal">
                     <ContentControl Content="{ui:SymbolIcon ChevronLeft24}"
                                     Margin="0,0,6,0"
                                     VerticalAlignment="Center" />
-                    <TextBlock Text="{loc:Loc Common_Back}" VerticalAlignment="Center" />
+                    <TextBlock Text="{loc:Localizastion Common_Back}" VerticalAlignment="Center" />
                 </StackPanel>
             </Button>
 
             <TextBlock Grid.Column="1"
                        Style="{StaticResource TitleTextBlockStyle}"
-                       Text="{loc:Loc Settings_Tab_BaseTime}"
+                       Text="{loc:Localizastion Settings_Tab_BaseTime}"
                        VerticalAlignment="Center"
                        Margin="16,0" />
 
@@ -52,23 +52,23 @@
                 <Button Command="{Binding OpenWorldAquaticsPointsCommand}"
                         Padding="16,8"
                         Margin="0,0,8,0"
-                        ToolTip="{loc:Loc BaseTimes_WorldAquaticsPoints_Tooltip}">
+                        ToolTip="{loc:Localizastion BaseTimes_WorldAquaticsPoints_Tooltip}">
                     <StackPanel Orientation="Horizontal">
                         <ContentControl Content="{ui:SymbolIcon Globe24}"
                                         Margin="0,0,8,0"
                                         VerticalAlignment="Center" />
-                        <TextBlock Text="{loc:Loc BaseTimes_WorldAquaticsPoints}"
+                        <TextBlock Text="{loc:Localizastion BaseTimes_WorldAquaticsPoints}"
                                    VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
                 <Button Command="{Binding SaveCommand}"
                         Padding="16,8"
-                        ToolTip="{loc:Loc Common_Save}">
+                        ToolTip="{loc:Localizastion Common_Save}">
                     <StackPanel Orientation="Horizontal">
                         <ContentControl Content="{ui:SymbolIcon Save24}"
                                         Margin="0,0,8,0"
                                         VerticalAlignment="Center" />
-                        <TextBlock Text="{loc:Loc Common_Save}"
+                        <TextBlock Text="{loc:Localizastion Common_Save}"
                                    VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
@@ -91,7 +91,7 @@
                 </Grid.RowDefinitions>
 
                 <GroupBox Grid.Row="0"
-                          Header="{loc:Loc BaseTimes_Group_Scm}"
+                          Header="{loc:Localizastion BaseTimes_Group_Scm}"
                           Margin="0,0,0,12">
                     <Grid>
                     <ui:DataGrid ItemsSource="{Binding ScmRows}"
@@ -99,14 +99,14 @@
                                  AutoGenerateColumns="False"
                                  IsReadOnly="False">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="{loc:Loc BaseTimes_Col_Stroke}" Binding="{Binding Name}" IsReadOnly="True"
+                            <DataGridTextColumn Header="{loc:Localizastion BaseTimes_Col_Stroke}" Binding="{Binding Name}" IsReadOnly="True"
                                                 Width="*" />
                             <DataGridTemplateColumn Width="*">
                                 <DataGridTemplateColumn.Header>
                                     <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                        <TextBlock Text="{loc:Loc Common_Men}" HorizontalAlignment="Center"
+                                        <TextBlock Text="{loc:Localizastion Common_Men}" HorizontalAlignment="Center"
                                                    TextAlignment="Center" FontWeight="SemiBold" />
-                                        <TextBlock Text="{loc:Loc BaseTimes_Header_BaseTime}" HorizontalAlignment="Center"
+                                        <TextBlock Text="{loc:Localizastion BaseTimes_Header_BaseTime}" HorizontalAlignment="Center"
                                                    TextAlignment="Center" />
                                     </StackPanel>
                                 </DataGridTemplateColumn.Header>
@@ -120,9 +120,9 @@
                             <DataGridTemplateColumn Width="*">
                                 <DataGridTemplateColumn.Header>
                                     <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                        <TextBlock Text="{loc:Loc Common_Men}" HorizontalAlignment="Center"
+                                        <TextBlock Text="{loc:Localizastion Common_Men}" HorizontalAlignment="Center"
                                                    TextAlignment="Center" FontWeight="SemiBold" />
-                                        <TextBlock Text="{loc:Loc BaseTimes_Header_BaseTimeSeconds}" HorizontalAlignment="Center"
+                                        <TextBlock Text="{loc:Localizastion BaseTimes_Header_BaseTimeSeconds}" HorizontalAlignment="Center"
                                                    TextAlignment="Center" />
                                     </StackPanel>
                                 </DataGridTemplateColumn.Header>
@@ -136,9 +136,9 @@
                             <DataGridTemplateColumn Width="*">
                                 <DataGridTemplateColumn.Header>
                                     <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                        <TextBlock Text="{loc:Loc Common_Women}" HorizontalAlignment="Center"
+                                        <TextBlock Text="{loc:Localizastion Common_Women}" HorizontalAlignment="Center"
                                                    TextAlignment="Center" FontWeight="SemiBold" />
-                                        <TextBlock Text="{loc:Loc BaseTimes_Header_BaseTime}" HorizontalAlignment="Center"
+                                        <TextBlock Text="{loc:Localizastion BaseTimes_Header_BaseTime}" HorizontalAlignment="Center"
                                                    TextAlignment="Center" />
                                     </StackPanel>
                                 </DataGridTemplateColumn.Header>
@@ -152,9 +152,9 @@
                             <DataGridTemplateColumn Width="*">
                                 <DataGridTemplateColumn.Header>
                                     <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                        <TextBlock Text="{loc:Loc Common_Women}" HorizontalAlignment="Center"
+                                        <TextBlock Text="{loc:Localizastion Common_Women}" HorizontalAlignment="Center"
                                                    TextAlignment="Center" FontWeight="SemiBold" />
-                                        <TextBlock Text="{loc:Loc BaseTimes_Header_BaseTimeSeconds}" HorizontalAlignment="Center"
+                                        <TextBlock Text="{loc:Localizastion BaseTimes_Header_BaseTimeSeconds}" HorizontalAlignment="Center"
                                                    TextAlignment="Center" />
                                     </StackPanel>
                                 </DataGridTemplateColumn.Header>
@@ -171,7 +171,7 @@
                 </GroupBox>
 
                 <GroupBox Grid.Row="1"
-                          Header="{loc:Loc BaseTimes_Group_ScmMixedRelay}"
+                          Header="{loc:Localizastion BaseTimes_Group_ScmMixedRelay}"
                           Margin="0,0,0,12">
                     <Grid>
                     <ui:DataGrid ItemsSource="{Binding ScmMixedRelayRows}"
@@ -179,14 +179,14 @@
                                  AutoGenerateColumns="False"
                                  IsReadOnly="False">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="{loc:Loc BaseTimes_Col_Stroke}" Binding="{Binding Name}" IsReadOnly="True"
+                            <DataGridTextColumn Header="{loc:Localizastion BaseTimes_Col_Stroke}" Binding="{Binding Name}" IsReadOnly="True"
                                                 Width="*" />
                             <DataGridTemplateColumn Width="*">
                                 <DataGridTemplateColumn.Header>
                                     <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                        <TextBlock Text="{loc:Loc Common_Mixed}" HorizontalAlignment="Center"
+                                        <TextBlock Text="{loc:Localizastion Common_Mixed}" HorizontalAlignment="Center"
                                                    TextAlignment="Center" FontWeight="SemiBold" />
-                                        <TextBlock Text="{loc:Loc BaseTimes_Header_BaseTime}" HorizontalAlignment="Center"
+                                        <TextBlock Text="{loc:Localizastion BaseTimes_Header_BaseTime}" HorizontalAlignment="Center"
                                                    TextAlignment="Center" />
                                     </StackPanel>
                                 </DataGridTemplateColumn.Header>
@@ -200,9 +200,9 @@
                             <DataGridTemplateColumn Width="*">
                                 <DataGridTemplateColumn.Header>
                                     <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                        <TextBlock Text="{loc:Loc Common_Mixed}" HorizontalAlignment="Center"
+                                        <TextBlock Text="{loc:Localizastion Common_Mixed}" HorizontalAlignment="Center"
                                                    TextAlignment="Center" FontWeight="SemiBold" />
-                                        <TextBlock Text="{loc:Loc BaseTimes_Header_BaseTimeSeconds}" HorizontalAlignment="Center"
+                                        <TextBlock Text="{loc:Localizastion BaseTimes_Header_BaseTimeSeconds}" HorizontalAlignment="Center"
                                                    TextAlignment="Center" />
                                     </StackPanel>
                                 </DataGridTemplateColumn.Header>
@@ -221,7 +221,7 @@
                 </GroupBox>
 
                 <GroupBox Grid.Row="2"
-                          Header="{loc:Loc BaseTimes_Group_Lcm}"
+                          Header="{loc:Localizastion BaseTimes_Group_Lcm}"
                           Margin="0,0,0,12">
                     <Grid>
                     <ui:DataGrid ItemsSource="{Binding LcmRows}"
@@ -229,14 +229,14 @@
                                  AutoGenerateColumns="False"
                                  IsReadOnly="False">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="{loc:Loc BaseTimes_Col_Stroke}" Binding="{Binding Name}" IsReadOnly="True"
+                            <DataGridTextColumn Header="{loc:Localizastion BaseTimes_Col_Stroke}" Binding="{Binding Name}" IsReadOnly="True"
                                                 Width="*" />
                             <DataGridTemplateColumn Width="*">
                                 <DataGridTemplateColumn.Header>
                                     <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                        <TextBlock Text="{loc:Loc Common_Men}" HorizontalAlignment="Center"
+                                        <TextBlock Text="{loc:Localizastion Common_Men}" HorizontalAlignment="Center"
                                                    TextAlignment="Center" FontWeight="SemiBold" />
-                                        <TextBlock Text="{loc:Loc BaseTimes_Header_BaseTime}" HorizontalAlignment="Center"
+                                        <TextBlock Text="{loc:Localizastion BaseTimes_Header_BaseTime}" HorizontalAlignment="Center"
                                                    TextAlignment="Center" />
                                     </StackPanel>
                                 </DataGridTemplateColumn.Header>
@@ -250,9 +250,9 @@
                             <DataGridTemplateColumn Width="*">
                                 <DataGridTemplateColumn.Header>
                                     <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                        <TextBlock Text="{loc:Loc Common_Men}" HorizontalAlignment="Center"
+                                        <TextBlock Text="{loc:Localizastion Common_Men}" HorizontalAlignment="Center"
                                                    TextAlignment="Center" FontWeight="SemiBold" />
-                                        <TextBlock Text="{loc:Loc BaseTimes_Header_BaseTimeSeconds}" HorizontalAlignment="Center"
+                                        <TextBlock Text="{loc:Localizastion BaseTimes_Header_BaseTimeSeconds}" HorizontalAlignment="Center"
                                                    TextAlignment="Center" />
                                     </StackPanel>
                                 </DataGridTemplateColumn.Header>
@@ -266,9 +266,9 @@
                             <DataGridTemplateColumn Width="*">
                                 <DataGridTemplateColumn.Header>
                                     <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                        <TextBlock Text="{loc:Loc Common_Women}" HorizontalAlignment="Center"
+                                        <TextBlock Text="{loc:Localizastion Common_Women}" HorizontalAlignment="Center"
                                                    TextAlignment="Center" FontWeight="SemiBold" />
-                                        <TextBlock Text="{loc:Loc BaseTimes_Header_BaseTime}" HorizontalAlignment="Center"
+                                        <TextBlock Text="{loc:Localizastion BaseTimes_Header_BaseTime}" HorizontalAlignment="Center"
                                                    TextAlignment="Center" />
                                     </StackPanel>
                                 </DataGridTemplateColumn.Header>
@@ -282,9 +282,9 @@
                             <DataGridTemplateColumn Width="*">
                                 <DataGridTemplateColumn.Header>
                                     <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                        <TextBlock Text="{loc:Loc Common_Women}" HorizontalAlignment="Center"
+                                        <TextBlock Text="{loc:Localizastion Common_Women}" HorizontalAlignment="Center"
                                                    TextAlignment="Center" FontWeight="SemiBold" />
-                                        <TextBlock Text="{loc:Loc BaseTimes_Header_BaseTimeSeconds}" HorizontalAlignment="Center"
+                                        <TextBlock Text="{loc:Localizastion BaseTimes_Header_BaseTimeSeconds}" HorizontalAlignment="Center"
                                                    TextAlignment="Center" />
                                     </StackPanel>
                                 </DataGridTemplateColumn.Header>
@@ -301,21 +301,21 @@
                 </GroupBox>
 
                 <GroupBox Grid.Row="3"
-                          Header="{loc:Loc BaseTimes_Group_LcmMixedRelay}">
+                          Header="{loc:Localizastion BaseTimes_Group_LcmMixedRelay}">
                     <Grid>
                     <ui:DataGrid ItemsSource="{Binding LcmMixedRelayRows}"
                                  HorizontalAlignment="Stretch"
                                  AutoGenerateColumns="False"
                                  IsReadOnly="False">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="{loc:Loc BaseTimes_Col_Stroke}" Binding="{Binding Name}" IsReadOnly="True"
+                            <DataGridTextColumn Header="{loc:Localizastion BaseTimes_Col_Stroke}" Binding="{Binding Name}" IsReadOnly="True"
                                                 Width="*" />
                             <DataGridTemplateColumn Width="*">
                                 <DataGridTemplateColumn.Header>
                                     <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                        <TextBlock Text="{loc:Loc Common_Mixed}" HorizontalAlignment="Center"
+                                        <TextBlock Text="{loc:Localizastion Common_Mixed}" HorizontalAlignment="Center"
                                                    TextAlignment="Center" FontWeight="SemiBold" />
-                                        <TextBlock Text="{loc:Loc BaseTimes_Header_BaseTime}" HorizontalAlignment="Center"
+                                        <TextBlock Text="{loc:Localizastion BaseTimes_Header_BaseTime}" HorizontalAlignment="Center"
                                                    TextAlignment="Center" />
                                     </StackPanel>
                                 </DataGridTemplateColumn.Header>
@@ -329,9 +329,9 @@
                             <DataGridTemplateColumn Width="*">
                                 <DataGridTemplateColumn.Header>
                                     <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                        <TextBlock Text="{loc:Loc Common_Mixed}" HorizontalAlignment="Center"
+                                        <TextBlock Text="{loc:Localizastion Common_Mixed}" HorizontalAlignment="Center"
                                                    TextAlignment="Center" FontWeight="SemiBold" />
-                                        <TextBlock Text="{loc:Loc BaseTimes_Header_BaseTimeSeconds}" HorizontalAlignment="Center"
+                                        <TextBlock Text="{loc:Localizastion BaseTimes_Header_BaseTimeSeconds}" HorizontalAlignment="Center"
                                                    TextAlignment="Center" />
                                     </StackPanel>
                                 </DataGridTemplateColumn.Header>

@@ -36,7 +36,7 @@
         <StackPanel>
             <DockPanel LastChildFill="True">
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
-                    <Button ToolTip="{loc:Loc Import_Details}"
+                    <Button ToolTip="{loc:Localizastion Import_Details}"
                             Margin="5,0,0,0"
                             Padding="9"
                             Command="{Binding ToggleOperationDetailsCommand}">
@@ -57,13 +57,13 @@
                     </Button>
 
                     <Button Content="{ui:SymbolIcon Stop24}"
-                            ToolTip="{loc:Loc Import_Cancel}"
+                            ToolTip="{loc:Localizastion Import_Cancel}"
                             Margin="5,0,0,0"
                             Padding="9"
                             Command="{Binding CancelOperationCommand}"
                             Visibility="{Binding IsOperationRunning, Converter={StaticResource BoolToVis}}" />
 
-                    <Button ToolTip="{loc:Loc Import_Close}"
+                    <Button ToolTip="{loc:Localizastion Import_Close}"
                             Margin="5,0,0,0"
                             Padding="9"
                             Command="{Binding DismissOperationBarCommand}">
@@ -243,18 +243,18 @@
                             </DataTemplate>
                         </ui:DataGrid.RowDetailsTemplate>
                         <ui:DataGrid.Columns>
-                            <DataGridTextColumn Header="{loc:Loc Operation_Col_Event}"
+                            <DataGridTextColumn Header="{loc:Localizastion Operation_Col_Event}"
                                                 Binding="{Binding EventName}"
                                                 Width="*" />
-                            <DataGridTextColumn Header="{loc:Loc Import_Col_Status}"
+                            <DataGridTextColumn Header="{loc:Localizastion Import_Col_Status}"
                                                 Width="200"
                                                 Binding="{Binding StatusDisplay}" />
-                            <DataGridTextColumn Header="{loc:Loc Operation_Col_HeatsCreated}"
+                            <DataGridTextColumn Header="{loc:Localizastion Operation_Col_HeatsCreated}"
                                                 Binding="{Binding HeatsCreatedDisplay}"
                                                 Width="120"
                                                 ElementStyle="{StaticResource OperationStatsCellTextStyle}"
                                                 HeaderStyle="{StaticResource OperationStatsColumnHeaderStyle}" />
-                            <DataGridTemplateColumn Header="{loc:Loc Import_Col_Warnings}" Width="170">
+                            <DataGridTemplateColumn Header="{loc:Localizastion Import_Col_Warnings}" Width="170">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <TextBlock HorizontalAlignment="Center" TextAlignment="Center"
@@ -262,7 +262,7 @@
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTemplateColumn Header="{loc:Loc Import_Col_Errors}" Width="100">
+                            <DataGridTemplateColumn Header="{loc:Localizastion Import_Col_Errors}" Width="100">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <TextBlock HorizontalAlignment="Center" TextAlignment="Center"

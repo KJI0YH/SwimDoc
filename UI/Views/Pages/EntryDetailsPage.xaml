@@ -11,7 +11,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <TabControl Grid.Row="1" Margin="5">
-            <TabItem Header="{loc:Loc Tabs_Heat}">
+            <TabItem Header="{loc:Localizastion Tabs_Heat}">
                 <dataGridView:HeatsView DataContext="{Binding HeatTable}"/>
             </TabItem>
         </TabControl>

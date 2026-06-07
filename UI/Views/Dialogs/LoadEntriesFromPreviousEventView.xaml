@@ -19,7 +19,7 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0"
-                               Text="{loc:Loc LoadPrev_Field_PreviousEvent}"
+                               Text="{loc:Localizastion LoadPrev_Field_PreviousEvent}"
                                VerticalAlignment="Center"
                                Margin="0,0,10,0"
                                TextWrapping="Wrap" />
@@ -35,7 +35,7 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0"
-                               Text="{loc:Loc LoadPrev_Field_CurrentEvent}"
+                               Text="{loc:Localizastion LoadPrev_Field_CurrentEvent}"
                                VerticalAlignment="Center"
                                Margin="0,0,10,0"
                                TextWrapping="Wrap" />

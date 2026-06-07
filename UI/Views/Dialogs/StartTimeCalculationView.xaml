@@ -19,7 +19,7 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0"
-                               Text="{loc:Loc StartTimes_Field_StartTime}"
+                               Text="{loc:Localizastion StartTimes_Field_StartTime}"
                                VerticalAlignment="Center"
                                Margin="0,0,10,0" />
                     <UniformGrid Grid.Column="1" Columns="2">
@@ -40,7 +40,7 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0"
-                               Text="{loc:Loc StartTimes_Field_HeatPauseMinutes}"
+                               Text="{loc:Localizastion StartTimes_Field_HeatPauseMinutes}"
                                VerticalAlignment="Center"
                                Margin="0,0,10,0" />
                     <ui:NumberBox Grid.Column="1"
@@ -55,7 +55,7 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0"
-                               Text="{loc:Loc StartTimes_Field_EventPauseMinutes}"
+                               Text="{loc:Localizastion StartTimes_Field_EventPauseMinutes}"
                                VerticalAlignment="Center"
                                Margin="0,0,10,0" />
                     <ui:NumberBox Grid.Column="1"

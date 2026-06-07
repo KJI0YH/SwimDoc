@@ -2,7 +2,7 @@
 using DataLayer.EfCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace BizDbAccess;
+namespace BizDbAccess.HeatAllocation;
 
 public class HeatAllocationDbAccess(EfCoreContext context) : IHeatAllocationDbAccess
 {
@@ -14,13 +14,6 @@ public class HeatAllocationDbAccess(EfCoreContext context) : IHeatAllocationDbAc
             .OrderBy(entry => entry.EntryTime == null ? 1 : 0)
             .ThenBy(entry => entry.EntryTime)
             .ToList();
-    }
-
-    public bool IsEventStarted(int swimEventId)
-    {
-        return context.Heats.Any(heat =>
-            heat.SwimEventId == swimEventId &&
-            (heat.Status == HeatStatus.UNOFFICIAL || heat.Status == HeatStatus.OFFICIAL));
     }
 
     public bool IsHeatsAllocated(int swimEventId)

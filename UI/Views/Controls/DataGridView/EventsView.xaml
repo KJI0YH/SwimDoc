@@ -60,7 +60,7 @@
 
                     <Button
                         Content="{ui:SymbolIcon Dismiss24}"
-                        ToolTip="{loc:Loc Filters_Clear}"
+                        ToolTip="{loc:Localizastion Filters_Clear}"
                         Command="{Binding ClearFiltersCommand}"
                         Margin="5,0,5,5"
                         Padding="9"
@@ -71,19 +71,19 @@
                     <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
                         <Button
                             Content="{ui:SymbolIcon SwimmingPool24}"
-                            ToolTip="{loc:Loc Events_AllocateHeats}"
+                            ToolTip="{loc:Localizastion Events_AllocateHeats}"
                             Command="{Binding HeatAllocationCommand}"
                             Margin="5"
                             Padding="9" />
                         <Button
                             Content="{ui:SymbolIcon Print24}"
-                            ToolTip="{loc:Loc Events_GenerateReports}"
+                            ToolTip="{loc:Localizastion Events_GenerateReports}"
                             Command="{Binding GenerateReportsCommand}"
                             Margin="5"
                             Padding="9" />
                         <Button
                             Content="{ui:SymbolIcon Clock24}"
-                            ToolTip="{loc:Loc Events_CalculateStartTimes}"
+                            ToolTip="{loc:Localizastion Events_CalculateStartTimes}"
                             Command="{Binding CalculateStartTimesCommand}"
                             Margin="5"
                             Padding="9" />

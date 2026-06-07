@@ -10,14 +10,14 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <TabControl Grid.Row="1" Margin="5" SelectedIndex="{Binding SelectedTabIndex}">
-            <TabItem Header="{loc:Loc Tabs_Entries}">
+            <TabItem Header="{loc:Localizastion Tabs_Entries}">
                 <dataGridView:EntriesView DataContext="{Binding EntriesTable}"
                                           ShowImportActions="False" />
             </TabItem>
-            <TabItem Header="{loc:Loc Tabs_Heats}">
+            <TabItem Header="{loc:Localizastion Tabs_Heats}">
                 <dataGridView:HeatsView DataContext="{Binding HeatsTable}" />
             </TabItem>
-            <TabItem Header="{loc:Loc Tabs_Results}">
+            <TabItem Header="{loc:Localizastion Tabs_Results}">
                 <dataGridView:ParticipantResultsView DataContext="{Binding ResultsTable}" />
             </TabItem>
         </TabControl>

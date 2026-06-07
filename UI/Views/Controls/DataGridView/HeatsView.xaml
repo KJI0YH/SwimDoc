@@ -66,16 +66,16 @@
                     </GroupStyle>
                 </ui:DataGrid.GroupStyle>
                 <ui:DataGrid.Columns>
-                    <DataGridTextColumn Header="{loc:Loc Heats_Col_Lane}" Binding="{Binding DisplayLane}" IsReadOnly="True" Width="90" MinWidth="80" />
-                    <DataGridTextColumn Header="{loc:Loc Heats_Col_Participant}" Binding="{Binding Participant}" IsReadOnly="True"
+                    <DataGridTextColumn Header="{loc:Localizastion Heats_Col_Lane}" Binding="{Binding DisplayLane}" IsReadOnly="True" Width="90" MinWidth="80" />
+                    <DataGridTextColumn Header="{loc:Localizastion Heats_Col_Participant}" Binding="{Binding Participant}" IsReadOnly="True"
                                         Width="*" MinWidth="220" />
-                    <DataGridTextColumn Header="{loc:Loc Heats_Col_BirthYear}" Binding="{Binding YearOfBirth}" IsReadOnly="True"
+                    <DataGridTextColumn Header="{loc:Localizastion Heats_Col_BirthYear}" Binding="{Binding YearOfBirth}" IsReadOnly="True"
                                         Width="140" MinWidth="120" />
-                    <DataGridTextColumn Header="{loc:Loc Heats_Col_Team}" Binding="{Binding Club}" IsReadOnly="True" Width="*"
+                    <DataGridTextColumn Header="{loc:Localizastion Heats_Col_Team}" Binding="{Binding Club}" IsReadOnly="True" Width="*"
                                         MinWidth="220" />
-                    <DataGridTextColumn Header="{loc:Loc Heats_Col_EntryTime}" Binding="{Binding EntryTime}" IsReadOnly="True"
+                    <DataGridTextColumn Header="{loc:Localizastion Heats_Col_EntryTime}" Binding="{Binding EntryTime}" IsReadOnly="True"
                                         Width="160" MinWidth="140" />
-                    <DataGridTextColumn Header="{loc:Loc Heats_Col_Result}" Binding="{Binding FinishTime}" IsReadOnly="True"
+                    <DataGridTextColumn Header="{loc:Localizastion Heats_Col_Result}" Binding="{Binding FinishTime}" IsReadOnly="True"
                                         Width="160" MinWidth="140" />
                 </ui:DataGrid.Columns>
             </ui:DataGrid>

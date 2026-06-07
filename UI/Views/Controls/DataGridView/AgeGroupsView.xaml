@@ -17,7 +17,7 @@
                 <DockPanel>
                     <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
                         <Button Content="{ui:SymbolIcon Print24}"
-                                ToolTip="{loc:Loc AgeGroups_GenerateCombinedResultsReports}"
+                                ToolTip="{loc:Localizastion AgeGroups_GenerateCombinedResultsReports}"
                                 Command="{Binding GenerateCombinedResultsReportsCommand}"
                                 Margin="5"
                                 Padding="9" />

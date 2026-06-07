@@ -15,7 +15,7 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0"
-                               Text="{loc:Loc SwimStyle_Field_Stroke}"
+                               Text="{loc:Localizastion SwimStyle_Field_Stroke}"
                                VerticalAlignment="Center"
                                Margin="0,0,10,0" />
                     <ComboBox Grid.Column="1"
@@ -32,7 +32,7 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0"
-                               Text="{loc:Loc SwimStyle_Field_Distance}"
+                               Text="{loc:Localizastion SwimStyle_Field_Distance}"
                                VerticalAlignment="Center"
                                Margin="0,0,10,0" />
                     <ComboBox Grid.Column="1"
@@ -58,11 +58,11 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0"
-                               Text="{loc:Loc SwimStyle_Field_RelayCount}"
+                               Text="{loc:Localizastion SwimStyle_Field_RelayCount}"
                                VerticalAlignment="Center"
                                Margin="0,0,10,0" />
                     <ui:NumberBox Grid.Column="1"
-                                  PlaceholderText="{loc:Loc Common_Individual}"
+                                  PlaceholderText="{loc:Localizastion Common_Individual}"
                                   Value="{Binding RelayCount, UpdateSourceTrigger=PropertyChanged}"
                                   Margin="0,2,0,2" />
     

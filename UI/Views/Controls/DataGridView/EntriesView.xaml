@@ -60,7 +60,7 @@
 
                         <Button
                             Content="{ui:SymbolIcon Dismiss24}"
-                            ToolTip="{loc:Loc Filters_Clear}"
+                            ToolTip="{loc:Localizastion Filters_Clear}"
                             Command="{Binding ClearFiltersCommand}"
                             Margin="5,0,5,5"
                             Padding="9"
@@ -73,12 +73,12 @@
                                     Visibility="{Binding ShowImportActions, ElementName=Root, Converter={StaticResource BoolToVis}}">
                             <Button Content="{ui:SymbolIcon FolderAdd24}"
                                     Command="{Binding ImportEntriesFromFileCommand}"
-                                    ToolTip="{loc:Loc Entries_ImportFromFile}"
+                                    ToolTip="{loc:Localizastion Entries_ImportFromFile}"
                                     Margin="5"
                                     Padding="9" />
                             <Button Content="{ui:SymbolIcon DocumentArrowRight24}"
                                     Command="{Binding LoadEntriesFromPreviousEventCommand}"
-                                    ToolTip="{loc:Loc Entries_ImportFromPrevEvent}"
+                                    ToolTip="{loc:Localizastion Entries_ImportFromPrevEvent}"
                                     Margin="5"
                                     Padding="9" />
                         </StackPanel>

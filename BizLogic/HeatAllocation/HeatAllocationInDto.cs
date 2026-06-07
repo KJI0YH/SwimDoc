@@ -1,4 +1,5 @@
 ﻿using DataLayer;
+using DataLayer.Display;
 using DataLayer.EfClasses;
 
 namespace BizLogic.HeatLogic;

@@ -4,15 +4,15 @@ using System.Windows.Markup;
 namespace UI.Localization;
 
 [MarkupExtensionReturnType(typeof(BindingExpression))]
-public sealed class LocExtension : MarkupExtension
+public sealed class LocalizastionExtension : MarkupExtension
 {
     public string Key { get; set; } = string.Empty;
 
-    public LocExtension()
+    public LocalizastionExtension()
     {
     }
 
-    public LocExtension(string key)
+    public LocalizastionExtension(string key)
     {
         Key = key;
     }

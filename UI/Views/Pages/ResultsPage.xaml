@@ -5,10 +5,10 @@
       xmlns:loc="clr-namespace:UI.Localization"
       xmlns:dataGridView="clr-namespace:UI.Views.Controls.DataGridView">
     <TabControl Margin="5">
-        <TabItem Header="{loc:Loc Tabs_Results}">
+        <TabItem Header="{loc:Localizastion Tabs_Results}">
             <dataGridView:ResultsView />
         </TabItem>
-        <TabItem Header="{loc:Loc Tabs_CombinedResults}">
+        <TabItem Header="{loc:Localizastion Tabs_CombinedResults}">
             <dataGridView:CombinedResultsView DataContext="{Binding CombinedResults}" />
         </TabItem>
     </TabControl>

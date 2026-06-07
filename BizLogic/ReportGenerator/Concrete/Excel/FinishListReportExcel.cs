@@ -95,9 +95,9 @@ public class FinishListReportExcel(EfCoreContext dbContext) : BaseReportExcel(db
                     prevPlace = place;
                 }
 
-                worksheet.Cells[row, colParticipant].Value = ReportEntryDisplayHelper.GetParticipantName(entry);
-                worksheet.Cells[row, colBirthYear].Value = ReportEntryDisplayHelper.GetBirthYear(entry);
-                worksheet.Cells[row, colTeam].Value = ReportEntryDisplayHelper.GetTeamName(entry);
+                worksheet.Cells[row, colParticipant].Value = LocalizedEntityDisplayFormatter.FormatEntryParticipantName(entry);
+                worksheet.Cells[row, colBirthYear].Value = LocalizedEntityDisplayFormatter.FormatEntryParticipantBirthYear(entry);
+                worksheet.Cells[row, colTeam].Value = LocalizedEntityDisplayFormatter.FormatEntryParticipantClubName(entry);
                 worksheet.Cells[row, colFinishTime].Value = EntryTimeDisplay.FormatFinishTime(entry);
                 worksheet.Cells[row, colPoints].Value = entry.Points;
                 worksheet.Cells[row, colComment].Value = entry.Comment;

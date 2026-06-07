@@ -7,7 +7,6 @@ namespace BizDbAccess;
 public interface IHeatAllocationDbAccess
 {
     ICollection<Entry> GetOrderedEntriesByEventId(int swimEventId);
-    bool IsEventStarted(int swimEventId);
 
     bool IsHeatsAllocated(int swimEventId);
 

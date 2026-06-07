@@ -1,4 +1,5 @@
 using BizDbAccess;
+using BizDbAccess.ReportGenerator;
 using DataLayer.EfCore;
 using OfficeOpenXml;
 

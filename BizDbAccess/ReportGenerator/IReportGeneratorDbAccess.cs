@@ -1,8 +1,6 @@
 using DataLayer.EfClasses;
-using DataLayer.EfCore;
-using Microsoft.EntityFrameworkCore;
 
-namespace BizDbAccess;
+namespace BizDbAccess.ReportGenerator;
 
 public interface IReportGeneratorDbAccess
 {

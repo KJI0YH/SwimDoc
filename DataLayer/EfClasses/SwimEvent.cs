@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using DataLayer;
+using DataLayer.Display;
 using DataLayer.EfCore;
 using DataLayer.Resources;
 using Microsoft.EntityFrameworkCore;

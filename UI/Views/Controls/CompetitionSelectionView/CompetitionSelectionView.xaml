@@ -28,7 +28,7 @@
             </Border>
 
             <TextBlock Style="{StaticResource TitleLargeTextBlockStyle}"
-                       Text="{loc:Loc App_Title}"
+                       Text="{loc:Localizastion App_Title}"
                        HorizontalAlignment="Center"
                        TextAlignment="Center" />
             <TextBlock Margin="0,6,0,28"
@@ -36,10 +36,10 @@
                        Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                        TextWrapping="Wrap"
                        TextAlignment="Center"
-                       Text="{loc:Loc CompetitionSelection_Subtitle}" />
+                       Text="{loc:Localizastion CompetitionSelection_Subtitle}" />
 
             <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
-                       Text="{loc:Loc Menu_Competition}"
+                       Text="{loc:Localizastion Menu_Competition}"
                        Margin="0,0,0,12" />
 
             <Border Style="{StaticResource SettingsCardBorderStyle}"
@@ -61,7 +61,7 @@
                                 Margin="16,0,16,0"
                                 VerticalAlignment="Center">
                         <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}"
-                                   Text="{loc:Loc CompetitionSelection_Create}" />
+                                   Text="{loc:Localizastion CompetitionSelection_Create}" />
                         <TextBlock Margin="0,4,0,0"
                                    Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                                    TextWrapping="Wrap"
@@ -73,7 +73,7 @@
                                VerticalAlignment="Center"
                                Padding="16,8"
                                Command="{Binding CreateNewCommand}"
-                               Content="{loc:Loc Menu_Create}" />
+                               Content="{loc:Localizastion Menu_Create}" />
                 </Grid>
             </Border>
 
@@ -96,7 +96,7 @@
                                 Margin="16,0,16,0"
                                 VerticalAlignment="Center">
                         <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}"
-                                   Text="{loc:Loc CompetitionSelection_Open}" />
+                                   Text="{loc:Localizastion CompetitionSelection_Open}" />
                         <TextBlock Margin="0,4,0,0"
                                    Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                                    TextWrapping="Wrap"
@@ -108,7 +108,7 @@
                                VerticalAlignment="Center"
                                Padding="16,8"
                                Command="{Binding OpenExistingCommand}"
-                               Content="{loc:Loc Menu_Open}" />
+                               Content="{loc:Localizastion Menu_Open}" />
                 </Grid>
             </Border>
         </StackPanel>

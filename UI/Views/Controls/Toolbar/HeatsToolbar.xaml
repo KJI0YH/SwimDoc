@@ -18,12 +18,12 @@
         <StackPanel Grid.Column="0" Orientation="Horizontal">
             <Button Content="{ui:SymbolIcon Add24}"
                     Command="{Binding CreateHeatCommand}"
-                    ToolTip="{loc:Loc Heats_Create}"
+                    ToolTip="{loc:Localizastion Heats_Create}"
                     Margin="5"
                     Padding="9" />
             <Button Content="{ui:SymbolIcon Edit24}"
                     Command="{Binding EditHeatCommand}"
-                    ToolTip="{loc:Loc Heats_Edit}"
+                    ToolTip="{loc:Localizastion Heats_Edit}"
                     Margin="5"
                     Padding="9" />
             <Button Content="{ui:SymbolIcon Delete24}"
@@ -63,12 +63,12 @@
                        VerticalAlignment="Center" />
             <Button Content="{ui:SymbolIcon ArrowPrevious24}"
                     Command="{Binding GoToFirstHeatPageCommand}"
-                    ToolTip="{loc:Loc Paging_First}"
+                    ToolTip="{loc:Localizastion Paging_First}"
                     Margin="5"
                     Padding="9" />
             <Button Content="{ui:SymbolIcon ChevronLeft24}"
                     Command="{Binding GoToPreviousHeatPageCommand}"
-                    ToolTip="{loc:Loc Paging_Previous}"
+                    ToolTip="{loc:Localizastion Paging_Previous}"
                     Margin="5"
                     Padding="9" />
             <ComboBox IsEditable="True"
@@ -81,12 +81,12 @@
                       helpers:PageComboBoxBehavior.CurrentPage="{Binding HeatCurrentPage, Mode=TwoWay}" />
             <Button Content="{ui:SymbolIcon ChevronRight24}"
                     Command="{Binding GoToNextHeatPageCommand}"
-                    ToolTip="{loc:Loc Paging_Next}"
+                    ToolTip="{loc:Localizastion Paging_Next}"
                     Margin="5"
                     Padding="9" />
             <Button Content="{ui:SymbolIcon ArrowNext24}"
                     Command="{Binding GoToLastHeatPageCommand}"
-                    ToolTip="{loc:Loc Paging_Last}"
+                    ToolTip="{loc:Localizastion Paging_Last}"
                     Margin="5"
                     Padding="9" />
         </StackPanel>

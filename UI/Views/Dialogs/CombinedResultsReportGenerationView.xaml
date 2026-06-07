@@ -13,7 +13,7 @@
                 </Grid.RowDefinitions>
     
                 <TextBlock Grid.Row="0"
-                           Text="{loc:Loc Reports_Field_OutputFile}"
+                           Text="{loc:Localizastion Reports_Field_OutputFile}"
                            FontWeight="SemiBold"
                            Margin="0,0,0,10" />
     

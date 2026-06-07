@@ -38,15 +38,15 @@
             <StackPanel x:Name="SettingsHubContent"
                         HorizontalAlignment="Stretch">
                 <TextBlock Style="{StaticResource TitleLargeTextBlockStyle}"
-                           Text="{loc:Loc Nav_Settings}"
+                           Text="{loc:Localizastion Nav_Settings}"
                            Margin="0,0,0,8" />
                 <TextBlock Margin="0,0,0,32"
                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                            TextWrapping="Wrap"
-                           Text="{loc:Loc Settings_Page_Subtitle}" />
+                           Text="{loc:Localizastion Settings_Page_Subtitle}" />
 
                 <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
-                           Text="{loc:Loc Settings_Section_General}"
+                           Text="{loc:Localizastion Settings_Section_General}"
                            Margin="0,0,0,12" />
 
                 <Border Style="{StaticResource SettingsCardBorderStyle}">
@@ -65,11 +65,11 @@
 
                         <StackPanel Grid.Column="1" Margin="16,0,16,0" VerticalAlignment="Center">
                             <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}"
-                                       Text="{loc:Loc Language_Label}" />
+                                       Text="{loc:Localizastion Language_Label}" />
                             <TextBlock Margin="0,4,0,0"
                                        Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                                        TextWrapping="Wrap"
-                                       Text="{loc:Loc Settings_Language_Description}" />
+                                       Text="{loc:Localizastion Settings_Language_Description}" />
                         </StackPanel>
 
                         <ComboBox Grid.Column="2"
@@ -87,13 +87,13 @@
                 </Border>
 
                 <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
-                           Text="{loc:Loc Settings_Section_Paging}"
+                           Text="{loc:Localizastion Settings_Section_Paging}"
                            Margin="0,8,0,12" />
 
                 <TextBlock Margin="0,0,0,12"
                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                            TextWrapping="Wrap"
-                           Text="{loc:Loc Settings_Paging_Description}" />
+                           Text="{loc:Localizastion Settings_Paging_Description}" />
 
                 <ItemsControl ItemsSource="{Binding PagingSettings}">
                     <ItemsControl.ItemTemplate>
@@ -133,7 +133,7 @@
                 </ItemsControl>
 
                 <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
-                           Text="{loc:Loc Settings_Section_Files}"
+                           Text="{loc:Localizastion Settings_Section_Files}"
                            Margin="0,8,0,12" />
 
                 <Border Style="{StaticResource SettingsCardBorderStyle}">
@@ -154,11 +154,11 @@
 
                         <StackPanel Grid.Column="1" Margin="16,0,16,0">
                             <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}"
-                                       Text="{loc:Loc Templates_EntryDoc_Title}" />
+                                       Text="{loc:Localizastion Templates_EntryDoc_Title}" />
                             <TextBlock Margin="0,4,0,0"
                                        Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                                        TextWrapping="Wrap"
-                                       Text="{loc:Loc Templates_EntryDoc_Subtitle}" />
+                                       Text="{loc:Localizastion Templates_EntryDoc_Subtitle}" />
                         </StackPanel>
 
                         <Button Grid.Column="2"
@@ -169,14 +169,14 @@
                                 <ui:SymbolIcon Symbol="ArrowDownload24"
                                                Margin="0,0,8,0"
                                                VerticalAlignment="Center" />
-                                <TextBlock Text="{loc:Loc Templates_Download}" VerticalAlignment="Center" />
+                                <TextBlock Text="{loc:Localizastion Templates_Download}" VerticalAlignment="Center" />
                             </StackPanel>
                         </Button>
                     </Grid>
                 </Border>
 
                 <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
-                           Text="{loc:Loc Settings_Section_Competition}"
+                           Text="{loc:Localizastion Settings_Section_Competition}"
                            Margin="0,8,0,12" />
 
                 <Button Style="{StaticResource SettingsNavCardButtonStyle}"
@@ -196,11 +196,11 @@
 
                         <StackPanel Grid.Column="1" Margin="16,0,16,0" VerticalAlignment="Center">
                             <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}"
-                                       Text="{loc:Loc Settings_Tab_BaseTime}" />
+                                       Text="{loc:Localizastion Settings_Tab_BaseTime}" />
                             <TextBlock Margin="0,4,0,0"
                                        Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                                        TextWrapping="Wrap"
-                                       Text="{loc:Loc Settings_BaseTimes_Description}" />
+                                       Text="{loc:Localizastion Settings_BaseTimes_Description}" />
                         </StackPanel>
 
                         <ui:SymbolIcon Grid.Column="2"

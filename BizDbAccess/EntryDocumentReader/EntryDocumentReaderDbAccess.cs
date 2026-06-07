@@ -2,7 +2,7 @@ using BizDbAccess.Helpers;
 using DataLayer.EfClasses;
 using DataLayer.EfCore;
 
-namespace BizDbAccess;
+namespace BizDbAccess.EntryDocumentReader;
 
 public class EntryDocumentReaderDbAccess(EfCoreContext context) : IEntryDocumentReaderDbAccess
 {

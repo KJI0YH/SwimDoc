@@ -12,7 +12,7 @@
                  xmlns:competitionSelectionView="clr-namespace:UI.Views.Controls.CompetitionSelectionView"
                  xmlns:dataGridView="clr-namespace:UI.Views.Controls.DataGridView"
                  mc:Ignorable="d"
-                 Title="{loc:Loc App_Title}"
+                 Title="{loc:Localizastion App_Title}"
                  Icon="pack://application:,,,/Assets/AppIcon.ico"
                  WindowState="Maximized"
                  WindowBackdropType="Mica"
@@ -111,11 +111,11 @@
               Background="Transparent"
               PreviewMouseLeftButtonDown="TitleBar_PreviewMouseLeftButtonDown">
             <Menu VerticalAlignment="Center">
-                <MenuItem Header="{loc:Loc Menu_Competition}">
-                    <MenuItem Header="{loc:Loc Menu_Create}"
+                <MenuItem Header="{loc:Localizastion Menu_Competition}">
+                    <MenuItem Header="{loc:Localizastion Menu_Create}"
                               InputGestureText="Ctrl+N"
                               Command="{Binding CompetitionSelectionViewModel.CreateNewCommand}" />
-                    <MenuItem Header="{loc:Loc Menu_Open}"
+                    <MenuItem Header="{loc:Localizastion Menu_Open}"
                               InputGestureText="Ctrl+O"
                               Command="{Binding CompetitionSelectionViewModel.OpenExistingCommand}" />
                 </MenuItem>
@@ -126,7 +126,7 @@
                 <Button x:Name="MinimizeButton"
                         Style="{StaticResource RestoreWindowControlButtonStyle}"
                         Click="MinimizeButton_Click"
-                        ToolTip="{loc:Loc Window_Minimize}"
+                        ToolTip="{loc:Localizastion Window_Minimize}"
                         Content="{ui:SymbolIcon Subtract24}" />
                 <Button x:Name="RestoreButton"
                         Style="{StaticResource RestoreWindowControlButtonStyle}"
@@ -135,7 +135,7 @@
                 <Button x:Name="CloseButton"
                         Style="{StaticResource CloseWindowControlButtonStyle}"
                         Click="CloseButton_Click"
-                        ToolTip="{loc:Loc Window_Close}"
+                        ToolTip="{loc:Localizastion Window_Close}"
                         Content="{ui:SymbolIcon Dismiss24}" />
             </StackPanel>
         </Grid>
@@ -146,49 +146,49 @@
                            IsBackButtonVisible="Auto"
                            Loaded="NavigationView_OnLoaded">
             <ui:NavigationView.MenuItems>
-                <ui:NavigationViewItem Content="{loc:Loc Nav_Program}"
+                <ui:NavigationViewItem Content="{loc:Localizastion Nav_Program}"
                                        Tag="Events"
                                        Icon="{ui:SymbolIcon CalendarLtr24}"
                                        TargetPageType="{x:Type pages:EventsPage}"
                                        IsEnabled="{Binding IsCompetitionSelected}" />
-                <ui:NavigationViewItem Content="{loc:Loc Nav_Entries}"
+                <ui:NavigationViewItem Content="{loc:Localizastion Nav_Entries}"
                                        Tag="Entries"
                                        Icon="{ui:SymbolIcon DocumentCopy24}"
                                        TargetPageType="{x:Type pages:EntriesPage}"
                                        IsEnabled="{Binding IsCompetitionSelected}" />
-                <ui:NavigationViewItem Content="{loc:Loc Nav_Heats}"
+                <ui:NavigationViewItem Content="{loc:Localizastion Nav_Heats}"
                                        Tag="Heats"
                                        Icon="{ui:SymbolIcon SwimmingPool24}"
                                        TargetPageType="{x:Type pages:HeatsPage}"
                                        IsEnabled="{Binding IsCompetitionSelected}" />
-                <ui:NavigationViewItem Content="{loc:Loc Nav_Fixation}"
+                <ui:NavigationViewItem Content="{loc:Localizastion Nav_Fixation}"
                                        Tag="HeatsResults"
                                        Icon="{ui:SymbolIcon Clock24}"
                                        TargetPageType="{x:Type pages:FixationPage}"
                                        IsEnabled="{Binding IsCompetitionSelected}" />
-                <ui:NavigationViewItem Content="{loc:Loc Nav_Results}"
+                <ui:NavigationViewItem Content="{loc:Localizastion Nav_Results}"
                                        Tag="Results"
                                        Icon="{ui:SymbolIcon Trophy24}"
                                        TargetPageType="{x:Type pages:ResultsPage}"
                                        IsEnabled="{Binding IsCompetitionSelected}" />
                 <ui:NavigationViewItemSeparator />
-                <ui:NavigationViewItem Content="{loc:Loc Nav_Athletes}"
+                <ui:NavigationViewItem Content="{loc:Localizastion Nav_Athletes}"
                                        Tag="Athletes"
                                        Icon="{ui:SymbolIcon People24}"
                                        TargetPageType="{x:Type pages:AthletesPage}"
                                        IsEnabled="{Binding IsCompetitionSelected}" />
-                <ui:NavigationViewItem Content="{loc:Loc Nav_Clubs}"
+                <ui:NavigationViewItem Content="{loc:Localizastion Nav_Clubs}"
                                        Tag="Clubs"
                                        Icon="{ui:SymbolIcon BuildingTownhouse24}"
                                        TargetPageType="{x:Type pages:ClubsPage}"
                                        IsEnabled="{Binding IsCompetitionSelected}" />
                 <ui:NavigationViewItemSeparator />
-                <ui:NavigationViewItem Content="{loc:Loc Nav_AgeGroups}"
+                <ui:NavigationViewItem Content="{loc:Localizastion Nav_AgeGroups}"
                                        Tag="AgeGroups"
                                        Icon="{ui:SymbolIcon GroupList24}"
                                        TargetPageType="{x:Type pages:AgeGroupsPage}"
                                        IsEnabled="{Binding IsCompetitionSelected}" />
-                <ui:NavigationViewItem Content="{loc:Loc Nav_SwimStyles}"
+                <ui:NavigationViewItem Content="{loc:Localizastion Nav_SwimStyles}"
                                        Tag="SwimStyles"
                                        Icon="{ui:SymbolIcon Water24}"
                                        TargetPageType="{x:Type pages:SwimStylesPage}"
@@ -196,12 +196,12 @@
             </ui:NavigationView.MenuItems>
             <ui:NavigationView.FooterMenuItems>
                 <ui:NavigationViewItem
-                    Content="{loc:Loc Nav_Settings}"
+                    Content="{loc:Localizastion Nav_Settings}"
                     Tag="Settings"
                     Icon="{ui:SymbolIcon Settings24}"
                     TargetPageType="{x:Type pages:SettingsPage}" />
                 <ui:NavigationViewItem
-                    Content="{loc:Loc Nav_About}"
+                    Content="{loc:Localizastion Nav_About}"
                     Tag="About"
                     Icon="{ui:SymbolIcon Info24}"
                     TargetPageType="{x:Type pages:AboutPage}" />

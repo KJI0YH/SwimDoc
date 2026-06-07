@@ -1,4 +1,4 @@
-namespace DataLayer;
+namespace DataLayer.Display;
 
 public static class StartTimeDisplay
 {

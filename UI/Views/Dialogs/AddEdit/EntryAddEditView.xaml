@@ -14,7 +14,7 @@
     </UserControl.Resources>
     <TabControl SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         Margin="0,0,0,15">
-                <TabItem Header="{loc:Loc Entry_Tab_Individual}"
+                <TabItem Header="{loc:Localizastion Entry_Tab_Individual}"
                          IsEnabled="{Binding IsIndividualTabEnabled}">
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <StackPanel>
@@ -25,7 +25,7 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0"
-                                           Text="{loc:Loc Entry_Field_Athlete}"
+                                           Text="{loc:Localizastion Entry_Field_Athlete}"
                                            VerticalAlignment="Center"
                                            Margin="0,0,10,0" />
                                 <searchableComboBox:SearchableComboBox Grid.Column="1"
@@ -46,7 +46,7 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0"
-                                           Text="{loc:Loc Entry_Field_Event}"
+                                           Text="{loc:Localizastion Entry_Field_Event}"
                                            VerticalAlignment="Center"
                                            Margin="0,0,10,0" />
                                 <searchableComboBox:SearchableComboBox Grid.Column="1"
@@ -66,13 +66,13 @@
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0"
-                                           Text="{loc:Loc Entry_Field_EntryTime}"
+                                           Text="{loc:Localizastion Entry_Field_EntryTime}"
                                            VerticalAlignment="Center"
                                            Margin="0,0,10,0" />
                                 <ui:TextBox Grid.Column="1"
                                             Text="{Binding EntryTimeText, UpdateSourceTrigger=PropertyChanged}"
                                             Margin="0,2,0,2"
-                                            PlaceholderText="{loc:Loc Common_NoTime}" />
+                                            PlaceholderText="{loc:Localizastion Common_NoTime}" />
                             </Grid>
     
                             <Grid Margin="0,5">
@@ -81,7 +81,7 @@
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0"
-                                           Text="{loc:Loc Entry_Field_Scoring}"
+                                           Text="{loc:Localizastion Entry_Field_Scoring}"
                                            VerticalAlignment="Center"
                                            Margin="0,0,10,0" />
                                 <CheckBox Grid.Column="1"
@@ -93,7 +93,7 @@
                     </ScrollViewer>
                 </TabItem>
     
-                <TabItem Header="{loc:Loc Entry_Tab_Relay}"
+                <TabItem Header="{loc:Localizastion Entry_Tab_Relay}"
                          IsEnabled="{Binding IsRelayTabEnabled}">
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <StackPanel>
@@ -104,7 +104,7 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0"
-                                           Text="{loc:Loc Entry_Field_Club}"
+                                           Text="{loc:Localizastion Entry_Field_Club}"
                                            VerticalAlignment="Center"
                                            Margin="0,0,10,0" />
                                 <searchableComboBox:SearchableComboBox Grid.Column="1"
@@ -124,14 +124,14 @@
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0"
-                                           Text="{loc:Loc Entry_Field_RelayNumber}"
+                                           Text="{loc:Localizastion Entry_Field_RelayNumber}"
                                            VerticalAlignment="Center"
                                            Margin="0,0,10,0" />
                                 <ui:NumberBox Grid.Column="1"
                                               Minimum="1"
                                               Value="{Binding RelayNumber, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource NullableIntConverter}, TargetNullValue=''}"
                                               Margin="0,2,0,2"
-                                              PlaceholderText="{loc:Loc Common_Auto}" />
+                                              PlaceholderText="{loc:Localizastion Common_Auto}" />
                             </Grid>
     
                             <Grid Margin="0,5">
@@ -141,7 +141,7 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0"
-                                           Text="{loc:Loc Entry_Field_Event}"
+                                           Text="{loc:Localizastion Entry_Field_Event}"
                                            VerticalAlignment="Center"
                                            Margin="0,0,10,0" />
                                 <searchableComboBox:SearchableComboBox Grid.Column="1"
@@ -184,7 +184,7 @@
                                                     <ui:TextBox Grid.Column="3"
                                                                 Text="{Binding EntryTimeText, UpdateSourceTrigger=PropertyChanged}"
                                                                 Margin="0,2,0,2"
-                                                                PlaceholderText="{loc:Loc Common_NoTime}" />
+                                                                PlaceholderText="{loc:Localizastion Common_NoTime}" />
                                                 </Grid>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
@@ -198,13 +198,13 @@
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0"
-                                           Text="{loc:Loc Entry_Field_EntryTime}"
+                                           Text="{loc:Localizastion Entry_Field_EntryTime}"
                                            VerticalAlignment="Center"
                                            Margin="0,0,10,0" />
                                 <ui:TextBox Grid.Column="1"
                                             Text="{Binding EntryTimeText, UpdateSourceTrigger=PropertyChanged}"
                                             Margin="0,2,0,2"
-                                            PlaceholderText="{loc:Loc Common_NoTime}" />
+                                            PlaceholderText="{loc:Localizastion Common_NoTime}" />
                             </Grid>
     
                             <Grid Margin="0,5">
@@ -213,7 +213,7 @@
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0"
-                                           Text="{loc:Loc Entry_Field_Scoring}"
+                                           Text="{loc:Localizastion Entry_Field_Scoring}"
                                            VerticalAlignment="Center"
                                            Margin="0,0,10,0" />
                                 <CheckBox Grid.Column="1"

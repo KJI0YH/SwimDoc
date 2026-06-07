@@ -88,9 +88,9 @@ public class EntryListReportExcel(EfCoreContext dbContext) : BaseReportExcel(dbC
                     prevPlace = place;
                 }
 
-                worksheet.Cells[row, colParticipant].Value = ReportEntryDisplayHelper.GetParticipantName(entry);
-                worksheet.Cells[row, colBirthYear].Value = ReportEntryDisplayHelper.GetBirthYear(entry);
-                worksheet.Cells[row, colTeam].Value = ReportEntryDisplayHelper.GetTeamName(entry);
+                worksheet.Cells[row, colParticipant].Value = LocalizedEntityDisplayFormatter.FormatEntryParticipantName(entry);
+                worksheet.Cells[row, colBirthYear].Value = LocalizedEntityDisplayFormatter.FormatEntryParticipantBirthYear(entry);
+                worksheet.Cells[row, colTeam].Value = LocalizedEntityDisplayFormatter.FormatEntryParticipantClubName(entry);
                 worksheet.Cells[row, colEntryTime].Value = EntryTimeDisplay.FormatEntryTime(entry.EntryTime);
 
                 var dataRange = worksheet.Cells[row, colNo, row, tableLastCol];

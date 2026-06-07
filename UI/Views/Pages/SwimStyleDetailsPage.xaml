@@ -11,10 +11,10 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <TabControl Grid.Row="1" Margin="5">
-            <TabItem Header="{loc:Loc Tabs_Events}">
+            <TabItem Header="{loc:Localizastion Tabs_Events}">
                 <dataGridView:EventsView DataContext="{Binding EventsTable}" />
             </TabItem>
-            <TabItem Header="{loc:Loc Tabs_Entries}">
+            <TabItem Header="{loc:Localizastion Tabs_Entries}">
                 <dataGridView:EntriesView DataContext="{Binding EntriesTable}" />
             </TabItem>
         </TabControl>

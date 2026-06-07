@@ -18,17 +18,17 @@
         <StackPanel Grid.Column="0" Orientation="Horizontal">
             <Button Content="{ui:SymbolIcon Add24}"
                     Command="{Binding CreateItemCommand}"
-                    ToolTip="{loc:Loc Toolbar_Create}"
+                    ToolTip="{loc:Localizastion Toolbar_Create}"
                     Margin="5"
                     Padding="9" />
             <Button Content="{ui:SymbolIcon Edit24}"
                     Command="{Binding EditItemCommand}"
-                    ToolTip="{loc:Loc Toolbar_Edit}"
+                    ToolTip="{loc:Localizastion Toolbar_Edit}"
                     Margin="5"
                     Padding="9" />
             <Button Content="{ui:SymbolIcon Delete24}"
                     Command="{Binding DeleteItemCommand}"
-                    ToolTip="{loc:Loc Toolbar_Delete}"
+                    ToolTip="{loc:Localizastion Toolbar_Delete}"
                     Margin="5"
                     Padding="9" />
         </StackPanel>
@@ -36,7 +36,7 @@
         <Button Grid.Column="1"
                 Content="{ui:SymbolIcon Filter24}"
                 Command="{Binding ToggleFiltersPanelCommand}"
-                ToolTip="{loc:Loc Toolbar_ToggleFilters}"
+                ToolTip="{loc:Localizastion Toolbar_ToggleFilters}"
                 Margin="5"
                 Padding="9"
                 VerticalAlignment="Center" />
@@ -55,12 +55,12 @@
                        VerticalAlignment="Center" />
             <Button Content="{ui:SymbolIcon ArrowPrevious24}"
                     Command="{Binding GoToFirstPageCommand}"
-                    ToolTip="{loc:Loc Paging_First}"
+                    ToolTip="{loc:Localizastion Paging_First}"
                     Margin="5"
                     Padding="9" />
             <Button Content="{ui:SymbolIcon ChevronLeft24}"
                     Command="{Binding GoToPreviousPageCommand}"
-                    ToolTip="{loc:Loc Paging_Previous}"
+                    ToolTip="{loc:Localizastion Paging_Previous}"
                     Margin="5"
                     Padding="9" />
             <ComboBox IsEditable="True"
@@ -73,12 +73,12 @@
                       helpers:PageComboBoxBehavior.CurrentPage="{Binding CurrentPage, Mode=TwoWay}" />
             <Button Content="{ui:SymbolIcon ChevronRight24}"
                     Command="{Binding GoToNextPageCommand}"
-                    ToolTip="{loc:Loc Paging_Next}"
+                    ToolTip="{loc:Localizastion Paging_Next}"
                     Margin="5"
                     Padding="9" />
             <Button Content="{ui:SymbolIcon ArrowNext24}"
                     Command="{Binding GoToLastPageCommand}"
-                    ToolTip="{loc:Loc Paging_Last}"
+                    ToolTip="{loc:Localizastion Paging_Last}"
                     Margin="5"
                     Padding="9" />
         </StackPanel>

@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Resources;
 using DataLayer;
+using DataLayer.Display;
 
 namespace UI.Resources;
 

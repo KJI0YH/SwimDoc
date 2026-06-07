@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using System.Reflection;
 
-namespace DataLayer;
+namespace DataLayer.Display;
 
 public static class EnumDisplay
 {

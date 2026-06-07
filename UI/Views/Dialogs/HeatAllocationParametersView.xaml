@@ -19,15 +19,15 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0"
-                               Text="{loc:Loc HeatAlloc_Field_Order}"
+                               Text="{loc:Localizastion HeatAlloc_Field_Order}"
                                VerticalAlignment="Center"
                                Margin="0,0,10,0" />
                     <ComboBox Grid.Column="1"
                               SelectedValuePath="Tag"
                               SelectedValue="{Binding SelectedHeatOrder, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                        <ComboBoxItem Content="{loc:Loc HeatAlloc_Order_WeakToStrong}"
+                        <ComboBoxItem Content="{loc:Localizastion HeatAlloc_Order_WeakToStrong}"
                                       Tag="{x:Static heatLogic:HeatOrder.FromWeakToStrong}" />
-                        <ComboBoxItem Content="{loc:Loc HeatAlloc_Order_StrongToWeak}"
+                        <ComboBoxItem Content="{loc:Localizastion HeatAlloc_Order_StrongToWeak}"
                                       Tag="{x:Static heatLogic:HeatOrder.FromStrongToWeak}" />
                     </ComboBox>
                 </Grid>
@@ -38,7 +38,7 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0"
-                               Text="{loc:Loc HeatAlloc_Field_MinHeatSize}"
+                               Text="{loc:Localizastion HeatAlloc_Field_MinHeatSize}"
                                VerticalAlignment="Center"
                                Margin="0,0,10,0" />
                     <ui:NumberBox Grid.Column="1"

@@ -17,12 +17,12 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0"
-                               Text="{loc:Loc Field_Name}"
+                               Text="{loc:Localizastion Field_Name}"
                                VerticalAlignment="Center"
                                Margin="0,0,10,0" />
                     <ui:TextBox Grid.Column="1"
                                 Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
-                                PlaceholderText="{loc:Loc Common_Auto}"
+                                PlaceholderText="{loc:Localizastion Common_Auto}"
                                 Margin="0,2,0,2" />
                 </Grid>
     
@@ -32,7 +32,7 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0"
-                               Text="{loc:Loc Athlete_Field_Gender}"
+                               Text="{loc:Localizastion Athlete_Field_Gender}"
                                VerticalAlignment="Center"
                                Margin="0,0,10,0" />
                     <ComboBox Grid.Column="1"
@@ -49,15 +49,15 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0"
-                               Text="{loc:Loc Athlete_Field_BirthYear}"
+                               Text="{loc:Localizastion Athlete_Field_BirthYear}"
                                VerticalAlignment="Center"
                                Margin="0,0,10,0" />
                     <UniformGrid Grid.Column="1" Columns="2">
-                        <ui:NumberBox PlaceholderText="{loc:Loc Common_AbsoluteMin}"
+                        <ui:NumberBox PlaceholderText="{loc:Localizastion Common_AbsoluteMin}"
                                       Value="{Binding BirthYearMin, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource NullableIntConverter}, TargetNullValue=''}"
                                       Margin="0,2,2,2"
                                       Minimum="1900" />
-                        <ui:NumberBox PlaceholderText="{loc:Loc Common_AbsoluteMax}"
+                        <ui:NumberBox PlaceholderText="{loc:Localizastion Common_AbsoluteMax}"
                                       Value="{Binding BirthYearMax, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource NullableIntConverter}, TargetNullValue=''}"
                                       Margin="2, 2, 0, 2"
                                       Minimum="1900" />

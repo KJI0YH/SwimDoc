@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using BizDbAccess;
+using BizDbAccess.EntryDocumentReader;
 using BizLogic.EntryDocumentReaderLogic;
 using BizLogic.EntryDocumentReaderLogic.Concrete;
 using DataLayer.EfClasses;

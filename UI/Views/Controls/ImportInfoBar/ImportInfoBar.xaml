@@ -38,7 +38,7 @@
             
             <DockPanel LastChildFill="True">
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
-                    <Button ToolTip="{loc:Loc Import_Details}"
+                    <Button ToolTip="{loc:Localizastion Import_Details}"
                             Margin="5,0,0,0"
                             Padding="9"
                             Command="{Binding ToggleImportDetailsCommand}">
@@ -60,13 +60,13 @@
                     </Button>
 
                     <Button Content="{ui:SymbolIcon Stop24}"
-                            ToolTip="{loc:Loc Import_Cancel}"
+                            ToolTip="{loc:Localizastion Import_Cancel}"
                             Margin="5,0,0,0"
                             Padding="9"
                             Command="{Binding CancelImportCommand}"
                             Visibility="{Binding IsImportRunning, Converter={StaticResource BoolToVis}}" />
 
-                    <Button ToolTip="{loc:Loc Import_Close}"
+                    <Button ToolTip="{loc:Localizastion Import_Close}"
                             Margin="5,0,0,0"
                             Padding="9"
                             Command="{Binding DismissImportBarCommand}">
@@ -252,24 +252,24 @@
                                     </DataTemplate>
                                 </ui:DataGrid.RowDetailsTemplate>
                                 <ui:DataGrid.Columns>
-                                    <DataGridTextColumn Header="{loc:Loc Import_Col_File}" Binding="{Binding FileName}" Width="150" />
-                                    <DataGridTextColumn Header="{loc:Loc Import_Col_Path}" Binding="{Binding FullPath}" Width="*" />
-                                    <DataGridTextColumn Header="{loc:Loc Import_Col_Status}" Width="180"
+                                    <DataGridTextColumn Header="{loc:Localizastion Import_Col_File}" Binding="{Binding FileName}" Width="150" />
+                                    <DataGridTextColumn Header="{loc:Localizastion Import_Col_Path}" Binding="{Binding FullPath}" Width="*" />
+                                    <DataGridTextColumn Header="{loc:Localizastion Import_Col_Status}" Width="180"
                                                         Binding="{Binding StatusText}" />
-                                    <DataGridTextColumn Header="{loc:Loc Import_Col_Clubs}" Width="130"
+                                    <DataGridTextColumn Header="{loc:Localizastion Import_Col_Clubs}" Width="130"
                                                         Binding="{Binding ClubsStatsDisplay}"
                                                         ElementStyle="{StaticResource ImportStatsCellTextStyle}"
                                                         HeaderStyle="{StaticResource ImportStatsColumnHeaderStyle}" />
-                                    <DataGridTextColumn Header="{loc:Loc Import_Col_Athletes}" Width="150"
+                                    <DataGridTextColumn Header="{loc:Localizastion Import_Col_Athletes}" Width="150"
                                                         Binding="{Binding AthletesStatsDisplay}"
                                                         ElementStyle="{StaticResource ImportStatsCellTextStyle}"
                                                         HeaderStyle="{StaticResource ImportStatsColumnHeaderStyle}" />
-                                    <DataGridTextColumn Header="{loc:Loc Import_Col_Entries}" Width="130"
+                                    <DataGridTextColumn Header="{loc:Localizastion Import_Col_Entries}" Width="130"
                                                         Binding="{Binding EntriesStatsDisplay}"
                                                         ElementStyle="{StaticResource ImportStatsCellTextStyle}"
                                                         HeaderStyle="{StaticResource ImportStatsColumnHeaderStyle}" />
 
-                                    <DataGridTemplateColumn Header="{loc:Loc Import_Col_Warnings}" Width="170"
+                                    <DataGridTemplateColumn Header="{loc:Localizastion Import_Col_Warnings}" Width="170"
                                                             HeaderStyle="{StaticResource ImportStatsColumnHeaderStyle}">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
@@ -280,7 +280,7 @@
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
 
-                                    <DataGridTemplateColumn Header="{loc:Loc Import_Col_Errors}" Width="100"
+                                    <DataGridTemplateColumn Header="{loc:Localizastion Import_Col_Errors}" Width="100"
                                                             HeaderStyle="{StaticResource ImportStatsColumnHeaderStyle}">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
@@ -320,7 +320,7 @@
                             <ColumnDefinition Width="160" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="{loc:Loc Import_EventPrev}" Opacity="0.75" />
+                        <TextBlock Grid.Column="0" Text="{loc:Localizastion Import_EventPrev}" Opacity="0.75" />
                         <TextBlock Grid.Column="1" Text="{Binding EventImportPreviousEventName}" TextWrapping="Wrap" />
                     </Grid>
                     <Grid Margin="0,0,0,8">
@@ -328,7 +328,7 @@
                             <ColumnDefinition Width="160" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="{loc:Loc Import_EventCurrent}" Opacity="0.75" />
+                        <TextBlock Grid.Column="0" Text="{loc:Localizastion Import_EventCurrent}" Opacity="0.75" />
                         <TextBlock Grid.Column="1" Text="{Binding EventImportTargetEventName}" TextWrapping="Wrap" />
                     </Grid>
                     <Grid Margin="0,0,0,8">
@@ -336,7 +336,7 @@
                             <ColumnDefinition Width="160" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="{loc:Loc Import_CreatedEntries}" Opacity="0.75" />
+                        <TextBlock Grid.Column="0" Text="{loc:Localizastion Import_CreatedEntries}" Opacity="0.75" />
                         <TextBlock Grid.Column="1" Text="{Binding EventImportCreatedCount}" />
                     </Grid>
                     <GroupBox>

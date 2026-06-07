@@ -20,7 +20,7 @@
                     </Grid.ColumnDefinitions>
     
                     <TextBlock Grid.Column="0"
-                               Text="{loc:Loc Heat_Field_Number}"
+                               Text="{loc:Localizastion Heat_Field_Number}"
                                VerticalAlignment="Center"
                                Margin="0,0,10,0" />
                     <ui:NumberBox Grid.Column="1"
@@ -37,7 +37,7 @@
                     </Grid.ColumnDefinitions>
     
                     <TextBlock Grid.Column="0"
-                               Text="{loc:Loc Heat_Field_StartTime}"
+                               Text="{loc:Localizastion Heat_Field_StartTime}"
                                VerticalAlignment="Center"
                                Margin="0,0,10,0" />
                     <UniformGrid Grid.Column="1" Columns="2">
@@ -63,7 +63,7 @@
                     </Grid.ColumnDefinitions>
     
                     <TextBlock Grid.Column="0"
-                               Text="{loc:Loc Heat_Field_Status}"
+                               Text="{loc:Localizastion Heat_Field_Status}"
                                VerticalAlignment="Center"
                                Margin="0,0,10,0" />
                     <ComboBox Grid.Column="1"
@@ -83,7 +83,7 @@
                     <Button DockPanel.Dock="Right"
                             Content="{ui:SymbolIcon Add24}"
                             Command="{Binding AddPositionRowCommand}"
-                            ToolTip="{loc:Loc Common_Add}"
+                            ToolTip="{loc:Localizastion Common_Add}"
                             Padding="9"
                             Margin="5,0,0,0" />
                 </DockPanel>
@@ -97,7 +97,7 @@
                           Margin="0,0,0,5">
                     <DataGrid.Columns>
     
-                        <DataGridTemplateColumn Header="{loc:Loc Heat_Col_Lane}" Width="130">
+                        <DataGridTemplateColumn Header="{loc:Localizastion Heat_Col_Lane}" Width="130">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <Grid>
@@ -119,7 +119,7 @@
     
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
-                        <DataGridTemplateColumn Header="{loc:Loc Heat_Col_Entry}" Width="*">
+                        <DataGridTemplateColumn Header="{loc:Localizastion Heat_Col_Entry}" Width="*">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <searchableComboBox:SearchableComboBox

@@ -1,6 +1,6 @@
 using DataLayer.EfClasses;
 
-namespace DataLayer;
+namespace DataLayer.Display;
 
 public static class SwimEventLaneNames
 {

@@ -17,13 +17,13 @@
                       RowStyle="{StaticResource DataGridRowResultsPlaceStyle}"
                       MouseDoubleClick="DataGrid_MouseDoubleClick">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="{loc:Loc Results_Col_Event}" Binding="{Binding EventName}" Width="*" />
-                    <DataGridTextColumn Header="{loc:Loc Results_Col_Participant}" Binding="{Binding ParticipantName}" Width="*" />
-                    <DataGridTextColumn Header="{loc:Loc Fixation_Col_BirthYear}" Binding="{Binding ParticipantYearOfBirth}" Width="120" />
-                    <DataGridTextColumn Header="{loc:Loc Results_Col_Team}" Binding="{Binding ClubName}" Width="*" />
-                    <DataGridTextColumn Header="{loc:Loc Results_Col_Place}" Binding="{Binding Place}" Width="80" />
-                    <DataGridTextColumn Header="{loc:Loc Results_Col_Result}" Binding="{Binding ResultText}" Width="150" />
-                    <DataGridTextColumn Header="{loc:Loc Results_Col_Points}" Binding="{Binding Points}" Width="150" />
+                    <DataGridTextColumn Header="{loc:Localizastion Results_Col_Event}" Binding="{Binding EventName}" Width="*" />
+                    <DataGridTextColumn Header="{loc:Localizastion Results_Col_Participant}" Binding="{Binding ParticipantName}" Width="*" />
+                    <DataGridTextColumn Header="{loc:Localizastion Fixation_Col_BirthYear}" Binding="{Binding ParticipantYearOfBirth}" Width="120" />
+                    <DataGridTextColumn Header="{loc:Localizastion Results_Col_Team}" Binding="{Binding ClubName}" Width="*" />
+                    <DataGridTextColumn Header="{loc:Localizastion Results_Col_Place}" Binding="{Binding Place}" Width="80" />
+                    <DataGridTextColumn Header="{loc:Localizastion Results_Col_Result}" Binding="{Binding ResultText}" Width="150" />
+                    <DataGridTextColumn Header="{loc:Localizastion Results_Col_Points}" Binding="{Binding Points}" Width="150" />
                 </DataGrid.Columns>
             </ui:DataGrid>
         </dataView:DefaultDataView.MainContent>

@@ -14,18 +14,18 @@
                 </Grid.RowDefinitions>
     
                 <StackPanel Grid.Row="0" Margin="0,0,0,15">
-                    <CheckBox Content="{loc:Loc Reports_Include_EntryList}"
+                    <CheckBox Content="{loc:Localizastion Reports_Include_EntryList}"
                               IsChecked="{Binding IncludeEntryList, Mode=TwoWay}" />
-                    <CheckBox Content="{loc:Loc Reports_Include_StartList}"
+                    <CheckBox Content="{loc:Localizastion Reports_Include_StartList}"
                               IsChecked="{Binding IncludeStartList, Mode=TwoWay}"
                               Margin="0,8,0,0" />
-                    <CheckBox Content="{loc:Loc Reports_Include_FinishList}"
+                    <CheckBox Content="{loc:Localizastion Reports_Include_FinishList}"
                               IsChecked="{Binding IncludeFinishList, Mode=TwoWay}"
                               Margin="0,8,0,0" />
                 </StackPanel>
     
                 <TextBlock Grid.Row="1"
-                           Text="{loc:Loc Reports_Field_OutputFile}"
+                           Text="{loc:Localizastion Reports_Field_OutputFile}"
                            Style="{StaticResource BodyStrongTextBlockStyle}"
                            Margin="0,0,0,10" />
     
@@ -39,7 +39,7 @@
                                 Text="{Binding OutputFilePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                 MinWidth="320"
                                 Margin="0,0,10,0"
-                                PlaceholderText="{loc:Loc Reports_Field_OutputFile}" />
+                                PlaceholderText="{loc:Localizastion Reports_Field_OutputFile}" />
                     <ui:Button Grid.Column="1"
                                Content="{ui:SymbolIcon Folder24}"
                                Padding="9"
