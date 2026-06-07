@@ -13,6 +13,7 @@ using ServiceLayer.HeatService;
 using UI.Resources;
 using UI.ViewModels.Pages.Data;
 using UI.Models.Rows;
+using UI.Models.Rows.Projections;
 using UI.Models;
 using UI.Views.Dialogs.Markers.AddEdit;
 
@@ -127,12 +128,13 @@ public partial class HeatsViewModel(
         UpdateHeatPaging(0);
     }
 
-    protected override IQueryable<SwimEvent> ApplyQuery(IQueryable<SwimEvent> query)
+    protected override IQueryable<SwimEvent> ApplyQuery(IQueryable<SwimEvent> query) =>
+        query.OrderBy(se => se.Order);
+
+    protected override async Task<List<SwimEventRowView>> LoadPageRowsAsync(IQueryable<SwimEvent> query)
     {
-        return query
-            .OrderBy(se => se.Order)
-            .Include(e => e.AgeGroup)
-            .Include(e => e.SwimStyle);
+        var projections = await RowProjectionQueries.SelectSwimEvent(query).ToListAsync();
+        return projections.Select(SwimEventRowView.FromProjection).ToList();
     }
 
     protected override void OnItemsLoaded(IReadOnlyList<SwimEvent> items)

@@ -9,4 +9,4 @@ using UI.Models;
 
 namespace UI.Models.CombinedResults;
 
-public sealed record CombinedResultsEventColumnView(int EventId, string Header);
+public sealed record CombinedResultsEventColumnView(int SwimStyleId, string Header);

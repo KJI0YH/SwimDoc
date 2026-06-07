@@ -12,6 +12,7 @@ using ServiceLayer.ReportGeneratorService;
 using UI.Resources;
 using UI.ViewModels.Pages.Data;
 using UI.Models.Rows;
+using UI.Models.Rows.Projections;
 using UI.ViewModels.Dialogs.CombinedResultsReportGeneration;
 using UI.Views.Dialogs.Markers.AddEdit;
 using CombinedResultsReportGenerationWindow = UI.Views.Dialogs.Markers.CombinedResultsReportGeneration.CombinedResultsReportGenerationWindow;
@@ -40,7 +41,8 @@ public partial class AgeGroupsViewModel : DataViewModel<AgeGroup, AgeGroupRowVie
         ColumnConfigurations.Clear();
         ColumnConfigurations.Add(new ColumnConfiguration<AgeGroup>("DisplayName", Strings.AgeGroups_Col_Name, 400,
             ColumnConfiguration<AgeGroup>.SortBy(ag => ag.Name)));
-        ColumnConfigurations.Add(new ColumnConfiguration<AgeGroup>("Gender", Strings.AgeGroups_Col_Gender, 100));
+        ColumnConfigurations.Add(new ColumnConfiguration<AgeGroup>("Gender", Strings.AgeGroups_Col_Gender, 100,
+            ColumnConfiguration<AgeGroup>.SortBy(ag => ag.Gender)));
         ColumnConfigurations.Add(new ColumnConfiguration<AgeGroup>("BirthYearMin", Strings.AgeGroups_Col_BirthYearFrom, 150,
             ColumnConfiguration<AgeGroup>.SortBy(ag => ag.BirthYearMin))
         {
@@ -53,6 +55,12 @@ public partial class AgeGroupsViewModel : DataViewModel<AgeGroup, AgeGroupRowVie
             Converter = new BirthYearBoundConverter(),
             ConverterParameter = BirthYearBoundConverter.Max
         });
+    }
+
+    protected override async Task<List<AgeGroupRowView>> LoadPageRowsAsync(IQueryable<AgeGroup> query)
+    {
+        var projections = await RowProjectionQueries.SelectAgeGroup(query).ToListAsync();
+        return projections.Select(AgeGroupRowView.FromProjection).ToList();
     }
 
     protected override IQueryable<AgeGroup> ApplySearch(IQueryable<AgeGroup> query)

@@ -110,6 +110,7 @@
                                     <Grid>
                                         <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
                                                     Text="{Binding FinishTimeText, UpdateSourceTrigger=PropertyChanged}"
+                                                    uiHelpers:FixationTimeInputNavigation.IsEnabled="True"
                                                     Visibility="{Binding DataContext.CanEditHeat, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVis}}" />
                                         <TextBlock Text="{Binding FinishTimeDisplay}"
                                                    Visibility="{Binding DataContext.CanEditHeat, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVis}, ConverterParameter=Invert}"

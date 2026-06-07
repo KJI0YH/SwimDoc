@@ -68,6 +68,8 @@ public class NavigationService(IServiceProvider serviceProvider) : INavigationSe
         if (ReferenceEquals(_currentViewModel, viewModel))
         {
             RequestPageForViewModel<TViewModel>();
+            if (viewModel is IDataLoadable loadable)
+                loadable.EnsureDataLoaded();
             return;
         }
         if (_currentViewModel is INavigationAware leaving)
@@ -76,6 +78,8 @@ public class NavigationService(IServiceProvider serviceProvider) : INavigationSe
             _navigationHistory.Push(_currentViewModel);
         CurrentViewModel = viewModel;
         RequestPageForViewModel<TViewModel>();
+        if (viewModel is IDataLoadable dataLoadable)
+            dataLoadable.EnsureDataLoaded();
     }
 
     public void NavigateTo<TViewModel>(NavigationContext context) where TViewModel : ViewModelBase

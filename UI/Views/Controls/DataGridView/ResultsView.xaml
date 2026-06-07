@@ -46,6 +46,8 @@
                                         Width="*" />
                     <DataGridTextColumn Header="{loc:Localizastion Fixation_Col_BirthYear}" Binding="{Binding ParticipantYearOfBirth}"
                                         IsReadOnly="True" Width="120" />
+                    <DataGridTextColumn Header="{loc:Localizastion Athletes_Col_Category}" Binding="{Binding ParticipantCategory}"
+                                        IsReadOnly="True" Width="100" />
                     <DataGridTextColumn Header="{loc:Localizastion Results_Col_Team}" Binding="{Binding ClubName}" IsReadOnly="True" Width="*" />
                     <DataGridTextColumn Header="{loc:Localizastion Results_Col_Result}" Binding="{Binding ResultText}" IsReadOnly="True"
                                         Width="150" />

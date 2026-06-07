@@ -32,7 +32,8 @@ public class EntriesByEventViewModel : EntriesViewModel
     public void SetEventId(int? eventId)
     {
         _eventId = eventId;
-        LoadDataCommand.Execute(null);
+        RequestReload();
+        EnsureDataLoaded();
     }
 
     protected override IQueryable<Entry> ApplyQuery(IQueryable<Entry> query)
@@ -48,4 +49,7 @@ public class EntriesByEventViewModel : EntriesViewModel
         if (result == true)
             _ = LoadDataAsync();
     }
+
+    protected override NavigationContext? GetLoadEntriesFromPreviousEventContext() =>
+        _eventId.HasValue ? new NavigationContext { EventId = _eventId.Value } : null;
 }

@@ -33,7 +33,8 @@ public class EntriesBySwimStyleViewModel : EntriesViewModel
     public void SetSwimStyleId(int? swimStyleId)
     {
         _swimStyleId = swimStyleId;
-        LoadDataCommand.Execute(null);
+        RequestReload();
+        EnsureDataLoaded();
     }
 
     protected override IQueryable<Entry> ApplyQuery(IQueryable<Entry> query)

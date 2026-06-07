@@ -78,8 +78,8 @@ public static class CombinedResultsReportExcel
                 foreach (var eventColumn in data.EventColumns)
                 {
                     var cell = worksheet.Cells[row, ++eventColumnOffset];
-                    cell.Value = athleteRow.PointsByEventId.GetValueOrDefault(eventColumn.EventId);
-                    if (IsNonScoringEvent(athleteRow, eventColumn.EventId))
+                    cell.Value = athleteRow.PointsBySwimStyleId.GetValueOrDefault(eventColumn.SwimStyleId);
+                    if (IsNonScoringSwimStyle(athleteRow, eventColumn.SwimStyleId))
                         ReportExcelScoringHelper.ApplyNonScoringFill(cell);
                 }
                 worksheet.Cells[row, tableLastCol].Value = athleteRow.TotalPoints;
@@ -98,6 +98,6 @@ public static class CombinedResultsReportExcel
         worksheet.Cells[worksheet.Dimension.Address].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
     }
 
-    private static bool IsNonScoringEvent(CombinedResultsReportAthleteRow athleteRow, int eventId) =>
-        athleteRow.ScoringByEventId.TryGetValue(eventId, out var scoring) && !scoring;
+    private static bool IsNonScoringSwimStyle(CombinedResultsReportAthleteRow athleteRow, int swimStyleId) =>
+        athleteRow.ScoringBySwimStyleId.TryGetValue(swimStyleId, out var scoring) && !scoring;
 }

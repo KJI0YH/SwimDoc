@@ -1,9 +1,12 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Windows.Data;
 using BizLogic.HeatAllocation;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DataLayer.EfClasses;
 using ServiceLayer.HeatService.Exceptions;
+using UI.Helpers.Operations;
 using UI.Resources;
 
 namespace UI.ViewModels.Pages;
@@ -21,6 +24,7 @@ public partial class EventsViewModel
     [ObservableProperty] private int _operationProcessedItems;
     [ObservableProperty] private int _operationTotalItems;
     [ObservableProperty] private ObservableCollection<OperationItem> _operationItems = new();
+    [ObservableProperty] private ICollectionView? _operationItemsView;
     [ObservableProperty] private ObservableCollection<string> _operationErrors = new();
     public bool IsOperationIndeterminate => IsOperationRunning;
     public bool HasOperationDetails =>
@@ -54,6 +58,7 @@ public partial class EventsViewModel
 
     partial void OnOperationItemsChanged(ObservableCollection<OperationItem> value)
     {
+        OperationItemsView = OperationItemsViewHelper.CreateView(value);
         OnPropertyChanged(nameof(HasOperationDetails));
         OnPropertyChanged(nameof(CanToggleOperationDetails));
     }
@@ -91,6 +96,8 @@ public partial class EventsViewModel
         _operationSummaryRow.Warnings = [];
         _operationSummaryRow.Errors = [];
         _operationSummaryRow.IsDetailsOpen = false;
+        if (OperationItemsView is ListCollectionView listView)
+            listView.Refresh();
     }
 
     private async Task<OperationRunResult> RunMultiItemOperationAsync(

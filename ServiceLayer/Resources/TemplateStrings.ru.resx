@@ -13,7 +13,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
 
-  <data name="Sheet_Entries" xml:space="preserve"><value>Заявочные команды</value></data>
+  <data name="Sheet_Entries" xml:space="preserve"><value>Заявки</value></data>
   <data name="Sheet_Settings" xml:space="preserve"><value>Настройки</value></data>
 
   <data name="Entries_Title_A1" xml:space="preserve"><value>Команда</value></data>
@@ -29,8 +29,6 @@
   <data name="Settings_Header_Category" xml:space="preserve"><value>Разряд</value></data>
   <data name="Settings_Header_Distance" xml:space="preserve"><value>Дистанция</value></data>
   <data name="Settings_Header_Stroke" xml:space="preserve"><value>Стиль</value></data>
-  <data name="Settings_Header_TeamType" xml:space="preserve"><value>Тип команды</value></data>
-
   <data name="Gender_Male" xml:space="preserve"><value>Мужчины</value></data>
   <data name="Gender_Female" xml:space="preserve"><value>Женщины</value></data>
 

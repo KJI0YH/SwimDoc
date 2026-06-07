@@ -45,6 +45,8 @@
         </dataView:DefaultDataView.Toolbar>
         <dataView:DefaultDataView.MainContent>
             <ui:DataGrid ItemsSource="{Binding Rows}"
+                         SelectedItem="{Binding SelectedRow}"
+                         MouseDoubleClick="CombinedResultsGrid_MouseDoubleClick"
                          AutoGenerateColumns="False"
                          IsReadOnly="True"
                          Loaded="CombinedResultsGrid_Loaded"

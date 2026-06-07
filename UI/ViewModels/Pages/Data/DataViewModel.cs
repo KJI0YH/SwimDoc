@@ -15,9 +15,10 @@ using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.Crud;
 using UI.Resources;
 using UI.Models.Rows;
+using UI.Services.Navigation;
 namespace UI.ViewModels.Pages.Data;
 
-public partial class DataViewModel<TEntity, TRowView, TKey> : DataViewModelBase
+public partial class DataViewModel<TEntity, TRowView, TKey> : DataViewModelBase, IDataLoadable
     where TEntity : class
     where TRowView : IEntityRowView<TEntity>
 {
@@ -26,6 +27,7 @@ public partial class DataViewModel<TEntity, TRowView, TKey> : DataViewModelBase
     protected INavigationService NavigationService => _navigationService;
     private readonly SemaphoreSlim _loadGate = new(1, 1);
     private bool _suppressPageLoad;
+    private bool _needsLoad = true;
     [ObservableProperty] private bool _autoGenerateColumns = true;
     [ObservableProperty] private ObservableCollection<ColumnConfiguration> _columnConfigurations = new();
     [ObservableProperty] private bool _isLoading;
@@ -76,7 +78,6 @@ public partial class DataViewModel<TEntity, TRowView, TKey> : DataViewModelBase
         if (UsesPaging)
             PageSize = pagingSettings.GetPageSize(PagingSettingsPage);
         InitializeColumns();
-        LoadDataCommand.Execute(null);
     }
 
     private static Type ResolveServiceType(ICrudService<TEntity, TKey> service)
@@ -90,7 +91,28 @@ public partial class DataViewModel<TEntity, TRowView, TKey> : DataViewModelBase
     private void OnConnectionChanged(string _)
     {
         ResetForNewCompetition();
-        LoadDataCommand.Execute(null);
+        RequestReload();
+    }
+
+    public void EnsureDataLoaded()
+    {
+        if (!_needsLoad)
+            return;
+        _needsLoad = false;
+        _ = LoadDataWithPrepareAsync();
+    }
+
+    public void RequestReload()
+    {
+        _needsLoad = true;
+    }
+
+    protected virtual Task PrepareBeforeLoadAsync() => Task.CompletedTask;
+
+    private async Task LoadDataWithPrepareAsync()
+    {
+        await PrepareBeforeLoadAsync();
+        await LoadDataAsync();
     }
 
     protected virtual void ResetForNewCompetition()
@@ -131,6 +153,12 @@ public partial class DataViewModel<TEntity, TRowView, TKey> : DataViewModelBase
     protected virtual void InitializeColumns()
     {
         AutoGenerateColumns = true;
+    }
+
+    protected virtual async Task<List<TRowView>> LoadPageRowsAsync(IQueryable<TEntity> query)
+    {
+        var entities = await query.ToListAsync();
+        return entities.Select(CreateRowView).ToList();
     }
 
     protected virtual TRowView CreateRowView(TEntity entity) =>
@@ -191,7 +219,7 @@ public partial class DataViewModel<TEntity, TRowView, TKey> : DataViewModelBase
     }
 
     [RelayCommand(CanExecute = nameof(CanLoadData))]
-    protected async Task LoadDataAsync()
+    protected virtual async Task LoadDataAsync()
     {
         await _loadGate.WaitAsync();
         IsLoading = true;
@@ -200,7 +228,6 @@ public partial class DataViewModel<TEntity, TRowView, TKey> : DataViewModelBase
             var query = CrudService.Query();
             query = ApplyQuery(query);
             query = ApplySearch(query);
-            query = ApplySorting(query);
             TotalItems = await query.CountAsync();
             _suppressPageLoad = true;
             if (UsesPaging)
@@ -217,12 +244,13 @@ public partial class DataViewModel<TEntity, TRowView, TKey> : DataViewModelBase
                 CurrentPage = 0;
             }
             _suppressPageLoad = false;
+            query = ApplySorting(query);
             if (UsesPaging)
                 query = query.Page(CurrentPage, PageSize);
-            var entities = await query.ToListAsync();
-            Items = new ObservableCollection<TRowView>(entities.Select(CreateRowView));
+            var rows = await LoadPageRowsAsync(query);
+            Items = new ObservableCollection<TRowView>(rows);
             OnPropertyChanged(nameof(ItemsInfo));
-            OnItemsLoaded(entities);
+            OnItemsLoaded(rows.Select(row => row.Entity).ToList());
         }
         finally
         {

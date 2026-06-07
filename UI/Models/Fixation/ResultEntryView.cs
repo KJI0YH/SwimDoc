@@ -9,6 +9,7 @@ public sealed class ResultEntryView(int place, Entry entry)
     public string ParticipantName => EntityDisplayFormatter.FormatEntryParticipantName(Entry);
     public string ParticipantYearOfBirth => Entry.Athlete?.YearOfBirth.ToString()
         ?? EntityDisplayFormatter.FormatEntryParticipantBirthYear(Entry);
+    public string ParticipantCategory => EntityDisplayFormatter.FormatAthleteCategory(Entry.Athlete);
     public string ClubName => EntityDisplayFormatter.FormatEntryParticipantClubName(Entry);
     public string ResultText => EntityDisplayFormatter.FormatFinishTime(Entry);
     public int? Points => Entry.Points;

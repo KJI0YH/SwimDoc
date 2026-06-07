@@ -7,6 +7,7 @@ using ServiceLayer.AthleteService;
 using UI.Resources;
 using UI.ViewModels.Pages.Data;
 using UI.Models.Rows;
+using UI.Models.Rows.Projections;
 using UI.Views.Dialogs.Markers.AddEdit;
 
 namespace UI.ViewModels.Pages;
@@ -26,11 +27,16 @@ public class AthletesViewModel : DataViewModel<Athlete, AthleteRowView, int?>
     {
         AutoGenerateColumns = false;
         ColumnConfigurations.Clear();
-        ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("FirstName", Strings.Athletes_Col_FirstName, 200));
-        ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("LastName", Strings.Athletes_Col_LastName, 200));
-        ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("Gender", Strings.Athletes_Col_Gender, 90));
-        ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("YearOfBirth", Strings.Athletes_Col_BirthYear, 120));
-        ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("Category", Strings.Athletes_Col_Category, 100));
+        ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("FirstName", Strings.Athletes_Col_FirstName, 200,
+            ColumnConfiguration<Athlete>.SortBy(e => e.FirstName)));
+        ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("LastName", Strings.Athletes_Col_LastName, 200,
+            ColumnConfiguration<Athlete>.SortBy(e => e.LastName)));
+        ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("Gender", Strings.Athletes_Col_Gender, 90,
+            ColumnConfiguration<Athlete>.SortBy(e => e.Gender)));
+        ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("YearOfBirth", Strings.Athletes_Col_BirthYear, 120,
+            ColumnConfiguration<Athlete>.SortBy(e => e.YearOfBirth)));
+        ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("Category", Strings.Athletes_Col_Category, 100,
+            ColumnConfiguration<Athlete>.SortBy(e => e.Category)));
         ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("ClubName", Strings.Athletes_Col_Team, 300,
             ColumnConfiguration<Athlete>.SortBy(e => e.Club!.Name)));
         ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("PointCount", Strings.Athletes_Col_Points, 80,
@@ -38,11 +44,10 @@ public class AthletesViewModel : DataViewModel<Athlete, AthleteRowView, int?>
                 e.Entries.Where(entry => entry.Scoring).Sum(entry => entry.Points ?? 0))));
     }
 
-    protected override IQueryable<Athlete> ApplyQuery(IQueryable<Athlete> query)
+    protected override async Task<List<AthleteRowView>> LoadPageRowsAsync(IQueryable<Athlete> query)
     {
-        return query
-            .Include(athlete => athlete.Club)
-            .Include(athlete => athlete.Entries);
+        var projections = await RowProjectionQueries.SelectAthlete(query).ToListAsync();
+        return projections.Select(AthleteRowView.FromProjection).ToList();
     }
 
     protected override IQueryable<Athlete> ApplySearch(IQueryable<Athlete> query)

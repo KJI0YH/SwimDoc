@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Reflection;
 using System.Windows;
@@ -33,6 +34,7 @@ public partial class SearchableComboBox : UserControl
     private bool _isSyncingSelection;
     private bool _isOpeningDropDownForSearch;
     private ICollectionView? _itemsView;
+    private ObservableCollection<SearchableItem>? _boundItemsSource;
     private string _searchText = string.Empty;
     public SearchableComboBox()
     {
@@ -73,16 +75,26 @@ public partial class SearchableComboBox : UserControl
 
     private void BindItemsView(ObservableCollection<SearchableItem>? itemsSource)
     {
+        if (_boundItemsSource is not null)
+            _boundItemsSource.CollectionChanged -= OnBoundItemsSourceChanged;
+        _boundItemsSource = itemsSource;
         if (itemsSource == null)
         {
             _itemsView = null;
             ComboBoxControl.ItemsSource = null;
             return;
         }
+        itemsSource.CollectionChanged += OnBoundItemsSourceChanged;
         _itemsView = new ListCollectionView(itemsSource);
         _itemsView.Filter = FilterItem;
         ComboBoxControl.ItemsSource = _itemsView;
         _itemsView.Refresh();
+    }
+
+    private void OnBoundItemsSourceChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        _itemsView?.Refresh();
+        SyncSelectedItem();
     }
 
     private void SyncSelectedItem()

@@ -124,7 +124,7 @@
                 </Border.Style>
                 <ScrollViewer VerticalScrollBarVisibility="Auto"
                               HorizontalScrollBarVisibility="Disabled">
-                    <ui:DataGrid ItemsSource="{Binding OperationItems}"
+                    <ui:DataGrid ItemsSource="{Binding OperationItemsView}"
                                  AutoGenerateColumns="False"
                                  CanUserDeleteRows="False"
                                  IsReadOnly="True"
@@ -132,6 +132,7 @@
                                  RowDetailsVisibilityMode="Visible"
                                  PreviewMouseLeftButtonDown="ItemsGrid_PreviewMouseLeftButtonDown"
                                  LoadingRow="ItemsGrid_LoadingRow"
+                                 Sorting="ItemsGrid_Sorting"
                                  x:Name="ItemsGrid">
                         <ui:DataGrid.RowStyle>
                             <Style TargetType="DataGridRow"
@@ -250,28 +251,24 @@
                                                 Width="*" />
                             <DataGridTextColumn Header="{loc:Localizastion Import_Col_Status}"
                                                 Width="200"
-                                                Binding="{Binding StatusDisplay}" />
+                                                Binding="{Binding StatusDisplay}"
+                                                SortMemberPath="Status" />
                             <DataGridTextColumn Header="{loc:Localizastion Operation_Col_HeatsCreated}"
                                                 Binding="{Binding HeatsCreatedDisplay}"
+                                                SortMemberPath="HeatsCreatedCount"
                                                 Width="120"
                                                 ElementStyle="{StaticResource OperationStatsCellTextStyle}"
                                                 HeaderStyle="{StaticResource OperationStatsColumnHeaderStyle}" />
-                            <DataGridTemplateColumn Header="{loc:Localizastion Import_Col_Warnings}" Width="170">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <TextBlock HorizontalAlignment="Center" TextAlignment="Center"
-                                                   Text="{Binding WarningsCount}" />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                            <DataGridTemplateColumn Header="{loc:Localizastion Import_Col_Errors}" Width="100">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <TextBlock HorizontalAlignment="Center" TextAlignment="Center"
-                                                   Text="{Binding ErrorsCount}" />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
+                            <DataGridTextColumn Header="{loc:Localizastion Import_Col_Warnings}"
+                                                Binding="{Binding WarningsCount}"
+                                                Width="170"
+                                                ElementStyle="{StaticResource OperationStatsCellTextStyle}"
+                                                HeaderStyle="{StaticResource OperationStatsColumnHeaderStyle}" />
+                            <DataGridTextColumn Header="{loc:Localizastion Import_Col_Errors}"
+                                                Binding="{Binding ErrorsCount}"
+                                                Width="100"
+                                                ElementStyle="{StaticResource OperationStatsCellTextStyle}"
+                                                HeaderStyle="{StaticResource OperationStatsColumnHeaderStyle}" />
                         </ui:DataGrid.Columns>
                     </ui:DataGrid>
                 </ScrollViewer>

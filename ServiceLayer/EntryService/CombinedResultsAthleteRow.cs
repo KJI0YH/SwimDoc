@@ -4,7 +4,7 @@ namespace ServiceLayer.EntryService;
 
 public sealed record CombinedResultsAthleteRow(
     Athlete Athlete,
-    IReadOnlyDictionary<int, int?> PointsByEventId,
-    IReadOnlyDictionary<int, bool> ScoringByEventId,
+    IReadOnlyDictionary<int, string> PointsBySwimStyleId,
+    IReadOnlyDictionary<int, bool> ScoringBySwimStyleId,
     int TotalPoints,
     bool IsInOfficialStandings);

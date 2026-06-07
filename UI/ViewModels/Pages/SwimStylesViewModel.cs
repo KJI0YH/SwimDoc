@@ -6,6 +6,7 @@ using ServiceLayer.SwimStyleService;
 using UI.Resources;
 using UI.ViewModels.Pages.Data;
 using UI.Models.Rows;
+using UI.Models.Rows.Projections;
 using UI.Views.Dialogs.Markers.AddEdit;
 
 namespace UI.ViewModels.Pages;
@@ -26,8 +27,16 @@ public class SwimStylesViewModel : DataViewModel<SwimStyle, SwimStyleRowView, in
         ColumnConfigurations.Clear();
         ColumnConfigurations.Add(new ColumnConfiguration<SwimStyle>("DisplayName", Strings.SwimStyles_Col_Name, 300,
             ColumnConfiguration<SwimStyle>.SortBy(e => e.Distance, e => e.Stroke, e => e.RelayCount)));
-        ColumnConfigurations.Add(new ColumnConfiguration<SwimStyle>("Distance", Strings.SwimStyles_Col_Distance, 150));
-        ColumnConfigurations.Add(new ColumnConfiguration<SwimStyle>("Stroke", Strings.SwimStyles_Col_Stroke, 200));
+        ColumnConfigurations.Add(new ColumnConfiguration<SwimStyle>("Distance", Strings.SwimStyles_Col_Distance, 150,
+            ColumnConfiguration<SwimStyle>.SortBy(e => e.Distance)));
+        ColumnConfigurations.Add(new ColumnConfiguration<SwimStyle>("Stroke", Strings.SwimStyles_Col_Stroke, 200,
+            ColumnConfiguration<SwimStyle>.SortBy(e => e.Stroke)));
+    }
+
+    protected override async Task<List<SwimStyleRowView>> LoadPageRowsAsync(IQueryable<SwimStyle> query)
+    {
+        var projections = await RowProjectionQueries.SelectSwimStyle(query).ToListAsync();
+        return projections.Select(SwimStyleRowView.FromProjection).ToList();
     }
 
     protected override IQueryable<SwimStyle> ApplySearch(IQueryable<SwimStyle> query)

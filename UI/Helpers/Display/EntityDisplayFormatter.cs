@@ -1,5 +1,6 @@
 using DataLayer.Display;
 using DataLayer.EfClasses;
+using UI.Resources;
 
 namespace UI.Helpers.Display;
 
@@ -12,6 +13,9 @@ public static class EntityDisplayFormatter
 
     public static string FormatAthleteClubName(Athlete? athlete) =>
         EntityDisplay.FormatAthleteClubName(athlete, Texts);
+
+    public static string FormatAthleteCategory(Athlete? athlete) =>
+        athlete is null ? string.Empty : Strings.GetEnumDisplay(athlete.Category);
 
     public static int FormatAthletePointCount(Athlete? athlete) =>
         EntityDisplay.FormatAthletePointCount(athlete);

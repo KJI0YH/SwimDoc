@@ -8,6 +8,7 @@ using ServiceLayer.ClubService;
 using UI.Resources;
 using UI.ViewModels.Pages.Data;
 using UI.Models.Rows;
+using UI.Models.Rows.Projections;
 using UI.Views.Dialogs.Markers.AddEdit;
 
 namespace UI.ViewModels.Pages;
@@ -25,7 +26,8 @@ public class ClubsViewModel : DataViewModel<Club, ClubRowView, int?>
     {
         AutoGenerateColumns = false;
         ColumnConfigurations.Clear();
-        ColumnConfigurations.Add(new ColumnConfiguration<Club>("Name", Strings.Clubs_Col_Name, 300));
+        ColumnConfigurations.Add(new ColumnConfiguration<Club>("Name", Strings.Clubs_Col_Name, 300,
+            ColumnConfiguration<Club>.SortBy(club => club.Name)));
         ColumnConfigurations.Add(new ColumnConfiguration<Club>("AthleteCount", Strings.Clubs_Col_Athletes, 150,
             ColumnConfiguration<Club>.SortBy(club => club.Athletes.Count)));
         ColumnConfigurations.Add(new ColumnConfiguration<Club>("EntryCount", Strings.Clubs_Col_Entries, 150,
@@ -34,15 +36,13 @@ public class ClubsViewModel : DataViewModel<Club, ClubRowView, int?>
             ColumnConfiguration<Club>.SortBy(club => club.Relays.Count)));
         ColumnConfigurations.Add(new ColumnConfiguration<Club>("PointCount", Strings.Clubs_Col_Points, 150,
             ColumnConfiguration<Club>.SortBy(club => club.Athletes.Sum(athlete =>
-                athlete.Entries.Where(entry => entry.Scoring).Sum(entry => entry.Points)))));
+                athlete.Entries.Where(entry => entry.Scoring).Sum(entry => entry.Points ?? 0)))));
     }
 
-    protected override IQueryable<Club> ApplyQuery(IQueryable<Club> query)
+    protected override async Task<List<ClubRowView>> LoadPageRowsAsync(IQueryable<Club> query)
     {
-        return base.ApplyQuery(query)
-            .Include(club => club.Relays)
-            .Include(club => club.Athletes)
-            .ThenInclude(athlete => athlete.Entries);
+        var projections = await RowProjectionQueries.SelectClub(query).ToListAsync();
+        return projections.Select(ClubRowView.FromProjection).ToList();
     }
 
     protected override IQueryable<Club> ApplySearch(IQueryable<Club> query)

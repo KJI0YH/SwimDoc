@@ -1,3 +1,3 @@
 namespace BizLogic.ReportGenerator;
 
-public sealed record CombinedResultsReportEventColumn(int EventId, string Header, bool HasScoringEntries);
+public sealed record CombinedResultsReportEventColumn(int SwimStyleId, string Header, bool HasScoringEntries);

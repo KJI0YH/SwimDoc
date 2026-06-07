@@ -139,33 +139,51 @@ public class EntryService(EfCoreContext dbContext) : CrudService<Entry, int?>(db
             .Include(e => e.Athlete!)
             .ThenInclude(a => a.Club)
             .ToListAsync();
-        var eventColumns = events
-            .Select(se => new CombinedResultsEventColumn(
-                se.Id,
-                LocalizedEntityDisplayFormatter.FormatSwimStyle(se.SwimStyle),
-                entries.Any(entry => entry.SwimEventId == se.Id && entry.Scoring)))
+        var eventGroups = CombinedResultsCalculator.GroupEventsBySwimStyle(events);
+        var eventColumns = eventGroups
+            .Select(group =>
+            {
+                var swimStyle = group.First().SwimStyle;
+                return new CombinedResultsEventColumn(
+                    group.Key,
+                    LocalizedEntityDisplayFormatter.FormatSwimStyle(swimStyle),
+                    entries.Any(entry =>
+                        entry.Scoring &&
+                        group.Any(swimEvent => swimEvent.Id == entry.SwimEventId)));
+            })
             .ToList();
         var athletes = entries
             .GroupBy(e => e.AthleteId!.Value)
             .Select(group =>
             {
                 var athlete = group.First().Athlete!;
-                var pointsByEventId = new Dictionary<int, int?>();
-                var scoringByEventId = new Dictionary<int, bool>();
-                foreach (var swimEvent in events)
+                var entriesByEventId = group
+                    .Where(entry => entry.SwimEventId.HasValue)
+                    .ToDictionary(entry => entry.SwimEventId!.Value);
+                var pointsBySwimStyleId = new Dictionary<int, string>();
+                var scoringBySwimStyleId = new Dictionary<int, bool>();
+                var totalPoints = 0;
+                foreach (var eventGroup in eventGroups)
                 {
-                    var entry = group.FirstOrDefault(e => e.SwimEventId == swimEvent.Id);
-                    if (entry is null)
+                    var groupEvents = eventGroup.ToList();
+                    var groupEntriesByEventId = groupEvents
+                        .Where(swimEvent => entriesByEventId.ContainsKey(swimEvent.Id))
+                        .ToDictionary(swimEvent => swimEvent.Id, swimEvent => entriesByEventId[swimEvent.Id]);
+                    if (groupEntriesByEventId.Count == 0)
                         continue;
-                    pointsByEventId[swimEvent.Id] = entry.Points;
-                    scoringByEventId[swimEvent.Id] = entry.Scoring;
+                    var highestRoundEntry =
+                        CombinedResultsCalculator.GetHighestRoundEntry(groupEvents, groupEntriesByEventId);
+                    pointsBySwimStyleId[eventGroup.Key] =
+                        CombinedResultsCalculator.FormatPoints(highestRoundEntry);
+                    if (highestRoundEntry is not null)
+                        scoringBySwimStyleId[eventGroup.Key] = highestRoundEntry.Scoring;
+                    totalPoints += CombinedResultsCalculator.GetTotalContribution(highestRoundEntry);
                 }
-                var totalPoints = group.Where(e => e.Scoring).Sum(e => e.Points ?? 0);
                 var isInOfficialStandings = group.Any(e => e.Scoring);
                 return new CombinedResultsAthleteRow(
                     athlete,
-                    pointsByEventId,
-                    scoringByEventId,
+                    pointsBySwimStyleId,
+                    scoringBySwimStyleId,
                     totalPoints,
                     isInOfficialStandings);
             })
@@ -236,21 +254,28 @@ public class EntryService(EfCoreContext dbContext) : CrudService<Entry, int?>(db
 
     private Entry BuildEntryFromPreviousResult(Entry source, SwimEvent targetEvent)
     {
+        var scoring = source.Scoring;
         var entry = new Entry
         {
             SwimEventId = targetEvent.Id,
             SwimStyleId = targetEvent.SwimStyleId,
-            Scoring = source.Scoring,
+            Scoring = scoring,
             EntryTime = source.FinishTime,
             Comment = source.Comment
         };
         if (source.AthleteId.HasValue)
         {
             entry.AthleteId = source.AthleteId;
-            return dbContext.NormalizeEntry(entry);
+            entry = dbContext.NormalizeEntry(entry);
+            entry.Scoring = scoring;
+            return entry;
         }
         if (source.Relay is null)
-            return dbContext.NormalizeEntry(entry);
+        {
+            entry = dbContext.NormalizeEntry(entry);
+            entry.Scoring = scoring;
+            return entry;
+        }
         entry.Relay = new Relay
         {
             ClubId = source.Relay.ClubId,
@@ -265,7 +290,9 @@ public class EntryService(EfCoreContext dbContext) : CrudService<Entry, int?>(db
                 })
                 .ToList()
         };
-        return dbContext.NormalizeEntry(entry);
+        entry = dbContext.NormalizeEntry(entry);
+        entry.Scoring = scoring;
+        return entry;
     }
 
     public override async Task DeleteAsync(int? id, CancellationToken cancellationToken = default)

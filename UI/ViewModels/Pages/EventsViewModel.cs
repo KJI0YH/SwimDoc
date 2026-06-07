@@ -11,10 +11,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.EventService;
 using ServiceLayer.HeatService;
+using ServiceLayer.SwimStyleService;
 using ServiceLayer.ReportGeneratorService;
 using UI.Resources;
 using UI.ViewModels.Pages.Data;
 using UI.Models.Rows;
+using UI.Models.Rows.Projections;
 using UI.ViewModels.Dialogs.HeatAllocationParameters;
 using UI.ViewModels.Dialogs.ReportGeneration;
 using UI.ViewModels.Dialogs.StartTimeCalculation;
@@ -42,20 +44,24 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView
     public string GenderFilterText => GetFilterText(GenderFilterOptions, Strings.Filters_Gender);
     public string StatusFilterText => GetFilterText(StatusFilterOptions, Strings.Filters_Status);
     public string RoundFilterText => GetFilterText(RoundFilterOptions, Strings.Filters_Round);
+    private bool _filterOptionsInitialized;
+
     public EventsViewModel(IEventService eventService) : base(eventService)
     {
         _windowFactory = App.Current.Services.GetRequiredService<IAddEditWindowFactory>();
         PropertyChanged += OnViewModelPropertyChanged;
-        InitializeFilterOptions();
-        SubscribeFilterOptions();
         App.Current.Services.GetRequiredService<ILocalizationService>().CultureChanged += OnCultureChanged;
+    }
+
+    protected override async Task PrepareBeforeLoadAsync()
+    {
+        await EnsureFilterOptionsInitializedAsync();
     }
 
     protected override void ResetForNewCompetition()
     {
         base.ResetForNewCompetition();
-        InitializeFilterOptions();
-        SubscribeFilterOptions();
+        _filterOptionsInitialized = false;
     }
 
     private void OnCultureChanged(CultureInfo culture)
@@ -94,11 +100,14 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView
     {
         AutoGenerateColumns = false;
         ColumnConfigurations.Clear();
-        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Order", Strings.Events_Col_Order, 80));
+        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Order", Strings.Events_Col_Order, 80,
+            ColumnConfiguration<SwimEvent>.SortBy(e => e.Order)));
         ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Date", Strings.Events_Col_Date, 85,
             ColumnConfiguration<SwimEvent>.SortBy(e => e.Date)));
-        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Time", Strings.Events_Col_Time, 57));
-        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Round", Strings.Events_Col_Round, 150));
+        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Time", Strings.Events_Col_Time, 57,
+            ColumnConfiguration<SwimEvent>.SortBy(e => e.Time)));
+        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Round", Strings.Events_Col_Round, 150,
+            ColumnConfiguration<SwimEvent>.SortBy(e => e.Round)));
         ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("SwimStyle", Strings.Events_Col_Distance, 300,
             ColumnConfiguration<SwimEvent>.SortBy(
                 e => e.SwimStyle.Distance,
@@ -116,16 +125,17 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView
         });
         ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Lanes", Strings.Events_Col_Lanes, 80,
             ColumnConfiguration<SwimEvent>.SortBy(e => e.LaneMin, e => e.LaneMax)));
-        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Status", Strings.Events_Col_Status, 210));
+        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Status", Strings.Events_Col_Status, 210,
+            ColumnConfiguration<SwimEvent>.SortBy(e => e.Status)));
     }
 
-    protected override IQueryable<SwimEvent> ApplyQuery(IQueryable<SwimEvent> query)
+    protected override IQueryable<SwimEvent> ApplyQuery(IQueryable<SwimEvent> query) =>
+        query.OrderBy(se => se.Order);
+
+    protected override async Task<List<SwimEventRowView>> LoadPageRowsAsync(IQueryable<SwimEvent> query)
     {
-        return query
-            .OrderBy(se => se.Order)
-            .Include(swimEvent => swimEvent.AgeGroup)
-            .Include(swimEvent => swimEvent.SwimStyle)
-            .Include(swimEvent => swimEvent.Heats);
+        var projections = await RowProjectionQueries.SelectSwimEvent(query).ToListAsync();
+        return projections.Select(SwimEventRowView.FromProjection).ToList();
     }
 
     protected override IQueryable<SwimEvent> ApplySearch(IQueryable<SwimEvent> query) =>
@@ -151,13 +161,23 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView
         return query;
     }
 
-    private void InitializeFilterOptions()
+    private async Task EnsureFilterOptionsInitializedAsync()
     {
-        var distances = EventService.Query()
-            .Select(e => e.SwimStyle.Distance)
+        if (_filterOptionsInitialized)
+            return;
+        _filterOptionsInitialized = true;
+        await InitializeFilterOptionsAsync();
+        SubscribeFilterOptions();
+    }
+
+    private async Task InitializeFilterOptionsAsync()
+    {
+        var swimStyleService = App.Current.Services.GetRequiredService<ISwimStyleService>();
+        var distances = await swimStyleService.Query()
+            .Select(swimStyle => swimStyle.Distance)
             .Distinct()
             .OrderBy(distance => distance)
-            .ToList();
+            .ToListAsync();
         DistanceFilterOptions = new ObservableCollection<EventFilterOption<int>>(
             distances.Select(distance => new EventFilterOption<int>(
                 distance,

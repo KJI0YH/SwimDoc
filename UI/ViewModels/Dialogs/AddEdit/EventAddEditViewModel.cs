@@ -243,13 +243,13 @@ public partial class EventAddViewModel(
         }
         else
         {
-            Date = DateOnly.FromDateTime(DateTime.Today);
             Order = eventService.GetNextOrderNumber();
+            Date = eventService.GetPreviousDate();
+            Time = eventService.GetPreviousTime();
+            Course = eventService.GetPreviousCourse();
             var previousLanes = eventService.GetPreviousLaneSettings();
             (LaneMin, LaneMax) = (previousLanes.min, previousLanes.max);
             CustomLaneNames = previousLanes.customLaneNames;
-            Course = eventService.GetPreviousCourse();
-            Time = eventService.GetPreviousTime();
             SelectedPreviousSwimEvent = Enumerable.FirstOrDefault<SearchableItem>(PreviousSwimEvents, item => item.Value == null);
             if (_contextAgeGroupId.HasValue)
                 SelectedAgeGroup =

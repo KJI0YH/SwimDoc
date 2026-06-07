@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.AgeGroupService;
 using ServiceLayer.EntryService;
 using UI.Models;
+using UI.Services.Navigation;
 
 namespace UI.ViewModels.Pages;
 
@@ -21,6 +22,7 @@ public partial class CombinedResultsViewModel : ViewModelBase
     [ObservableProperty] private ObservableCollection<SearchableItem> _ageGroupOptions = new();
     [ObservableProperty] private ObservableCollection<CombinedResultsEventColumnView> _eventColumns = new();
     [ObservableProperty] private ObservableCollection<CombinedResultRow> _rows = new();
+    [ObservableProperty] private CombinedResultRow? _selectedRow;
     public virtual bool ShowAgeGroupSelector => true;
     private int? _preferredAgeGroupId;
     public void SetPreferredAgeGroupId(int? ageGroupId) => _preferredAgeGroupId = ageGroupId;
@@ -66,6 +68,7 @@ public partial class CombinedResultsViewModel : ViewModelBase
         {
             EventColumns = [];
             Rows = [];
+            SelectedRow = null;
             return;
         }
         IsLoading = true;
@@ -73,13 +76,28 @@ public partial class CombinedResultsViewModel : ViewModelBase
         {
             var data = await EntryService.GetCombinedResultsByAgeGroupAsync(ageGroupId);
             EventColumns = new ObservableCollection<CombinedResultsEventColumnView>(
-                data.EventColumns.Select(column => new CombinedResultsEventColumnView(column.EventId, column.Header)));
+                data.EventColumns.Select(column => new CombinedResultsEventColumnView(column.SwimStyleId, column.Header)));
             Rows = new ObservableCollection<CombinedResultRow>(BuildRows(data.Athletes));
+            SelectedRow = null;
         }
         finally
         {
             IsLoading = false;
         }
+    }
+
+    partial void OnSelectedRowChanged(CombinedResultRow? value) =>
+        OpenAthleteDetailsCommand.NotifyCanExecuteChanged();
+
+    private bool CanOpenAthleteDetails() => SelectedRow?.AthleteId > 0;
+
+    [RelayCommand(CanExecute = nameof(CanOpenAthleteDetails))]
+    private void OpenAthleteDetails()
+    {
+        if (SelectedRow is null || SelectedRow.AthleteId <= 0)
+            return;
+        var navigationService = App.Current.Services.GetRequiredService<INavigationService>();
+        navigationService.NavigateTo<AthleteDetailsViewModel>(SelectedRow.AthleteId);
     }
 
     internal static List<CombinedResultRow> BuildRows(IReadOnlyList<CombinedResultsAthleteRow> athletes)
@@ -112,10 +130,11 @@ public partial class CombinedResultsViewModel : ViewModelBase
             athlete.Id,
             EntityDisplayFormatter.FormatAthleteName(athlete),
             athlete.YearOfBirth.ToString(),
+            EntityDisplayFormatter.FormatAthleteCategory(athlete),
             EntityDisplayFormatter.FormatAthleteClubName(athlete),
             athleteRow.TotalPoints,
-            athleteRow.PointsByEventId,
-            athleteRow.ScoringByEventId,
+            athleteRow.PointsBySwimStyleId,
+            athleteRow.ScoringBySwimStyleId,
             isOutOfScoring);
     }
 

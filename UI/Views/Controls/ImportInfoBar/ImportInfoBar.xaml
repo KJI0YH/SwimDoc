@@ -257,7 +257,8 @@
                                     <DataGridTextColumn Header="{loc:Localizastion Import_Col_File}" Binding="{Binding FileName}" Width="150" />
                                     <DataGridTextColumn Header="{loc:Localizastion Import_Col_Path}" Binding="{Binding FullPath}" Width="*" />
                                     <DataGridTextColumn Header="{loc:Localizastion Import_Col_Status}" Width="180"
-                                                        Binding="{Binding StatusText}" />
+                                                        Binding="{Binding StatusText}"
+                                                        SortMemberPath="Status" />
                                     <DataGridTextColumn Header="{loc:Localizastion Import_Col_Clubs}" Width="130"
                                                         Binding="{Binding ClubsStatsDisplay}"
                                                         ElementStyle="{StaticResource ImportStatsCellTextStyle}"
@@ -271,27 +272,16 @@
                                                         ElementStyle="{StaticResource ImportStatsCellTextStyle}"
                                                         HeaderStyle="{StaticResource ImportStatsColumnHeaderStyle}" />
 
-                                    <DataGridTemplateColumn Header="{loc:Localizastion Import_Col_Warnings}" Width="170"
-                                                            HeaderStyle="{StaticResource ImportStatsColumnHeaderStyle}">
-                                        <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <TextBlock HorizontalAlignment="Center" TextAlignment="Center">
-                                                    <Run Text="{Binding WarningsCount}" />
-                                                </TextBlock>
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellTemplate>
-                                    </DataGridTemplateColumn>
-
-                                    <DataGridTemplateColumn Header="{loc:Localizastion Import_Col_Errors}" Width="100"
-                                                            HeaderStyle="{StaticResource ImportStatsColumnHeaderStyle}">
-                                        <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <TextBlock HorizontalAlignment="Center" TextAlignment="Center">
-                                                    <Run Text="{Binding ErrorsCount}" />
-                                                </TextBlock>
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellTemplate>
-                                    </DataGridTemplateColumn>
+                                    <DataGridTextColumn Header="{loc:Localizastion Import_Col_Warnings}"
+                                                        Binding="{Binding WarningsCount}"
+                                                        Width="170"
+                                                        ElementStyle="{StaticResource ImportStatsCellTextStyle}"
+                                                        HeaderStyle="{StaticResource ImportStatsColumnHeaderStyle}" />
+                                    <DataGridTextColumn Header="{loc:Localizastion Import_Col_Errors}"
+                                                        Binding="{Binding ErrorsCount}"
+                                                        Width="100"
+                                                        ElementStyle="{StaticResource ImportStatsCellTextStyle}"
+                                                        HeaderStyle="{StaticResource ImportStatsColumnHeaderStyle}" />
                                 </ui:DataGrid.Columns>
                             </ui:DataGrid>
                         </ScrollViewer>

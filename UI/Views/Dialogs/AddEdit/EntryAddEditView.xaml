@@ -22,7 +22,7 @@
                         <StackPanel>
                             <Grid Margin="0,5">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="180" />
+                                    <ColumnDefinition Width="200" />
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
@@ -43,7 +43,7 @@
     
                             <Grid Margin="0,5">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="180" />
+                                    <ColumnDefinition Width="200" />
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
@@ -64,7 +64,7 @@
     
                             <Grid Margin="0,5">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="180" />
+                                    <ColumnDefinition Width="200" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0"
@@ -79,7 +79,7 @@
     
                             <Grid Margin="0,5">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="180" />
+                                    <ColumnDefinition Width="200" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0"
@@ -101,7 +101,7 @@
                         <StackPanel>
                             <Grid Margin="0,5">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="180" />
+                                    <ColumnDefinition Width="200" />
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
@@ -122,7 +122,7 @@
     
                             <Grid Margin="0,5">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="180" />
+                                    <ColumnDefinition Width="200" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0"
@@ -138,7 +138,7 @@
     
                             <Grid Margin="0,5">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="180" />
+                                    <ColumnDefinition Width="200" />
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
@@ -174,7 +174,7 @@
                                                                Text="{Binding Order}"
                                                                VerticalAlignment="Center" />
                                                     <searchableComboBox:SearchableComboBox Grid.Column="1"
-                                                            ItemsSource="{Binding DataContext.RelayAthletes, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                            ItemsSource="{Binding AvailableAthletes}"
                                                             SelectedItem="{Binding SelectedAthlete, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                             Margin="0,2,10,2" />
                                                     <Button Grid.Column="2"
@@ -196,7 +196,7 @@
     
                             <Grid Margin="0,5">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="180" />
+                                    <ColumnDefinition Width="200" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0"
@@ -211,7 +211,7 @@
     
                             <Grid Margin="0,5">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="180" />
+                                    <ColumnDefinition Width="200" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0"

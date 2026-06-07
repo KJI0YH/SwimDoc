@@ -7,12 +7,14 @@ using Microsoft.EntityFrameworkCore;
 using ServiceLayer.EventService;
 using UI.Resources;
 using UI.Models;
+using UI.Services.Navigation;
 
 namespace UI.ViewModels.Dialogs.LoadEntriesFromPreviousEvent;
 
-public partial class LoadEntriesFromPreviousEventViewModel : ViewModelBase, IWindowResult
+public partial class LoadEntriesFromPreviousEventViewModel : ViewModelBase, IWindowResult, INavigationContextAware
 {
     private readonly IEventService _eventService;
+    private int? _contextEventId;
     [ObservableProperty] private ObservableCollection<SearchableItem> _officialPreviousEvents = new();
     [ObservableProperty] private ObservableCollection<SearchableItem> _targetEvents = new();
     [ObservableProperty] private SearchableItem? _selectedPreviousEvent;
@@ -61,6 +63,27 @@ public partial class LoadEntriesFromPreviousEventViewModel : ViewModelBase, IWin
                 DisplayText = EntityDisplayFormatter.FormatSwimEvent(swimEvent)
             });
         }
+        ApplyDefaultSelections();
+    }
+
+    public void ApplyContext(NavigationContext context)
+    {
+        _contextEventId = context.EventId ?? context.Id;
+        ApplyDefaultSelections();
+    }
+
+    private void ApplyDefaultSelections()
+    {
+        if (!_contextEventId.HasValue)
+            return;
+        SelectedTargetEvent = TargetEvents.FirstOrDefault(item =>
+            item.Value is SwimEvent swimEvent && swimEvent.Id == _contextEventId.Value);
+        if (SelectedTargetEvent?.Value is not SwimEvent targetEvent)
+            return;
+        if (!targetEvent.PreviousSwimEventId.HasValue)
+            return;
+        SelectedPreviousEvent = OfficialPreviousEvents.FirstOrDefault(item =>
+            item.Value is SwimEvent swimEvent && swimEvent.Id == targetEvent.PreviousSwimEventId.Value);
     }
 
     [RelayCommand]

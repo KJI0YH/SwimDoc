@@ -31,8 +31,8 @@
   <data name="Settings_Header_Stroke" xml:space="preserve"><value>Stroke</value></data>
   <data name="Settings_Header_TeamType" xml:space="preserve"><value>Team type</value></data>
 
-  <data name="Gender_Male" xml:space="preserve"><value>Men</value></data>
-  <data name="Gender_Female" xml:space="preserve"><value>Women</value></data>
+  <data name="Gender_Male" xml:space="preserve"><value>Male</value></data>
+  <data name="Gender_Female" xml:space="preserve"><value>Female</value></data>
 
   <data name="Stroke_Fly" xml:space="preserve"><value>Butterfly</value></data>
   <data name="Stroke_Back" xml:space="preserve"><value>Backstroke</value></data>

@@ -10,6 +10,7 @@ using ServiceLayer.EntryService;
 using ServiceLayer.EventService;
 using UI.ViewModels.Pages.Data;
 using UI.Models.Rows;
+using UI.Models.Rows.Projections;
 using UI.Models;
 
 namespace UI.ViewModels.Pages;
@@ -53,12 +54,14 @@ public partial class ResultsViewModel(
             return;
         }
         _ = CombinedResults.InitializeAsync();
+        EnsureDataLoaded();
     }
 
     private async Task InitializeForEventAsync(int eventId)
     {
-        var swimEvent = await ApplyQuery(EventService.Query())
-            .FirstOrDefaultAsync(se => se.Id == eventId);
+        RequestReload();
+        await LoadDataAsync();
+        var swimEvent = await QuerySwimEventAsync(eventId);
         if (swimEvent?.AgeGroupId is int ageGroupId)
             CombinedResults.SetPreferredAgeGroupId(ageGroupId);
         await CombinedResults.InitializeAsync();
@@ -67,12 +70,20 @@ public partial class ResultsViewModel(
 
     public Task RefreshAsync() => LoadEntriesAsync();
     protected Task LoadEntriesForEventIdAsync(int eventId) => LoadEntriesCoreAsync(eventId);
-    protected override IQueryable<SwimEvent> ApplyQuery(IQueryable<SwimEvent> query)
+    protected override IQueryable<SwimEvent> ApplyQuery(IQueryable<SwimEvent> query) =>
+        query.OrderBy(se => se.Order);
+
+    protected override async Task<List<SwimEventRowView>> LoadPageRowsAsync(IQueryable<SwimEvent> query)
     {
-        return query
-            .OrderBy(se => se.Order)
-            .Include(se => se.AgeGroup)
-            .Include(se => se.SwimStyle);
+        var projections = await RowProjectionQueries.SelectSwimEvent(query).ToListAsync();
+        return projections.Select(SwimEventRowView.FromProjection).ToList();
+    }
+
+    private async Task<SwimEvent?> QuerySwimEventAsync(int eventId)
+    {
+        var projection = await RowProjectionQueries.SelectSwimEvent(ApplyQuery(EventService.Query()))
+            .FirstOrDefaultAsync(se => se.Id == eventId);
+        return projection is null ? null : SwimEventRowView.FromProjection(projection).Entity;
     }
 
     protected override void OnItemsLoaded(IReadOnlyList<SwimEvent> items)
@@ -117,8 +128,7 @@ public partial class ResultsViewModel(
 
     private async Task SelectNavigatedEventAsync(int eventId)
     {
-        var swimEvent = await ApplyQuery(EventService.Query())
-            .FirstOrDefaultAsync(se => se.Id == eventId);
+        var swimEvent = await QuerySwimEventAsync(eventId);
         if (swimEvent is null)
         {
             ClearNavigatedEvent();
@@ -170,8 +180,7 @@ public partial class ResultsViewModel(
     {
         try
         {
-            var swimEvent = await ApplyQuery(EventService.Query())
-                .FirstOrDefaultAsync(se => se.Id == eventId);
+            var swimEvent = await QuerySwimEventAsync(eventId);
             if (swimEvent is null)
                 return;
             if (Items.All(e => e.Id != eventId))

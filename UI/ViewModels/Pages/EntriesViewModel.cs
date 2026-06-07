@@ -16,9 +16,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
 using ServiceLayer.EntryDocumentReaderService;
 using ServiceLayer.EntryService;
+using ServiceLayer.SwimStyleService;
 using UI.Resources;
 using UI.ViewModels.Pages.Data;
 using UI.Models.Rows;
+using UI.Models.Rows.Projections;
 using UI.ViewModels.Dialogs.LoadEntriesFromPreviousEvent;
 using UI.Views.Dialogs.Markers.AddEdit;
 using UI.Views.Dialogs.Markers.LoadEntriesFromPreviousEvent;
@@ -125,8 +127,18 @@ public partial class EntriesViewModel(
 
     protected override void InitializeColumns()
     {
-        EnsureFilterOptionsInitialized();
         InitializeEntriesColumns();
+    }
+
+    protected override async Task PrepareBeforeLoadAsync()
+    {
+        await EnsureFilterOptionsInitializedAsync();
+    }
+
+    protected override async Task LoadDataAsync()
+    {
+        await EnsureFilterOptionsInitializedAsync();
+        await base.LoadDataAsync();
     }
 
     protected void InitializeEntriesColumns()
@@ -145,11 +157,17 @@ public partial class EntriesViewModel(
                 q => q.OrderBy(e => e.Athlete != null ? e.Athlete.YearOfBirth : int.MaxValue).ThenBy(e => e.Id),
                 q => q.OrderByDescending(e => e.Athlete != null ? e.Athlete.YearOfBirth : int.MinValue)
                     .ThenByDescending(e => e.Id))));
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("ParticipantCategory", Strings.Athletes_Col_Category, 100,
+            ColumnConfiguration<Entry>.SortByDirection(
+                q => q.OrderBy(e => e.Athlete != null ? (int)e.Athlete.Category : int.MaxValue).ThenBy(e => e.Id),
+                q => q.OrderByDescending(e => e.Athlete != null ? (int)e.Athlete.Category : int.MinValue)
+                    .ThenByDescending(e => e.Id))));
         ColumnConfigurations.Add(new ColumnConfiguration<Entry>("ParticipantClubName", Strings.Entries_Col_Team, 200,
             ColumnConfiguration<Entry>.SortBy(
                 e => e.Athlete != null ? e.Athlete.Club!.Name : e.Relay != null ? e.Relay.Club!.Name : null,
                 e => e.Id)));
-        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("Status", Strings.Entries_Col_Status, 150));
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("Status", Strings.Entries_Col_Status, 150,
+            ColumnConfiguration<Entry>.SortBy(e => e.Status)));
         ColumnConfigurations.Add(new ColumnConfiguration<Entry>("EntryTime", Strings.Entries_Col_EntryTime, 95,
             ColumnConfiguration<Entry>.SortBy(e => e.EntryTime ?? SlowestTimeRank, e => e.Id),
             nameof(Entry.EntryTime)));
@@ -160,27 +178,19 @@ public partial class EntriesViewModel(
                     : SlowestTimeRank,
                 e => e.Id),
             nameof(Entry.FinishTime)));
-        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("Points", Strings.Entries_Col_Points, 50));
-        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("Comment", Strings.Entries_Col_Comment, 250));
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("Points", Strings.Entries_Col_Points, 50,
+            ColumnConfiguration<Entry>.SortBy(e => e.Points ?? 0)));
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("Comment", Strings.Entries_Col_Comment, 250,
+            ColumnConfiguration<Entry>.SortBy(e => e.Comment)));
     }
 
-    protected override IQueryable<Entry> ApplyQuery(IQueryable<Entry> query)
+    protected override async Task<List<EntryRowView>> LoadPageRowsAsync(IQueryable<Entry> query)
     {
-        return query
-            .Include(entry => entry.Athlete)
-            .ThenInclude(a => a.Club)
-            .Include(entry => entry.Relay)
-            .ThenInclude(relay => relay.Club)
-            .Include(entry => entry.Relay)
-            .ThenInclude(relay => relay.Positions)
-            .ThenInclude(pos => pos.Athlete)
-            .Include(entry => entry.SwimStyle)
-            .Include(entry => entry.SwimEvent)
-            .ThenInclude(se => se.SwimStyle)
-            .Include(entry => entry.SwimEvent)
-            .ThenInclude(se => se.AgeGroup)
-            .Include(entry => entry.HeatPosition)
-            .ThenInclude(heatPosition => heatPosition.Heat);
+        var projections = await RowProjectionQueries.SelectEntry(query).ToListAsync();
+        await using var scope = App.Current.Services.CreateAsyncScope();
+        var db = scope.ServiceProvider.GetRequiredService<EfCoreContext>();
+        await EntryRelayPositionEnricher.EnrichAsync(projections, db);
+        return projections.Select(EntryRowView.FromProjection).ToList();
     }
 
     protected override void OpenEntryDetails(Entry entry)
@@ -237,12 +247,12 @@ public partial class EntriesViewModel(
         return query;
     }
 
-    protected void EnsureFilterOptionsInitialized()
+    private async Task EnsureFilterOptionsInitializedAsync()
     {
         if (_filterOptionsInitialized)
             return;
         _filterOptionsInitialized = true;
-        InitializeFilterOptions();
+        await InitializeFilterOptionsAsync();
         SubscribeFilterOptions();
         EnsureCultureSubscription();
     }
@@ -301,14 +311,14 @@ public partial class EntriesViewModel(
         _filterOptionsInitialized = false;
     }
 
-    protected virtual IQueryable<Entry> GetFilterOptionsSource() => CrudService.Query();
-    protected virtual void InitializeFilterOptions()
+    protected virtual async Task InitializeFilterOptionsAsync()
     {
-        var distances = GetFilterOptionsSource()
-            .Select(e => e.SwimStyle.Distance)
+        var swimStyleService = App.Current.Services.GetRequiredService<ISwimStyleService>();
+        var distances = await swimStyleService.Query()
+            .Select(swimStyle => swimStyle.Distance)
             .Distinct()
             .OrderBy(distance => distance)
-            .ToList();
+            .ToListAsync();
         DistanceFilterOptions = new ObservableCollection<EventFilterOption<int>>(
             distances.Select(distance => new EventFilterOption<int>(
                 distance,
@@ -407,10 +417,13 @@ public partial class EntriesViewModel(
         if (result == true) _ = LoadDataAsync();
     }
 
+    protected virtual NavigationContext? GetLoadEntriesFromPreviousEventContext() => null;
+
     [RelayCommand]
     private async Task LoadEntriesFromPreviousEventAsync()
     {
-        var dialog = _windowFactory.CreateAndShowAndReturn<LoadEntriesFromPreviousEventWindow>();
+        var dialog = _windowFactory.CreateAndShowAndReturn<LoadEntriesFromPreviousEventWindow>(
+            context: GetLoadEntriesFromPreviousEventContext());
         if (dialog.DataContext is not IWindowResult { Result: LoadEntriesFromPreviousEventResult selection })
             return;
         try
@@ -526,8 +539,8 @@ public partial class EntriesViewModel(
     public void OnNavigatedTo(object? parameter)
     {
         ResetFilterOptions();
-        EnsureFilterOptionsInitialized();
-        _ = LoadDataAsync();
+        RequestReload();
+        EnsureDataLoaded();
     }
 
     public void OnNavigatedFrom()

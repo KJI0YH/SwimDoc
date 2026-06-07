@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -5,6 +6,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
+using UI.Helpers.Operations;
 
 namespace UI.Views.Controls.OperationInfoBar;
 
@@ -14,6 +16,26 @@ public partial class OperationInfoBar : UserControl
     public OperationInfoBar()
     {
         InitializeComponent();
+    }
+
+    private void ItemsGrid_Sorting(object sender, DataGridSortingEventArgs e)
+    {
+        e.Handled = true;
+        if (e.Column is not DataGridColumn column)
+            return;
+        var sortProperty = column.SortMemberPath;
+        if (string.IsNullOrEmpty(sortProperty) && column is DataGridBoundColumn boundColumn)
+            sortProperty = (boundColumn.Binding as Binding)?.Path.Path;
+        if (string.IsNullOrEmpty(sortProperty))
+            return;
+        var direction = column.SortDirection != ListSortDirection.Ascending
+            ? ListSortDirection.Ascending
+            : ListSortDirection.Descending;
+        column.SortDirection = direction;
+        var viewProp = DataContext?.GetType().GetProperty("OperationItemsView");
+        if (viewProp?.GetValue(DataContext) is not ListCollectionView listView)
+            return;
+        OperationItemsViewHelper.ApplySort(listView, sortProperty, direction);
     }
 
     private void ItemsGrid_LoadingRow(object sender, DataGridRowEventArgs e)

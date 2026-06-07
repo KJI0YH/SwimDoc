@@ -2,7 +2,9 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Input;
 using System.Windows.Media;
+using UI.Models.CombinedResults;
 using UI.Resources;
 using UI.ViewModels.Pages;
 
@@ -24,6 +26,18 @@ public partial class CombinedResultsView : UserControl
     {
         _grid = (DataGrid)sender;
         UpdateColumns();
+    }
+
+    private void CombinedResultsGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+    {
+        if (sender is not DataGrid dataGrid || DataContext is not CombinedResultsViewModel viewModel)
+            return;
+        if (DataGridRowSelectionHelper.TryGetRowItem(dataGrid, e, out CombinedResultRow? row))
+            viewModel.SelectedRow = row;
+        if (!viewModel.OpenAthleteDetailsCommand.CanExecute(null))
+            return;
+        viewModel.OpenAthleteDetailsCommand.Execute(null);
+        e.Handled = true;
     }
 
     private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -52,6 +66,7 @@ public partial class CombinedResultsView : UserControl
         _grid.Columns.Add(CreateTextColumn(Strings.Results_Col_Place, nameof(CombinedResultRow.PlaceDisplay), 80));
         _grid.Columns.Add(CreateTextColumn(Strings.Results_Col_Participant, nameof(CombinedResultRow.ParticipantName), 220));
         _grid.Columns.Add(CreateTextColumn(Strings.Fixation_Col_BirthYear, nameof(CombinedResultRow.YearOfBirth), 120));
+        _grid.Columns.Add(CreateTextColumn(Strings.Athletes_Col_Category, nameof(CombinedResultRow.Category), 100));
         _grid.Columns.Add(CreateTextColumn(Strings.Results_Col_Team, nameof(CombinedResultRow.ClubName), 180));
         foreach (var column in viewModel.EventColumns)
         {
@@ -59,11 +74,11 @@ public partial class CombinedResultsView : UserControl
             {
                 Header = column.Header,
                 Width = 110,
-                Binding = new Binding($"[{column.EventId}]")
+                Binding = new Binding($"[{column.SwimStyleId}]")
                 {
                     TargetNullValue = string.Empty
                 },
-                CellStyle = CreateNonScoringCellStyle(column.EventId)
+                CellStyle = CreateNonScoringCellStyle(column.SwimStyleId)
             });
         }
         _grid.Columns.Add(CreateTextColumn(Strings.Results_Col_Total, nameof(CombinedResultRow.TotalPoints), 90));

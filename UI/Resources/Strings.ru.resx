@@ -83,7 +83,7 @@
 
   <data name="Dialog_SaveExcelTemplate_Title" xml:space="preserve"><value>Сохранить шаблон Excel</value></data>
   <data name="Dialog_SaveExcelTemplate_Filter" xml:space="preserve"><value>Excel (*.xlsx)|*.xlsx</value></data>
-  <data name="Dialog_SaveExcelTemplate_DefaultFileName" xml:space="preserve"><value>EntryDocumentTemplate.xlsx</value></data>
+  <data name="Dialog_SaveExcelTemplate_DefaultFileName" xml:space="preserve"><value>Шаблон заявки.xlsx</value></data>
 
   <data name="Language_Label" xml:space="preserve"><value>Язык</value></data>
   <data name="Language_English" xml:space="preserve"><value>English</value></data>

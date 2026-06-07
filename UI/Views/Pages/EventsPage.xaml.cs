@@ -1,4 +1,5 @@
 using System.Windows.Controls;
+using UI.Helpers.Navigation;
 using EventsViewModel = UI.ViewModels.Pages.EventsViewModel;
 
 namespace UI.Views.Pages;
@@ -9,5 +10,6 @@ public partial class EventsPage : Page
     {
         InitializeComponent();
         DataContext = viewModel;
+        DataPageNavigation.WireLoaded(this);
     }
 }

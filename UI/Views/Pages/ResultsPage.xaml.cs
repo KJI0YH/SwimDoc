@@ -1,5 +1,6 @@
 using System.Windows.Controls;
 using Microsoft.Extensions.DependencyInjection;
+using UI.Helpers.Navigation;
 using UI.ViewModels.Pages;
 
 namespace UI.Views.Pages;
@@ -13,6 +14,7 @@ public partial class ResultsPage : Page
         InitializeComponent();
         _navigationService.PageNavigationRequested += OnPageNavigationRequested;
         Unloaded += (_, _) => _navigationService.PageNavigationRequested -= OnPageNavigationRequested;
+        DataPageNavigation.WireLoaded(this);
         ApplyViewModel();
     }
 

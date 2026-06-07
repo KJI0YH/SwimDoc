@@ -38,18 +38,11 @@ public class EntriesByClubViewModel : EntriesViewModel
     {
         _clubId = clubId;
         ResetFilterOptions();
-        EnsureFilterOptionsInitialized();
-        LoadDataCommand.Execute(null);
+        RequestReload();
+        EnsureDataLoaded();
     }
 
-    protected override IQueryable<Entry> GetFilterOptionsSource() =>
-        ApplyClubScope(CrudService.Query());
-
-    protected override IQueryable<Entry> ApplyQuery(IQueryable<Entry> query)
-    {
-        query = base.ApplyQuery(query);
-        return ApplyClubScope(query);
-    }
+    protected override IQueryable<Entry> ApplyQuery(IQueryable<Entry> query) => ApplyClubScope(query);
 
     private IQueryable<Entry> ApplyClubScope(IQueryable<Entry> query) =>
         _clubId.HasValue

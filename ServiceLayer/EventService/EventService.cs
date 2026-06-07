@@ -32,6 +32,14 @@ public class EventService(EfCoreContext dbContext, IBaseTimeRepository baseTimeR
         return swimEvent is null ? (0, 0, null) : (swimEvent.LaneMin, swimEvent.LaneMax, swimEvent.CustomLaneNames);
     }
 
+    public DateOnly GetPreviousDate()
+    {
+        return dbContext.SwimEvents
+            .OrderByDescending(se => se.Order)
+            .Select(se => (DateOnly?)se.Date)
+            .FirstOrDefault() ?? DateOnly.FromDateTime(DateTime.Today);
+    }
+
     public TimeOnly? GetPreviousTime()
     {
         return dbContext.SwimEvents.OrderByDescending(se => se.Order).FirstOrDefault()?.Time;

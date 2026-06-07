@@ -21,11 +21,15 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
     private const string GENDER_HEADER = "Gender";
     private const string CATEGORY_HEADER = "Category";
     private const string CLUB_NAME_HEADER = "ClubName";
-    private static readonly string[] ButterflyNames = ["Баттерфляй", "Butterfly"];
-    private static readonly string[] BackstrokeNames = ["На спине", "Backstroke"];
-    private static readonly string[] BreaststrokeNames = ["Брасс", "Breaststroke"];
-    private static readonly string[] FreestyleNames = ["Вольный стиль", "Freestyle"];
-    private static readonly string[] MedleyNames = ["Комплексное плавание", "Medley"];
+    private static readonly string[] StrokeHeaderNames =
+    [
+        "Баттерфляй", "Butterfly", "Fly",
+        "На спине", "Backstroke", "Back",
+        "Брасс", "Breaststroke", "Breast",
+        "Вольный стиль", "Freestyle", "Free",
+        "Комплексное плавание", "Medley"
+    ];
+
     private static readonly Dictionary<string, string[]> HeaderAliases = new(StringComparer.OrdinalIgnoreCase)
     {
         [FIRSTNAME_HEADER] = ["Имя", "First name", "First Name", "Firstname"],
@@ -35,22 +39,27 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
         [CATEGORY_HEADER] = ["Разряд", "Category"],
         [CLUB_NAME_HEADER] = ["Команда", "Team", "Club", "Team name", "Club name"]
     };
+
     private List<string> _warnings;
     private List<string> _errors;
 
-    [GeneratedRegex(@"(?:\d{1,}\D)?[0-5]\d\D\d{2}")]
+    [GeneratedRegex(@"^\s*(?:\d{1,}\D)?[0-5]\d(?:\D\d{1,2})?\s*$")]
     private static partial Regex EntryTimeRegex();
+
     public IReadOnlyList<EntryDocument> Action(string dataIn) => Action(dataIn, CancellationToken.None);
+
     public IReadOnlyList<EntryDocument> Action(string dataIn, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         if (!File.Exists(dataIn))
-            throw new FileNotFoundException(string.Format(CultureInfo.CurrentUICulture, EntryImportStrings.FileNotFound_Format, dataIn));
+            throw new FileNotFoundException(string.Format(CultureInfo.CurrentUICulture,
+                EntryImportStrings.FileNotFound_Format, dataIn));
         using var package = OpenEntryFile(dataIn);
         var workBook = package.Workbook;
         var worksheets = workBook.Worksheets
             .Where(worksheet =>
-                !SettingsWorksheetNames.Contains(worksheet.Name?.Trim() ?? string.Empty, StringComparer.OrdinalIgnoreCase))
+                !SettingsWorksheetNames.Contains(worksheet.Name?.Trim() ?? string.Empty,
+                    StringComparer.OrdinalIgnoreCase))
             .ToList();
         var documents = new List<EntryDocument>(worksheets.Count);
         foreach (var worksheet in worksheets)
@@ -58,6 +67,7 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
             cancellationToken.ThrowIfCancellationRequested();
             documents.Add(ReadClubEntry(worksheet, cancellationToken));
         }
+
         return documents;
     }
 
@@ -66,7 +76,8 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
         cancellationToken.ThrowIfCancellationRequested();
         _warnings = [];
         _errors = [];
-        var athleteHeaders = FindHeaders(workSheet, cancellationToken, FIRSTNAME_HEADER, LASTNAME_HEADER, BIRTH_YEAR_HEADER, GENDER_HEADER, CATEGORY_HEADER);
+        var athleteHeaders = FindHeaders(workSheet, cancellationToken, FIRSTNAME_HEADER, LASTNAME_HEADER,
+            BIRTH_YEAR_HEADER, GENDER_HEADER, CATEGORY_HEADER);
         var clubHeaders = FindHeaders(workSheet, cancellationToken, CLUB_NAME_HEADER);
         var swimStyleHeaders = FindSwimStyles(workSheet, cancellationToken);
         _warnings.AddRange(CheckHeaders(workSheet, clubHeaders, CLUB_NAME_HEADER));
@@ -79,6 +90,7 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
         {
             return EntryDocument.OfAthletes(athletes, _warnings, _errors);
         }
+
         club.Athletes = athletes;
         return EntryDocument.OfClub(club, _warnings, _errors);
     }
@@ -105,6 +117,7 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
                 }
             }
         }
+
         return headersCols;
     }
 
@@ -116,6 +129,7 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
             if (headers.Contains(cell.Text, StringComparer.OrdinalIgnoreCase))
                 return cell.Start;
         }
+
         return null;
     }
 
@@ -123,13 +137,7 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
     {
         cancellationToken.ThrowIfCancellationRequested();
         Dictionary<int, SwimStyle> swimStyles = new();
-        var strokeHeaders = ButterflyNames
-            .Concat(BackstrokeNames)
-            .Concat(BreaststrokeNames)
-            .Concat(FreestyleNames)
-            .Concat(MedleyNames)
-            .ToArray();
-        var startCell = FindFirstHeaderFromList(workSheet, strokeHeaders);
+        var startCell = FindFirstHeaderFromList(workSheet, StrokeHeaderNames);
         if (startCell is null) return swimStyles;
         var startCol = startCell.Column;
         var endCol = workSheet.Dimension.End.Column;
@@ -148,9 +156,10 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
                     MessageLocation(workSheet.Name, distanceRow, col)));
                 continue;
             }
+
             var strokeText = workSheet.Cells[strokeRow, col].Text;
             if (string.IsNullOrWhiteSpace(strokeText)) continue;
-            if (!TryParseStroke(strokeText, out var style))
+            if (!EntryDocumentEnumParser.TryParseStroke(strokeText, out var style))
             {
                 _warnings.Add(string.Format(
                     CultureInfo.CurrentUICulture,
@@ -158,9 +167,11 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
                     MessageLocation(workSheet.Name, strokeRow, col)));
                 continue;
             }
+
             var swimStyle = dbAccess.GetOrAddIndividualSwimStyleByParameters(distance, style);
             swimStyles.Add(col, swimStyle);
         }
+
         return swimStyles;
     }
 
@@ -178,32 +189,8 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
                     header));
             }
         }
+
         return errors;
-    }
-
-    private static bool TryParseStroke(string text, out Stroke stroke)
-    {
-        var t = (text ?? string.Empty).Trim();
-        if (ButterflyNames.Contains(t, StringComparer.OrdinalIgnoreCase)) { stroke = Stroke.Fly; return true; }
-        if (BackstrokeNames.Contains(t, StringComparer.OrdinalIgnoreCase)) { stroke = Stroke.Back; return true; }
-        if (BreaststrokeNames.Contains(t, StringComparer.OrdinalIgnoreCase)) { stroke = Stroke.Breast; return true; }
-        if (FreestyleNames.Contains(t, StringComparer.OrdinalIgnoreCase)) { stroke = Stroke.Free; return true; }
-        if (MedleyNames.Contains(t, StringComparer.OrdinalIgnoreCase)) { stroke = Stroke.Medley; return true; }
-        stroke = default;
-        return false;
-    }
-
-    private static bool TryParseGender(string text, out Gender gender)
-    {
-        var t = (text ?? string.Empty).Trim();
-        if (string.Equals(t, "Мужчины", StringComparison.OrdinalIgnoreCase) || string.Equals(t, "Men", StringComparison.OrdinalIgnoreCase))
-        { gender = Gender.Male; return true; }
-        if (string.Equals(t, "Женщины", StringComparison.OrdinalIgnoreCase) || string.Equals(t, "Women", StringComparison.OrdinalIgnoreCase))
-        { gender = Gender.Female; return true; }
-        if (string.Equals(t, "Смешанная", StringComparison.OrdinalIgnoreCase) || string.Equals(t, "Mixed", StringComparison.OrdinalIgnoreCase))
-        { gender = Gender.Mixed; return true; }
-        gender = default;
-        return false;
     }
 
     private List<Athlete> ReadAthletes(
@@ -230,6 +217,7 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
                         MessageLocation(workSheet.Name, row, athleteHeaders[FIRSTNAME_HEADER]!.Column)));
                 hasErrors = true;
             }
+
             var lastName = workSheet.Cells[row, athleteHeaders[LASTNAME_HEADER]!.Column].Text;
             if (string.IsNullOrWhiteSpace(lastName))
             {
@@ -240,6 +228,7 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
                         MessageLocation(workSheet.Name, row, athleteHeaders[LASTNAME_HEADER]!.Column)));
                 hasErrors = true;
             }
+
             if (!int.TryParse(workSheet.Cells[row, athleteHeaders[BIRTH_YEAR_HEADER]!.Column].Text,
                     out var yearOfBirth))
             {
@@ -250,7 +239,9 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
                         MessageLocation(workSheet.Name, row, athleteHeaders[BIRTH_YEAR_HEADER]!.Column)));
                 hasErrors = true;
             }
-            if (!TryParseGender(workSheet.Cells[row, athleteHeaders[GENDER_HEADER]!.Column].Text, out var gender))
+
+            if (!EntryDocumentEnumParser.TryParseGender(workSheet.Cells[row, athleteHeaders[GENDER_HEADER]!.Column].Text,
+                    out var gender))
             {
                 _warnings.Add(
                     string.Format(
@@ -259,6 +250,7 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
                         MessageLocation(workSheet.Name, row, athleteHeaders[GENDER_HEADER]!.Column)));
                 hasErrors = true;
             }
+
             var category = ResolveCategory(workSheet, athleteHeaders, row);
             if (hasErrors) continue;
             var athlete = dbAccess.GetOrAddAthlete(firstName, lastName, yearOfBirth, gender, category);
@@ -269,16 +261,19 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
             foreach (var col in entryCols)
             {
                 cancellationToken.ThrowIfCancellationRequested();
+                var cellText = workSheet.Cells[row, col].Text.Trim();
                 var entry = dbAccess.GetOrAddEntry(athlete, swimStyleHeaders[col],
                     workSheet.Cells[row, col].Style.Fill.PatternType == ExcelFillStyle.None,
-                    EntryTimeRegex().IsMatch(workSheet.Cells[row, col].Text)
-                        ? ConvertEntryTimeToHundreds(workSheet.Cells[row, col].Text)
+                    EntryTimeRegex().IsMatch(cellText)
+                        ? ConvertEntryTimeToHundreds(cellText)
                         : null);
                 entries.Add(entry);
             }
+
             athlete.Entries = entries;
             athletes.Add(athlete);
         }
+
         return athletes;
     }
 
@@ -288,12 +283,14 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
         var row = clubHeaders.First(pair => pair.Key == CLUB_NAME_HEADER).Value!.Row;
         var col = colClub!.Column;
         var clubName = workSheet.Cells[row, col].Text;
-        if (string.Equals(clubName?.Trim(), HeaderAliases[CLUB_NAME_HEADER].First(), StringComparison.OrdinalIgnoreCase) ||
+        if (string.Equals(clubName?.Trim(), HeaderAliases[CLUB_NAME_HEADER].First(),
+                StringComparison.OrdinalIgnoreCase) ||
             HeaderAliases[CLUB_NAME_HEADER].Contains(clubName ?? string.Empty, StringComparer.OrdinalIgnoreCase))
         {
             while (workSheet.Cells[row, col + 1].IsEmpty()) row++;
             clubName = workSheet.Cells[row, col + 1].Text;
         }
+
         if (string.IsNullOrWhiteSpace(clubName))
         {
             _warnings.Add(string.Format(
@@ -302,17 +299,28 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
                 MessageLocation(workSheet.Name, null, null)));
             return null;
         }
+
         return dbAccess.GetOrAddClub(clubName);
     }
 
     private static int ConvertEntryTimeToHundreds(string entryTime)
     {
-        if (string.IsNullOrWhiteSpace(entryTime)) return 0;
         var matches = Regex.Matches(entryTime, @"\d+");
-        var hundreds = int.Parse(matches.Last().Value);
-        var seconds = int.Parse(matches[matches.Count > 2 ? 1 : 0].Value);
-        var minutes = matches.Count > 2 ? int.Parse(matches[0].Value) : 0;
-        return minutes * 60 * 100 + seconds * 100 + hundreds;
+        if (matches.Count == 0)
+            return 0;
+
+        var hasFraction = Regex.IsMatch(entryTime, @"\D\d{1,2}\s*$");
+        if (hasFraction)
+        {
+            var hundredths = int.Parse(matches[^1].Value);
+            var seconds = int.Parse(matches[^2].Value);
+            var minutes = matches.Count > 2 ? int.Parse(matches[0].Value) : 0;
+            return minutes * 6000 + seconds * 100 + hundredths;
+        }
+
+        var secondsOnly = int.Parse(matches[^1].Value);
+        var minutesOnly = matches.Count > 1 ? int.Parse(matches[0].Value) : 0;
+        return minutesOnly * 6000 + secondsOnly * 100;
     }
 
     private string MessageLocation(string worksheetName, int? row, int? col)
@@ -320,7 +328,8 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
         return $"'{worksheetName}'[{row ?? '?'}:{col ?? '?'}]";
     }
 
-    private static void ThrowIfCancellationRequested(CancellationToken cancellationToken, ref int counter, int interval = 32)
+    private static void ThrowIfCancellationRequested(CancellationToken cancellationToken, ref int counter,
+        int interval = 32)
     {
         if (++counter % interval == 0)
             cancellationToken.ThrowIfCancellationRequested();
@@ -338,7 +347,7 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
         if (string.IsNullOrWhiteSpace(categoryText))
             return Category.NoCategory;
 
-        if (EnumHelper.TryGetEnumByDescription<Category>(categoryText, out var category))
+        if (EntryDocumentEnumParser.TryParseCategory(categoryText, out var category))
             return category;
 
         _warnings.Add(

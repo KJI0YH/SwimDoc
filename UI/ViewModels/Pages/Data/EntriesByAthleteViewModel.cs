@@ -38,18 +38,11 @@ public class EntriesByAthleteViewModel : EntriesViewModel
     {
         _athleteId = athleteId;
         ResetFilterOptions();
-        EnsureFilterOptionsInitialized();
-        LoadDataCommand.Execute(null);
+        RequestReload();
+        EnsureDataLoaded();
     }
 
-    protected override IQueryable<Entry> GetFilterOptionsSource() =>
-        ApplyAthleteScope(CrudService.Query());
-
-    protected override IQueryable<Entry> ApplyQuery(IQueryable<Entry> query)
-    {
-        query = base.ApplyQuery(query);
-        return ApplyAthleteScope(query);
-    }
+    protected override IQueryable<Entry> ApplyQuery(IQueryable<Entry> query) => ApplyAthleteScope(query);
 
     private IQueryable<Entry> ApplyAthleteScope(IQueryable<Entry> query) =>
         _athleteId.HasValue

@@ -75,7 +75,7 @@ public sealed class ReportExportService(EfCoreContext dbContext, IEntryService e
         return new CombinedResultsReportData(
             data.EventColumns
                 .Select(column => new CombinedResultsReportEventColumn(
-                    column.EventId,
+                    column.SwimStyleId,
                     column.Header,
                     column.HasScoringEntries))
                 .ToList(),
@@ -87,8 +87,8 @@ public sealed class ReportExportService(EfCoreContext dbContext, IEntryService e
             LocalizedEntityDisplayFormatter.FormatAthleteName(row.Athlete),
             row.Athlete.YearOfBirth,
             LocalizedEntityDisplayFormatter.FormatAthleteClubName(row.Athlete),
-            row.PointsByEventId,
-            row.ScoringByEventId,
+            row.PointsBySwimStyleId,
+            row.ScoringBySwimStyleId,
             row.TotalPoints,
             row.IsInOfficialStandings,
             place);
