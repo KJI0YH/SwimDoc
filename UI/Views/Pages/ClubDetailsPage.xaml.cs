@@ -5,10 +5,9 @@ namespace UI.Views.Pages;
 
 public partial class ClubDetailsPage : Page
 {
-    public ClubDetailsPage(ClubDetailsViewModel viewModel, INavigationService navigationService)
+    public ClubDetailsPage(ClubDetailsViewModel viewModel)
     {
         InitializeComponent();
-        viewModel.OnNavigatedTo(navigationService.GetNavigationParameter<ClubDetailsViewModel>());
         DataContext = viewModel;
     }
 }

@@ -90,7 +90,6 @@ public partial class MainViewModel : ViewModelBase
     private void OnCompetitionSelected(string filePath)
     {
         IsCompetitionSelected = true;
-        _navigationService.ResetForNewCompetition();
-        _navigationService.NavigateTo<EventsViewModel>();
+        _navigationService.NavigateToRoot<EventsViewModel>();
     }
 }

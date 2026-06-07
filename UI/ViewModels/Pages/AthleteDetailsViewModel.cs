@@ -5,17 +5,23 @@ using ServiceLayer.EntryDocumentReaderService;
 using ServiceLayer.EntryService;
 using ServiceLayer.EventService;
 using ServiceLayer.HeatService;
+using UI.Services.Navigation;
 using UI.ViewModels.Pages.Data;
 
 namespace UI.ViewModels.Pages;
 
-public partial class AthleteDetailsViewModel : ViewModelBase, INavigationAware
+public partial class AthleteDetailsViewModel : ViewModelBase, INavigationAware, INavigationTabState
 {
     private readonly EntriesByAthleteViewModel _entriesTable;
     private readonly HeatsByAthleteViewModel _heatsTable;
     private readonly ResultsByAthleteViewModel _resultsTable;
     [ObservableProperty] private string? _title = string.Empty;
     [ObservableProperty] private int _selectedTabIndex;
+    public int NavigationTabIndex
+    {
+        get => SelectedTabIndex;
+        set => SelectedTabIndex = value;
+    }
     public AthleteDetailsViewModel(
         IEntryService entryService,
         IEntryDocumentReaderService entryDocumentReaderService,

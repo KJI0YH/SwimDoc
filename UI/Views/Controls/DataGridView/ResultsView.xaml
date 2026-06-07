@@ -18,8 +18,8 @@
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
                     <ComboBox uiHelpers:ComboBoxAutoWidthHelper.Enable="True"
                               ItemsSource="{Binding SwimEventOptions}"
-                              SelectedValue="{Binding SelectedSwimEvent}"
-                              SelectedValuePath="Value"
+                              SelectedItem="{Binding SelectedSwimEventOption}"
+                              DisplayMemberPath="DisplayText"
                               Margin="0,5,6,5" />
                     <Button Content="{ui:SymbolIcon ArrowPrevious24}"
                             Command="{Binding GoToPrevEventCommand}"

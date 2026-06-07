@@ -12,6 +12,7 @@ using UI.ViewModels.Pages.Data;
 using UI.Models.Rows;
 using UI.Models.Rows.Projections;
 using UI.Models;
+using UI.Services.Navigation;
 
 namespace UI.ViewModels.Pages;
 
@@ -20,16 +21,24 @@ public partial class ResultsViewModel(
     IEntryService entryService,
     IAgeGroupService ageGroupService,
     INavigationService navigationService) :
-    DataViewModel<SwimEvent, SwimEventRowView, int?>(eventService), INavigationAware
+    DataViewModel<SwimEvent, SwimEventRowView, int?>(eventService), INavigationAware, INavigationTabState
 {
     private int? _navigatedEventId;
     private bool _navigatedEventPageAdjusted;
+    private int? _persistedSwimEventId;
     private IEventService EventService =>
         App.Current.Services.GetRequiredService<IEventService>();
     private IEntryService EntryService =>
         App.Current.Services.GetRequiredService<IEntryService>();
     public CombinedResultsViewModel CombinedResults { get; } = new();
+    [ObservableProperty] private int _selectedTabIndex;
+    public int NavigationTabIndex
+    {
+        get => SelectedTabIndex;
+        set => SelectedTabIndex = value;
+    }
     [ObservableProperty] private SwimEvent? _selectedSwimEvent;
+    [ObservableProperty] private SearchableItem? _selectedSwimEventOption;
     [ObservableProperty] private ObservableCollection<SearchableItem> _swimEventOptions = new();
     [ObservableProperty] private ObservableCollection<ResultEntryView> _entries = new();
     [ObservableProperty] private ResultEntryView? _selectedResultEntry;
@@ -37,9 +46,11 @@ public partial class ResultsViewModel(
     {
         base.ResetForNewCompetition();
         SelectedSwimEvent = null;
+        SelectedSwimEventOption = null;
         SwimEventOptions = [];
         Entries = [];
         SelectedResultEntry = null;
+        _persistedSwimEventId = null;
         ClearNavigatedEvent();
         _ = CombinedResults.InitializeAsync();
     }
@@ -86,13 +97,34 @@ public partial class ResultsViewModel(
         return projection is null ? null : SwimEventRowView.FromProjection(projection).Entity;
     }
 
+    public void OnNavigationRestored()
+    {
+        var eventId = _persistedSwimEventId ?? SelectedSwimEvent?.Id;
+        if (eventId is not int selectedEventId)
+            return;
+        var pageItems = Items.Count > 0
+            ? Items.Select(row => row.Entity).ToList()
+            : SelectedSwimEvent?.Id == selectedEventId
+                ? new List<SwimEvent> { SelectedSwimEvent }
+                : [];
+        ApplySwimEventSelectionFromId(
+            selectedEventId,
+            pageItems,
+            SelectedSwimEvent?.Id == selectedEventId ? SelectedSwimEvent : null);
+        _ = RestoreAfterNavigationAsync(selectedEventId);
+    }
+
     protected override void OnItemsLoaded(IReadOnlyList<SwimEvent> items)
     {
         if (items.Count == 0)
         {
-            SelectedSwimEvent = null;
-            SwimEventOptions = [];
-            Entries = [];
+            if (_persistedSwimEventId is null)
+            {
+                SelectedSwimEvent = null;
+                SelectedSwimEventOption = null;
+                SwimEventOptions = [];
+                Entries = [];
+            }
             return;
         }
         if (_navigatedEventId is int eventId)
@@ -102,10 +134,14 @@ public partial class ResultsViewModel(
             {
                 SelectedSwimEvent = found;
                 ClearNavigatedEvent();
+                SyncSwimEventSelection(items);
                 return;
             }
             if (SelectedSwimEvent?.Id == eventId)
+            {
+                SyncSwimEventSelection(items);
                 return;
+            }
             if (!_navigatedEventPageAdjusted)
             {
                 _navigatedEventPageAdjusted = true;
@@ -115,15 +151,71 @@ public partial class ResultsViewModel(
             _ = LoadAndSelectEventAsync(eventId);
             return;
         }
-        if (SelectedSwimEvent is not null && items.Any(e => e.Id == SelectedSwimEvent.Id))
+        SyncSwimEventSelection(items);
+        if (SelectedSwimEvent is null)
+            SelectedSwimEvent = items.OrderBy(e => e.Order).FirstOrDefault();
+    }
+
+    private async Task RestoreAfterNavigationAsync(int eventId)
+    {
+        SwimEvent? swimEvent = SelectedSwimEvent?.Id == eventId
+            ? SelectedSwimEvent
+            : Items.FirstOrDefault(row => row.Id == eventId)?.Entity;
+        swimEvent ??= await QuerySwimEventAsync(eventId);
+        if (swimEvent is null)
             return;
-        SelectedSwimEvent ??= items.OrderBy(e => e.Order).FirstOrDefault();
+        var pageItems = Items.Count > 0
+            ? Items.Select(row => row.Entity).ToList()
+            : new List<SwimEvent> { swimEvent };
+        ApplySwimEventSelectionFromId(eventId, pageItems, swimEvent);
+        await LoadEntriesForEventIdAsync(eventId);
+    }
+
+    private void ApplySwimEventSelectionFromId(
+        int eventId,
+        IReadOnlyList<SwimEvent> pageItems,
+        SwimEvent? preferredEvent = null)
+    {
+        var swimEvent = preferredEvent
+            ?? pageItems.FirstOrDefault(e => e.Id == eventId)
+            ?? (SelectedSwimEvent?.Id == eventId ? SelectedSwimEvent : null);
+        if (swimEvent is null)
+            return;
+        var options = pageItems.Count > 0 ? pageItems.ToList() : [swimEvent];
+        if (options.All(e => e.Id != eventId))
+            options.Add(swimEvent);
+        options = options.OrderBy(e => e.Order).ToList();
         SwimEventOptions = new ObservableCollection<SearchableItem>(
-            items.Select(e => new SearchableItem
+            options.Select(e => new SearchableItem
             {
                 Value = e,
                 DisplayText = EntityDisplayFormatter.FormatSwimEvent(e)
             }));
+        SelectedSwimEvent = options.First(e => e.Id == eventId);
+        SelectedSwimEventOption = SwimEventOptions.FirstOrDefault(o =>
+            o.Value is SwimEvent swim && swim.Id == eventId);
+    }
+
+    private void SyncSwimEventSelection()
+    {
+        var eventId = _persistedSwimEventId ?? SelectedSwimEvent?.Id;
+        if (eventId is not int selectedEventId)
+            return;
+        ApplySwimEventSelectionFromId(selectedEventId, Items.Select(row => row.Entity).ToList());
+    }
+
+    private void SyncSwimEventSelection(IReadOnlyList<SwimEvent> pageItems)
+    {
+        var eventId = _persistedSwimEventId ?? SelectedSwimEvent?.Id;
+        if (eventId is not int selectedEventId)
+        {
+            if (pageItems.Count == 0)
+                return;
+            var first = pageItems.OrderBy(e => e.Order).First();
+            ApplySwimEventSelectionFromId(first.Id, pageItems, first);
+            return;
+        }
+        ApplySwimEventSelectionFromId(selectedEventId, pageItems);
     }
 
     private async Task SelectNavigatedEventAsync(int eventId)
@@ -140,6 +232,7 @@ public partial class ResultsViewModel(
         await EnsureNavigatedEventVisibleAsync(eventId, swimEvent);
         if (Items.FirstOrDefault(e => e.Id == eventId) is { } listed)
             SelectedSwimEvent = listed.Entity;
+        SyncSwimEventSelection();
         ClearNavigatedEvent();
     }
 
@@ -189,6 +282,7 @@ public partial class ResultsViewModel(
                 Items = new ObservableCollection<SwimEventRowView>(merged);
             }
             SelectedSwimEvent = Items.First(e => e.Id == eventId).Entity;
+            SyncSwimEventSelection();
         }
         finally
         {
@@ -204,9 +298,25 @@ public partial class ResultsViewModel(
 
     partial void OnSelectedSwimEventChanged(SwimEvent? value)
     {
+        _persistedSwimEventId = value?.Id;
+        if (value?.Id is int eventId)
+        {
+            var option = SwimEventOptions.FirstOrDefault(o =>
+                o.Value is SwimEvent swim && swim.Id == eventId);
+            if (!ReferenceEquals(SelectedSwimEventOption, option))
+                SelectedSwimEventOption = option;
+        }
+        else if (SelectedSwimEventOption is not null)
+            SelectedSwimEventOption = null;
         if (value?.AgeGroupId is int ageGroupId)
             CombinedResults.TrySelectAgeGroup(ageGroupId);
         _ = LoadEntriesAsync();
+    }
+
+    partial void OnSelectedSwimEventOptionChanged(SearchableItem? value)
+    {
+        if (value?.Value is SwimEvent swimEvent && SelectedSwimEvent?.Id != swimEvent.Id)
+            SelectedSwimEvent = swimEvent;
     }
 
     private Task LoadEntriesAsync()

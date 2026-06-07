@@ -6,4 +6,8 @@ public interface INavigationAware
     void OnNavigatedFrom()
     {
     }
+
+    void OnNavigationRestored()
+    {
+    }
 }

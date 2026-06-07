@@ -24,6 +24,10 @@ public partial class EntryViewModel(
 {
     private bool _initialized;
     private bool _suppressRelaySync;
+    private bool _suppressIndividualFilterSync;
+    private List<Athlete> _allAthletes = [];
+    private List<SwimEvent> _allIndividualSwimEvents = [];
+    private HashSet<(int AthleteId, int SwimEventId)> _existingIndividualEntryKeys = [];
     private bool _relayNumberManuallySet;
     private string _relayNumberText = string.Empty;
     public bool IsInitialized => _initialized;
@@ -207,18 +211,17 @@ public partial class EntryViewModel(
         SelectedTabIndex = 0;
         IsIndividualTabEnabled = true;
         IsRelayTabEnabled = true;
-        await LoadIndividualEventsAsync();
+        await LoadAllIndividualEventsAsync();
         await LoadRelayEventsAsync();
         LoadClubs();
-        LoadAthletes();
+        LoadAllAthletes();
+        await LoadExistingIndividualEntryKeysAsync();
         _entryTimeText = SwimTimeInput.Format(Entity.EntryTime);
         OnPropertyChanged(nameof(EntryTimeText));
         OnPropertyChanged(nameof(Scoring));
-        SelectedAthlete = Athletes.FirstOrDefault(item => item.Value is Athlete a && a.Id == Entity.AthleteId);
-        SelectedSwimEvent = Entity.SwimEventId == null
-            ? SwimEvents.FirstOrDefault(item => item.Value == null)
-            : SwimEvents.FirstOrDefault(item => item.Value is SwimEvent se && se.Id == Entity.SwimEventId);
-        if (Entity.Relay is not null)
+        if (IsAdd)
+            ApplyAddContextDefaults();
+        if (!IsAdd && Entity.Relay is not null)
         {
             SelectedTabIndex = 1;
             _suppressRelaySync = true;
@@ -241,18 +244,60 @@ public partial class EntryViewModel(
             RefreshRelayLegAthleteOptions();
         }
         if (IsAdd)
-        {
-            if (_contextAthleteId.HasValue)
-                SelectedAthlete =
-                    Athletes.FirstOrDefault(item => item.Value is Athlete a && a.Id == _contextAthleteId.Value);
-            if (_contextEventId.HasValue)
-                ApplyAddContextForEvent(_contextEventId.Value);
-            else if (_contextSwimStyleId.HasValue)
-                ApplyAddContextForSwimStyle(_contextSwimStyleId.Value);
-            else
-                SelectedTabIndex = 0;
-        }
+            ApplyAddContextUiState();
+        RefreshIndividualEntryOptions();
         _initialized = true;
+    }
+
+    private void ApplyAddContextDefaults()
+    {
+        if (_contextAthleteId is int athleteId)
+            Entity.AthleteId = athleteId;
+        if (_contextEventId is int eventId)
+        {
+            if (!IsRelayContextEvent(eventId))
+                ApplyIndividualEventToEntity(eventId);
+        }
+        else if (_contextSwimStyleId is int swimStyleId && !IsRelayContextSwimStyle(swimStyleId))
+            ApplyIndividualSwimStyleToEntity(swimStyleId);
+    }
+
+    private void ApplyAddContextUiState()
+    {
+        if (_contextEventId is int eventId)
+            ApplyAddContextForEvent(eventId);
+        else if (_contextSwimStyleId is int swimStyleId)
+            ApplyAddContextForSwimStyle(swimStyleId);
+        else if (_contextAthleteId.HasValue)
+        {
+            SelectedTabIndex = 0;
+            IsIndividualTabEnabled = true;
+            IsRelayTabEnabled = true;
+        }
+    }
+
+    private bool IsRelayContextEvent(int eventId) =>
+        RelaySwimEvents.Any(item => item.Value is SwimEvent swimEvent && swimEvent.Id == eventId);
+
+    private bool IsRelayContextSwimStyle(int swimStyleId) =>
+        RelaySwimEvents.Any(item => item.Value is SwimEvent swimEvent && swimEvent.SwimStyleId == swimStyleId);
+
+    private void ApplyIndividualEventToEntity(int eventId)
+    {
+        var swimEvent = _allIndividualSwimEvents.FirstOrDefault(e => e.Id == eventId);
+        if (swimEvent is null)
+            return;
+        Entity.SwimEventId = swimEvent.Id;
+        Entity.SwimStyleId = swimEvent.SwimStyleId;
+    }
+
+    private void ApplyIndividualSwimStyleToEntity(int swimStyleId)
+    {
+        var swimEvent = _allIndividualSwimEvents.FirstOrDefault(e => e.SwimStyleId == swimStyleId);
+        if (swimEvent is null)
+            return;
+        Entity.SwimEventId = swimEvent.Id;
+        Entity.SwimStyleId = swimEvent.SwimStyleId;
     }
 
     private void ApplyAddContextForEvent(int eventId)
@@ -265,8 +310,6 @@ public partial class EntryViewModel(
             return;
         }
         SelectedTabIndex = 0;
-        SelectedSwimEvent =
-            SwimEvents.FirstOrDefault(item => item.Value is SwimEvent se && se.Id == eventId);
         IsRelayTabEnabled = false;
     }
 
@@ -280,9 +323,7 @@ public partial class EntryViewModel(
             return;
         }
         SelectedTabIndex = 0;
-        SelectedSwimEvent =
-            SwimEvents.FirstOrDefault(item => item.Value is SwimEvent se && se.SwimStyleId == swimStyleId);
-        if (SelectedSwimEvent != null)
+        if (_allIndividualSwimEvents.Any(e => e.SwimStyleId == swimStyleId))
             IsRelayTabEnabled = false;
     }
 
@@ -304,39 +345,133 @@ public partial class EntryViewModel(
         _ = TryAssignDefaultRelayNumberAsync();
     }
 
-    private void LoadAthletes()
+    private void LoadAllAthletes()
     {
         var query = athleteService.Query();
         if (_contextAthleteId.HasValue)
             query = query.Where(a => a.Id == _contextAthleteId.Value);
         else if (_contextClubId.HasValue)
             query = query.Where(a => a.ClubId == _contextClubId.Value);
-        var athletes = query.ToList();
-        Athletes.Clear();
-        foreach (var athlete in athletes)
-            Athletes.Add(new SearchableItem { Value = athlete, DisplayText = EntityDisplayFormatter.FormatAthleteName(athlete) });
+        _allAthletes = query
+            .OrderBy(a => a.LastName)
+            .ThenBy(a => a.FirstName)
+            .ToList();
     }
 
-    private async Task LoadIndividualEventsAsync()
+    private async Task LoadAllIndividualEventsAsync()
+    {
+        _allIndividualSwimEvents = (await eventService.GetIndividualEventsAsync())
+            .OrderBy(swimEvent => swimEvent.Order)
+            .ThenBy(swimEvent => swimEvent.Date)
+            .ToList();
+    }
+
+    private async Task LoadExistingIndividualEntryKeysAsync()
+    {
+        var entries = await entryService.Query()
+            .AsNoTracking()
+            .Where(entry => entry.AthleteId != null && entry.RelayId == null && entry.SwimEventId != null)
+            .Select(entry => new { entry.Id, entry.AthleteId, entry.SwimEventId })
+            .ToListAsync();
+        _existingIndividualEntryKeys = entries
+            .Where(entry => IsAdd || entry.Id != Entity.Id)
+            .Select(entry => (entry.AthleteId!.Value, entry.SwimEventId!.Value))
+            .ToHashSet();
+    }
+
+    private bool IndividualEntryExists(int athleteId, int swimEventId) =>
+        _existingIndividualEntryKeys.Contains((athleteId, swimEventId));
+
+    private void RefreshIndividualEntryOptions()
+    {
+        if (SelectedTabIndex != 0)
+            return;
+
+        var selectedAthleteId = (SelectedAthlete?.Value as Athlete)?.Id
+            ?? Entity.AthleteId
+            ?? _contextAthleteId;
+        var selectedEventId = (SelectedSwimEvent?.Value as SwimEvent)?.Id
+            ?? Entity.SwimEventId
+            ?? _contextEventId;
+        var selectedAthlete = selectedAthleteId is int athleteId
+            ? _allAthletes.FirstOrDefault(a => a.Id == athleteId)
+            : null;
+        var selectedEvent = selectedEventId is int eventId
+            ? _allIndividualSwimEvents.FirstOrDefault(e => e.Id == eventId)
+            : null;
+
+        var filteredAthletes = _allAthletes.AsEnumerable();
+        var filteredEvents = _allIndividualSwimEvents.AsEnumerable();
+        if (selectedAthlete is not null)
+        {
+            filteredEvents = filteredEvents.Where(swimEvent =>
+                swimEvent.AgeGroup.Contains(selectedAthlete.YearOfBirth, selectedAthlete.Gender));
+            filteredEvents = filteredEvents.Where(swimEvent =>
+                !IndividualEntryExists(selectedAthlete.Id, swimEvent.Id));
+        }
+        if (selectedEvent is not null)
+        {
+            filteredAthletes = filteredAthletes.Where(athlete =>
+                selectedEvent.AgeGroup.Contains(athlete.YearOfBirth, athlete.Gender));
+            filteredAthletes = filteredAthletes.Where(athlete =>
+                !IndividualEntryExists(athlete.Id, selectedEvent.Id));
+        }
+
+        _suppressIndividualFilterSync = true;
+        try
+        {
+            SyncAthleteItems(filteredAthletes);
+            SyncSwimEventItems(filteredEvents);
+            SelectedAthlete = selectedAthleteId is int restoredAthleteId
+                ? Athletes.FirstOrDefault(item => item.Value is Athlete athlete && athlete.Id == restoredAthleteId)
+                : null;
+            SelectedSwimEvent = selectedEventId is int restoredEventId
+                ? SwimEvents.FirstOrDefault(item => item.Value is SwimEvent swimEvent && swimEvent.Id == restoredEventId)
+                : SwimEvents.FirstOrDefault(item => item.Value == null);
+            if (SelectedAthlete?.Value is Athlete athlete)
+                Entity.AthleteId = athlete.Id;
+            else if (selectedAthleteId is not null && SelectedAthlete is null)
+                Entity.AthleteId = null;
+            if (SelectedSwimEvent?.Value is SwimEvent swimEvent)
+            {
+                Entity.SwimEventId = swimEvent.Id;
+                Entity.SwimStyleId = swimEvent.SwimStyleId;
+            }
+            else if (selectedEventId is not null && SelectedSwimEvent?.Value is null)
+            {
+                Entity.SwimEventId = null;
+            }
+        }
+        finally
+        {
+            _suppressIndividualFilterSync = false;
+        }
+    }
+
+    private void SyncAthleteItems(IEnumerable<Athlete> athletes)
+    {
+        Athletes.Clear();
+        foreach (var athlete in athletes)
+        {
+            Athletes.Add(new SearchableItem
+            {
+                Value = athlete,
+                DisplayText = EntityDisplayFormatter.FormatAthleteName(athlete)
+            });
+        }
+    }
+
+    private void SyncSwimEventItems(IEnumerable<SwimEvent> swimEvents)
     {
         SwimEvents.Clear();
-        var individualEvents = await eventService.GetIndividualEventsAsync();
-        if (_contextEventId.HasValue && individualEvents.Count != 0)
+        SwimEvents.Add(new SearchableItem { Value = null, DisplayText = string.Empty });
+        foreach (var swimEvent in swimEvents)
         {
-            var indEvent = individualEvents.FirstOrDefault(item => item.Id == _contextEventId.Value);
-            if (indEvent != null)
-                SwimEvents.Add(new SearchableItem { Value = indEvent, DisplayText = EntityDisplayFormatter.FormatSwimEvent(indEvent) });
-        }
-        else if (_contextSwimStyleId.HasValue && individualEvents.Count != 0)
-        {
-            var indEvent = individualEvents.FirstOrDefault(item => item.SwimStyleId == _contextSwimStyleId.Value);
-            if (indEvent != null)
-                SwimEvents.Add(new SearchableItem { Value = indEvent, DisplayText = EntityDisplayFormatter.FormatSwimEvent(indEvent) });
-        }
-        else
-        {
-            foreach (var swimEvent in individualEvents)
-                SwimEvents.Add(new SearchableItem { Value = swimEvent, DisplayText = EntityDisplayFormatter.FormatSwimEvent(swimEvent) });
+            SwimEvents.Add(new SearchableItem
+            {
+                Value = swimEvent,
+                DisplayText = EntityDisplayFormatter.FormatSwimEvent(swimEvent)
+            });
         }
     }
 
@@ -361,7 +496,11 @@ public partial class EntryViewModel(
             foreach (var swimEvent in relayEvents)
                 RelaySwimEvents.Add(new SearchableItem { Value = swimEvent, DisplayText = EntityDisplayFormatter.FormatSwimEvent(swimEvent) });
         }
-        if (IsAdd && Entity.SwimEventId == null && SelectedRelaySwimEvent == null && RelaySwimEvents.Count > 0)
+        if (IsAdd
+            && !_contextAthleteId.HasValue
+            && Entity.SwimEventId == null
+            && SelectedRelaySwimEvent == null
+            && RelaySwimEvents.Count > 0)
         {
             if (_contextEventId.HasValue)
                 SelectedRelaySwimEvent = RelaySwimEvents.FirstOrDefault(i =>
@@ -369,7 +508,6 @@ public partial class EntryViewModel(
             else if (_contextSwimStyleId.HasValue)
                 SelectedRelaySwimEvent = RelaySwimEvents.FirstOrDefault(i =>
                     i.Value is SwimEvent se && se.SwimStyleId == _contextSwimStyleId.Value);
-            SelectedRelaySwimEvent ??= RelaySwimEvents.Count == 1 ? RelaySwimEvents[0] : null;
         }
     }
 
@@ -446,17 +584,31 @@ public partial class EntryViewModel(
 
     partial void OnSelectedAthleteChanged(SearchableItem? value)
     {
-        if (value?.Value is not Athlete athlete) return;
-        Entity.AthleteId = athlete.Id;
-        Entity.RelayId = null;
-        Entity.Relay = null;
+        if (_suppressIndividualFilterSync)
+            return;
+        if (value?.Value is Athlete athlete)
+        {
+            Entity.AthleteId = athlete.Id;
+            Entity.RelayId = null;
+            Entity.Relay = null;
+        }
+        else
+            Entity.AthleteId = null;
+        RefreshIndividualEntryOptions();
     }
 
     partial void OnSelectedSwimEventChanged(SearchableItem? value)
     {
-        if (value?.Value is not SwimEvent swimEvent) return;
-        Entity.SwimEventId = swimEvent.Id;
-        Entity.SwimStyleId = swimEvent.SwimStyleId;
+        if (_suppressIndividualFilterSync)
+            return;
+        if (value?.Value is SwimEvent swimEvent)
+        {
+            Entity.SwimEventId = swimEvent.Id;
+            Entity.SwimStyleId = swimEvent.SwimStyleId;
+        }
+        else
+            Entity.SwimEventId = null;
+        RefreshIndividualEntryOptions();
     }
 
     partial void OnSelectedRelaySwimEventChanged(SearchableItem? value)
@@ -506,6 +658,8 @@ public partial class EntryViewModel(
             if (SelectedTabIndex != 0) SelectedTabIndex = 0;
             return;
         }
+        if (value == 0)
+            RefreshIndividualEntryOptions();
         if (value == 1)
         {
             EnsureRelayEntity();
@@ -736,7 +890,8 @@ public partial class EntryViewModel(
         var dialog = factory.CreateAndShowAndReturn<AthleteAddEditWindow>();
         if (dialog is { DialogResult: true, DataContext: IWindowResult { Result: Athlete newAthlete } })
         {
-            LoadAthletes();
+            LoadAllAthletes();
+            RefreshIndividualEntryOptions();
             SelectedAthlete = Athletes.FirstOrDefault(item => item.Value is Athlete a && a.Id == newAthlete.Id);
         }
     }
@@ -786,7 +941,8 @@ public partial class EntryViewModel(
         var dialog = factory.CreateAndShowAndReturn<EventAddEditWindow>();
         if (dialog is { DialogResult: true, DataContext: IWindowResult { Result: SwimEvent newSwimEvent } })
         {
-            await LoadIndividualEventsAsync();
+            await LoadAllIndividualEventsAsync();
+            RefreshIndividualEntryOptions();
             SelectedSwimEvent =
                 SwimEvents.FirstOrDefault(item => item.Value is SwimEvent se && se.Id == newSwimEvent.Id);
         }

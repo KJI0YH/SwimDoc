@@ -5,10 +5,9 @@ namespace UI.Views.Pages;
 
 public partial class EventDetailsPage : Page
 {
-    public EventDetailsPage(EventDetailsViewModel viewModel, INavigationService navigationService)
+    public EventDetailsPage(EventDetailsViewModel viewModel)
     {
         InitializeComponent();
-        viewModel.OnNavigatedTo(navigationService.GetNavigationParameter<EventDetailsViewModel>());
         DataContext = viewModel;
     }
 }

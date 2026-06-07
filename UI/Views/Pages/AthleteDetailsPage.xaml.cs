@@ -5,10 +5,9 @@ namespace UI.Views.Pages;
 
 public partial class AthleteDetailsPage : Page
 {
-    public AthleteDetailsPage(AthleteDetailsViewModel viewModel, INavigationService navigationService)
+    public AthleteDetailsPage(AthleteDetailsViewModel viewModel)
     {
         InitializeComponent();
-        viewModel.OnNavigatedTo(navigationService.GetNavigationParameter<AthleteDetailsViewModel>());
         DataContext = viewModel;
     }
 }

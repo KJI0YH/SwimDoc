@@ -143,7 +143,7 @@
         <ui:NavigationView Grid.Row="1" x:Name="NavigationView"
                            PaneDisplayMode="Left"
                            OpenPaneLength="200"
-                           IsBackButtonVisible="Auto"
+                           IsBackButtonVisible="Collapsed"
                            Loaded="NavigationView_OnLoaded">
             <ui:NavigationView.MenuItems>
                 <ui:NavigationViewItem Content="{loc:Localizastion Nav_Program}"

@@ -5,17 +5,24 @@ using ServiceLayer.EntryService;
 using ServiceLayer.EventService;
 using ServiceLayer.HeatService;
 using ServiceLayer.PointScoreProvider;
+using UI.Services.Navigation;
 using UI.ViewModels.Pages.Data;
 
 namespace UI.ViewModels.Pages;
 
-public partial class EventDetailsViewModel : ViewModelBase, INavigationAware
+public partial class EventDetailsViewModel : ViewModelBase, INavigationAware, INavigationTabState
 {
     private readonly EntriesByEventViewModel _entriesTable;
     private readonly HeatsByEventViewModel _heatsTable;
     private readonly FixationByEventViewModel _fixationTable;
     private readonly ResultsByEventViewModel _resultsTable;
     [ObservableProperty] private string? _title = string.Empty;
+    [ObservableProperty] private int _selectedTabIndex;
+    public int NavigationTabIndex
+    {
+        get => SelectedTabIndex;
+        set => SelectedTabIndex = value;
+    }
     public EventDetailsViewModel(
         IEntryService entryService,
         IEntryDocumentReaderService entryDocumentReaderService,

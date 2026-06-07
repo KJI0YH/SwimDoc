@@ -5,10 +5,9 @@ namespace UI.Views.Pages;
 
 public partial class AgeGroupDetailsPage : Page
 {
-    public AgeGroupDetailsPage(AgeGroupDetailsViewModel viewModel, INavigationService navigationService)
+    public AgeGroupDetailsPage(AgeGroupDetailsViewModel viewModel)
     {
         InitializeComponent();
-        viewModel.OnNavigatedTo(navigationService.GetNavigationParameter<AgeGroupDetailsViewModel>());
         DataContext = viewModel;
     }
 }

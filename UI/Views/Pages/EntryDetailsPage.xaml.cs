@@ -1,14 +1,13 @@
 using System.Windows.Controls;
-using UI.ViewModels.Pages;
+using EntryDetailsViewModel = UI.ViewModels.Pages.EntryDetailsViewModel;
 
 namespace UI.Views.Pages;
 
 public partial class EntryDetailsPage : Page
 {
-    public EntryDetailsPage(EntryDetailsViewModel viewModel, INavigationService navigationService)
+    public EntryDetailsPage(EntryDetailsViewModel viewModel)
     {
         InitializeComponent();
-        viewModel.OnNavigatedTo(navigationService.GetNavigationParameter<EntryDetailsViewModel>());
         DataContext = viewModel;
     }
 }
