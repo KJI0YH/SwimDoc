@@ -4,7 +4,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using UI.Resources;
-using UI.Services;
 
 namespace UI.Models.Dialogs;
 

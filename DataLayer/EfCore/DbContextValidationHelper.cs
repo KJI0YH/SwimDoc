@@ -12,7 +12,6 @@ namespace DataLayer.EfCore
             {
                 var result = context.ExecuteValidation();
                 if (!result.IsEmpty) return result;
-
                 context.ChangeTracker.AutoDetectChangesEnabled = false;
                 try
                 {
@@ -22,16 +21,13 @@ namespace DataLayer.EfCore
                 {
                     context.ChangeTracker.AutoDetectChangesEnabled = true;
                 }
-
                 return result;
             }
-
             public ImmutableList<ValidationResult>
                 SaveChangesWithValidation()
             {
                 var result = context.ExecuteValidation();
                 if (result.Any()) return result;
-
                 context.ChangeTracker.AutoDetectChangesEnabled = false;
                 try
                 {
@@ -41,10 +37,8 @@ namespace DataLayer.EfCore
                 {
                     context.ChangeTracker.AutoDetectChangesEnabled = true;
                 }
-
                 return result;
             }
-
             private ImmutableList<ValidationResult> ExecuteValidation()
             {
                 var result = new List<ValidationResult>();
@@ -61,7 +55,6 @@ namespace DataLayer.EfCore
                         result.AddRange(entityErrors);
                     }
                 }
-
                 return result.ToImmutableList();
             }
         }

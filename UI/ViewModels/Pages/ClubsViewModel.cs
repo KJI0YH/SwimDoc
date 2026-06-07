@@ -6,7 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.AthleteService;
 using ServiceLayer.ClubService;
 using UI.Resources;
-using UI.Services;
 using UI.ViewModels.Pages.Data;
 using UI.Models.Rows;
 using UI.Views.Dialogs.Markers.AddEdit;
@@ -16,9 +15,7 @@ namespace UI.ViewModels.Pages;
 public class ClubsViewModel : DataViewModel<Club, ClubRowView, int?>
 {
     protected override PagingPage PagingSettingsPage => PagingPage.Clubs;
-
     private readonly IAddEditWindowFactory _windowFactory;
-
     public ClubsViewModel(IClubService clubService, IAthleteService athleteService) : base(clubService)
     {
         _windowFactory = App.Current.Services.GetRequiredService<IAddEditWindowFactory>();
@@ -28,38 +25,16 @@ public class ClubsViewModel : DataViewModel<Club, ClubRowView, int?>
     {
         AutoGenerateColumns = false;
         ColumnConfigurations.Clear();
-
         ColumnConfigurations.Add(new ColumnConfiguration<Club>("Name", Strings.Clubs_Col_Name, 300));
         ColumnConfigurations.Add(new ColumnConfiguration<Club>("AthleteCount", Strings.Clubs_Col_Athletes, 150,
-            (query, direction) =>
-            {
-                return direction == ListSortDirection.Ascending
-                    ? query.OrderBy(club => club.Athletes.Count)
-                    : query.OrderByDescending(club => club.Athletes.Count);
-            }));
-
+            ColumnConfiguration<Club>.SortBy(club => club.Athletes.Count)));
         ColumnConfigurations.Add(new ColumnConfiguration<Club>("EntryCount", Strings.Clubs_Col_Entries, 150,
-            (query, direction) =>
-            {
-                return direction == ListSortDirection.Ascending
-                    ? query.OrderBy(club => club.Athletes.Sum(a => a.Entries.Count))
-                    : query.OrderByDescending(club => club.Athletes.Sum(a => a.Entries.Count));
-            }));
+            ColumnConfiguration<Club>.SortBy(club => club.Athletes.Sum(athlete => athlete.Entries.Count))));
         ColumnConfigurations.Add(new ColumnConfiguration<Club>("RelayCount", Strings.Clubs_Col_Relays, 150,
-            (query, direction) =>
-            {
-                return direction == ListSortDirection.Ascending
-                    ? query.OrderBy(club => club.Relays.Count)
-                    : query.OrderByDescending(club => club.Relays.Count);
-            }));
+            ColumnConfiguration<Club>.SortBy(club => club.Relays.Count)));
         ColumnConfigurations.Add(new ColumnConfiguration<Club>("PointCount", Strings.Clubs_Col_Points, 150,
-            (query, direction) =>
-            {
-                return direction == ListSortDirection.Ascending
-                    ? query.OrderBy(club => club.Athletes.Sum(a => a.Entries.Where(e => e.Scoring).Sum(e => e.Points)))
-                    : query.OrderByDescending(club =>
-                        club.Athletes.Sum(a => a.Entries.Where(e => e.Scoring).Sum(e => e.Points)));
-            }));
+            ColumnConfiguration<Club>.SortBy(club => club.Athletes.Sum(athlete =>
+                athlete.Entries.Where(entry => entry.Scoring).Sum(entry => entry.Points)))));
     }
 
     protected override IQueryable<Club> ApplyQuery(IQueryable<Club> query)
@@ -74,7 +49,6 @@ public class ClubsViewModel : DataViewModel<Club, ClubRowView, int?>
     {
         if (string.IsNullOrWhiteSpace(SearchText))
             return query;
-
         var term = SearchText.Trim();
         return Queryable.Where(query, club =>
             SwimDocDbFunctions.ContainsIgnoreCase(club.Name, term));

@@ -1,7 +1,6 @@
 using BizLogic.GenericInterfaces;
-using DataLayer.EfClasses;
 
-namespace BizLogic.EntryDocumentReaderLogic;
+namespace BizLogic.EntryDocumentReader;
 
 public interface IEntryDocumentReadAction : IBizAction<string, IReadOnlyList<EntryDocument>>
 {

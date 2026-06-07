@@ -9,14 +9,11 @@ public static class EntryNormalizationHelper
     {
         var swimEvent = entry.SwimEvent ??
                         dbContext.SwimEvents.AsNoTracking().FirstOrDefault(se => se.Id == entry.SwimEventId);
-
         if (swimEvent is not null)
             entry.SwimStyleId = swimEvent.SwimStyleId;
-
         var state = dbContext.Entry(entry).State;
         if (state == EntityState.Added || entry.Id == 0)
             entry.Status = swimEvent is null ? EntryStatus.ENTRY : EntryStatus.EVENT;
-
         return entry;
     }
 
@@ -24,7 +21,6 @@ public static class EntryNormalizationHelper
     {
         if (entry.Status is not (EntryStatus.DSQ or EntryStatus.DNS or EntryStatus.DNF))
             return entry;
-
         entry.FinishTime = null;
         entry.Points = 0;
         return entry;

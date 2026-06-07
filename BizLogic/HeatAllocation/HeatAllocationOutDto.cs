@@ -1,6 +1,6 @@
 using DataLayer.EfClasses;
 
-namespace BizLogic.HeatLogic;
+namespace BizLogic.HeatAllocation;
 
 public class HeatAllocationOutDto(List<Heat> heats, IReadOnlyList<string> warnings, IReadOnlyList<string> errors)
 {

@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="UI.Views.Controls.DataGridView.EntriesView"
+<UserControl x:Class="UI.Views.Controls.DataGridView.EntriesView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -9,13 +9,15 @@
              xmlns:dataGridView="clr-namespace:UI.Views.Controls.DataGridView"
              xmlns:importInfoBar="clr-namespace:UI.Views.Controls.ImportInfoBar"
              xmlns:eventFilterComboBox="clr-namespace:UI.Views.Controls.EventFilterComboBox"
-             xmlns:helpers="clr-namespace:UI.Helpers"
+             xmlns:displayHelpers="clr-namespace:UI.Helpers.Display"
+             xmlns:converters="clr-namespace:UI.Helpers.Converters"
+             xmlns:uiHelpers="clr-namespace:UI.Helpers.Controls"
              xmlns:loc="clr-namespace:UI.Localization"
              x:Name="Root"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
-        <helpers:BoolToVisibilityConverter x:Key="BoolToVis" />
+        <converters:BoolToVisibilityConverter x:Key="BoolToVis" />
     </UserControl.Resources>
     <Grid>
         <dataView:DefaultDataView>

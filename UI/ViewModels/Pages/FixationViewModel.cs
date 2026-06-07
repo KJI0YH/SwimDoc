@@ -4,12 +4,11 @@ using CommunityToolkit.Mvvm.Input;
 using DataLayer;
 using DataLayer.EfClasses;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.EventService;
 using ServiceLayer.HeatService;
 using ServiceLayer.PointScoreProvider;
-using UI.Helpers;
 using UI.Resources;
-using UI.Services;
 using UI.ViewModels.Pages.Data;
 using UI.Models.Rows;
 using UI.Models;
@@ -23,35 +22,28 @@ public partial class FixationViewModel(
     INavigationService navigationService)
     : DataViewModel<SwimEvent, SwimEventRowView, int?>(eventService)
 {
+    private IHeatService HeatService =>
+        App.Current.Services.GetRequiredService<IHeatService>();
+    private IPointScoreProvider PointScoreProvider =>
+        App.Current.Services.GetRequiredService<IPointScoreProvider>();
     public event Action<int>? EventResultsChanged;
-
     [ObservableProperty] private SwimEvent? _selectedSwimEvent;
     [ObservableProperty] private ObservableCollection<SearchableItem> _swimEventOptions = new();
-
     [ObservableProperty] private HeatListItemView? _selectedHeatItem;
-
     [ObservableProperty] private ObservableCollection<HeatListItemView> _eventHeats = new();
-
     private Heat? SelectedHeat => SelectedHeatItem?.Entity;
-
     [ObservableProperty] private ObservableCollection<FixationHeatPositionView> _fixationHeatPositionViews = new();
-
     [ObservableProperty] private FixationHeatPositionView? _selectedFixationPosition;
-
     [ObservableProperty] private bool _canApprove;
-
     [ObservableProperty] private bool _canUnapprove;
-
     public bool CanEditHeat => SelectedHeat?.Status != HeatStatus.OFFICIAL;
-
     public string SelectedHeatHeader
     {
         get
         {
             if (SelectedHeat is null || SelectedSwimEvent is null) return string.Empty;
-
             var heatsInEvent = EventHeats.Count;
-            var heatsTotal = heatService.GetTotalHeats();
+            var heatsTotal = HeatService.GetTotalHeats();
             return string.Format(
                 Strings.Get("Fixation_SelectedHeatHeader_NoEvent_Format"),
                 SelectedHeat.Number,
@@ -63,6 +55,15 @@ public partial class FixationViewModel(
     }
 
     public string SelectedHeatStatus => SelectedHeat?.Status.ToString() ?? string.Empty;
+    protected override void ResetForNewCompetition()
+    {
+        base.ResetForNewCompetition();
+        SelectedSwimEvent = null;
+        SwimEventOptions = [];
+        EventHeats = [];
+        SelectedHeatItem = null;
+        FixationHeatPositionViews = [];
+    }
 
     protected override IQueryable<SwimEvent> ApplyQuery(IQueryable<SwimEvent> query)
     {
@@ -83,9 +84,7 @@ public partial class FixationViewModel(
             FixationHeatPositionViews = [];
             return;
         }
-
         SelectedSwimEvent ??= items.OrderBy(e => e.Order).FirstOrDefault();
-
         SwimEventOptions = new ObservableCollection<SearchableItem>(
             items.Select(e => new SearchableItem
             {
@@ -120,12 +119,11 @@ public partial class FixationViewModel(
             FixationHeatPositionViews = [];
             return;
         }
-
         IsLoading = true;
         try
         {
             var keepHeatId = SelectedHeat?.Id;
-            var heats = await heatService.GetHeatsByEventIdAsync(eventId);
+            var heats = await HeatService.GetHeatsByEventIdAsync(eventId);
             EventHeats = new ObservableCollection<HeatListItemView>(heats.Select(h => new HeatListItemView(h)));
             SelectedHeatItem = keepHeatId is int id
                 ? EventHeats.FirstOrDefault(h => h.Entity.Id == id) ?? EventHeats.FirstOrDefault()
@@ -145,17 +143,15 @@ public partial class FixationViewModel(
             RefreshButtons();
             return;
         }
-
         if (SelectedSwimEvent is null)
         {
             FixationHeatPositionViews = [];
             RefreshButtons();
             return;
         }
-
         var positions = SelectedHeat.Positions.OrderBy(p => p.Lane).ToList();
         FixationHeatPositionViews = new ObservableCollection<FixationHeatPositionView>(positions
-            .Select(p => new FixationHeatPositionView(p, SelectedSwimEvent, OnRowChanged, pointScoreProvider)));
+            .Select(p => new FixationHeatPositionView(p, SelectedSwimEvent, OnRowChanged, PointScoreProvider)));
         RefreshButtons();
     }
 
@@ -171,7 +167,6 @@ public partial class FixationViewModel(
                      && CanEditHeat
                      && FixationHeatPositionViews.Count > 0
                      && FixationHeatPositionViews.All(v => v.IsCompleteForApproval());
-
         OnPropertyChanged(nameof(CanEditHeat));
         OnPropertyChanged(nameof(SelectedHeatHeader));
         OnPropertyChanged(nameof(SelectedHeatStatus));
@@ -182,17 +177,15 @@ public partial class FixationViewModel(
     {
         if (SelectedHeat is null) return;
         if (!CanApprove) return;
-
         try
         {
-            await heatService.ApproveHeatAsync(SelectedHeat);
+            await HeatService.ApproveHeatAsync(SelectedHeat);
             await LoadEventHeatsAsync();
             if (SelectedSwimEvent?.Id is int eventId)
                 EventResultsChanged?.Invoke(eventId);
         }
         catch
         {
-
         }
     }
 
@@ -201,17 +194,15 @@ public partial class FixationViewModel(
     {
         if (SelectedHeat?.Id is not int heatId)
             return;
-
         try
         {
-            await heatService.UnapproveHeatAsync(heatId);
+            await HeatService.UnapproveHeatAsync(heatId);
             await LoadEventHeatsAsync();
             if (SelectedSwimEvent?.Id is int eventId)
                 EventResultsChanged?.Invoke(eventId);
         }
         catch
         {
-
         }
     }
 
@@ -251,7 +242,6 @@ public partial class FixationViewModel(
     private void GoToPrevHeat()
     {
         if (EventHeats.Count == 0) return;
-
         var idx = SelectedHeatItem is null ? 0 : EventHeats.IndexOf(SelectedHeatItem);
         var prevIdx = idx - 1;
         if (prevIdx < 0)
@@ -271,7 +261,6 @@ public partial class FixationViewModel(
     {
         if (!EntryAthleteNavigationHelper.TryGetAthleteId(SelectedFixationPosition?.Entry, out var athleteId))
             return;
-
         navigationService.NavigateTo<AthleteDetailsViewModel>(athleteId);
     }
 }

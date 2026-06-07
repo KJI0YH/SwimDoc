@@ -27,10 +27,8 @@ public class FinishListReportExcel(EfCoreContext dbContext) : BaseReportExcel(db
         const int colPoints = 6;
         const int colComment = 7;
         const int tableLastCol = colComment;
-
         worksheet.Cells.Style.Font.Name = "Calibri";
         worksheet.Cells.Style.Font.Size = 11;
-
         worksheet.Column(colNo).Width = 5;
         worksheet.Column(colParticipant).Width = 30;
         worksheet.Column(colBirthYear).Width = 10;
@@ -38,17 +36,14 @@ public class FinishListReportExcel(EfCoreContext dbContext) : BaseReportExcel(db
         worksheet.Column(colFinishTime).Width = 10;
         worksheet.Column(colPoints).Width = 10;
         worksheet.Column(colComment).Width = 50;
-
         worksheet.Column(colNo).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
         worksheet.Column(colBirthYear).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
         worksheet.Column(colFinishTime).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
         worksheet.Column(colPoints).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-
         var row = 1;
         foreach (var swimEvent in swimEvents)
         {
             if (row > 1) row += 1;
-
             var titleRange = worksheet.Cells[row, colNo, row, tableLastCol];
             titleRange.Merge = true;
             titleRange.Value = LocalizedEntityDisplayFormatter.FormatSwimEvent(swimEvent);
@@ -57,7 +52,6 @@ public class FinishListReportExcel(EfCoreContext dbContext) : BaseReportExcel(db
             if (ReportExcelScoringHelper.IsNonScoringSwimEvent(swimEvent))
                 ReportExcelScoringHelper.ApplyNonScoringFill(titleRange);
             row += 1;
-
             worksheet.Cells[row, colNo].Value = ReportExcelStrings.Col_No;
             worksheet.Cells[row, colParticipant].Value = ReportExcelStrings.Col_Participant;
             worksheet.Cells[row, colBirthYear].Value = ReportExcelStrings.Col_BirthYear;
@@ -65,7 +59,6 @@ public class FinishListReportExcel(EfCoreContext dbContext) : BaseReportExcel(db
             worksheet.Cells[row, colFinishTime].Value = ReportExcelStrings.Col_Time;
             worksheet.Cells[row, colPoints].Value = ReportExcelStrings.Col_Points;
             worksheet.Cells[row, colComment].Value = ReportExcelStrings.Col_Comment;
-
             var headerRange = worksheet.Cells[row, colNo, row, tableLastCol];
             headerRange.Style.Font.Bold = true;
             headerRange.Style.Border.Top.Style = ExcelBorderStyle.Thin;
@@ -76,10 +69,8 @@ public class FinishListReportExcel(EfCoreContext dbContext) : BaseReportExcel(db
             headerRange.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
             headerRange.Style.WrapText = true;
             row += 1;
-
             if (swimEvent.Entries.Count == 0)
                 continue;
-
             var place = 1;
             var prevEntry = swimEvent.Entries.First();
             var prevPlace = 1;
@@ -94,14 +85,12 @@ public class FinishListReportExcel(EfCoreContext dbContext) : BaseReportExcel(db
                     worksheet.Cells[row, colNo].Value = place;
                     prevPlace = place;
                 }
-
                 worksheet.Cells[row, colParticipant].Value = LocalizedEntityDisplayFormatter.FormatEntryParticipantName(entry);
                 worksheet.Cells[row, colBirthYear].Value = LocalizedEntityDisplayFormatter.FormatEntryParticipantBirthYear(entry);
                 worksheet.Cells[row, colTeam].Value = LocalizedEntityDisplayFormatter.FormatEntryParticipantClubName(entry);
                 worksheet.Cells[row, colFinishTime].Value = EntryTimeDisplay.FormatFinishTime(entry);
                 worksheet.Cells[row, colPoints].Value = entry.Points;
                 worksheet.Cells[row, colComment].Value = entry.Comment;
-
                 var dataRange = worksheet.Cells[row, colNo, row, tableLastCol];
                 dataRange.Style.Border.Top.Style = ExcelBorderStyle.Thin;
                 dataRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
@@ -109,15 +98,12 @@ public class FinishListReportExcel(EfCoreContext dbContext) : BaseReportExcel(db
                 dataRange.Style.Border.Right.Style = ExcelBorderStyle.Thin;
                 if (ReportExcelScoringHelper.IsNonScoringEntry(entry))
                     ReportExcelScoringHelper.ApplyNonScoringFill(dataRange);
-
                 prevEntry = entry;
                 place++;
                 row += 1;
             }
         }
-
         if (worksheet.Dimension is null) return;
-
         worksheet.Cells[worksheet.Dimension.Address].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
     }
 }

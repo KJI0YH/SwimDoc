@@ -24,7 +24,6 @@ public class Heat : IValidatableObject
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
         var currContext = validationContext.GetService(typeof(DbContext));
-
         throw new NotImplementedException();
     }
 }

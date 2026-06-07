@@ -7,11 +7,8 @@ namespace UI.Localization;
 public sealed class LocalizationProvider : INotifyPropertyChanged
 {
     public static LocalizationProvider Instance { get; } = new();
-
     private CultureInfo _culture = CultureInfo.CurrentUICulture;
-
     public event PropertyChangedEventHandler? PropertyChanged;
-
     private LocalizationProvider()
     {
     }

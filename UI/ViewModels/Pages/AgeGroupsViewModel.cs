@@ -9,9 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.AgeGroupService;
 using ServiceLayer.ReportGeneratorService;
-using UI.Helpers;
 using UI.Resources;
-using UI.Services;
 using UI.ViewModels.Pages.Data;
 using UI.Models.Rows;
 using UI.ViewModels.Dialogs.CombinedResultsReportGeneration;
@@ -23,9 +21,7 @@ namespace UI.ViewModels.Pages;
 public partial class AgeGroupsViewModel : DataViewModel<AgeGroup, AgeGroupRowView, int?>
 {
     protected override PagingPage PagingSettingsPage => PagingPage.AgeGroups;
-
     private readonly IAddEditWindowFactory _windowFactory;
-
     public AgeGroupsViewModel(IAgeGroupService ageGroupService) : base(ageGroupService)
     {
         _windowFactory = App.Current.Services.GetRequiredService<IAddEditWindowFactory>();
@@ -42,33 +38,17 @@ public partial class AgeGroupsViewModel : DataViewModel<AgeGroup, AgeGroupRowVie
     {
         AutoGenerateColumns = false;
         ColumnConfigurations.Clear();
-
         ColumnConfigurations.Add(new ColumnConfiguration<AgeGroup>("DisplayName", Strings.AgeGroups_Col_Name, 400,
-            (query, direction) =>
-            {
-                return direction == ListSortDirection.Ascending
-                    ? query.OrderBy(ag => ag.Name)
-                    : query.OrderByDescending(ag => ag.Name);
-            }));
+            ColumnConfiguration<AgeGroup>.SortBy(ag => ag.Name)));
         ColumnConfigurations.Add(new ColumnConfiguration<AgeGroup>("Gender", Strings.AgeGroups_Col_Gender, 100));
         ColumnConfigurations.Add(new ColumnConfiguration<AgeGroup>("BirthYearMin", Strings.AgeGroups_Col_BirthYearFrom, 150,
-            (query, direction) =>
-            {
-                return direction == ListSortDirection.Ascending
-                    ? query.OrderBy(ag => ag.BirthYearMin)
-                    : query.OrderByDescending(ag => ag.BirthYearMin);
-            })
+            ColumnConfiguration<AgeGroup>.SortBy(ag => ag.BirthYearMin))
         {
             Converter = new BirthYearBoundConverter(),
             ConverterParameter = BirthYearBoundConverter.Min
         });
         ColumnConfigurations.Add(new ColumnConfiguration<AgeGroup>("BirthYearMax", Strings.AgeGroups_Col_BirthYearTo, 150,
-            (query, direction) =>
-            {
-                return direction == ListSortDirection.Ascending
-                    ? query.OrderBy(ag => ag.BirthYearMax)
-                    : query.OrderByDescending(ag => ag.BirthYearMax);
-            })
+            ColumnConfiguration<AgeGroup>.SortBy(ag => ag.BirthYearMax))
         {
             Converter = new BirthYearBoundConverter(),
             ConverterParameter = BirthYearBoundConverter.Max
@@ -81,12 +61,10 @@ public partial class AgeGroupsViewModel : DataViewModel<AgeGroup, AgeGroupRowVie
             return query;
         if (Strings.TryFindEnumByDisplayContains(SearchText, out Gender gender))
             return query.Where(ag => ag.Gender == gender);
-
         if (int.TryParse((string?)SearchText, out var year))
             return Queryable.Where(query, ag =>
                 EF.Functions.Like(ag.BirthYearMin.ToString(), $"%{SearchText}%") ||
                 EF.Functions.Like(ag.BirthYearMax.ToString(), $"%{SearchText}%"));
-
         var term = SearchText.Trim();
         return Queryable.Where(query, ag =>
             SwimDocDbFunctions.ContainsIgnoreCase(ag.Name, term));
@@ -103,17 +81,14 @@ public partial class AgeGroupsViewModel : DataViewModel<AgeGroup, AgeGroupRowVie
     {
         if (SelectedItems.Count == 0)
             return;
-
         var dialog = _windowFactory.CreateAndShowAndReturn<CombinedResultsReportGenerationWindow>();
         if (dialog.DataContext is not IWindowResult { Result: CombinedResultsReportGenerationResult result })
             return;
-
         var options = new CombinedResultsExportOptions
         {
             AgeGroupIds = SelectedItems.Select(ageGroup => ageGroup.Id).ToList(),
             OutputFilePath = result.OutputFilePath
         };
-
         await RunSingleOperationAsync(
             Strings.Operation_Reports_Header,
             Strings.Operation_Reports_Running_Message,
@@ -129,16 +104,12 @@ public partial class AgeGroupsViewModel : DataViewModel<AgeGroup, AgeGroupRowVie
                         AgeGroupIds = options.AgeGroupIds,
                         OutputFilePath = tempPath
                     };
-
                     using var scope = App.Current.Services.CreateScope();
                     scope.ServiceProvider.GetRequiredService<IReportExportService>()
                         .ExportCombinedResultsToExcel(tempOptions);
-
                     ct.ThrowIfCancellationRequested();
-
                     if (File.Exists(options.OutputFilePath))
                         File.Delete(options.OutputFilePath);
-
                     File.Move(tempPath, options.OutputFilePath);
                     return OperationItemOutcome.Success();
                 }

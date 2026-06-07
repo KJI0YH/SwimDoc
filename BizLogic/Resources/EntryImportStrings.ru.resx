@@ -14,6 +14,7 @@
   </resheader>
 
   <data name="FileNotFound_Format" xml:space="preserve"><value>Файл не найден: {0}</value></data>
+  <data name="FileBusyOrUnavailable_Format" xml:space="preserve"><value>Не удалось открыть «{0}»: файл занят другим процессом или недоступен. Закройте файл в Excel или другой программе и повторите попытку.</value></data>
   <data name="HeaderNotFound_Format" xml:space="preserve"><value>Заголовок "{0}" не найден.</value></data>
   <data name="ClubNameNotFound_PersonalScoring_Format" xml:space="preserve"><value>Имя клуба не найдено, спортсмены добавлены в личный зачёт: {0}</value></data>
 

@@ -1,9 +1,9 @@
 using System.Collections.ObjectModel;
+using BizLogic.HeatAllocation;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DataLayer.EfClasses;
 using ServiceLayer.HeatService.Exceptions;
-using UI.Helpers;
 using UI.Resources;
 
 namespace UI.ViewModels.Pages;
@@ -12,7 +12,6 @@ public partial class EventsViewModel
 {
     private CancellationTokenSource? _operationCts;
     private OperationItem? _operationSummaryRow;
-
     [ObservableProperty] private bool _isOperationBarOpen;
     [ObservableProperty] private bool _isOperationRunning;
     [ObservableProperty] private bool _isOperationDetailsOpen;
@@ -23,9 +22,7 @@ public partial class EventsViewModel
     [ObservableProperty] private int _operationTotalItems;
     [ObservableProperty] private ObservableCollection<OperationItem> _operationItems = new();
     [ObservableProperty] private ObservableCollection<string> _operationErrors = new();
-
     public bool IsOperationIndeterminate => IsOperationRunning;
-
     public bool HasOperationDetails =>
         IsMultiItemOperation
             ? OperationItems.Any(item => item.WarningsCount > 0 || item.ErrorsCount > 0)
@@ -63,7 +60,6 @@ public partial class EventsViewModel
 
     [RelayCommand(CanExecute = nameof(CanCancelOperation))]
     private void CancelOperation() => _operationCts?.Cancel();
-
     private bool CanCancelOperation() => IsOperationRunning;
 
     [RelayCommand]
@@ -73,7 +69,6 @@ public partial class EventsViewModel
     private void DismissOperationBar()
     {
         if (IsOperationRunning) return;
-
         IsOperationBarOpen = false;
         IsOperationDetailsOpen = false;
         OperationItems.Clear();
@@ -86,11 +81,9 @@ public partial class EventsViewModel
     private void RecalculateOperationSummary()
     {
         var dataItems = OperationItems.Where(item => !item.IsSummaryRow).ToList();
-
         _operationSummaryRow ??= new OperationItem(Strings.Import_Summary_Total) { IsSummaryRow = true };
         if (!OperationItems.Contains(_operationSummaryRow))
             OperationItems.Add(_operationSummaryRow);
-
         _operationSummaryRow.EventName = Strings.Import_Summary_Total;
         _operationSummaryRow.HeatsCreatedCount = dataItems.Sum(item => item.HeatsCreatedCount ?? 0);
         _operationSummaryRow.WarningsCount = dataItems.Sum(item => item.WarningsCount);
@@ -111,18 +104,15 @@ public partial class EventsViewModel
     {
         if (events.Count == 0)
             return new OperationRunResult(false, false);
-
         _operationCts?.Cancel();
         _operationCts = new CancellationTokenSource();
         var token = _operationCts.Token;
-
         IsMultiItemOperation = true;
         OperationErrors.Clear();
         OperationItems = new ObservableCollection<OperationItem>(
             events.Select(swimEvent => new OperationItem(EntityDisplayFormatter.FormatSwimEvent(swimEvent))));
         _operationSummaryRow = null;
         RecalculateOperationSummary();
-
         OperationTotalItems = events.Count;
         OperationProcessedItems = 0;
         IsOperationRunning = true;
@@ -131,12 +121,10 @@ public partial class EventsViewModel
         OperationHeader = header;
         OperationMessage = string.Format(preparingMessageFormat, OperationTotalItems);
         CancelOperationCommand.NotifyCanExecuteChanged();
-
         var hadFailure = false;
         var hadWarnings = false;
         var skippedCount = 0;
         var canceled = false;
-
         try
         {
             await Task.Run(async () =>
@@ -144,7 +132,6 @@ public partial class EventsViewModel
                 foreach (var (item, swimEvent) in OperationItems.Where(i => !i.IsSummaryRow).Zip(events))
                 {
                     token.ThrowIfCancellationRequested();
-
                     await RunOnUiAsync(() =>
                     {
                         item.Status = OperationItemStatus.Processing;
@@ -154,23 +141,19 @@ public partial class EventsViewModel
                             OperationProcessedItems + 1,
                             OperationTotalItems);
                     });
-
                     try
                     {
                         var outcome = await processOne(swimEvent, token).ConfigureAwait(false);
-
                         await RunOnUiAsync(() =>
                         {
                             ApplyOutcome(item, outcome);
                             OperationProcessedItems++;
                             RecalculateOperationSummary();
                         });
-
                         hadFailure |= outcome.Status == OperationItemStatus.Failed;
                         hadWarnings |= outcome.Status == OperationItemStatus.CompletedWithWarnings;
                         if (outcome.Status == OperationItemStatus.Skipped)
                             skippedCount++;
-
                         if (outcome.Status == OperationItemStatus.Failed)
                             break;
                     }
@@ -212,7 +195,6 @@ public partial class EventsViewModel
             RecalculateOperationSummary();
             IsOperationDetailsOpen = HasOperationDetails;
             OnPropertyChanged(nameof(HasOperationDetails));
-
             if (canceled)
             {
                 OperationHeader = canceledHeader;
@@ -227,7 +209,6 @@ public partial class EventsViewModel
                     finishedMessageFormat,
                     OperationProcessedItems,
                     OperationTotalItems);
-
                 if (hadFailure)
                     OperationHeader = Strings.Operation_Finished_WithErrors_Header;
                 else if (hadWarnings)
@@ -238,7 +219,6 @@ public partial class EventsViewModel
                     OperationHeader = Strings.Operation_Finished_Success_Header;
             }
         }
-
         return new OperationRunResult(canceled, hadFailure);
     }
 
@@ -252,7 +232,6 @@ public partial class EventsViewModel
         _operationCts?.Cancel();
         _operationCts = new CancellationTokenSource();
         var token = _operationCts.Token;
-
         IsMultiItemOperation = false;
         OperationItems.Clear();
         OperationErrors.Clear();
@@ -264,10 +243,8 @@ public partial class EventsViewModel
         OperationHeader = header;
         OperationMessage = runningMessage;
         CancelOperationCommand.NotifyCanExecuteChanged();
-
         var canceled = false;
         var hadFailure = false;
-
         try
         {
             await Task.Run(async () =>
@@ -276,7 +253,6 @@ public partial class EventsViewModel
                 await RunOnUiAsync(() =>
                 {
                     OperationProcessedItems = 1;
-
                     if (outcome.Status == OperationItemStatus.Failed)
                     {
                         OperationErrors = new ObservableCollection<string>(outcome.Errors);
@@ -317,12 +293,10 @@ public partial class EventsViewModel
             CancelOperationCommand.NotifyCanExecuteChanged();
             OnPropertyChanged(nameof(HasOperationDetails));
         }
-
         return new OperationRunResult(canceled, hadFailure);
     }
 
     private static Task RunOnUiAsync(Action action) => DispatcherUiHelper.RunOnUiAsync(action);
-
     private void MarkUnfinishedOperationItemsCanceled()
     {
         foreach (var item in OperationItems.Where(i => !i.IsSummaryRow))
@@ -342,18 +316,15 @@ public partial class EventsViewModel
         item.HeatsCreatedCount = outcome.HeatsCreatedCount;
     }
 
-    public static OperationItemOutcome OutcomeFromHeatAllocation(BizLogic.HeatLogic.HeatAllocationOutDto result)
+    public static OperationItemOutcome OutcomeFromHeatAllocation(HeatAllocationOutDto result)
     {
         var warnings = HeatAllocationMessageLocalizer.LocalizeAll(
             result.Warnings?.Where(message => message.Length > 0) ?? []);
         var errors = HeatAllocationMessageLocalizer.LocalizeAll(
             result.Errors?.Where(message => message.Length > 0) ?? []);
-
         var heatsCreated = result.Heats.Count;
-
         if (errors.Count > 0)
             return OperationItemOutcome.Failed(errors, warnings, heatsCreated);
-
         return warnings.Count > 0
             ? OperationItemOutcome.WithWarnings(warnings, heatsCreated)
             : OperationItemOutcome.Success(heatsCreated);
@@ -366,7 +337,6 @@ public partial class EventsViewModel
                 .Select(error => error.ErrorMessage)
                 .Where(message => !string.IsNullOrWhiteSpace(message))
                 .Cast<string>());
-
         return OperationItemOutcome.Failed(errors);
     }
 }

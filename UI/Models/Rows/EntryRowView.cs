@@ -1,12 +1,10 @@
 using DataLayer.EfClasses;
-using UI.Helpers;
 
 namespace UI.Models.Rows;
 
 public sealed class EntryRowView(Entry entity) : IEntityRowView<Entry>
 {
     public Entry Entity { get; } = entity;
-
     public int Id => Entity.Id;
     public string SwimName => EntityDisplayFormatter.FormatEntrySwimName(Entity);
     public string ParticipantName => EntityDisplayFormatter.FormatEntryParticipantName(Entity);

@@ -19,7 +19,6 @@ using ServiceLayer.SwimStyleService;
 using System.Globalization;
 using System.Net.Http;
 using UI.Localization;
-using UI.Services;
 using UI.ViewModels.Pages;
 using UI.Views.Controls.DataGridView;
 using UI.Views.Pages;
@@ -45,17 +44,14 @@ namespace UI;
 public partial class App : Application
 {
     private readonly IServiceProvider? _serviceProvider;
-
     public App()
     {
         ExcelPackage.License.SetNonCommercialPersonal("Aliaksei Kryzhanouski");
-
         _serviceProvider = ConfigureServiceProvider();
         RegisterViewModelMappings();
     }
 
     public new static App Current => (App)Application.Current;
-
     public IServiceProvider Services
     {
         get
@@ -79,15 +75,12 @@ public partial class App : Application
             options => options.UseSwimDocSqlite(),
             ServiceLifetime.Transient,
             ServiceLifetime.Singleton);
-
         ConfigureServices(serviceCollection);
         ConfigureViewModels(serviceCollection);
         var provider = serviceCollection.BuildServiceProvider();
-
         var localization = provider.GetRequiredService<ILocalizationService>();
         LocalizationProvider.Instance.Culture = CultureInfo.CurrentUICulture;
         localization.CultureChanged += culture => LocalizationProvider.Instance.Culture = culture;
-
         return provider;
     }
 
@@ -128,7 +121,6 @@ public partial class App : Application
             httpClient.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
             return new GitHubUpdateCheckService(httpClient);
         });
-
         services.AddTransient<IAgeGroupService, AgeGroupService>();
         services.AddTransient<IAthleteService, AthleteService>();
         services.AddTransient<IClubService, ClubService>();
@@ -163,7 +155,6 @@ public partial class App : Application
         services.AddTransient<EventDetailsViewModel>();
         services.AddTransient<AgeGroupDetailsViewModel>();
         services.AddTransient<SwimStyleDetailsViewModel>();
-
         services.AddTransient<CompetitionSelectionPage>();
         services.AddTransient<EventsPage>();
         services.AddTransient<HeatsPage>();

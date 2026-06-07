@@ -1,6 +1,5 @@
-﻿using System.Windows.Controls;
+using System.Windows.Controls;
 using Microsoft.Extensions.DependencyInjection;
-using UI.Services;
 using UI.ViewModels.Pages;
 
 namespace UI.Views.Pages;
@@ -8,7 +7,6 @@ namespace UI.Views.Pages;
 public partial class ResultsPage : Page
 {
     private readonly INavigationService _navigationService;
-
     public ResultsPage(INavigationService navigationService)
     {
         _navigationService = navigationService;
@@ -35,7 +33,6 @@ public partial class ResultsPage : Page
     {
         if (_navigationService.CurrentViewModel is ResultsViewModel resultsVm)
             return (resultsVm, _navigationService.GetNavigationParameter<ResultsViewModel>());
-
         return (App.Current.Services.GetRequiredService<ResultsViewModel>(), null);
     }
 }

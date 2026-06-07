@@ -13,8 +13,6 @@ using ServiceLayer.EventService;
 using ServiceLayer.HeatService;
 using ServiceLayer.PointScoreProvider;
 using ServiceLayer.SwimStyleService;
-using UI.Helpers;
-using UI.Services;
 using UI.ViewModels;
 using UI.ViewModels.Pages;
 
@@ -23,9 +21,7 @@ namespace UI.ViewModels.Pages.Data;
 public class HeatByEntryIdViewModel : HeatsViewModel
 {
     private int? _entryId;
-
     protected override bool UsesHeatPaging => false;
-
     public HeatByEntryIdViewModel(IEventService eventService, IHeatService heatService,
         INavigationService navigationService) : base(eventService, heatService, navigationService)
     {
@@ -45,7 +41,6 @@ public class HeatByEntryIdViewModel : HeatsViewModel
             UpdateHeatPaging(0);
             return;
         }
-
         IsLoading = true;
         try
         {
@@ -74,22 +69,21 @@ public class HeatByEntryIdViewModel : HeatsViewModel
         query = base.ApplyQuery(query);
         return _entryId.HasValue
             ? query.Select(se => new SwimEvent
-                {
-                    Id = se.Id,
-                    Date = se.Date,
-                    Time = se.Time,
-                    Order = se.Order,
-                    AgeGroup = se.AgeGroup,
-                    SwimStyle = se.SwimStyle,
-                    LaneMin = se.LaneMin,
-                    LaneMax = se.LaneMax,
-
-                    Heats = se.Heats
+            {
+                Id = se.Id,
+                Date = se.Date,
+                Time = se.Time,
+                Order = se.Order,
+                AgeGroup = se.AgeGroup,
+                SwimStyle = se.SwimStyle,
+                LaneMin = se.LaneMin,
+                LaneMax = se.LaneMax,
+                Heats = se.Heats
                         .Where(heat => heat.Positions
                             .Any(hp => hp.EntryId == _entryId.Value)
                         )
                         .ToList()
-                })
+            })
                 .Where(se => se.Heats.Any())
             : query.Where(_ => false);
     }

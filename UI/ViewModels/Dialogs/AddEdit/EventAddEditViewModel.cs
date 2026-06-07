@@ -9,8 +9,6 @@ using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.AgeGroupService;
 using ServiceLayer.EventService;
 using ServiceLayer.SwimStyleService;
-using UI.Helpers;
-using UI.Services;
 using UI.Resources;
 using UI.Models;
 using UI.Views.Dialogs.Markers.AddEdit;
@@ -27,27 +25,17 @@ public partial class EventAddViewModel(
     [ObservableProperty] private ObservableCollection<SearchableItem> _ageGroups = new();
     private int? _contextAgeGroupId;
     private int? _contextSwimStyleId;
-
     [ObservableProperty] private ObservableCollection<SearchableItem> _previousSwimEvents = new();
-
     [ObservableProperty] private SearchableItem? _selectedAgeGroup;
-
     [ObservableProperty] private SearchableItem? _selectedPreviousSwimEvent;
-
     [ObservableProperty] private SearchableItem? _selectedSwimStyle;
-
     [ObservableProperty] private ObservableCollection<SearchableItem> _swimStyles = new();
-
     [ObservableProperty] private int _laneTabIndex;
-
     private string? _savedCustomLaneNames;
     private bool _isSyncingLaneTab;
-
     public IReadOnlyList<string> HourOptions { get; } = CreateTimePartOptions(24);
     public IReadOnlyList<string> MinuteOptions { get; } = CreateTimePartOptions(60);
-
     public override string WindowTitle => IsAdd ? Strings.WindowTitle_CreateEvent : Strings.WindowTitle_EditEvent;
-
     public int Order
     {
         get => Entity.Order;
@@ -98,7 +86,6 @@ public partial class EventAddViewModel(
         {
             if (!TryParseTimePart(value, 23, out var hour))
                 return;
-
             UpdateTime(hour, Entity.Time?.Minute);
         }
     }
@@ -110,7 +97,6 @@ public partial class EventAddViewModel(
         {
             if (!TryParseTimePart(value, 59, out var minute))
                 return;
-
             UpdateTime(Entity.Time?.Hour, minute);
         }
     }
@@ -135,7 +121,6 @@ public partial class EventAddViewModel(
             Entity.Time = null;
         else
             Entity.Time = new TimeOnly(hour ?? 0, minute ?? 0);
-
         OnPropertyChanged(nameof(Time));
         OnPropertyChanged(nameof(HourText));
         OnPropertyChanged(nameof(MinuteText));
@@ -148,13 +133,11 @@ public partial class EventAddViewModel(
             value = null;
             return true;
         }
-
         if (int.TryParse(text.Trim(), out var parsed) && parsed >= 0 && parsed <= max)
         {
             value = parsed;
             return true;
         }
-
         value = null;
         return false;
     }
@@ -226,7 +209,6 @@ public partial class EventAddViewModel(
 
     public Array CourseValues => Enum.GetValues<Course>();
     public Array EventRoundValues => Enum.GetValues<EventRound>();
-
     public void ApplyContext(NavigationContext context)
     {
         _contextAgeGroupId = context.AgeGroupId;
@@ -250,7 +232,6 @@ public partial class EventAddViewModel(
         LoadAgeGroups();
         LoadSwimStyles();
         LoadPreviousSwimEvents();
-
         if (IsEdit)
         {
             SelectedAgeGroup =
@@ -277,7 +258,6 @@ public partial class EventAddViewModel(
                 SelectedSwimStyle = Enumerable.FirstOrDefault<SearchableItem>(SwimStyles, item =>
                     item.Value is SwimStyle ss && ss.Id == _contextSwimStyleId.Value);
         }
-
         InitializeLaneTab();
     }
 
@@ -293,12 +273,10 @@ public partial class EventAddViewModel(
         }
         else
             Entity.CustomLaneNames = null;
-
         return true;
     }
 
     partial void OnLaneTabIndexChanged(int value) => ApplyLaneTabIndex(value);
-
     private void InitializeLaneTab()
     {
         _isSyncingLaneTab = true;
@@ -320,7 +298,6 @@ public partial class EventAddViewModel(
     {
         if (_isSyncingLaneTab || Entity is null)
             return;
-
         if (tabIndex == 0)
         {
             _savedCustomLaneNames = Entity.CustomLaneNames;
@@ -328,7 +305,6 @@ public partial class EventAddViewModel(
         }
         else
             Entity.CustomLaneNames = _savedCustomLaneNames;
-
         OnPropertyChanged(nameof(CustomLaneNames));
     }
 
@@ -355,10 +331,8 @@ public partial class EventAddViewModel(
         var query = ageGroupService.Query();
         if (_contextAgeGroupId.HasValue)
             query = query.Where(ag => ag.Id == _contextAgeGroupId.Value);
-
         var ageGroups = query.ToList();
         AgeGroups.Clear();
-
         foreach (var ageGroup in ageGroups)
             AgeGroups.Add(new SearchableItem
             {
@@ -372,10 +346,8 @@ public partial class EventAddViewModel(
         var query = swimStyleService.Query();
         if (_contextSwimStyleId.HasValue)
             query = query.Where(ss => ss.Id == _contextSwimStyleId.Value);
-
         var swimStyles = query.ToList();
         SwimStyles.Clear();
-
         foreach (var swimStyle in swimStyles)
             SwimStyles.Add(new SearchableItem
             {
@@ -393,12 +365,10 @@ public partial class EventAddViewModel(
             .ToList();
         PreviousSwimEvents.Clear();
         PreviousSwimEvents.Add(new SearchableItem { Value = null, DisplayText = Strings.Common_NoneParen });
-
         foreach (var swimEvent in swimEvents)
         {
             if (!IsAdd && swimEvent.Id == Entity.Id)
                 continue;
-
             PreviousSwimEvents.Add(new SearchableItem
             {
                 Value = swimEvent,

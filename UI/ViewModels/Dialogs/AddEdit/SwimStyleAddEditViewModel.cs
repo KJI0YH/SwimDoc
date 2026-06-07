@@ -1,6 +1,5 @@
 using DataLayer.EfClasses;
 using ServiceLayer.SwimStyleService;
-using UI.Helpers;
 using UI.Resources;
 
 namespace UI.ViewModels.Dialogs.AddEdit;
@@ -9,7 +8,6 @@ public class SwimStyleAddViewModel(int? id, ISwimStyleService crudService)
     : AddEditViewModel<SwimStyle, int?>(id, crudService)
 {
     public override string WindowTitle => IsAdd ? Strings.WindowTitle_CreateSwimStyle : Strings.WindowTitle_EditSwimStyle;
-
     public Stroke Stroke
     {
         get => Entity.Stroke;

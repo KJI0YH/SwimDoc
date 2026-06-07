@@ -1,5 +1,4 @@
 using System.Windows.Controls;
-using UI.Services;
 using SwimStyleDetailsViewModel = UI.ViewModels.Pages.SwimStyleDetailsViewModel;
 
 namespace UI.Views.Pages;

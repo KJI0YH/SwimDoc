@@ -11,7 +11,6 @@ public static class Strings
         new("UI.Resources.Strings", typeof(Strings).Assembly);
 
     public static ResourceManager ResourceManager => ResourceManagerImpl;
-
     public static string Get(string name) =>
         ResourceManager.GetString(name, CultureInfo.CurrentUICulture) ?? $"[[{name}]]";
 
@@ -27,7 +26,6 @@ public static class Strings
         enumValue = default;
         if (string.IsNullOrWhiteSpace(search))
             return false;
-
         foreach (T item in Enum.GetValues<T>())
         {
             var display = GetEnumDisplay(item);
@@ -38,7 +36,6 @@ public static class Strings
                 return true;
             }
         }
-
         return false;
     }
 
@@ -50,7 +47,6 @@ public static class Strings
     public static string Enum_Stroke_Breast => Get(nameof(Enum_Stroke_Breast));
     public static string Enum_Stroke_Free => Get(nameof(Enum_Stroke_Free));
     public static string Enum_Stroke_Medley => Get(nameof(Enum_Stroke_Medley));
-
     public static string Nav_Program => Get(nameof(Nav_Program));
     public static string Nav_Entries => Get(nameof(Nav_Entries));
     public static string Nav_Heats => Get(nameof(Nav_Heats));
@@ -85,11 +81,9 @@ public static class Strings
     public static string About_Updates_NoReleases => Get(nameof(About_Updates_NoReleases));
     public static string About_Updates_Error => Get(nameof(About_Updates_Error));
     public static string About_Updates_ErrorWithDetails => Get(nameof(About_Updates_ErrorWithDetails));
-
     public static string Menu_Competition => Get(nameof(Menu_Competition));
     public static string Menu_Create => Get(nameof(Menu_Create));
     public static string Menu_Open => Get(nameof(Menu_Open));
-
     public static string Settings_Tab_BaseTime => Get(nameof(Settings_Tab_BaseTime));
     public static string Settings_Tab_Templates => Get(nameof(Settings_Tab_Templates));
     public static string Settings_Page_Subtitle => Get(nameof(Settings_Page_Subtitle));
@@ -111,25 +105,20 @@ public static class Strings
     public static string BaseTimes_Col_Stroke => Get(nameof(BaseTimes_Col_Stroke));
     public static string BaseTimes_Header_BaseTime => Get(nameof(BaseTimes_Header_BaseTime));
     public static string BaseTimes_Header_BaseTimeSeconds => Get(nameof(BaseTimes_Header_BaseTimeSeconds));
-
     public static string Templates_EntryDoc_GroupHeader => Get(nameof(Templates_EntryDoc_GroupHeader));
     public static string Templates_EntryDoc_Title => Get(nameof(Templates_EntryDoc_Title));
     public static string Templates_EntryDoc_Subtitle => Get(nameof(Templates_EntryDoc_Subtitle));
     public static string Templates_Download => Get(nameof(Templates_Download));
     public static string Templates_Download_Tooltip => Get(nameof(Templates_Download_Tooltip));
-
     public static string Dialog_SaveExcelTemplate_Title => Get(nameof(Dialog_SaveExcelTemplate_Title));
     public static string Dialog_SaveExcelTemplate_Filter => Get(nameof(Dialog_SaveExcelTemplate_Filter));
     public static string Dialog_SaveExcelTemplate_DefaultFileName => Get(nameof(Dialog_SaveExcelTemplate_DefaultFileName));
-
     public static string Language_Label => Get(nameof(Language_Label));
     public static string Language_English => Get(nameof(Language_English));
     public static string Language_Russian => Get(nameof(Language_Russian));
-
     public static string CompetitionSelection_Subtitle => Get(nameof(CompetitionSelection_Subtitle));
     public static string CompetitionSelection_Create => Get(nameof(CompetitionSelection_Create));
     public static string CompetitionSelection_Open => Get(nameof(CompetitionSelection_Open));
-
     public static string Toolbar_Create => Get(nameof(Toolbar_Create));
     public static string Toolbar_Edit => Get(nameof(Toolbar_Edit));
     public static string Toolbar_Delete => Get(nameof(Toolbar_Delete));
@@ -141,7 +130,6 @@ public static class Strings
     public static string Paging_Last => Get(nameof(Paging_Last));
     public static string Paging_ItemsInfo_EmptyFormat => Get(nameof(Paging_ItemsInfo_EmptyFormat));
     public static string Paging_ItemsInfo_RangeFormat => Get(nameof(Paging_ItemsInfo_RangeFormat));
-
     public static string Import_Details => Get(nameof(Import_Details));
     public static string Import_Cancel => Get(nameof(Import_Cancel));
     public static string Import_Close => Get(nameof(Import_Close));
@@ -158,7 +146,6 @@ public static class Strings
     public static string Import_EventPrev => Get(nameof(Import_EventPrev));
     public static string Import_EventCurrent => Get(nameof(Import_EventCurrent));
     public static string Import_CreatedEntries => Get(nameof(Import_CreatedEntries));
-
     public static string Filters_Clear => Get(nameof(Filters_Clear));
     public static string Filters_Round => Get(nameof(Filters_Round));
     public static string Filters_Distance => Get(nameof(Filters_Distance));
@@ -167,7 +154,6 @@ public static class Strings
     public static string Filters_Status => Get(nameof(Filters_Status));
     public static string Entries_ImportFromFile => Get(nameof(Entries_ImportFromFile));
     public static string Entries_ImportFromPrevEvent => Get(nameof(Entries_ImportFromPrevEvent));
-
     public static string Entries_Col_Distance => Get(nameof(Entries_Col_Distance));
     public static string Entries_Col_Participant => Get(nameof(Entries_Col_Participant));
     public static string Entries_Col_Team => Get(nameof(Entries_Col_Team));
@@ -177,10 +163,8 @@ public static class Strings
     public static string Entries_Col_Points => Get(nameof(Entries_Col_Points));
     public static string Entries_Col_Comment => Get(nameof(Entries_Col_Comment));
     public static string Distance_MetersFormat => Get(nameof(Distance_MetersFormat));
-
     public static string Import_Summary_Total => Get(nameof(Import_Summary_Total));
     public static string Import_Summary_FilesCountFormat => Get(nameof(Import_Summary_FilesCountFormat));
-
     public static string Import_Event_Success_Header => Get(nameof(Import_Event_Success_Header));
     public static string Import_Event_Success_MessageFormat => Get(nameof(Import_Event_Success_MessageFormat));
     public static string Import_Event_Partial_Header => Get(nameof(Import_Event_Partial_Header));
@@ -188,7 +172,6 @@ public static class Strings
     public static string Import_Event_Failed_Header => Get(nameof(Import_Event_Failed_Header));
     public static string Import_Event_Failed_MessageFormat => Get(nameof(Import_Event_Failed_MessageFormat));
     public static string Import_Event_Error_Header => Get(nameof(Import_Event_Error_Header));
-
     public static string Dialog_SelectEntryFiles_Title => Get(nameof(Dialog_SelectEntryFiles_Title));
     public static string Dialog_SelectEntryFiles_Filter => Get(nameof(Dialog_SelectEntryFiles_Filter));
     public static string Dialog_SaveExcelReports_Filter => Get(nameof(Dialog_SaveExcelReports_Filter));
@@ -197,16 +180,13 @@ public static class Strings
     public static string Dialog_SaveExcelEntryListReports_DefaultFileName => Get(nameof(Dialog_SaveExcelEntryListReports_DefaultFileName));
     public static string Dialog_SaveExcelStartListReports_DefaultFileName => Get(nameof(Dialog_SaveExcelStartListReports_DefaultFileName));
     public static string Dialog_SaveExcelFinishListReports_DefaultFileName => Get(nameof(Dialog_SaveExcelFinishListReports_DefaultFileName));
-
     public static string Dialog_CompetitionDb_Filter => Get(nameof(Dialog_CompetitionDb_Filter));
     public static string Dialog_CompetitionDb_DefaultExt => Get(nameof(Dialog_CompetitionDb_DefaultExt));
-
     public static string Import_File_Header => Get(nameof(Import_File_Header));
     public static string Import_File_Preparing_MessageFormat => Get(nameof(Import_File_Preparing_MessageFormat));
     public static string Import_File_Processing_MessageFormat => Get(nameof(Import_File_Processing_MessageFormat));
     public static string Import_File_Canceled_Header => Get(nameof(Import_File_Canceled_Header));
     public static string Import_File_Finished_MessageFormat => Get(nameof(Import_File_Finished_MessageFormat));
-
     public static string Operation_Col_Event => Get(nameof(Operation_Col_Event));
     public static string Operation_Col_HeatsCreated => Get(nameof(Operation_Col_HeatsCreated));
     public static string Operation_Finished_Success_Header => Get(nameof(Operation_Finished_Success_Header));
@@ -230,29 +210,24 @@ public static class Strings
     public static string Operation_Reports_Running_Message => Get(nameof(Operation_Reports_Running_Message));
     public static string Operation_Reports_Finished_MessageFormat => Get(nameof(Operation_Reports_Finished_MessageFormat));
     public static string Operation_Reports_Canceled_Header => Get(nameof(Operation_Reports_Canceled_Header));
-
     public static string Dialog_Error_SaveReport_Title => Get(nameof(Dialog_Error_SaveReport_Title));
     public static string Dialog_Error_FileBusyOrUnavailable => Get(nameof(Dialog_Error_FileBusyOrUnavailable));
     public static string Dialog_Error_FileBusyOrUnavailableWithDetailsFormat => Get(nameof(Dialog_Error_FileBusyOrUnavailableWithDetailsFormat));
     public static string Dialog_Error_SaveBaseTimes_Title => Get(nameof(Dialog_Error_SaveBaseTimes_Title));
     public static string Dialog_Error_BaseTimesFileBusyOrUnavailable => Get(nameof(Dialog_Error_BaseTimesFileBusyOrUnavailable));
     public static string Dialog_Error_SaveFile_Title => Get(nameof(Dialog_Error_SaveFile_Title));
-
     public static string Dialog_CreateCompetition_Title => Get(nameof(Dialog_CreateCompetition_Title));
     public static string Dialog_OpenCompetition_Title => Get(nameof(Dialog_OpenCompetition_Title));
     public static string Dialog_Error_CreateDbFile_Title => Get(nameof(Dialog_Error_CreateDbFile_Title));
-
     public static string Reports_WindowTitle => Get(nameof(Reports_WindowTitle));
     public static string Reports_SaveDialog_Title => Get(nameof(Reports_SaveDialog_Title));
     public static string Reports_Validation_SelectAtLeastOne => Get(nameof(Reports_Validation_SelectAtLeastOne));
     public static string Reports_Validation_SelectOutputFile => Get(nameof(Reports_Validation_SelectOutputFile));
-
     public static string LoadPrev_WindowTitle => Get(nameof(LoadPrev_WindowTitle));
     public static string LoadPrev_Validation_SelectOfficialPreviousEvent => Get(nameof(LoadPrev_Validation_SelectOfficialPreviousEvent));
     public static string LoadPrev_Validation_SelectCurrentEvent => Get(nameof(LoadPrev_Validation_SelectCurrentEvent));
     public static string LoadPrev_Validation_EventsMustDiffer => Get(nameof(LoadPrev_Validation_EventsMustDiffer));
     public static string LoadPrev_Validation_RoundParticipantsRequired => Get(nameof(LoadPrev_Validation_RoundParticipantsRequired));
-
     public static string Events_Col_Order => Get(nameof(Events_Col_Order));
     public static string Events_Col_Date => Get(nameof(Events_Col_Date));
     public static string Events_Col_Time => Get(nameof(Events_Col_Time));
@@ -261,21 +236,16 @@ public static class Strings
     public static string Events_Col_AgeGroup => Get(nameof(Events_Col_AgeGroup));
     public static string Events_Col_Lanes => Get(nameof(Events_Col_Lanes));
     public static string Events_Col_Status => Get(nameof(Events_Col_Status));
-
     public static string WindowMode_Create => Get(nameof(WindowMode_Create));
     public static string WindowMode_Edit => Get(nameof(WindowMode_Edit));
     public static string Validation_ErrorFallback => Get(nameof(Validation_ErrorFallback));
-
     public static string StartTimes_WindowTitle => Get(nameof(StartTimes_WindowTitle));
     public static string StartTimes_Validation_StartTimeRequired => Get(nameof(StartTimes_Validation_StartTimeRequired));
     public static string StartTimes_Validation_HeatPauseNonNegative => Get(nameof(StartTimes_Validation_HeatPauseNonNegative));
     public static string StartTimes_Validation_EventPauseNonNegative => Get(nameof(StartTimes_Validation_EventPauseNonNegative));
-
     public static string Heats_DeleteTooltip_Heat => Get(nameof(Heats_DeleteTooltip_Heat));
     public static string Heats_DeleteTooltip_Position => Get(nameof(Heats_DeleteTooltip_Position));
-
     public static string Fixation_SelectedHeatHeader_Format => Get(nameof(Fixation_SelectedHeatHeader_Format));
-
     public static string WindowTitle_CreateClub => Get(nameof(WindowTitle_CreateClub));
     public static string WindowTitle_EditClub => Get(nameof(WindowTitle_EditClub));
     public static string WindowTitle_CreateAthlete => Get(nameof(WindowTitle_CreateAthlete));
@@ -290,23 +260,18 @@ public static class Strings
     public static string WindowTitle_EditSwimStyle => Get(nameof(WindowTitle_EditSwimStyle));
     public static string WindowTitle_CreateAgeGroup => Get(nameof(WindowTitle_CreateAgeGroup));
     public static string WindowTitle_EditAgeGroup => Get(nameof(WindowTitle_EditAgeGroup));
-
     public static string Common_NoneParen => Get(nameof(Common_NoneParen));
     public static string Common_PersonalParen => Get(nameof(Common_PersonalParen));
-
     public static string HeatAlloc_WindowTitle => Get(nameof(HeatAlloc_WindowTitle));
     public static string HeatAlloc_Validation_MinHeatSize => Get(nameof(HeatAlloc_Validation_MinHeatSize));
-
     public static string Heat_Validation_EventRequired => Get(nameof(Heat_Validation_EventRequired));
     public static string Heat_Validation_MinHeatNumber => Get(nameof(Heat_Validation_MinHeatNumber));
     public static string Heat_Validation_MaxPositionsFormat => Get(nameof(Heat_Validation_MaxPositionsFormat));
-
     public static string Clubs_Col_Name => Get(nameof(Clubs_Col_Name));
     public static string Clubs_Col_Athletes => Get(nameof(Clubs_Col_Athletes));
     public static string Clubs_Col_Entries => Get(nameof(Clubs_Col_Entries));
     public static string Clubs_Col_Relays => Get(nameof(Clubs_Col_Relays));
     public static string Clubs_Col_Points => Get(nameof(Clubs_Col_Points));
-
     public static string Athletes_Col_FirstName => Get(nameof(Athletes_Col_FirstName));
     public static string Athletes_Col_LastName => Get(nameof(Athletes_Col_LastName));
     public static string Athletes_Col_Gender => Get(nameof(Athletes_Col_Gender));
@@ -314,19 +279,15 @@ public static class Strings
     public static string Athletes_Col_Category => Get(nameof(Athletes_Col_Category));
     public static string Athletes_Col_Team => Get(nameof(Athletes_Col_Team));
     public static string Athletes_Col_Points => Get(nameof(Athletes_Col_Points));
-
     public static string SwimStyles_Col_Name => Get(nameof(SwimStyles_Col_Name));
     public static string SwimStyles_Col_Distance => Get(nameof(SwimStyles_Col_Distance));
     public static string SwimStyles_Col_Stroke => Get(nameof(SwimStyles_Col_Stroke));
-
     public static string AgeGroups_Col_Name => Get(nameof(AgeGroups_Col_Name));
     public static string AgeGroups_Col_Gender => Get(nameof(AgeGroups_Col_Gender));
     public static string AgeGroups_Col_BirthYearFrom => Get(nameof(AgeGroups_Col_BirthYearFrom));
     public static string AgeGroups_Col_BirthYearTo => Get(nameof(AgeGroups_Col_BirthYearTo));
     public static string AgeGroups_GenerateCombinedResultsReports => Get(nameof(AgeGroups_GenerateCombinedResultsReports));
-
     public static string Heats_GroupHeader_Format => Get(nameof(Heats_GroupHeader_Format));
-
     public static string Enum_HeatStatus_NOT_STARTED => Get(nameof(Enum_HeatStatus_NOT_STARTED));
     public static string Enum_HeatStatus_UNOFFICIAL => Get(nameof(Enum_HeatStatus_UNOFFICIAL));
     public static string Enum_HeatStatus_OFFICIAL => Get(nameof(Enum_HeatStatus_OFFICIAL));
@@ -348,7 +309,6 @@ public static class Strings
     public static string Enum_EntryStatus_DNS => Get(nameof(Enum_EntryStatus_DNS));
     public static string Enum_EntryStatus_DNF => Get(nameof(Enum_EntryStatus_DNF));
     public static string Enum_ImportFileStatus_Summary => Get(nameof(Enum_ImportFileStatus_Summary));
-
     public static string Common_Cancel => Get(nameof(Common_Cancel));
     public static string Common_Save => Get(nameof(Common_Save));
     public static string Common_Add => Get(nameof(Common_Add));
@@ -365,14 +325,11 @@ public static class Strings
     public static string Common_Individual => Get(nameof(Common_Individual));
     public static string Common_NoTime => Get(nameof(Common_NoTime));
     public static string Common_Ok => Get(nameof(Common_Ok));
-
     public static string Window_Minimize => Get(nameof(Window_Minimize));
     public static string Window_Maximize => Get(nameof(Window_Maximize));
     public static string Window_Restore => Get(nameof(Window_Restore));
     public static string Window_Close => Get(nameof(Window_Close));
-
     public static string App_Title => Get(nameof(App_Title));
-
     public static string Tabs_Athletes => Get(nameof(Tabs_Athletes));
     public static string Tabs_Entries => Get(nameof(Tabs_Entries));
     public static string Tabs_Heats => Get(nameof(Tabs_Heats));
@@ -381,19 +338,15 @@ public static class Strings
     public static string Tabs_Fixation => Get(nameof(Tabs_Fixation));
     public static string Tabs_Heat => Get(nameof(Tabs_Heat));
     public static string Tabs_Events => Get(nameof(Tabs_Events));
-
     public static string Field_Name => Get(nameof(Field_Name));
-
     public static string Heat_Field_Number => Get(nameof(Heat_Field_Number));
     public static string Heat_Field_StartTime => Get(nameof(Heat_Field_StartTime));
     public static string Heat_Field_Status => Get(nameof(Heat_Field_Status));
     public static string Heat_Col_Lane => Get(nameof(Heat_Col_Lane));
     public static string Heat_Col_Entry => Get(nameof(Heat_Col_Entry));
-
     public static string StartTimes_Field_StartTime => Get(nameof(StartTimes_Field_StartTime));
     public static string StartTimes_Field_HeatPauseMinutes => Get(nameof(StartTimes_Field_HeatPauseMinutes));
     public static string StartTimes_Field_EventPauseMinutes => Get(nameof(StartTimes_Field_EventPauseMinutes));
-
     public static string Event_Field_Order => Get(nameof(Event_Field_Order));
     public static string Event_Field_Date => Get(nameof(Event_Field_Date));
     public static string Event_Field_Time => Get(nameof(Event_Field_Time));
@@ -409,10 +362,8 @@ public static class Strings
     public static string Event_Validation_CustomLaneNamesRequired => Get(nameof(Event_Validation_CustomLaneNamesRequired));
     public static string Event_Field_CustomLaneNames => Get(nameof(Event_Field_CustomLaneNames));
     public static string Event_Field_CustomLaneNames_Placeholder => Get(nameof(Event_Field_CustomLaneNames_Placeholder));
-
     public static string LoadPrev_Field_PreviousEvent => Get(nameof(LoadPrev_Field_PreviousEvent));
     public static string LoadPrev_Field_CurrentEvent => Get(nameof(LoadPrev_Field_CurrentEvent));
-
     public static string Entry_Tab_Individual => Get(nameof(Entry_Tab_Individual));
     public static string Entry_Tab_Relay => Get(nameof(Entry_Tab_Relay));
     public static string Entry_Field_Athlete => Get(nameof(Entry_Field_Athlete));
@@ -421,7 +372,6 @@ public static class Strings
     public static string Entry_Field_Scoring => Get(nameof(Entry_Field_Scoring));
     public static string Entry_Field_Club => Get(nameof(Entry_Field_Club));
     public static string Entry_Field_RelayNumber => Get(nameof(Entry_Field_RelayNumber));
-
     public static string Reports_Include_EntryList => Get(nameof(Reports_Include_EntryList));
     public static string Reports_Include_StartList => Get(nameof(Reports_Include_StartList));
     public static string Reports_Include_FinishList => Get(nameof(Reports_Include_FinishList));
@@ -429,41 +379,32 @@ public static class Strings
     public static string Reports_CombinedResults_WindowTitle => Get(nameof(Reports_CombinedResults_WindowTitle));
     public static string Reports_CombinedResults_SaveDialog_Title => Get(nameof(Reports_CombinedResults_SaveDialog_Title));
     public static string Dialog_SaveExcelCombinedResultsReports_DefaultFileName => Get(nameof(Dialog_SaveExcelCombinedResultsReports_DefaultFileName));
-
     public static string HeatAlloc_Field_Order => Get(nameof(HeatAlloc_Field_Order));
     public static string HeatAlloc_Order_WeakToStrong => Get(nameof(HeatAlloc_Order_WeakToStrong));
     public static string HeatAlloc_Order_StrongToWeak => Get(nameof(HeatAlloc_Order_StrongToWeak));
     public static string HeatAlloc_Field_MinHeatSize => Get(nameof(HeatAlloc_Field_MinHeatSize));
-
     public static string Common_Delete => Get(nameof(Common_Delete));
     public static string Common_Allocate => Get(nameof(Common_Allocate));
     public static string Common_Reform => Get(nameof(Common_Reform));
-
     public static string Confirm_Title_Delete => Get(nameof(Confirm_Title_Delete));
     public static string Confirm_Title_HeatAllocation => Get(nameof(Confirm_Title_HeatAllocation));
-
     public static string Common_Entry_Accusative_Singular => Get(nameof(Common_Entry_Accusative_Singular));
     public static string Common_Entry_Accusative_Few => Get(nameof(Common_Entry_Accusative_Few));
     public static string Common_Entry_Accusative_Many => Get(nameof(Common_Entry_Accusative_Many));
-
     public static string Confirm_DeleteOfficialResults_MessageFormat => Get(nameof(Confirm_DeleteOfficialResults_MessageFormat));
     public static string Confirm_HeatAllocationOfficialResults_MessageFormat => Get(nameof(Confirm_HeatAllocationOfficialResults_MessageFormat));
-
     public static string SwimStyle_Field_Stroke => Get(nameof(SwimStyle_Field_Stroke));
     public static string SwimStyle_Field_Distance => Get(nameof(SwimStyle_Field_Distance));
     public static string SwimStyle_Field_RelayCount => Get(nameof(SwimStyle_Field_RelayCount));
-
     public static string Athlete_Field_FirstName => Get(nameof(Athlete_Field_FirstName));
     public static string Athlete_Field_LastName => Get(nameof(Athlete_Field_LastName));
     public static string Athlete_Field_Gender => Get(nameof(Athlete_Field_Gender));
     public static string Athlete_Field_BirthYear => Get(nameof(Athlete_Field_BirthYear));
     public static string Athlete_Field_Category => Get(nameof(Athlete_Field_Category));
     public static string Athlete_Field_Club => Get(nameof(Athlete_Field_Club));
-
     public static string Events_AllocateHeats => Get(nameof(Events_AllocateHeats));
     public static string Events_GenerateReports => Get(nameof(Events_GenerateReports));
     public static string Events_CalculateStartTimes => Get(nameof(Events_CalculateStartTimes));
-
     public static string Heats_Create => Get(nameof(Heats_Create));
     public static string Heats_Edit => Get(nameof(Heats_Edit));
     public static string Heats_Refresh => Get(nameof(Heats_Refresh));
@@ -473,7 +414,6 @@ public static class Strings
     public static string Heats_Col_Team => Get(nameof(Heats_Col_Team));
     public static string Heats_Col_EntryTime => Get(nameof(Heats_Col_EntryTime));
     public static string Heats_Col_Result => Get(nameof(Heats_Col_Result));
-
     public static string Results_Col_Event => Get(nameof(Results_Col_Event));
     public static string Results_Col_Participant => Get(nameof(Results_Col_Participant));
     public static string Results_Col_Team => Get(nameof(Results_Col_Team));
@@ -481,7 +421,6 @@ public static class Strings
     public static string Results_Col_Result => Get(nameof(Results_Col_Result));
     public static string Results_Col_Points => Get(nameof(Results_Col_Points));
     public static string Results_Col_Total => Get(nameof(Results_Col_Total));
-
     public static string Fixation_Refresh => Get(nameof(Fixation_Refresh));
     public static string Fixation_Col_Lane => Get(nameof(Fixation_Col_Lane));
     public static string Fixation_Col_Participant => Get(nameof(Fixation_Col_Participant));

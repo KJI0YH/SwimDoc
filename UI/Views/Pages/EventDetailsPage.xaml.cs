@@ -1,5 +1,4 @@
 using System.Windows.Controls;
-using UI.Services;
 using EventDetailsViewModel = UI.ViewModels.Pages.EventDetailsViewModel;
 
 namespace UI.Views.Pages;

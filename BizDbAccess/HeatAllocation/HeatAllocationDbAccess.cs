@@ -1,4 +1,4 @@
-﻿using DataLayer.EfClasses;
+using DataLayer.EfClasses;
 using DataLayer.EfCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -29,7 +29,6 @@ public class HeatAllocationDbAccess(EfCoreContext context) : IHeatAllocationDbAc
                 .SetProperty(e => e.FinishTime, (int?)null)
                 .SetProperty(e => e.Points, (int?)null)
                 .SetProperty(e => e.Status, EntryStatus.EVENT));
-
         context.Heats
             .Where(heat => heat.SwimEventId == swimEventId)
             .ExecuteDelete();

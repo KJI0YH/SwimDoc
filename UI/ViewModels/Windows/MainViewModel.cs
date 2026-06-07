@@ -1,6 +1,5 @@
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
-using UI.Services;
 using UI.ViewModels.Pages;
 
 namespace UI.ViewModels.Windows;
@@ -8,11 +7,8 @@ namespace UI.ViewModels.Windows;
 public partial class MainViewModel : ViewModelBase
 {
     private readonly INavigationService _navigationService;
-
     [ObservableProperty] private ViewModelBase? _currentViewModel;
-
     [ObservableProperty] private bool _isCompetitionSelected;
-
     public MainViewModel(
         INavigationService navigationService,
         Pages.CompetitionSelectionViewModel competitionSelectionViewModel,
@@ -27,11 +23,9 @@ public partial class MainViewModel : ViewModelBase
     {
         _navigationService = navigationService;
         _navigationService.CurrentViewModelChanged += HandleNavigationViewModelChanged;
-
         CompetitionSelectionViewModel = competitionSelectionViewModel;
         CompetitionSelectionViewModel.CompetitionSelected += OnCompetitionSelected;
         CurrentViewModel = CompetitionSelectionViewModel;
-
         EventsViewModel = eventsViewModel;
         HeatsViewModel = heatsViewModel;
         FixationViewModel = fixationViewModel;
@@ -40,7 +34,6 @@ public partial class MainViewModel : ViewModelBase
         ClubsViewModel = clubsViewModel;
         AgeGroupsViewModel = ageGroupsViewModel;
         SwimStylesViewModel = swimStylesViewModel;
-
         NavigateToEventsCommand =
             new NavigationCommand<EventsViewModel>(_navigationService, () => _isCompetitionSelected);
         NavigateToHeatsCommand =
@@ -60,7 +53,6 @@ public partial class MainViewModel : ViewModelBase
     }
 
     public Pages.CompetitionSelectionViewModel CompetitionSelectionViewModel { get; }
-
     public EventsViewModel EventsViewModel { get; }
     public HeatsViewModel HeatsViewModel { get; }
     public FixationViewModel FixationViewModel { get; }
@@ -69,7 +61,6 @@ public partial class MainViewModel : ViewModelBase
     public ClubsViewModel ClubsViewModel { get; }
     public AgeGroupsViewModel AgeGroupsViewModel { get; }
     public SwimStylesViewModel SwimStylesViewModel { get; }
-
     public ICommand NavigateToEventsCommand { get; }
     public ICommand NavigateToHeatsCommand { get; }
     public ICommand NavigateToHeatsResultsCommand { get; }
@@ -99,6 +90,7 @@ public partial class MainViewModel : ViewModelBase
     private void OnCompetitionSelected(string filePath)
     {
         IsCompetitionSelected = true;
+        _navigationService.ResetForNewCompetition();
         _navigationService.NavigateTo<EventsViewModel>();
     }
 }

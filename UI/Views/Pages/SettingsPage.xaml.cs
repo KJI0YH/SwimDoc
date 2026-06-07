@@ -22,14 +22,11 @@ public partial class SettingsPage : Page
     {
         if (SettingsHubContent is null)
             return;
-
         var width = SettingsHubScroll.ViewportWidth > 0
             ? SettingsHubScroll.ViewportWidth
             : SettingsHubRoot.ActualWidth;
-
         if (width <= 0)
             return;
-
         SettingsHubContent.Width = width;
     }
 }

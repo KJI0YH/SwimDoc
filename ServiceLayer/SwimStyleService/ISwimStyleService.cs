@@ -5,5 +5,4 @@ namespace ServiceLayer.SwimStyleService;
 
 public interface ISwimStyleService : ICrudService<SwimStyle, int?>
 {
-
 }

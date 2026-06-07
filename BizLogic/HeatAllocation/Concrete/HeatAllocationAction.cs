@@ -1,9 +1,9 @@
-using BizDbAccess;
+using BizDbAccess.HeatAllocation;
 using BizLogic.GenericInterfaces;
 using BizLogic.Helpers;
 using DataLayer.EfClasses;
 
-namespace BizLogic.HeatLogic.Concrete;
+namespace BizLogic.HeatAllocation.Concrete;
 
 public class HeatAllocationAction(IHeatAllocationDbAccess dbAccess) :
     BizActionErrors,
@@ -11,29 +11,24 @@ public class HeatAllocationAction(IHeatAllocationDbAccess dbAccess) :
 {
     private List<string> _errors = [];
     private List<string> _warnings = [];
-
     public HeatAllocationOutDto Action(HeatAllocationInDto dataIn)
     {
         _warnings = [];
         _errors = [];
-
         if (dbAccess.IsHeatsAllocated(dataIn.SwimEventId))
         {
             _warnings.Add(HeatAllocationMessageKeys.HeatsReallocated);
             dbAccess.DeleteExistedHeats(dataIn.SwimEventId);
         }
-
         var entries = new BufferedCollection<Entry>(dbAccess.GetOrderedEntriesByEventId(dataIn.SwimEventId));
         if (entries.Count == 0)
         {
             _warnings.Add(HeatAllocationMessageKeys.NoEntriesForEvent);
             return new HeatAllocationOutDto([], _warnings, _errors);
         }
-
         var heatNumbers = OrderHeatNumbers(entries.Count, dataIn.LaneCount, dataIn.HeatOrder);
         var laneNumbers = OrderLaneNumbers(dataIn.LaneMin, dataIn.LaneMax);
         var heats = new List<Heat>();
-
         if (!IsWeakHeatFull(entries.Count, dataIn.LaneCount))
         {
             var heatSize = Math.Max(dataIn.MinHeatSize, entries.Count % dataIn.LaneCount);
@@ -41,14 +36,12 @@ public class HeatAllocationAction(IHeatAllocationDbAccess dbAccess) :
                 dataIn.SwimEventId);
             heats.Add(weakHeat);
         }
-
         while (!entries.IsEmpty)
         {
             var heat = CreateHeat(entries.TakeFirst(dataIn.LaneCount), laneNumbers, heatNumbers.TakeFirst(),
                 dataIn.SwimEventId);
             heats.Add(heat);
         }
-
         dbAccess.AddHeats(heats);
         return new HeatAllocationOutDto(heats, _warnings, _errors);
     }
@@ -71,7 +64,6 @@ public class HeatAllocationAction(IHeatAllocationDbAccess dbAccess) :
                 Lane = laneNumbers[laneIndex++],
             });
         }
-
         return heat;
     }
 
@@ -100,7 +92,6 @@ public class HeatAllocationAction(IHeatAllocationDbAccess dbAccess) :
             sign *= -1;
             laneNumbers.Add(laneCenter + shift);
         }
-
         return laneNumbers.ToArray();
     }
 

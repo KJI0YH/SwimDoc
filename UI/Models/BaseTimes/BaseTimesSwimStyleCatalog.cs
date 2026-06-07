@@ -30,7 +30,6 @@ internal static class BaseTimesSwimStyleCatalog
         new(4, 50, Stroke.Medley),
         new(4, 100, Stroke.Medley),
     ];
-
     internal static readonly SwimStyleSpec[] LcmMenWomen =
     [
         new(0, 50, Stroke.Free),
@@ -54,13 +53,11 @@ internal static class BaseTimesSwimStyleCatalog
         new(4, 200, Stroke.Free),
         new(4, 100, Stroke.Medley),
     ];
-
     internal static readonly SwimStyleSpec[] ScmMixedRelay =
     [
         new(4, 50, Stroke.Free),
         new(4, 50, Stroke.Medley),
     ];
-
     internal static readonly SwimStyleSpec[] LcmMixedRelay =
     [
         new(4, 100, Stroke.Free),

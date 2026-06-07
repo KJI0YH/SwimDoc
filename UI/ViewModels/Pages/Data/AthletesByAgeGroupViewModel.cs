@@ -13,7 +13,6 @@ using ServiceLayer.EventService;
 using ServiceLayer.HeatService;
 using ServiceLayer.PointScoreProvider;
 using ServiceLayer.SwimStyleService;
-using UI.Services;
 using UI.ViewModels;
 using UI.ViewModels.Pages;
 using UI.Views.Dialogs.Markers.AddEdit;
@@ -29,7 +28,6 @@ public class AthletesByAgeGroupViewModel : AthletesViewModel
     private Gender _ageGroupGender;
     private int _birthYearMin;
     private int _birthYearMax;
-
     public AthletesByAgeGroupViewModel(IAthleteService athleteService, IAgeGroupService ageGroupService)
         : base(athleteService)
     {
@@ -41,7 +39,6 @@ public class AthletesByAgeGroupViewModel : AthletesViewModel
     {
         _ageGroupId = ageGroupId;
         _ageGroupLoaded = false;
-
         if (ageGroupId.HasValue)
         {
             var ageGroup = _ageGroupService.Query().FirstOrDefault(ag => ag.Id == ageGroupId.Value);
@@ -53,7 +50,6 @@ public class AthletesByAgeGroupViewModel : AthletesViewModel
                 _ageGroupLoaded = true;
             }
         }
-
         LoadDataCommand.Execute(null);
     }
 
@@ -62,7 +58,6 @@ public class AthletesByAgeGroupViewModel : AthletesViewModel
         query = base.ApplyQuery(query);
         if (!_ageGroupId.HasValue || !_ageGroupLoaded)
             return query.Where(_ => false);
-
         return query.Where(a =>
             a.YearOfBirth >= _birthYearMin &&
             a.YearOfBirth <= _birthYearMax &&

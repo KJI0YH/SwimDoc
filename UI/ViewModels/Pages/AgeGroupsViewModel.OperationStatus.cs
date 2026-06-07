@@ -1,7 +1,6 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using UI.Helpers;
 using UI.Resources;
 
 namespace UI.ViewModels.Pages;
@@ -9,7 +8,6 @@ namespace UI.ViewModels.Pages;
 public partial class AgeGroupsViewModel
 {
     private CancellationTokenSource? _operationCts;
-
     [ObservableProperty] private bool _isOperationBarOpen;
     [ObservableProperty] private bool _isOperationRunning;
     [ObservableProperty] private bool _isOperationDetailsOpen;
@@ -19,13 +17,9 @@ public partial class AgeGroupsViewModel
     [ObservableProperty] private int _operationProcessedItems;
     [ObservableProperty] private int _operationTotalItems;
     [ObservableProperty] private ObservableCollection<string> _operationErrors = new();
-
     public bool IsOperationIndeterminate => IsOperationRunning;
-
     public bool HasOperationDetails => OperationErrors.Count > 0;
-
     public bool CanToggleOperationDetails => HasOperationDetails;
-
     partial void OnIsOperationRunningChanged(bool value)
     {
         OnPropertyChanged(nameof(IsOperationIndeterminate));
@@ -41,7 +35,6 @@ public partial class AgeGroupsViewModel
 
     [RelayCommand(CanExecute = nameof(CanCancelOperation))]
     private void CancelOperation() => _operationCts?.Cancel();
-
     private bool CanCancelOperation() => IsOperationRunning;
 
     [RelayCommand]
@@ -52,7 +45,6 @@ public partial class AgeGroupsViewModel
     {
         if (IsOperationRunning)
             return;
-
         IsOperationBarOpen = false;
         IsOperationDetailsOpen = false;
         OperationErrors.Clear();
@@ -70,7 +62,6 @@ public partial class AgeGroupsViewModel
         _operationCts?.Cancel();
         _operationCts = new CancellationTokenSource();
         var token = _operationCts.Token;
-
         IsMultiItemOperation = false;
         OperationErrors.Clear();
         OperationTotalItems = 1;
@@ -81,10 +72,8 @@ public partial class AgeGroupsViewModel
         OperationHeader = header;
         OperationMessage = runningMessage;
         CancelOperationCommand.NotifyCanExecuteChanged();
-
         var canceled = false;
         var hadFailure = false;
-
         try
         {
             await Task.Run(async () =>
@@ -93,7 +82,6 @@ public partial class AgeGroupsViewModel
                 await RunOnUiAsync(() =>
                 {
                     OperationProcessedItems = 1;
-
                     if (outcome.Status == OperationItemStatus.Failed)
                     {
                         OperationErrors = new ObservableCollection<string>(outcome.Errors);

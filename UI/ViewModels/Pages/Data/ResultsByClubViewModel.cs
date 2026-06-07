@@ -13,7 +13,6 @@ using ServiceLayer.EventService;
 using ServiceLayer.HeatService;
 using ServiceLayer.PointScoreProvider;
 using ServiceLayer.SwimStyleService;
-using UI.Services;
 using UI.ViewModels;
 using UI.ViewModels.Pages;
 
@@ -25,11 +24,9 @@ public partial class ResultsByClubViewModel(IEntryService entryService) : ViewMo
         App.Current.Services.GetRequiredService<INavigationService>();
 
     private int? _clubId;
-
     [ObservableProperty] private bool _isLoading;
     [ObservableProperty] private ObservableCollection<ParticipantResultEntryView> _results = new();
     [ObservableProperty] private ParticipantResultEntryView? _selectedResult;
-
     public void SetClubId(int? clubId)
     {
         _clubId = clubId;
@@ -44,7 +41,6 @@ public partial class ResultsByClubViewModel(IEntryService entryService) : ViewMo
             Results = [];
             return;
         }
-
         IsLoading = true;
         try
         {
@@ -60,7 +56,6 @@ public partial class ResultsByClubViewModel(IEntryService entryService) : ViewMo
                 .Select(e => e.SwimEventId!.Value)
                 .Distinct()
                 .ToListAsync();
-
             var rows = new List<ParticipantResultEntryView>();
             foreach (var eventId in eventIds)
             {
@@ -69,7 +64,6 @@ public partial class ResultsByClubViewModel(IEntryService entryService) : ViewMo
                 foreach (var clubResult in ResultsViewModel.FindClubResults(eventResults, clubId))
                     rows.Add(new ParticipantResultEntryView(clubResult));
             }
-
             Results = new ObservableCollection<ParticipantResultEntryView>(rows);
         }
         finally
@@ -88,7 +82,6 @@ public partial class ResultsByClubViewModel(IEntryService entryService) : ViewMo
     {
         if (SelectedResult?.Entry.SwimEventId is not int eventId)
             return;
-
         _navigationService.NavigateTo<ResultsViewModel>(eventId);
     }
 }

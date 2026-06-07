@@ -5,7 +5,6 @@ using DataLayer.EfClasses;
 using Microsoft.EntityFrameworkCore;
 using ServiceLayer.AgeGroupService;
 using ServiceLayer.EntryService;
-using UI.Helpers;
 using UI.Models;
 
 namespace UI.Models.CombinedResults;

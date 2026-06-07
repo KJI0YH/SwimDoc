@@ -3,7 +3,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
-using UI.Helpers;
 using UI.Resources;
 using UI.ViewModels.Pages;
 
@@ -13,10 +12,8 @@ public partial class CombinedResultsView : UserControl
 {
     private static readonly CombinedResultsEventScoringConverter EventScoringConverter = new();
     private static readonly SolidColorBrush NonScoringCellBrush = new(Color.FromRgb(0xD3, 0xD3, 0xD3));
-
     private CombinedResultsViewModel? _subscribedViewModel;
     private DataGrid? _grid;
-
     public CombinedResultsView()
     {
         InitializeComponent();
@@ -33,11 +30,9 @@ public partial class CombinedResultsView : UserControl
     {
         if (_subscribedViewModel is not null)
             _subscribedViewModel.PropertyChanged -= OnViewModelPropertyChanged;
-
         _subscribedViewModel = e.NewValue as CombinedResultsViewModel;
         if (_subscribedViewModel is not null)
             _subscribedViewModel.PropertyChanged += OnViewModelPropertyChanged;
-
         UpdateColumns();
     }
 
@@ -51,17 +46,13 @@ public partial class CombinedResultsView : UserControl
     {
         if (_grid is null)
             return;
-
         _grid.Columns.Clear();
-
         if (DataContext is not CombinedResultsViewModel viewModel)
             return;
-
         _grid.Columns.Add(CreateTextColumn(Strings.Results_Col_Place, nameof(CombinedResultRow.PlaceDisplay), 80));
         _grid.Columns.Add(CreateTextColumn(Strings.Results_Col_Participant, nameof(CombinedResultRow.ParticipantName), 220));
         _grid.Columns.Add(CreateTextColumn(Strings.Fixation_Col_BirthYear, nameof(CombinedResultRow.YearOfBirth), 120));
         _grid.Columns.Add(CreateTextColumn(Strings.Results_Col_Team, nameof(CombinedResultRow.ClubName), 180));
-
         foreach (var column in viewModel.EventColumns)
         {
             _grid.Columns.Add(new DataGridTextColumn
@@ -75,7 +66,6 @@ public partial class CombinedResultsView : UserControl
                 CellStyle = CreateNonScoringCellStyle(column.EventId)
             });
         }
-
         _grid.Columns.Add(CreateTextColumn(Strings.Results_Col_Total, nameof(CombinedResultRow.TotalPoints), 90));
     }
 

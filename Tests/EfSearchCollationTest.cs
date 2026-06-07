@@ -18,11 +18,9 @@ public class EfSearchCollationTest
         _dbPath = Path.Combine(Path.GetTempPath(), $"swimdoc-search-{Guid.NewGuid():N}.db");
         var connectionService = new DatabaseConnectionService();
         connectionService.SetConnection($"Data Source={_dbPath}");
-
         _context = new EfCoreContext(
             new DbContextOptionsBuilder<EfCoreContext>().UseSwimDocSqlite().Options,
             connectionService);
-
         _context.Athletes.Add(new Athlete
         {
             FirstName = "Иван",
@@ -52,7 +50,6 @@ public class EfSearchCollationTest
         var query = _context.Athletes.AsNoTracking().Where(a =>
             SwimDocDbFunctions.ContainsIgnoreCase(a.LastName, term) ||
             SwimDocDbFunctions.ContainsIgnoreCase(a.FirstName, term));
-
         TestContext.Out.WriteLine(query.ToQueryString());
         Assert.That(await query.CountAsync(), Is.EqualTo(expected));
     }

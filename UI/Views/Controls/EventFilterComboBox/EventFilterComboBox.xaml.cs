@@ -3,7 +3,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using UI.Helpers;
 using UI.ViewModels.Pages;
 
 namespace UI.Views.Controls.EventFilterComboBox;
@@ -11,9 +10,7 @@ namespace UI.Views.Controls.EventFilterComboBox;
 public partial class EventFilterComboBox : UserControl
 {
     public event EventHandler? DropDownOpened;
-
     private Window? _hostWindow;
-
     public static readonly DependencyProperty ItemsSourceProperty =
         DependencyProperty.Register(
             nameof(ItemsSource),
@@ -62,23 +59,18 @@ public partial class EventFilterComboBox : UserControl
     private void OnDropDownOpened()
     {
         DropDownOpened?.Invoke(this, EventArgs.Empty);
-
         _hostWindow = Window.GetWindow(this);
         if (_hostWindow == null)
             return;
-
         _hostWindow.PreviewMouseDown += HostWindow_OnPreviewMouseDown;
     }
 
     private void DropDownToggle_OnChecked(object sender, RoutedEventArgs e) => OnDropDownOpened();
-
     private void DropDownToggle_OnUnchecked(object sender, RoutedEventArgs e) => DetachOutsideClickHandler();
-
     private void PopupRoot_OnPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
         if (FindFilterOption(e.OriginalSource as DependencyObject) is not { } option)
             return;
-
         option.IsSelected = !option.IsSelected;
         this.RefreshDisplayText();
         e.Handled = true;
@@ -88,13 +80,10 @@ public partial class EventFilterComboBox : UserControl
     {
         if (DropDownToggle.IsChecked != true)
             return;
-
         if (IsMouseOver)
             return;
-
         if (IsWithinPopup(e.OriginalSource as DependencyObject))
             return;
-
         DropDownToggle.IsChecked = false;
     }
 
@@ -104,10 +93,8 @@ public partial class EventFilterComboBox : UserControl
         {
             if (ReferenceEquals(source, PopupRoot))
                 return true;
-
             source = VisualTreeHelper.GetParent(source);
         }
-
         return false;
     }
 
@@ -117,10 +104,8 @@ public partial class EventFilterComboBox : UserControl
         {
             if (source is FrameworkElement { DataContext: IEventFilterOption option })
                 return option;
-
             source = VisualTreeHelper.GetParent(source);
         }
-
         return null;
     }
 
@@ -128,7 +113,6 @@ public partial class EventFilterComboBox : UserControl
     {
         if (_hostWindow == null)
             return;
-
         _hostWindow.PreviewMouseDown -= HostWindow_OnPreviewMouseDown;
         _hostWindow = null;
     }

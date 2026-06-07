@@ -15,9 +15,7 @@ public class SwimEvent : IValidatableObject
     public required DateOnly Date { get; set; }
     public TimeOnly? Time { get; set; }
     public EventRound Round { get; set; } = EventRound.FIN;
-
     public SwimEventStatus Status { get; set; } = SwimEventStatus.EMPTY;
-
     public Course Course { get; set; } = Course.LCM;
     public int? RoundParticipantsCount { get; set; }
     public required int LaneMin { get; set; }
@@ -29,7 +27,6 @@ public class SwimEvent : IValidatableObject
     public int SwimStyleId { get; set; }
     public SwimStyle SwimStyle { get; set; }
     public bool IsRelay => SwimStyle.IsRelay;
-
     public ICollection<Heat> Heats { get; set; }
     public ICollection<Entry> Entries { get; set; }
 

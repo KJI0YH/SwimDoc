@@ -35,10 +35,8 @@ public class EntryDocumentReaderServiceTest
         connectionService.SetConnection($"DataSource={path}");
         File.Create(path).Close();
         _context = new EfCoreContext(options, connectionService);
-
         _context.Database.OpenConnection();
         _context.Database.EnsureCreated();
-
         _service = new EntryDocumentReaderService(_context);
     }
 
@@ -53,7 +51,6 @@ public class EntryDocumentReaderServiceTest
     public void Test()
     {
         var result = _service.Read(ENTRY_DOCUMENT_TEMPLATE);
-
         Assert.That(result, Is.Not.Null);
     }
 }

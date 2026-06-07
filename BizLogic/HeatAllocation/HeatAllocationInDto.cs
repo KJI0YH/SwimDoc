@@ -1,15 +1,13 @@
-﻿using DataLayer;
-using DataLayer.Display;
+﻿using DataLayer.Display;
 using DataLayer.EfClasses;
 
-namespace BizLogic.HeatLogic;
+namespace BizLogic.HeatAllocation;
 
 public class HeatAllocationInDto
 {
     public HeatAllocationInDto(HeatAllocationParameters parameters, SwimEvent swimEvent)
     {
         _parameters = parameters;
-
         if (SwimEventLaneNames.HasCustomLaneNames(swimEvent))
         {
             UsesCustomLaneNames = true;
@@ -26,7 +24,6 @@ public class HeatAllocationInDto
     }
 
     private readonly HeatAllocationParameters _parameters;
-
     public int SwimEventId => _parameters.SwimEventId;
     public HeatOrder HeatOrder => _parameters.HeatOrder;
     public int MinHeatSize => _parameters.MinHeatSize;

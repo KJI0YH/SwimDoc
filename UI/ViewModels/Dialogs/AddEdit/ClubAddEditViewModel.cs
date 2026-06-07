@@ -11,13 +11,9 @@ public partial class ClubAddViewModel(int? id, IClubService crudService)
     : AddEditViewModel<Club, int?>(id, crudService)
 {
     [ObservableProperty] private ObservableCollection<SearchableItem> _availableAthletes = new();
-
     [ObservableProperty] private ObservableCollection<SearchableItem> _selectedAthletes = new();
-
     [ObservableProperty] private SearchableItem? _selectedAvailableAthlete;
-
     public override string WindowTitle => IsAdd ? Strings.WindowTitle_CreateClub : Strings.WindowTitle_EditClub;
-
     public string Name
     {
         get => Entity.Name;

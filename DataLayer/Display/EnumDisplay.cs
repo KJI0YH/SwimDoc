@@ -11,11 +11,9 @@ public static class EnumDisplay
         var name = Enum.GetName(type, value);
         if (name == null)
             return value.ToString() ?? string.Empty;
-
         var field = type.GetField(name);
         if (field == null)
             return name;
-
         var attr = field.GetCustomAttribute<DescriptionAttribute>();
         return !string.IsNullOrEmpty(attr?.Description) ? attr.Description : name;
     }
@@ -27,11 +25,9 @@ public static class EnumDisplay
         var name = Enum.GetName(type, value);
         if (name == null)
             return value.ToString() ?? string.Empty;
-
         var field = type.GetField(name);
         if (field == null)
             return name;
-
         var attr = field.GetCustomAttribute<DescriptionAttribute>();
         return !string.IsNullOrEmpty(attr?.Description) ? attr.Description : name;
     }

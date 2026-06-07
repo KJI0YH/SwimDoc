@@ -1,6 +1,5 @@
 using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
-using BizLogic.HeatLogic;
 
 namespace ServiceLayer.Crud;
 

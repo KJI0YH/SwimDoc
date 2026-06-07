@@ -13,7 +13,6 @@ using ServiceLayer.EventService;
 using ServiceLayer.HeatService;
 using ServiceLayer.PointScoreProvider;
 using ServiceLayer.SwimStyleService;
-using UI.Services;
 using UI.ViewModels;
 using UI.ViewModels.Pages;
 using UI.Views.Dialogs.Markers.AddEdit;
@@ -24,7 +23,6 @@ public class AthletesByClubViewModel : AthletesViewModel
 {
     private readonly IAddEditWindowFactory _windowFactory;
     private int? _clubId;
-
     public AthletesByClubViewModel(IAthleteService athleteService) : base(athleteService)
     {
         _windowFactory = App.Current.Services.GetRequiredService<IAddEditWindowFactory>();

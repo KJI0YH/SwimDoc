@@ -14,14 +14,11 @@ public static class DbContextExtensions
             .Where(e => e.State != EntityState.Deleted)
             .Select(e => e.Entity)
             .FirstOrDefault(predicate.Compile());
-
         if (localEntity != null)
             return localEntity;
-
         var entityInDb = context.Set<TEntity>().FirstOrDefault(predicate);
         if (entityInDb != null)
             return entityInDb;
-
         var newEntity = createEntity();
         context.Set<TEntity>().Add(newEntity);
         return newEntity;

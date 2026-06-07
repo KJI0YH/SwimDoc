@@ -1,5 +1,4 @@
 using System.Windows.Controls;
-using UI.Services;
 using AgeGroupDetailsViewModel = UI.ViewModels.Pages.AgeGroupDetailsViewModel;
 
 namespace UI.Views.Pages;

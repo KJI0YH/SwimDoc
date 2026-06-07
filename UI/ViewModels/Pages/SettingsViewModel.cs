@@ -6,7 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
 using ServiceLayer.EntryDocumentTemplateService;
 using UI.Resources;
-using UI.Services;
 
 namespace UI.ViewModels.Pages;
 
@@ -14,17 +13,14 @@ public sealed partial class SettingsViewModel : ObservableObject
 {
     private readonly IEntryDocumentTemplateService _entryDocumentTemplateService;
     private readonly ILocalizationService _localizationService;
-
     public ObservableCollection<AppLanguage> AvailableLanguages { get; } =
         new([AppLanguage.Russian, AppLanguage.English]);
 
     public ObservableCollection<PagingSettingItemViewModel> PagingSettings { get; }
-
     public BaseTimesSettingsViewModel BaseTimes { get; }
 
     [ObservableProperty] private AppLanguage _selectedLanguage;
     [ObservableProperty] private bool _isBaseTimesOpen;
-
     public SettingsViewModel(
         IEntryDocumentTemplateService entryDocumentTemplateService,
         ILocalizationService localizationService,
@@ -72,10 +68,8 @@ public sealed partial class SettingsViewModel : ObservableObject
             DefaultExt = ".xlsx",
             OverwritePrompt = true
         };
-
         if (dialog.ShowDialog() != true)
             return;
-
         try
         {
             var bytes = _entryDocumentTemplateService.CreateTemplate();

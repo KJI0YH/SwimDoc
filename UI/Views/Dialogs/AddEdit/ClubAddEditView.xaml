@@ -4,11 +4,13 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-             xmlns:helpers="clr-namespace:UI.Helpers"
+             xmlns:displayHelpers="clr-namespace:UI.Helpers.Display"
+             xmlns:converters="clr-namespace:UI.Helpers.Converters"
+             xmlns:uiHelpers="clr-namespace:UI.Helpers.Controls"
              xmlns:loc="clr-namespace:UI.Localization"
              mc:Ignorable="d">
     <UserControl.Resources>
-        <helpers:EnumDescriptionConverter x:Key="EnumDescriptionConverter" />
+        <displayHelpers:EnumDescriptionConverter x:Key="EnumDescriptionConverter" />
     </UserControl.Resources>
     <StackPanel Margin="0,0,0,15">
                 <Grid Margin="0,5">

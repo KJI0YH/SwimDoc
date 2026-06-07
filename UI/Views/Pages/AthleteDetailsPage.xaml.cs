@@ -1,5 +1,4 @@
 using System.Windows.Controls;
-using UI.Services;
 using AthleteDetailsViewModel = UI.ViewModels.Pages.AthleteDetailsViewModel;
 
 namespace UI.Views.Pages;

@@ -18,20 +18,16 @@ public sealed class ReportExportService(EfCoreContext dbContext, IEntryService e
             throw new ArgumentException(ServiceErrorStrings.ReportExport_NoSwimEventsSelected, nameof(options));
         if (string.IsNullOrWhiteSpace(options.OutputFilePath))
             throw new ArgumentException(ServiceErrorStrings.ReportExport_OutputPathEmpty, nameof(options));
-
         var any = options.IncludeEntryList || options.IncludeStartList || options.IncludeFinishList;
         if (!any)
             throw new ArgumentException(ServiceErrorStrings.ReportExport_NoReportsSelected, nameof(options));
-
         using var package = new ExcelPackage();
-
         if (options.IncludeEntryList)
             new EntryListReportExcel(dbContext).AddWorksheet(package, options.SwimEventIds.ToList());
         if (options.IncludeStartList)
             new StartListReportExcel(dbContext).AddWorksheet(package, options.SwimEventIds.ToList());
         if (options.IncludeFinishList)
             new FinishListReportExcel(dbContext).AddWorksheet(package, options.SwimEventIds.ToList());
-
         package.SaveAs(new FileInfo(options.OutputFilePath));
     }
 
@@ -41,22 +37,18 @@ public sealed class ReportExportService(EfCoreContext dbContext, IEntryService e
             throw new ArgumentException(ServiceErrorStrings.ReportExport_NoAgeGroupsSelected, nameof(options));
         if (string.IsNullOrWhiteSpace(options.OutputFilePath))
             throw new ArgumentException(ServiceErrorStrings.ReportExport_OutputPathEmpty, nameof(options));
-
         var ageGroupsById = dbContext.AgeGroups
             .AsNoTracking()
             .Where(ageGroup => options.AgeGroupIds.Contains(ageGroup.Id))
             .ToDictionary(ageGroup => ageGroup.Id);
-
         var sections = new List<(string AgeGroupTitle, CombinedResultsReportData Data)>();
         foreach (var ageGroupId in options.AgeGroupIds)
         {
             if (!ageGroupsById.TryGetValue(ageGroupId, out var ageGroup))
                 continue;
-
             var data = entryService.GetCombinedResultsByAgeGroupAsync(ageGroupId).GetAwaiter().GetResult();
             sections.Add((LocalizedEntityDisplayFormatter.FormatAgeGroup(ageGroup), MapReportData(data)));
         }
-
         using var package = new ExcelPackage();
         var worksheet = package.Workbook.Worksheets.Add(ReportExcelStrings.Sheet_CombinedResults);
         CombinedResultsReportExcel.RenderToWorksheet(worksheet, sections);
@@ -69,7 +61,6 @@ public sealed class ReportExportService(EfCoreContext dbContext, IEntryService e
         var reportAthletes = new List<CombinedResultsReportAthleteRow>();
         var place = 1;
         var previousTotal = officialAthletes.FirstOrDefault()?.TotalPoints ?? 0;
-
         foreach (var (athleteRow, index) in officialAthletes.Select((row, index) => (row, index)))
         {
             if (index > 0 && athleteRow.TotalPoints != previousTotal)
@@ -77,13 +68,10 @@ public sealed class ReportExportService(EfCoreContext dbContext, IEntryService e
                 place = index + 1;
                 previousTotal = athleteRow.TotalPoints;
             }
-
             reportAthletes.Add(MapAthleteRow(athleteRow, place));
         }
-
         foreach (var athleteRow in data.Athletes.Where(row => !row.IsInOfficialStandings))
             reportAthletes.Add(MapAthleteRow(athleteRow, place: null));
-
         return new CombinedResultsReportData(
             data.EventColumns
                 .Select(column => new CombinedResultsReportEventColumn(

@@ -1,4 +1,4 @@
-using BizLogic.EntryDocumentReaderLogic;
+using BizLogic.EntryDocumentReader;
 using DataLayer.EfClasses;
 
 namespace ServiceLayer.EntryDocumentReaderService;
@@ -20,7 +20,6 @@ internal static class ImportDocumentStats
         athletesWithErrors = 0;
         entriesScanned = 0;
         entriesWithErrors = 0;
-
         foreach (var document in documents)
         {
             var hasErrors = document.Errors.Count > 0;
@@ -32,17 +31,14 @@ internal static class ImportDocumentStats
                     clubsWithErrors++;
                 athletes ??= document.Club.Athletes;
             }
-
             if (athletes is null)
                 continue;
-
             var athleteCount = athletes.Count;
             var entryCount = athletes.Sum(a => a.Entries?.Count ?? 0);
             athletesScanned += athleteCount;
             entriesScanned += entryCount;
             if (!hasErrors)
                 continue;
-
             athletesWithErrors += athleteCount;
             entriesWithErrors += entryCount;
         }

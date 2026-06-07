@@ -1,10 +1,9 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using BizLogic.HeatLogic;
+using BizLogic.HeatAllocation;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using UI.Resources;
-using UI.Services;
 
 namespace UI.Models.Dialogs;
 

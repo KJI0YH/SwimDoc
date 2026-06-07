@@ -4,13 +4,15 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:dataView="clr-namespace:UI.Views.Controls.DataView"
-             xmlns:helpers="clr-namespace:UI.Helpers"
+             xmlns:displayHelpers="clr-namespace:UI.Helpers.Display"
+             xmlns:converters="clr-namespace:UI.Helpers.Converters"
+             xmlns:uiHelpers="clr-namespace:UI.Helpers.Controls"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:loc="clr-namespace:UI.Localization"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
-        <helpers:BoolToVisibilityConverter x:Key="BoolToVis" />
+        <converters:BoolToVisibilityConverter x:Key="BoolToVis" />
         <Style x:Key="CombinedResultsRowStyle"
                TargetType="DataGridRow"
                BasedOn="{StaticResource DataGridRowResultsPlaceStyle}">
@@ -25,7 +27,7 @@
         <dataView:DefaultDataView.Toolbar>
             <DockPanel Visibility="{Binding ShowAgeGroupSelector, Converter={StaticResource BoolToVis}}">
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
-                    <ComboBox helpers:ComboBoxAutoWidthHelper.Enable="True"
+                    <ComboBox uiHelpers:ComboBoxAutoWidthHelper.Enable="True"
                               ItemsSource="{Binding AgeGroupOptions}"
                               SelectedValue="{Binding SelectedAgeGroup}"
                               SelectedValuePath="Value"

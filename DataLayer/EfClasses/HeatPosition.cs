@@ -18,7 +18,6 @@ public class HeatPosition : IValidatableObject
     public Heat Heat { get; set; }
 
     public bool IsResultProvided => Entry.Status >= EntryStatus.FINISH;
-
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
         var currContext = validationContext.GetService(typeof(DbContext)) as EfCoreContext;

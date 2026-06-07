@@ -1,9 +1,7 @@
 using System.Windows;
 using System.Windows.Input;
 using Microsoft.Extensions.DependencyInjection;
-using UI.Helpers;
 using UI.Resources;
-using UI.Services;
 using UI.Views.Pages;
 using Wpf.Ui.Controls;
 using MainViewModel = UI.ViewModels.Windows.MainViewModel;
@@ -13,13 +11,11 @@ namespace UI.Views.Windows;
 public partial class MainWindow : FluentWindow
 {
     private readonly MainViewModel? _viewModel;
-
     public MainWindow()
     {
         InitializeComponent();
         _viewModel = App.Current.Services.GetRequiredService<MainViewModel>();
         DataContext = _viewModel;
-
         StateChanged += (_, _) => UpdateRestoreButtonIcon();
         Loaded += OnMainWindowLoaded;
     }
@@ -27,7 +23,6 @@ public partial class MainWindow : FluentWindow
     private void OnMainWindowLoaded(object sender, RoutedEventArgs e)
     {
         UpdateRestoreButtonIcon();
-
         var contentDialogService = App.Current.Services.GetRequiredService<Wpf.Ui.IContentDialogService>();
         contentDialogService.SetDialogHost(RootContentDialog);
     }
@@ -36,9 +31,7 @@ public partial class MainWindow : FluentWindow
     {
         NavigationView.SetServiceProvider(App.Current.Services);
         NavigationView.BackRequested += OnNavigationBackRequested;
-
         Dispatcher.BeginInvoke(() => NavigationView.Navigate(typeof(CompetitionSelectionPage)), System.Windows.Threading.DispatcherPriority.Loaded);
-
         var navigationService = App.Current.Services.GetRequiredService<INavigationService>();
         navigationService.PageNavigationRequested += OnPageNavigationRequested;
     }
@@ -53,7 +46,6 @@ public partial class MainWindow : FluentWindow
         var navigationService = App.Current.Services.GetRequiredService<INavigationService>();
         if (!navigationService.CanGoBack)
             return;
-
         navigationService.GoBack();
         e.Handled = true;
     }
@@ -67,7 +59,6 @@ public partial class MainWindow : FluentWindow
     {
         if (WindowDragHelper.IsInteractiveChrome(e.OriginalSource as DependencyObject))
             return;
-
         WindowDragHelper.HandleDrag(this, e, ToggleMaximizeRestore);
     }
 
@@ -89,12 +80,10 @@ public partial class MainWindow : FluentWindow
     {
         if (RestoreButton == null)
             return;
-
         var isMaximized = WindowState == WindowState.Maximized;
         RestoreButton.Content = isMaximized
             ? new SymbolIcon { Symbol = SymbolRegular.SquareMultiple24 }
             : new SymbolIcon { Symbol = SymbolRegular.Square24 };
         RestoreButton.ToolTip = isMaximized ? Strings.Window_Restore : Strings.Window_Maximize;
     }
-
 }

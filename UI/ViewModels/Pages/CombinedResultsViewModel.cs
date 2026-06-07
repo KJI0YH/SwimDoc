@@ -3,29 +3,27 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DataLayer.EfClasses;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.AgeGroupService;
 using ServiceLayer.EntryService;
-using UI.Helpers;
 using UI.Models;
 
 namespace UI.ViewModels.Pages;
 
-public partial class CombinedResultsViewModel(
-    IAgeGroupService ageGroupService,
-    IEntryService entryService) : ViewModelBase
+public partial class CombinedResultsViewModel : ViewModelBase
 {
+    protected IAgeGroupService AgeGroupService =>
+        App.Current.Services.GetRequiredService<IAgeGroupService>();
+    private IEntryService EntryService =>
+        App.Current.Services.GetRequiredService<IEntryService>();
     [ObservableProperty] private bool _isLoading;
     [ObservableProperty] private AgeGroup? _selectedAgeGroup;
     [ObservableProperty] private ObservableCollection<SearchableItem> _ageGroupOptions = new();
     [ObservableProperty] private ObservableCollection<CombinedResultsEventColumnView> _eventColumns = new();
     [ObservableProperty] private ObservableCollection<CombinedResultRow> _rows = new();
-
     public virtual bool ShowAgeGroupSelector => true;
-
     private int? _preferredAgeGroupId;
-
     public void SetPreferredAgeGroupId(int? ageGroupId) => _preferredAgeGroupId = ageGroupId;
-
     public void TrySelectAgeGroup(int ageGroupId)
     {
         if (AgeGroupOptions.FirstOrDefault(item => item.Value is AgeGroup ag && ag.Id == ageGroupId)?.Value
@@ -35,39 +33,33 @@ public partial class CombinedResultsViewModel(
                 SelectedAgeGroup = ageGroup;
             return;
         }
-
         _preferredAgeGroupId = ageGroupId;
     }
 
     public async Task InitializeAsync()
     {
-        var ageGroups = await ageGroupService.Query()
+        var ageGroups = await AgeGroupService.Query()
             .OrderBy(ag => ag.Name)
             .ThenBy(ag => ag.Gender)
             .ThenBy(ag => ag.BirthYearMin)
             .ToListAsync();
-
         AgeGroupOptions = new ObservableCollection<SearchableItem>(
             ageGroups.Select(ageGroup => new SearchableItem
             {
                 Value = ageGroup,
                 DisplayText = EntityDisplayFormatter.FormatAgeGroup(ageGroup)
             }));
-
         AgeGroup? target = null;
         if (_preferredAgeGroupId is int preferredId)
             target = ageGroups.FirstOrDefault(ageGroup => ageGroup.Id == preferredId);
-
         if (target is null && SelectedAgeGroup is not null &&
             ageGroups.Any(ageGroup => ageGroup.Id == SelectedAgeGroup.Id))
             target = SelectedAgeGroup;
-
         SelectedAgeGroup = target ?? ageGroups.FirstOrDefault();
         _preferredAgeGroupId = null;
     }
 
     partial void OnSelectedAgeGroupChanged(AgeGroup? value) => _ = LoadRowsAsync();
-
     private async Task LoadRowsAsync()
     {
         if (SelectedAgeGroup?.Id is not int ageGroupId)
@@ -76,11 +68,10 @@ public partial class CombinedResultsViewModel(
             Rows = [];
             return;
         }
-
         IsLoading = true;
         try
         {
-            var data = await entryService.GetCombinedResultsByAgeGroupAsync(ageGroupId);
+            var data = await EntryService.GetCombinedResultsByAgeGroupAsync(ageGroupId);
             EventColumns = new ObservableCollection<CombinedResultsEventColumnView>(
                 data.EventColumns.Select(column => new CombinedResultsEventColumnView(column.EventId, column.Header)));
             Rows = new ObservableCollection<CombinedResultRow>(BuildRows(data.Athletes));
@@ -95,12 +86,10 @@ public partial class CombinedResultsViewModel(
     {
         if (athletes.Count == 0)
             return [];
-
         var rows = new List<CombinedResultRow>();
         var officialAthletes = athletes.Where(row => row.IsInOfficialStandings).ToList();
         var place = 1;
         var previousTotal = officialAthletes.Count > 0 ? officialAthletes[0].TotalPoints : 0;
-
         foreach (var (athleteRow, index) in officialAthletes.Select((row, index) => (row, index)))
         {
             if (index > 0 && athleteRow.TotalPoints != previousTotal)
@@ -108,13 +97,10 @@ public partial class CombinedResultsViewModel(
                 place = index + 1;
                 previousTotal = athleteRow.TotalPoints;
             }
-
             rows.Add(CreateRow(athleteRow, place, isOutOfScoring: false));
         }
-
         foreach (var athleteRow in athletes.Where(row => !row.IsInOfficialStandings))
             rows.Add(CreateRow(athleteRow, place: null, isOutOfScoring: true));
-
         return rows;
     }
 
@@ -138,7 +124,6 @@ public partial class CombinedResultsViewModel(
     {
         if (AgeGroupOptions.Count == 0)
             return;
-
         var currentIndex = SelectedAgeGroup is null
             ? -1
             : AgeGroupOptions.ToList().FindIndex(item => item.Value is AgeGroup ag && ag.Id == SelectedAgeGroup.Id);
@@ -152,13 +137,11 @@ public partial class CombinedResultsViewModel(
     {
         if (AgeGroupOptions.Count == 0)
             return;
-
         var currentIndex = SelectedAgeGroup is null
             ? 0
             : AgeGroupOptions.ToList().FindIndex(item => item.Value is AgeGroup ag && ag.Id == SelectedAgeGroup.Id);
         if (currentIndex < 0)
             currentIndex = 0;
-
         var prevIndex = Math.Max(currentIndex - 1, 0);
         if (AgeGroupOptions[prevIndex].Value is AgeGroup prevAgeGroup)
             SelectedAgeGroup = prevAgeGroup;

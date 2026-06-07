@@ -5,7 +5,6 @@ namespace BizLogic.Helpers;
 public class BufferedCollection<T> : IEnumerable<T>
 {
     private readonly List<T> _items = [];
-
     public BufferedCollection(IEnumerable<T> source)
     {
         ArgumentNullException.ThrowIfNull(source);
@@ -14,11 +13,9 @@ public class BufferedCollection<T> : IEnumerable<T>
 
     public int Count => _items.Count;
     public bool IsEmpty => Count == 0;
-
     public IEnumerable<T> TakeFirst(int count)
     {
         if (count <= 0) return [];
-
         var actualCount = Math.Min(count, _items.Count);
         var result = _items.Take(actualCount).ToList();
         _items.RemoveRange(0, actualCount);
@@ -28,7 +25,6 @@ public class BufferedCollection<T> : IEnumerable<T>
     public IEnumerable<T> TakeLast(int count)
     {
         if (count <= 0) return [];
-
         var actualCount = Math.Min(count, _items.Count);
         var result = _items.Skip(_items.Count - actualCount).ToList();
         _items.RemoveRange(_items.Count - actualCount, actualCount);
@@ -59,6 +55,5 @@ public class BufferedCollection<T> : IEnumerable<T>
     }
 
     public IEnumerator<T> GetEnumerator() => _items.GetEnumerator();
-
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

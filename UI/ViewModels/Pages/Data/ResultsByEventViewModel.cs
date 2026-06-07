@@ -13,7 +13,6 @@ using ServiceLayer.EventService;
 using ServiceLayer.HeatService;
 using ServiceLayer.PointScoreProvider;
 using ServiceLayer.SwimStyleService;
-using UI.Services;
 using UI.ViewModels;
 using UI.ViewModels.Pages;
 
@@ -27,9 +26,7 @@ public class ResultsByEventViewModel(
     : ResultsViewModel(eventService, entryService, ageGroupService, navigationService)
 {
     private int? _eventId;
-
     public Task RefreshForEventAsync(int eventId) => LoadEntriesForEventIdAsync(eventId);
-
     public void SetEventId(int? eventId)
     {
         _eventId = eventId;

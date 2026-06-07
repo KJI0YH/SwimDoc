@@ -1,12 +1,10 @@
 using DataLayer.EfClasses;
-using UI.Helpers;
 
 namespace UI.Models.Rows;
 
 public sealed class AthleteRowView(Athlete entity) : IEntityRowView<Athlete>
 {
     public Athlete Entity { get; } = entity;
-
     public int Id => Entity.Id;
     public string FirstName => Entity.FirstName;
     public string LastName => Entity.LastName;

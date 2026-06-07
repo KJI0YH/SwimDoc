@@ -13,7 +13,6 @@ using ServiceLayer.EventService;
 using ServiceLayer.HeatService;
 using ServiceLayer.PointScoreProvider;
 using ServiceLayer.SwimStyleService;
-using UI.Services;
 using UI.ViewModels;
 using UI.ViewModels.Pages;
 
@@ -25,11 +24,9 @@ public partial class ResultsByAthleteViewModel(IEntryService entryService) : Vie
         App.Current.Services.GetRequiredService<INavigationService>();
 
     private int? _athleteId;
-
     [ObservableProperty] private bool _isLoading;
     [ObservableProperty] private ObservableCollection<ParticipantResultEntryView> _results = new();
     [ObservableProperty] private ParticipantResultEntryView? _selectedResult;
-
     public void SetAthleteId(int? athleteId)
     {
         _athleteId = athleteId;
@@ -44,7 +41,6 @@ public partial class ResultsByAthleteViewModel(IEntryService entryService) : Vie
             Results = [];
             return;
         }
-
         IsLoading = true;
         try
         {
@@ -59,7 +55,6 @@ public partial class ResultsByAthleteViewModel(IEntryService entryService) : Vie
                 .Select(e => e.SwimEventId!.Value)
                 .Distinct()
                 .ToListAsync();
-
             var rows = new List<ParticipantResultEntryView>();
             foreach (var eventId in eventIds)
             {
@@ -69,7 +64,6 @@ public partial class ResultsByAthleteViewModel(IEntryService entryService) : Vie
                 if (athleteResult is not null)
                     rows.Add(new ParticipantResultEntryView(athleteResult, _athleteId.Value));
             }
-
             Results = new ObservableCollection<ParticipantResultEntryView>(rows);
         }
         finally
@@ -88,7 +82,6 @@ public partial class ResultsByAthleteViewModel(IEntryService entryService) : Vie
     {
         if (SelectedResult?.Entry.SwimEventId is not int eventId)
             return;
-
         _navigationService.NavigateTo<ResultsViewModel>(eventId);
     }
 }

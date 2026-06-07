@@ -8,9 +8,7 @@ using CommunityToolkit.Mvvm.Input;
 using DataLayer.EfClasses;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.BaseTimeRepository;
-using UI.Helpers;
 using UI.Resources;
-using UI.Services;
 using static UI.Models.BaseTimes.BaseTimesSwimStyleCatalog;
 
 namespace UI.ViewModels.Pages;
@@ -18,14 +16,11 @@ namespace UI.ViewModels.Pages;
 public sealed partial class BaseTimesSettingsViewModel : ObservableObject
 {
     private const string WorldAquaticsPointsUrl = "https://www.worldaquatics.com/swimming/points";
-
     private readonly IBaseTimeRepository _baseTimeRepository;
-
     [ObservableProperty] private ObservableCollection<BaseTimeTableRowViewModel> _scmRows = new();
     [ObservableProperty] private ObservableCollection<BaseTimeTableRowViewModel> _lcmRows = new();
     [ObservableProperty] private ObservableCollection<MixedRelayRowViewModel> _scmMixedRelayRows = new();
     [ObservableProperty] private ObservableCollection<MixedRelayRowViewModel> _lcmMixedRelayRows = new();
-
     public BaseTimesSettingsViewModel(
         IBaseTimeRepository baseTimeRepository,
         ILocalizationService localizationService)
@@ -90,7 +85,6 @@ public sealed partial class BaseTimesSettingsViewModel : ObservableObject
             dispatcher.Invoke(RefreshDisplayNames);
             return;
         }
-
         RefreshDisplayNames();
     }
 
@@ -104,7 +98,6 @@ public sealed partial class BaseTimesSettingsViewModel : ObservableObject
             row.RefreshDisplayName();
         foreach (var row in LcmMixedRelayRows)
             row.RefreshDisplayName();
-
         ScmRows = new ObservableCollection<BaseTimeTableRowViewModel>(ScmRows);
         LcmRows = new ObservableCollection<BaseTimeTableRowViewModel>(LcmRows);
         ScmMixedRelayRows = new ObservableCollection<MixedRelayRowViewModel>(ScmMixedRelayRows);
@@ -127,19 +120,15 @@ public sealed partial class BaseTimesSettingsViewModel : ObservableObject
             _baseTimeRepository.SetBaseTime(row.Course, row.Distance, row.Stroke, row.RelayCount, Gender.Male, row.MenBaseTimeHundredths ?? 0);
             _baseTimeRepository.SetBaseTime(row.Course, row.Distance, row.Stroke, row.RelayCount, Gender.Female, row.WomenBaseTimeHundredths ?? 0);
         }
-
         foreach (var row in LcmRows)
         {
             _baseTimeRepository.SetBaseTime(row.Course, row.Distance, row.Stroke, row.RelayCount, Gender.Male, row.MenBaseTimeHundredths ?? 0);
             _baseTimeRepository.SetBaseTime(row.Course, row.Distance, row.Stroke, row.RelayCount, Gender.Female, row.WomenBaseTimeHundredths ?? 0);
         }
-
         foreach (var row in ScmMixedRelayRows)
             _baseTimeRepository.SetBaseTime(row.Course, row.Distance, row.Stroke, row.RelayCount, Gender.Mixed, row.MixedBaseTimeHundredths ?? 0);
-
         foreach (var row in LcmMixedRelayRows)
             _baseTimeRepository.SetBaseTime(row.Course, row.Distance, row.Stroke, row.RelayCount, Gender.Mixed, row.MixedBaseTimeHundredths ?? 0);
-
         try
         {
             _baseTimeRepository.Save();

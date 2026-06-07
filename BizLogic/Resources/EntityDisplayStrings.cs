@@ -9,7 +9,6 @@ public static class EntityDisplayStrings
         new("BizLogic.Resources.EntityDisplayStrings", typeof(EntityDisplayStrings).Assembly);
 
     public static ResourceManager ResourceManager => ResourceManagerImpl;
-
     public static string Get(string name) =>
         ResourceManager.GetString(name, CultureInfo.CurrentUICulture) ?? $"[[{name}]]";
 

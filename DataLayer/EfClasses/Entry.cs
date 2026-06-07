@@ -30,7 +30,6 @@ public class Entry : IValidatableObject
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
         var currContext = validationContext.GetService(typeof(DbContext)) as EfCoreContext;
-
         var existed = currContext.Entries.AsNoTracking().FirstOrDefault(e =>
             e.AthleteId == AthleteId &&
             e.RelayId == RelayId &&
@@ -52,7 +51,6 @@ public class Entry : IValidatableObject
             ? null
             : currContext.AgeGroups.AsNoTracking()
                 .FirstOrDefault(ag => ag.Id == swimEvent.AgeGroupId));
-
         if (athlete is null && relay is null)
             yield return new ValidationResult(ValidationStrings.Entry_ParticipantMustBeProvided);
         if (swimStyle is null)

@@ -18,7 +18,6 @@ public partial class ParticipantResultsView : UserControl
     {
         if (sender is not DataGrid dataGrid || dataGrid.DataContext is not IParticipantResultsViewModel viewModel)
             return;
-
         if (e.OriginalSource is DependencyObject source)
         {
             for (var current = source; current is not null && current != dataGrid; current = VisualTreeHelper.GetParent(current))
@@ -30,10 +29,8 @@ public partial class ParticipantResultsView : UserControl
                 }
             }
         }
-
         if (!viewModel.OpenEventResultsCommand.CanExecute(null))
             return;
-
         viewModel.OpenEventResultsCommand.Execute(null);
         e.Handled = true;
     }

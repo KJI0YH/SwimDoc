@@ -6,7 +6,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ServiceLayer.Crud;
 using UI.Resources;
-using UI.Services;
 
 namespace UI.ViewModels.Dialogs.AddEdit;
 
@@ -17,9 +16,7 @@ public partial class AddEditViewModel<TEntity, TKey> : ViewModelBase, IWindowRes
     protected readonly ICrudService<TEntity, TKey> CrudService;
     protected readonly bool IsAdd;
     protected readonly bool IsEdit;
-
     [ObservableProperty] private ObservableCollection<string> _validationErrors = new();
-
     public AddEditViewModel(TKey? id, ICrudService<TEntity, TKey> crudService)
     {
         _id = id;
@@ -30,13 +27,10 @@ public partial class AddEditViewModel<TEntity, TKey> : ViewModelBase, IWindowRes
     }
 
     public bool HasErrors => ValidationErrors.Count > 0;
-
     protected TEntity? Entity { get; set; }
 
     public virtual string WindowTitle => IsAdd ? Strings.WindowMode_Create : Strings.WindowMode_Edit;
-
     object? IWindowResult.Result => Entity;
-
     private void OnValidationErrorsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         OnPropertyChanged(nameof(HasErrors));
@@ -69,9 +63,7 @@ public partial class AddEditViewModel<TEntity, TKey> : ViewModelBase, IWindowRes
         ValidationErrors.Clear();
         if (!ValidateBeforeSave())
             return;
-
         ImmutableList<ValidationResult> errors;
-
         if (IsAdd)
         {
             var (entity, validationErrors) = await CrudService.CreateAsync(Entity);
@@ -84,13 +76,11 @@ public partial class AddEditViewModel<TEntity, TKey> : ViewModelBase, IWindowRes
             errors = validationErrors;
             Entity = entity;
         }
-
         if (errors.Count > 0)
         {
             foreach (var error in errors) ValidationErrors.Add(error.ErrorMessage ?? Strings.Validation_ErrorFallback);
             return;
         }
-
         CloseRequested?.Invoke(this, new DialogCloseEventArgs(true));
     }
 

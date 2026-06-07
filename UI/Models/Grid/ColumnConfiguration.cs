@@ -15,7 +15,6 @@ public class ColumnConfiguration
     public string? ConverterParameter { get; set; }
     public string? TrueSymbolIcon { get; set; }
     public string? FalseSymbolIcon { get; set; }
-
     internal string GetSortKey()
     {
         return SortMemberPath ?? PropertyPath;

@@ -9,7 +9,6 @@ public static class EfCoreSqliteExtensions
         optionsBuilder
             .UseSqlite()
             .AddInterceptors(new SqliteFunctionsInterceptor());
-
         return optionsBuilder;
     }
 
@@ -20,7 +19,6 @@ public static class EfCoreSqliteExtensions
         optionsBuilder
             .UseSqlite()
             .AddInterceptors(new SqliteFunctionsInterceptor());
-
         return optionsBuilder;
     }
 }

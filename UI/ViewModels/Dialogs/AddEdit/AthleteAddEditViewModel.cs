@@ -6,9 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.AthleteService;
 using ServiceLayer.ClubService;
-using UI.Helpers;
 using UI.Resources;
-using UI.Services;
 using UI.Models;
 using UI.Views.Dialogs.Markers.AddEdit;
 
@@ -19,11 +17,8 @@ public partial class AthleteAddViewModel(int? id, IAthleteService athleteService
 {
     [ObservableProperty] private ObservableCollection<SearchableItem> _clubs = new();
     private int? _contextClubId;
-
     [ObservableProperty] private SearchableItem? _selectedClub;
-
     public override string WindowTitle => IsAdd ? Strings.WindowTitle_CreateAthlete : Strings.WindowTitle_EditAthlete;
-
     public string FirstName
     {
         get => Entity.FirstName;
@@ -95,7 +90,6 @@ public partial class AthleteAddViewModel(int? id, IAthleteService athleteService
     {
         await base.InitializeAsync();
         LoadClubs();
-
         if (IsEdit)
         {
             SelectedClub = Enumerable.FirstOrDefault<SearchableItem>(Clubs, item => item.Value is Club club && club.Id == Entity.ClubId.Value);
@@ -117,7 +111,6 @@ public partial class AthleteAddViewModel(int? id, IAthleteService athleteService
             Entity.ClubId = null;
             return;
         }
-
         if (item?.Value is not Club club) return;
         Entity.ClubId = club.Id;
     }
@@ -127,13 +120,10 @@ public partial class AthleteAddViewModel(int? id, IAthleteService athleteService
         var clubsQuery = clubService.Query();
         if (_contextClubId.HasValue)
             clubsQuery = clubsQuery.Where(c => c.Id == _contextClubId.Value);
-
         var clubs = clubsQuery.ToList();
         Clubs.Clear();
-
         if (!_contextClubId.HasValue)
             Clubs.Add(new SearchableItem { Value = null, DisplayText = Strings.Common_PersonalParen });
-
         foreach (var club in clubs)
             Clubs.Add(new SearchableItem
             {

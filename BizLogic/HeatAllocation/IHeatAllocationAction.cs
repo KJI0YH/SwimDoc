@@ -1,7 +1,6 @@
 using BizLogic.GenericInterfaces;
-using DataLayer.EfClasses;
 
-namespace BizLogic.HeatLogic;
+namespace BizLogic.HeatAllocation;
 
 public interface IHeatAllocationAction : IBizAction<HeatAllocationInDto, HeatAllocationOutDto>
 {

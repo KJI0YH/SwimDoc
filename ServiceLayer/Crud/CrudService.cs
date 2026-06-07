@@ -33,30 +33,23 @@ public class CrudService<TEntity, TKey>(EfCoreContext dbContext) : ICrudService<
     public virtual async Task<(TEntity? entity, ImmutableList<ValidationResult> errors)> UpdateAsync(TEntity entity, CancellationToken cancellationToken = default)
     {
         var entry = dbContext.Entry(entity);
-
         var idProperty = typeof(TEntity).GetProperty("Id");
         if (idProperty == null)
         {
             throw new InvalidOperationException($"Entity type {typeof(TEntity).Name} does not have an Id property.");
         }
-
         var id = idProperty.GetValue(entity);
         if (id == null)
         {
             throw new InvalidOperationException("Cannot update entity with null Id.");
         }
-
         var trackedEntity = await dbContext.FindAsync<TEntity>([id], cancellationToken);
-
         if (trackedEntity == null)
         {
             throw new InvalidOperationException($"Entity with Id {id} was not found in the database.");
         }
-
         dbContext.Entry(trackedEntity).CurrentValues.SetValues(entity);
-
         dbContext.Entry(trackedEntity).State = EntityState.Modified;
-
         var errors = await dbContext.SaveChangesWithValidationAsync();
         if (errors.Count > 0)
             await dbContext.Entry(trackedEntity).ReloadAsync(cancellationToken).ConfigureAwait(false);

@@ -5,17 +5,19 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:media="clr-namespace:System.Windows.Media.Effects;assembly=PresentationCore"
-             xmlns:helpers="clr-namespace:UI.Helpers"
+             xmlns:displayHelpers="clr-namespace:UI.Helpers.Display"
+             xmlns:converters="clr-namespace:UI.Helpers.Converters"
+             xmlns:uiHelpers="clr-namespace:UI.Helpers.Controls"
              xmlns:loc="clr-namespace:UI.Localization"
              mc:Ignorable="d"
              d:DesignHeight="120"
              d:DesignWidth="800">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
-        <helpers:IntGreaterThanZeroConverter x:Key="IntGt0" />
-        <helpers:EnumDescriptionConverter x:Key="EnumDescription" />
-        <helpers:RectHeightConverter x:Key="RectHeight" />
-        <helpers:LocalizedStringFormatConverter x:Key="LocFormat" />
+        <converters:IntGreaterThanZeroConverter x:Key="IntGt0" />
+        <displayHelpers:EnumDescriptionConverter x:Key="EnumDescription" />
+        <converters:RectHeightConverter x:Key="RectHeight" />
+        <displayHelpers:LocalizedStringFormatConverter x:Key="LocFormat" />
         <Style x:Key="ImportStatsCellTextStyle" TargetType="TextBlock">
             <Setter Property="HorizontalAlignment" Value="Center" />
             <Setter Property="TextAlignment" Value="Center" />

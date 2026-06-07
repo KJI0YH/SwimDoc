@@ -5,5 +5,4 @@ namespace ServiceLayer.AgeGroupService;
 
 public interface IAgeGroupService : ICrudService<AgeGroup, int?>
 {
-
 }

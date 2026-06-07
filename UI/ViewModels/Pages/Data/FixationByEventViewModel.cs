@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using ServiceLayer.EventService;
 using ServiceLayer.HeatService;
 using ServiceLayer.PointScoreProvider;
-using UI.Services;
 using UI.ViewModels.Pages;
 
 namespace UI.ViewModels.Pages.Data;
@@ -16,7 +15,6 @@ public class FixationByEventViewModel(
     : FixationViewModel(eventService, heatService, pointScoreProvider, navigationService)
 {
     private int? _eventId;
-
     public void SetEventId(int? eventId)
     {
         _eventId = eventId;

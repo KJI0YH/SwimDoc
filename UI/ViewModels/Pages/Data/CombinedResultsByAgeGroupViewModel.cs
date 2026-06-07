@@ -13,7 +13,6 @@ using ServiceLayer.EventService;
 using ServiceLayer.HeatService;
 using ServiceLayer.PointScoreProvider;
 using ServiceLayer.SwimStyleService;
-using UI.Services;
 using UI.ViewModels;
 using UI.ViewModels.Pages;
 
@@ -21,16 +20,7 @@ namespace UI.ViewModels.Pages.Data;
 
 public class CombinedResultsByAgeGroupViewModel : CombinedResultsViewModel
 {
-    private readonly IAgeGroupService _ageGroupService;
-
-    public CombinedResultsByAgeGroupViewModel(IAgeGroupService ageGroupService, IEntryService entryService)
-        : base(ageGroupService, entryService)
-    {
-        _ageGroupService = ageGroupService;
-    }
-
     public override bool ShowAgeGroupSelector => false;
-
     public void SetAgeGroupId(int? ageGroupId)
     {
         if (!ageGroupId.HasValue)
@@ -38,8 +28,7 @@ public class CombinedResultsByAgeGroupViewModel : CombinedResultsViewModel
             SelectedAgeGroup = null;
             return;
         }
-
-        SelectedAgeGroup = _ageGroupService.Query()
+        SelectedAgeGroup = AgeGroupService.Query()
             .FirstOrDefault(ageGroup => ageGroup.Id == ageGroupId.Value);
     }
 }

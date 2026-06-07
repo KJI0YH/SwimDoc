@@ -1,5 +1,4 @@
 using System.Windows.Controls;
-using UI.Services;
 using ClubDetailsViewModel = UI.ViewModels.Pages.ClubDetailsViewModel;
 
 namespace UI.Views.Pages;

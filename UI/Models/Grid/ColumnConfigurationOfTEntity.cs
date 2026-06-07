@@ -13,9 +13,7 @@ public class ColumnConfiguration<TEntity> : ColumnConfiguration where TEntity : 
         SortMemberPath = sortMemberPath;
         Header = header;
         Width = width;
-
         var pathForSort = sortMemberPath ?? propertyPath;
-
         SortQuery = (query, direction) =>
         {
             var parameter = Expression.Parameter(typeof(TEntity), "x");
@@ -44,6 +42,25 @@ public class ColumnConfiguration<TEntity> : ColumnConfiguration where TEntity : 
 
     public ColumnSortQuery<TEntity> SortQuery { get; set; }
 
+    public static ColumnSortQuery<TEntity> SortBy<TKey>(Expression<Func<TEntity, TKey>> keySelector) =>
+        ColumnSort.By(keySelector);
+
+    public static ColumnSortQuery<TEntity> SortBy<TKey1, TKey2>(
+        Expression<Func<TEntity, TKey1>> primary,
+        Expression<Func<TEntity, TKey2>> secondary) =>
+        ColumnSort.By(primary, secondary);
+
+    public static ColumnSortQuery<TEntity> SortBy<TKey1, TKey2, TKey3>(
+        Expression<Func<TEntity, TKey1>> primary,
+        Expression<Func<TEntity, TKey2>> secondary,
+        Expression<Func<TEntity, TKey3>> tertiary) =>
+        ColumnSort.By(primary, secondary, tertiary);
+
+    public static ColumnSortQuery<TEntity> SortByDirection(
+        Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> ascending,
+        Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> descending) =>
+        ColumnSort.ByDirection(ascending, descending);
+
     public static IQueryable<TEntity> SortQueryableByPropertyPath(IQueryable<TEntity> query, string propertyPath,
         ListSortDirection direction)
     {
@@ -69,10 +86,8 @@ public class ColumnConfiguration<TEntity> : ColumnConfiguration where TEntity : 
                 BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
             if (prop == null)
                 throw new InvalidOperationException($"Property '{part}' not found on type '{expr.Type.Name}'.");
-
             expr = Expression.Property(expr, prop);
         }
-
         return expr;
     }
 }

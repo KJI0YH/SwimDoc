@@ -4,25 +4,27 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:dataView="clr-namespace:UI.Views.Controls.DataView"
-             xmlns:helpers="clr-namespace:UI.Helpers"
+             xmlns:displayHelpers="clr-namespace:UI.Helpers.Display"
+             xmlns:converters="clr-namespace:UI.Helpers.Converters"
+             xmlns:uiHelpers="clr-namespace:UI.Helpers.Controls"
              xmlns:dataGridView="clr-namespace:UI.Views.Controls.DataGridView"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:loc="clr-namespace:UI.Localization"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
-        <helpers:BoolToVisibilityConverter x:Key="BoolToVis" />
+        <converters:BoolToVisibilityConverter x:Key="BoolToVis" />
     </UserControl.Resources>
     <dataView:DefaultDataView>
         <dataView:DefaultDataView.Toolbar>
             <DockPanel LastChildFill="True">
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
-                    <ComboBox helpers:ComboBoxAutoWidthHelper.Enable="True"
+                    <ComboBox uiHelpers:ComboBoxAutoWidthHelper.Enable="True"
                               ItemsSource="{Binding SwimEventOptions}"
                               SelectedValue="{Binding SelectedSwimEvent}"
                               SelectedValuePath="Value"
                               Margin="0,5,6,5" />
-                    <ComboBox helpers:ComboBoxAutoWidthHelper.Enable="True"
+                    <ComboBox uiHelpers:ComboBoxAutoWidthHelper.Enable="True"
                               ItemsSource="{Binding EventHeats}"
                               SelectedItem="{Binding SelectedHeatItem}"
                               DisplayMemberPath="DisplayNumberWithTime"

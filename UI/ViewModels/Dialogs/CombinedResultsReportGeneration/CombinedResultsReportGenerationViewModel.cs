@@ -4,7 +4,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using UI.Resources;
-using UI.Services;
 
 namespace UI.ViewModels.Dialogs.CombinedResultsReportGeneration;
 
@@ -12,22 +11,16 @@ public partial class CombinedResultsReportGenerationViewModel : ViewModelBase, I
 {
     [ObservableProperty] private string _outputFilePath = string.Empty;
     [ObservableProperty] private ObservableCollection<string> _validationErrors = [];
-
     public CombinedResultsReportGenerationViewModel()
     {
         ValidationErrors.CollectionChanged += OnValidationErrorsChanged;
     }
 
     public string WindowTitle => Strings.Reports_CombinedResults_WindowTitle;
-
     public bool HasErrors => ValidationErrors.Count > 0;
-
     public CombinedResultsReportGenerationResult? Result { get; private set; }
-
     object? IWindowResult.Result => Result;
-
     public event EventHandler? CloseRequested;
-
     private void OnValidationErrorsChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         OnPropertyChanged(nameof(HasErrors));
@@ -44,7 +37,6 @@ public partial class CombinedResultsReportGenerationViewModel : ViewModelBase, I
             AddExtension = true,
             FileName = Strings.Dialog_SaveExcelCombinedResultsReports_DefaultFileName
         };
-
         if (dialog.ShowDialog() == true)
             OutputFilePath = dialog.FileName;
     }
@@ -53,13 +45,11 @@ public partial class CombinedResultsReportGenerationViewModel : ViewModelBase, I
     private void Save()
     {
         ValidationErrors.Clear();
-
         if (string.IsNullOrWhiteSpace(OutputFilePath))
         {
             ValidationErrors.Add(Strings.Reports_Validation_SelectOutputFile);
             return;
         }
-
         Result = new CombinedResultsReportGenerationResult(OutputFilePath);
         CloseRequested?.Invoke(this, EventArgs.Empty);
     }

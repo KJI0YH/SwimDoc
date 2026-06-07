@@ -9,10 +9,8 @@ public class RunnerWriteDb<TIn, TOut>
 {
     private readonly IBizAction<TIn, TOut> _actionClass;
     private readonly EfCoreContext _context;
-
     public IImmutableList<ValidationResult> Errors => _actionClass.Errors;
     public bool HasErrors => _actionClass.HasErrors;
-
     public RunnerWriteDb(IBizAction<TIn, TOut> actionClass, EfCoreContext context)
     {
         _context = context;

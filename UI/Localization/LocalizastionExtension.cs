@@ -7,7 +7,6 @@ namespace UI.Localization;
 public sealed class LocalizastionExtension : MarkupExtension
 {
     public string Key { get; set; } = string.Empty;
-
     public LocalizastionExtension()
     {
     }
@@ -21,13 +20,11 @@ public sealed class LocalizastionExtension : MarkupExtension
     {
         if (string.IsNullOrWhiteSpace(Key))
             return string.Empty;
-
         var binding = new Binding($"[{Key}]")
         {
             Source = LocalizationProvider.Instance,
             Mode = BindingMode.OneWay
         };
-
         return binding.ProvideValue(serviceProvider);
     }
 }

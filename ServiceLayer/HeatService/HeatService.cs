@@ -3,8 +3,8 @@ using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using BizDbAccess;
 using BizDbAccess.HeatAllocation;
-using BizLogic.HeatLogic;
-using BizLogic.HeatLogic.Concrete;
+using BizLogic.HeatAllocation;
+using BizLogic.HeatAllocation.Concrete;
 using DataLayer;
 using DataLayer.Display;
 using DataLayer.EfClasses;
@@ -49,13 +49,11 @@ public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbCo
             .Include(e => e.HeatPosition)
             .Where(e => e.HeatPosition != null && e.HeatPosition.Heat.SwimEventId == swimEventId)
             .ToListAsync();
-
         foreach (var entry in entriesInEventHeats)
         {
             entry.ClearHeatResultData();
             entry.Status = EntryStatus.EVENT;
         }
-
         dbContext.Heats.RemoveRange(dbContext.Heats.Where(heat => heat.SwimEventId == swimEventId));
         await dbContext.SaveChangesAsync();
     }
@@ -67,7 +65,6 @@ public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbCo
             .FirstOrDefaultAsync(heatPosition => heatPosition.HeatId == heatId && heatPosition.EntryId == entryId);
         if (position is null)
             return;
-
         position.Entry.ClearHeatResultData();
         dbContext.HeatPositions.Remove(position);
         await dbContext.SaveChangesAsync();
@@ -81,12 +78,10 @@ public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbCo
             .FirstOrDefaultAsync(h => h.Id == heatId);
         if (heat is null)
             return;
-
         foreach (var position in heat.Positions)
             position.Entry.ClearHeatResultData();
         foreach (var position in heat.Positions)
             position.Entry.Status = EntryStatus.EVENT;
-
         dbContext.Heats.Remove(heat);
         await dbContext.SaveChangesAsync();
     }
@@ -104,7 +99,6 @@ public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbCo
         bool isAdd)
     {
         ArgumentNullException.ThrowIfNull(heat);
-
         var swimEvent = await dbContext.SwimEvents
             .AsNoTracking()
             .FirstOrDefaultAsync(se => se.Id == heat.SwimEventId);
@@ -113,27 +107,22 @@ public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbCo
                 CultureInfo.CurrentUICulture,
                 ServiceErrorStrings.Heat_Save_SwimEventNotFound_Format,
                 heat.SwimEventId))]);
-
         var validationErrors = ValidateHeatWithPositions(heat, swimEvent, isAdd);
         if (validationErrors.Count > 0)
             return (null, validationErrors);
-
         if (isAdd)
         {
             heat.Status = HeatStatus.NOT_STARTED;
             heat.Positions ??= [];
             foreach (var position in heat.Positions)
                 position.Heat = heat;
-
             dbContext.Heats.Add(heat);
             await dbContext.SaveChangesAsync();
             await RecalculateHeatOrdersAsync();
             await dbContext.Entry(heat).ReloadAsync();
             return (heat, ImmutableList<ValidationResult>.Empty);
         }
-
         DetachHeatGraphIfTracked(heat);
-
         var trackedHeat = await dbContext.Heats
             .FirstOrDefaultAsync(h => h.Id == heat.Id);
         if (trackedHeat is null)
@@ -141,17 +130,14 @@ public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbCo
                 CultureInfo.CurrentUICulture,
                 ServiceErrorStrings.Heat_Save_HeatNotFound_Format,
                 heat.Id))]);
-
         trackedHeat.Number = heat.Number;
         trackedHeat.DayTime = heat.DayTime;
         trackedHeat.Status = heat.Status;
-
         var existingPositions = await dbContext.HeatPositions
             .Where(position => position.HeatId == heat.Id)
             .ToListAsync();
         if (existingPositions.Count > 0)
             dbContext.HeatPositions.RemoveRange(existingPositions);
-
         foreach (var position in heat.Positions ?? [])
         {
             dbContext.HeatPositions.Add(new HeatPosition
@@ -161,7 +147,6 @@ public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbCo
                 EntryId = position.EntryId
             });
         }
-
         await dbContext.SaveChangesAsync();
         await RecalculateHeatOrdersAsync();
         await dbContext.Entry(trackedHeat).ReloadAsync();
@@ -181,10 +166,8 @@ public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbCo
             .ThenBy(x => x.heat.Id)
             .Select(x => x.heat)
             .ToListAsync();
-
         for (var order = 1; order <= heats.Count; order++)
             heats[order - 1].Order = order;
-
         if (heats.Count > 0)
             await dbContext.SaveChangesAsync();
     }
@@ -194,24 +177,20 @@ public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbCo
         var heatEntry = dbContext.Entry(heat);
         if (heatEntry.State == EntityState.Detached)
             return;
-
         foreach (var position in heat.Positions ?? [])
         {
             var positionEntry = dbContext.Entry(position);
             if (positionEntry.State != EntityState.Detached)
                 positionEntry.State = EntityState.Detached;
         }
-
         heatEntry.State = EntityState.Detached;
     }
 
     private ImmutableList<ValidationResult> ValidateHeatWithPositions(Heat heat, SwimEvent swimEvent, bool isAdd)
     {
         var errors = new List<ValidationResult>();
-
         if (heat.Number < 1)
             errors.Add(new ValidationResult(ServiceErrorStrings.Heat_Number_MinOne, [nameof(Heat.Number)]));
-
         var positions = heat.Positions?.ToList() ?? [];
         var maxPositions = SwimEventLaneNames.GetLaneCount(swimEvent);
         if (positions.Count > maxPositions)
@@ -230,7 +209,6 @@ public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbCo
                     ServiceErrorStrings.Heat_Validation_DuplicateLane_Format,
                     SwimEventLaneNames.GetLaneDisplay(swimEvent, lane)),
                 [nameof(HeatPosition.Lane)]));
-
         var duplicateEntries = positions.GroupBy(position => position.EntryId).Where(g => g.Count() > 1)
             .Select(g => g.Key);
         foreach (var entryId in duplicateEntries)
@@ -239,7 +217,6 @@ public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbCo
                     ServiceErrorStrings.Heat_Validation_DuplicateEntry_Format,
                     entryId),
                 [nameof(HeatPosition.EntryId)]));
-
         foreach (var position in positions)
         {
             if (!SwimEventLaneNames.IsLaneInRange(swimEvent, position.Lane))
@@ -250,7 +227,6 @@ public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbCo
                         SwimEventLaneNames.GetLaneDisplay(swimEvent, position.Lane),
                         SwimEventLaneNames.FormatLanesSummary(swimEvent)),
                     [nameof(HeatPosition.Lane)]));
-
             var entryExists = dbContext.Entries.Any(entry =>
                 entry.Id == position.EntryId && entry.SwimEventId == swimEvent.Id);
             if (!entryExists)
@@ -259,7 +235,6 @@ public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbCo
                         ServiceErrorStrings.Heat_Validation_EntryNotInEvent_Format,
                         position.EntryId),
                     [nameof(HeatPosition.EntryId)]));
-
             var entryInOtherHeat = dbContext.HeatPositions.Any(existing =>
                 existing.EntryId == position.EntryId &&
                 existing.HeatId != (isAdd ? 0 : heat.Id));
@@ -270,7 +245,6 @@ public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbCo
                         position.EntryId),
                     [nameof(HeatPosition.EntryId)]));
         }
-
         return errors.ToImmutableList();
     }
 
@@ -311,20 +285,15 @@ public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbCo
         ArgumentNullException.ThrowIfNull(incomingHeat);
         if (incomingHeat.Positions is null)
             throw new ValidationException(ServiceErrorStrings.Heat_Approve_PositionsMissing);
-
         var trackedHeat = await dbContext.Heats
             .Include(h => h.Positions)
             .ThenInclude(p => p.Entry)
             .FirstOrDefaultAsync(h => h.Id == incomingHeat.Id);
-
         if (trackedHeat is null)
             throw new EntityNotFoundException($"No such heat: {incomingHeat.Id}");
-
         if (trackedHeat.Status == HeatStatus.OFFICIAL)
             return;
-
         var incomingByEntryId = incomingHeat.Positions.ToDictionary(p => p.EntryId, p => p.Entry);
-
         foreach (var trackedPosition in trackedHeat.Positions)
         {
             if (!incomingByEntryId.TryGetValue(trackedPosition.EntryId, out var incomingEntry))
@@ -332,16 +301,13 @@ public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbCo
                     CultureInfo.CurrentUICulture,
                     ServiceErrorStrings.Heat_Approve_NoResultForEntry_Format,
                     trackedPosition.EntryId));
-
             trackedPosition.Entry.Status = incomingEntry.Status;
             trackedPosition.Entry.FinishTime = incomingEntry.FinishTime;
             trackedPosition.Entry.Comment = incomingEntry.Comment;
             trackedPosition.Entry.Points = incomingEntry.Points;
             trackedPosition.Entry.ApplyNonFinishResultRules();
-
             dbContext.NormalizeEntry(trackedPosition.Entry);
         }
-
         foreach (var position in trackedHeat.Positions)
         {
             var entry = position.Entry;
@@ -351,11 +317,9 @@ public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbCo
                 EntryStatus.DNS or EntryStatus.DNF or EntryStatus.DSQ => true,
                 _ => false
             };
-
             if (!isResultProvided)
                 throw new ValidationException(ServiceErrorStrings.Heat_Approve_NotAllLaneResultsProvided);
         }
-
         trackedHeat.Status = HeatStatus.OFFICIAL;
         await dbContext.SaveChangesAsync();
     }
@@ -364,9 +328,7 @@ public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbCo
     {
         var heat = await dbContext.Heats.FirstOrDefaultAsync(h => h.Id == heatId);
         if (heat is null) throw new EntityNotFoundException($"No such heat: {heatId}");
-
         if (heat.Status != HeatStatus.OFFICIAL) return;
-
         heat.Status = HeatStatus.UNOFFICIAL;
         await dbContext.SaveChangesAsync();
     }

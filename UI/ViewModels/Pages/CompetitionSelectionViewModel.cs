@@ -2,7 +2,6 @@ using System.IO;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
-using UI.Services;
 using UI.Resources;
 
 namespace UI.ViewModels.Pages;
@@ -20,7 +19,6 @@ public partial class CompetitionSelectionViewModel : ViewModelBase
             Title = Strings.Dialog_CreateCompetition_Title,
             DefaultExt = Strings.Dialog_CompetitionDb_DefaultExt
         };
-
         if (saveFileDialog.ShowDialog() == true)
         {
             try
@@ -46,7 +44,6 @@ public partial class CompetitionSelectionViewModel : ViewModelBase
             Filter = Strings.Dialog_CompetitionDb_Filter,
             Title = Strings.Dialog_OpenCompetition_Title
         };
-
         if (openFileDialog.ShowDialog() == true) InitializeDatabase(openFileDialog.FileName);
     }
 

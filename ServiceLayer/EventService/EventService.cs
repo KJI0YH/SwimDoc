@@ -29,7 +29,6 @@ public class EventService(EfCoreContext dbContext, IBaseTimeRepository baseTimeR
             .OrderByDescending(se => se.Order)
             .Select(se => new { se.LaneMin, se.LaneMax, se.CustomLaneNames })
             .FirstOrDefault();
-
         return swimEvent is null ? (0, 0, null) : (swimEvent.LaneMin, swimEvent.LaneMax, swimEvent.CustomLaneNames);
     }
 
@@ -73,7 +72,6 @@ public class EventService(EfCoreContext dbContext, IBaseTimeRepository baseTimeR
     {
         if (swimEventIds.Count == 0)
             return;
-
         await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
         try
         {
@@ -87,13 +85,10 @@ public class EventService(EfCoreContext dbContext, IBaseTimeRepository baseTimeR
                 .Include(swimEvent => swimEvent.AgeGroup)
                 .OrderBy(swimEvent => swimEvent.Order)
                 .ToListAsync(cancellationToken);
-
             var currentTime = parameters.StartTime;
-
             foreach (var swimEvent in events)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-
                 swimEvent.Time = currentTime;
                 foreach (var heat in swimEvent.Heats)
                 {
@@ -107,10 +102,8 @@ public class EventService(EfCoreContext dbContext, IBaseTimeRepository baseTimeR
                     currentTime = currentTime.Add(TimeSpan.FromMilliseconds(slowestHeatTime * 10));
                     currentTime = currentTime.Add(parameters.HeatPause);
                 }
-
                 currentTime = currentTime.Add(parameters.EventPause);
             }
-
             cancellationToken.ThrowIfCancellationRequested();
             await dbContext.SaveChangesAsync(cancellationToken);
             await transaction.CommitAsync(cancellationToken);

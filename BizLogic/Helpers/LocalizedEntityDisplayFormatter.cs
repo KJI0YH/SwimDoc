@@ -6,9 +6,7 @@ namespace BizLogic.Helpers;
 public static class LocalizedEntityDisplayFormatter
 {
     private static readonly IEntityDisplayTexts Texts = BizLogicEntityDisplayTexts.Instance;
-
     public static string GetEnumDisplay(Enum value) => Texts.GetEnumDisplay(value);
-
     public static string FormatSwimStyle(SwimStyle? style) =>
         EntityDisplay.FormatSwimStyle(style, Texts);
 

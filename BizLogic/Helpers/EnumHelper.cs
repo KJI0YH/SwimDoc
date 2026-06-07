@@ -17,7 +17,6 @@ public static class EnumHelper
             enumValue = item;
             return true;
         }
-
         enumValue = default(T);
         return false;
     }
@@ -35,7 +34,6 @@ public static class EnumHelper
             enumValue = item;
             return true;
         }
-
         enumValue = default(T);
         return false;
     }

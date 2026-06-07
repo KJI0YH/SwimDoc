@@ -1,11 +1,13 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-                    xmlns:helpers="clr-namespace:UI.Helpers"
+                    xmlns:displayHelpers="clr-namespace:UI.Helpers.Display"
+             xmlns:converters="clr-namespace:UI.Helpers.Converters"
+             xmlns:uiHelpers="clr-namespace:UI.Helpers.Controls"
                     xmlns:system="clr-namespace:System;assembly=System.Runtime">
 
-    <helpers:EntryScoringConverter x:Key="EntryScoringConverter" />
-    <helpers:EnumDescriptionConverter x:Key="EnumDescriptionConverter" />
+    <converters:EntryScoringConverter x:Key="EntryScoringConverter" />
+    <displayHelpers:EnumDescriptionConverter x:Key="EnumDescriptionConverter" />
 
     <DataTemplate x:Key="EnumComboBoxItemTemplate">
         <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}}" />
@@ -440,7 +442,7 @@
         <Setter Property="CanUserAddRows" Value="False" />
         <Setter Property="RowHeaderWidth" Value="0" />
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
-        <Setter Property="helpers:DataGridHorizontalScrollHelper.IsEnabled" Value="True" />
+        <Setter Property="uiHelpers:DataGridHorizontalScrollHelper.IsEnabled" Value="True" />
     </Style>
 
     <Style TargetType="{x:Type ui:DataGrid}"
@@ -453,7 +455,7 @@
         <Setter Property="CanUserAddRows" Value="False" />
         <Setter Property="RowHeaderWidth" Value="0" />
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
-        <Setter Property="helpers:DataGridHorizontalScrollHelper.IsEnabled" Value="True" />
+        <Setter Property="uiHelpers:DataGridHorizontalScrollHelper.IsEnabled" Value="True" />
         <Setter Property="TextColumnElementStyle" Value="{StaticResource SwimDocDataGridTextColumnElementStyle}" />
         <Setter Property="TextColumnEditingElementStyle" Value="{StaticResource SwimDocDataGridTextColumnEditingElementStyle}" />
     </Style>

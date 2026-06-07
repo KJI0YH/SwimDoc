@@ -8,7 +8,6 @@ public sealed class EfCoreContext : DbContext
 {
     private static readonly object TriggerInitLock = new();
     private static string? _triggersInitializedForConnection;
-
     public DbSet<AgeGroup> AgeGroups { get; set; }
     public DbSet<Athlete> Athletes { get; set; }
     public DbSet<Club> Clubs { get; set; }
@@ -37,9 +36,7 @@ public sealed class EfCoreContext : DbContext
         modelBuilder.ApplyConfiguration(new HeatPositionConfiguration());
         modelBuilder.ApplyConfiguration(new RelayConfiguration());
         modelBuilder.ApplyConfiguration(new RelayPositionConfiguration());
-
         modelBuilder.HasDbFunction(typeof(SwimDocDbFunctions).GetMethod(nameof(SwimDocDbFunctions.ContainsIgnoreCase))!);
-
         base.OnModelCreating(modelBuilder);
     }
 
@@ -56,16 +53,13 @@ public sealed class EfCoreContext : DbContext
         {
             if (connectionString == _triggersInitializedForConnection)
                 return;
-
             CreateTriggers();
-
             _triggersInitializedForConnection = connectionString;
         }
     }
 
     private void CreateTriggers()
     {
-
         Database.ExecuteSqlRaw("DROP TRIGGER IF EXISTS trg_entries_after_update_set_entry_status_when_unlinked;");
         Database.ExecuteSqlRaw("""
             CREATE TRIGGER trg_entries_after_update_set_entry_status_when_unlinked
@@ -77,7 +71,6 @@ public sealed class EfCoreContext : DbContext
                 WHERE Id = NEW.Id;
             END;
             """);
-
         Database.ExecuteSqlRaw("""
             CREATE TRIGGER IF NOT EXISTS trg_entries_after_insert_update_swim_event_status
             AFTER INSERT ON Entries
@@ -103,7 +96,6 @@ public sealed class EfCoreContext : DbContext
                 WHERE Id = NEW.SwimEventId;
             END;
             """);
-
         Database.ExecuteSqlRaw("""
             CREATE TRIGGER IF NOT EXISTS trg_entries_after_update_update_swim_event_status
             AFTER UPDATE ON Entries
@@ -131,7 +123,6 @@ public sealed class EfCoreContext : DbContext
                 WHERE Id IN (NEW.SwimEventId, OLD.SwimEventId);
             END;
             """);
-
         Database.ExecuteSqlRaw("""
             CREATE TRIGGER IF NOT EXISTS trg_entries_after_delete_update_swim_event_status
             AFTER DELETE ON Entries
@@ -157,7 +148,6 @@ public sealed class EfCoreContext : DbContext
                 WHERE Id = OLD.SwimEventId;
             END;
             """);
-
         Database.ExecuteSqlRaw("""
             CREATE TRIGGER IF NOT EXISTS trg_heats_after_insert_update_swim_event_status
             AFTER INSERT ON Heats
@@ -183,7 +173,6 @@ public sealed class EfCoreContext : DbContext
                 WHERE Id = NEW.SwimEventId;
             END;
             """);
-
         Database.ExecuteSqlRaw("""
             CREATE TRIGGER IF NOT EXISTS trg_heats_after_update_update_swim_event_status
             AFTER UPDATE ON Heats
@@ -212,7 +201,6 @@ public sealed class EfCoreContext : DbContext
                 WHERE Id IN (NEW.SwimEventId, OLD.SwimEventId);
             END;
             """);
-
         Database.ExecuteSqlRaw("""
             CREATE TRIGGER IF NOT EXISTS trg_heats_after_delete_update_swim_event_status
             AFTER DELETE ON Heats
@@ -238,7 +226,6 @@ public sealed class EfCoreContext : DbContext
                 WHERE Id = OLD.SwimEventId;
             END;
             """);
-
         Database.ExecuteSqlRaw("""
             CREATE TRIGGER IF NOT EXISTS trg_heat_positions_after_insert
             AFTER INSERT ON HeatPositions
@@ -248,7 +235,6 @@ public sealed class EfCoreContext : DbContext
                 WHERE Id = NEW.EntryId;
             END;
             """);
-
         Database.ExecuteSqlRaw("DROP TRIGGER IF EXISTS trg_heat_positions_after_delete;");
         Database.ExecuteSqlRaw("""
             CREATE TRIGGER trg_heat_positions_after_delete
@@ -262,7 +248,6 @@ public sealed class EfCoreContext : DbContext
                 WHERE Id = OLD.EntryId;
             END;
             """);
-
         Database.ExecuteSqlRaw("""
             CREATE TRIGGER IF NOT EXISTS trg_swim_events_after_insert
             AFTER INSERT ON SwimEvents
@@ -284,7 +269,6 @@ public sealed class EfCoreContext : DbContext
                   );
             END;
             """);
-
         Database.ExecuteSqlRaw("""
             CREATE TRIGGER IF NOT EXISTS trg_swim_events_after_update
             AFTER UPDATE ON SwimEvents
@@ -331,7 +315,6 @@ public sealed class EfCoreContext : DbContext
                           )
                       )
                   );
-
                 UPDATE Entries
                 SET SwimEventId = NEW.Id,
                     Status = 1
@@ -349,7 +332,6 @@ public sealed class EfCoreContext : DbContext
                   );
             END;
             """);
-
         Database.ExecuteSqlRaw("""
             CREATE TRIGGER IF NOT EXISTS trg_relay_positions_after_insert_validate_entry_event
             AFTER INSERT ON RelayPositions
@@ -375,7 +357,6 @@ public sealed class EfCoreContext : DbContext
                   );
             END;
             """);
-
         Database.ExecuteSqlRaw("""
             CREATE TRIGGER IF NOT EXISTS trg_relay_positions_after_update_validate_entry_event
             AFTER UPDATE ON RelayPositions
@@ -401,7 +382,6 @@ public sealed class EfCoreContext : DbContext
                   );
             END;
             """);
-
         Database.ExecuteSqlRaw("""
             CREATE TRIGGER IF NOT EXISTS trg_relay_positions_after_delete_validate_entry_event
             AFTER DELETE ON RelayPositions
@@ -430,7 +410,6 @@ public sealed class EfCoreContext : DbContext
                   );
             END;
             """);
-
         Database.ExecuteSqlRaw("""
             CREATE TRIGGER IF NOT EXISTS trg_swim_events_before_delete
             BEFORE DELETE ON SwimEvents
@@ -441,7 +420,6 @@ public sealed class EfCoreContext : DbContext
                 WHERE SwimEventId = OLD.Id;
             END;
             """);
-
         Database.ExecuteSqlRaw("""
             CREATE TRIGGER IF NOT EXISTS trg_heats_after_insert_reorder
             AFTER INSERT ON Heats
@@ -462,7 +440,6 @@ public sealed class EfCoreContext : DbContext
                 );
             END;
             """);
-
         Database.ExecuteSqlRaw("""
             CREATE TRIGGER IF NOT EXISTS trg_heats_after_delete_reorder
             AFTER DELETE ON Heats
@@ -483,7 +460,6 @@ public sealed class EfCoreContext : DbContext
                 );
             END;
             """);
-
         Database.ExecuteSqlRaw("""
             CREATE TRIGGER IF NOT EXISTS trg_heats_after_update_reorder
             AFTER UPDATE OF Number ON Heats

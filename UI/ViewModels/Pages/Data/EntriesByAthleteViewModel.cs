@@ -13,7 +13,6 @@ using ServiceLayer.EventService;
 using ServiceLayer.HeatService;
 using ServiceLayer.PointScoreProvider;
 using ServiceLayer.SwimStyleService;
-using UI.Services;
 using UI.ViewModels;
 using UI.ViewModels.Pages;
 using UI.Views.Dialogs.Markers.AddEdit;
@@ -24,7 +23,6 @@ public class EntriesByAthleteViewModel : EntriesViewModel
 {
     private readonly IAddEditWindowFactory _windowFactory;
     private int? _athleteId;
-
     public EntriesByAthleteViewModel(IEntryService entryService, IEntryDocumentReaderService entryDocumentReaderService)
         : base(entryService, entryDocumentReaderService)
     {
@@ -45,7 +43,7 @@ public class EntriesByAthleteViewModel : EntriesViewModel
     }
 
     protected override IQueryable<Entry> GetFilterOptionsSource() =>
-        ApplyAthleteScope(_crudService.Query());
+        ApplyAthleteScope(CrudService.Query());
 
     protected override IQueryable<Entry> ApplyQuery(IQueryable<Entry> query)
     {

@@ -1,6 +1,6 @@
 using DataLayer.EfClasses;
 
-namespace BizLogic.EntryDocumentReaderLogic;
+namespace BizLogic.EntryDocumentReader;
 
 public class EntryDocument
 {
@@ -8,7 +8,6 @@ public class EntryDocument
     public readonly ICollection<Athlete>? Athletes;
     public IReadOnlyList<string> Warnings;
     public IReadOnlyList<string> Errors;
-
     private EntryDocument(Club? club, ICollection<Athlete>? athletes, IReadOnlyList<string> warnings, IReadOnlyList<string> errors)
     {
         Club = club;

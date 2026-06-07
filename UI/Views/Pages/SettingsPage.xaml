@@ -3,12 +3,14 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       xmlns:loc="clr-namespace:UI.Localization"
-      xmlns:helpers="clr-namespace:UI.Helpers"
+      xmlns:displayHelpers="clr-namespace:UI.Helpers.Display"
+             xmlns:converters="clr-namespace:UI.Helpers.Converters"
+             xmlns:uiHelpers="clr-namespace:UI.Helpers.Controls"
       xmlns:baseTimesView="clr-namespace:UI.Views.Controls.BaseTimesSettingsView"
       ScrollViewer.CanContentScroll="False">
     <Page.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
-        <helpers:AppLanguageDisplayConverter x:Key="AppLanguageDisplayConverter" />
+        <displayHelpers:AppLanguageDisplayConverter x:Key="AppLanguageDisplayConverter" />
     </Page.Resources>
 
     <Grid HorizontalAlignment="Stretch"

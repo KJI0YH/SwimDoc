@@ -185,7 +185,7 @@
   <data name="Import_Event_Error_Header" xml:space="preserve"><value>Ошибка загрузки из события</value></data>
 
   <data name="Dialog_SelectEntryFiles_Title" xml:space="preserve"><value>Выберите файлы заявок</value></data>
-  <data name="Dialog_SelectEntryFiles_Filter" xml:space="preserve"><value>Excel (*.xlsx)|*.xlsx|All Files (*.*)|*.*</value></data>
+  <data name="Dialog_SelectEntryFiles_Filter" xml:space="preserve"><value>Excel (*.xlsx;*.xls)|*.xlsx;*.xls|Excel 2007+ (*.xlsx)|*.xlsx|Excel 97-2003 (*.xls)|*.xls|Все файлы (*.*)|*.*</value></data>
   <data name="Dialog_SaveExcelReports_Filter" xml:space="preserve"><value>Excel (*.xlsx)|*.xlsx|All Files (*.*)|*.*</value></data>
   <data name="Dialog_SaveExcelReports_DefaultExt" xml:space="preserve"><value>xlsx</value></data>
   <data name="Dialog_SaveExcelReports_DefaultFileName" xml:space="preserve"><value>Отчёты.xlsx</value></data>

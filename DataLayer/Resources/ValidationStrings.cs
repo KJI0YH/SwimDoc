@@ -9,7 +9,6 @@ public static class ValidationStrings
         new("DataLayer.Resources.ValidationStrings", typeof(ValidationStrings).Assembly);
 
     public static ResourceManager ResourceManager => ResourceManagerImpl;
-
     public static string Get(string name) =>
         ResourceManager.GetString(name, CultureInfo.CurrentUICulture) ?? $"[[{name}]]";
 
@@ -21,20 +20,15 @@ public static class ValidationStrings
     public static string SwimEvent_CustomLaneNamesMustBeUnique => Get(nameof(SwimEvent_CustomLaneNamesMustBeUnique));
     public static string SwimEvent_InvalidLaneRange => Get(nameof(SwimEvent_InvalidLaneRange));
     public static string SwimEvent_InvalidRoundOrder => Get(nameof(SwimEvent_InvalidRoundOrder));
-
     public static string SwimStyle_AlreadyExists_Format => Get(nameof(SwimStyle_AlreadyExists_Format));
     public static string SwimStyle_DistanceMustBeGreaterThanZero => Get(nameof(SwimStyle_DistanceMustBeGreaterThanZero));
-
     public static string AgeGroup_InvalidYearRange => Get(nameof(AgeGroup_InvalidYearRange));
     public static string AgeGroup_AlreadyExists => Get(nameof(AgeGroup_AlreadyExists));
-
     public static string Athlete_FirstNameCannotBeEmpty => Get(nameof(Athlete_FirstNameCannotBeEmpty));
     public static string Athlete_LastNameCannotBeEmpty => Get(nameof(Athlete_LastNameCannotBeEmpty));
     public static string Athlete_GenderCannotBeMixed => Get(nameof(Athlete_GenderCannotBeMixed));
     public static string Athlete_YearOfBirthInvalid => Get(nameof(Athlete_YearOfBirthInvalid));
-
     public static string Club_NameCannotBeEmpty => Get(nameof(Club_NameCannotBeEmpty));
-
     public static string Entry_ParticipantMustBeProvided => Get(nameof(Entry_ParticipantMustBeProvided));
     public static string Entry_SwimStyleMustBeProvided => Get(nameof(Entry_SwimStyleMustBeProvided));
     public static string Entry_AlreadyExists => Get(nameof(Entry_AlreadyExists));
@@ -42,7 +36,6 @@ public static class ValidationStrings
     public static string Entry_AthleteNotInAgeGroup => Get(nameof(Entry_AthleteNotInAgeGroup));
     public static string Entry_SwimEventMustBeIndividual => Get(nameof(Entry_SwimEventMustBeIndividual));
     public static string Entry_SwimEventMustBeRelay => Get(nameof(Entry_SwimEventMustBeRelay));
-
     public static string HeatPosition_HeatDoesNotExist => Get(nameof(HeatPosition_HeatDoesNotExist));
     public static string HeatPosition_LaneOutOfRange_Format => Get(nameof(HeatPosition_LaneOutOfRange_Format));
     public static string HeatPosition_LaneAlreadyBusy_Format => Get(nameof(HeatPosition_LaneAlreadyBusy_Format));

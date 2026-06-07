@@ -9,9 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using ServiceLayer.EntryService;
 using ServiceLayer.EventService;
 using ServiceLayer.HeatService;
-using UI.Helpers;
 using UI.Resources;
-using UI.Services;
 using UI.ViewModels;
 using UI.Models;
 
@@ -29,7 +27,6 @@ public partial class HeatAddEditViewModel(
     private int? _contextEventId;
     private Heat _entity = new() { Positions = [] };
     private SwimEvent? _swimEvent;
-
     [ObservableProperty] private ObservableCollection<string> _validationErrors = new();
     [ObservableProperty] private ObservableCollection<HeatPositionEditorRow> _positionRows = new();
     private List<SearchableItem> _allEntryItems = [];
@@ -37,9 +34,7 @@ public partial class HeatAddEditViewModel(
     [ObservableProperty] private string _swimEventDisplayName = string.Empty;
     [ObservableProperty] private int _laneMin = 1;
     [ObservableProperty] private int _laneMax = 1;
-
     public ObservableCollection<LaneSlot> AvailableLanes { get; } = new();
-
     public bool UsesCustomLaneNames =>
         _swimEvent is not null && SwimEventLaneNames.HasCustomLaneNames(_swimEvent);
 
@@ -47,20 +42,16 @@ public partial class HeatAddEditViewModel(
         ? SwimEventLaneNames.GetLaneCount(_swimEvent)
         : LaneMax - LaneMin + 1;
     public int MinHeatNumber => 1;
-
     public bool HasErrors => ValidationErrors.Count > 0;
     public bool WasSaved { get; private set; }
     public bool IsReadOnly => false;
     public bool CanEditFields => true;
     public string WindowTitle => _isAdd ? Strings.WindowTitle_CreateHeat : Strings.WindowTitle_EditHeat;
     object? IWindowResult.Result => _entity;
-
     public event EventHandler<DialogCloseEventArgs>? CloseRequested;
-
     public IReadOnlyList<string> HourOptions { get; } = CreateTimePartOptions(24);
     public IReadOnlyList<string> MinuteOptions { get; } = CreateTimePartOptions(60);
     public Array HeatStatusValues => Enum.GetValues<HeatStatus>();
-
     public int Number
     {
         get => _entity.Number;
@@ -88,7 +79,6 @@ public partial class HeatAddEditViewModel(
         {
             if (!TryParseTimePart(value, 23, out var hour))
                 return;
-
             UpdateDayTime(hour, _entity.DayTime?.Minute);
         }
     }
@@ -100,7 +90,6 @@ public partial class HeatAddEditViewModel(
         {
             if (!TryParseTimePart(value, 59, out var minute))
                 return;
-
             UpdateDayTime(_entity.DayTime?.Hour, minute);
         }
     }
@@ -116,7 +105,6 @@ public partial class HeatAddEditViewModel(
         {
             if (!_contextEventId.HasValue)
                 throw new InvalidOperationException(Strings.Heat_Validation_EventRequired);
-
             _entity = new Heat
             {
                 SwimEventId = _contextEventId.Value,
@@ -142,7 +130,6 @@ public partial class HeatAddEditViewModel(
                 .ThenInclude(entry => entry.Relay!)
                 .ThenInclude(relay => relay.Club)
                 .FirstOrDefaultAsync(heat => heat.Id == _id);
-
             _entity = loadedHeat ?? new Heat { Positions = [] };
             _contextEventId = _entity.SwimEventId;
             SetPositionRows(new ObservableCollection<HeatPositionEditorRow>(
@@ -150,7 +137,6 @@ public partial class HeatAddEditViewModel(
                     .OrderBy(position => position.Lane)
                     .Select(position => CreateRowFromPosition(position))));
         }
-
         await LoadSwimEventInfoAsync();
         await LoadAvailableEntriesAsync();
         OnPropertyChanged(nameof(Number));
@@ -178,25 +164,21 @@ public partial class HeatAddEditViewModel(
     {
         if (row is null)
             return;
-
         PositionRows.Remove(row);
     }
 
     private bool CanModifyPositions() => !IsReadOnly;
-
     private bool CanAddPositionRow() => CanModifyPositions() && PositionRows.Count < MaxPositionCount;
 
     [RelayCommand(CanExecute = nameof(CanSave))]
     private async Task SaveAsync()
     {
         ValidationErrors.Clear();
-
         if (Number < MinHeatNumber)
         {
             ValidationErrors.Add(Strings.Heat_Validation_MinHeatNumber);
             return;
         }
-
         var filledRows = PositionRows
             .Where(row => row.SelectedEntry?.Value is Entry)
             .ToList();
@@ -209,7 +191,6 @@ public partial class HeatAddEditViewModel(
                 string.Format(Strings.Heat_Validation_MaxPositionsFormat, MaxPositionCount, lanesSummary));
             return;
         }
-
         _entity.Positions = filledRows
             .Select(row => new HeatPosition
             {
@@ -218,7 +199,6 @@ public partial class HeatAddEditViewModel(
                 EntryId = ((Entry)row.SelectedEntry!.Value!).Id
             })
             .ToList();
-
         var (savedHeat, errors) = await heatService.SaveHeatWithPositionsAsync(_entity, _isAdd);
         if (errors.Count > 0)
         {
@@ -226,7 +206,6 @@ public partial class HeatAddEditViewModel(
                 ValidationErrors.Add(error.ErrorMessage ?? Strings.Validation_ErrorFallback);
             return;
         }
-
         _entity = savedHeat ?? _entity;
         WasSaved = true;
         CloseRequested?.Invoke(this, new DialogCloseEventArgs(true));
@@ -239,7 +218,6 @@ public partial class HeatAddEditViewModel(
     }
 
     private bool CanSave() => !IsReadOnly && _contextEventId.HasValue;
-
     private async Task LoadSwimEventInfoAsync()
     {
         if (!_contextEventId.HasValue)
@@ -247,12 +225,10 @@ public partial class HeatAddEditViewModel(
             SwimEventDisplayName = string.Empty;
             return;
         }
-
         var swimEvent = await eventService.Query()
             .Include(se => se.AgeGroup)
             .Include(se => se.SwimStyle)
             .FirstOrDefaultAsync(se => se.Id == _contextEventId.Value);
-
         SwimEventDisplayName = EntityDisplayFormatter.FormatSwimEvent(swimEvent);
         _swimEvent = swimEvent;
         if (swimEvent is not null)
@@ -267,7 +243,6 @@ public partial class HeatAddEditViewModel(
         {
             AvailableLanes.Clear();
         }
-
         OnPropertyChanged(nameof(UsesCustomLaneNames));
         OnPropertyChanged(nameof(MaxPositionCount));
         AddPositionRowCommand.NotifyCanExecuteChanged();
@@ -281,7 +256,6 @@ public partial class HeatAddEditViewModel(
             foreach (var row in PositionRows)
                 UnsubscribeFromRow(row);
         }
-
         PositionRows = rows;
         foreach (var row in PositionRows)
             SubscribeToRow(row);
@@ -295,13 +269,11 @@ public partial class HeatAddEditViewModel(
             foreach (HeatPositionEditorRow row in e.NewItems)
                 SubscribeToRow(row);
         }
-
         if (e.OldItems is not null)
         {
             foreach (HeatPositionEditorRow row in e.OldItems)
                 UnsubscribeFromRow(row);
         }
-
         RefreshRowAvailableEntries();
         AddPositionRowCommand.NotifyCanExecuteChanged();
     }
@@ -316,14 +288,11 @@ public partial class HeatAddEditViewModel(
     {
         if (_isRefreshingRowEntries)
             return;
-
         RefreshRowAvailableEntries();
     }
 
     partial void OnLaneMinChanged(int value) => OnPropertyChanged(nameof(MaxPositionCount));
-
     partial void OnLaneMaxChanged(int value) => OnPropertyChanged(nameof(MaxPositionCount));
-
     private async Task LoadAvailableEntriesAsync()
     {
         if (!_contextEventId.HasValue)
@@ -332,18 +301,15 @@ public partial class HeatAddEditViewModel(
             RefreshRowAvailableEntries();
             return;
         }
-
         var assignedEntryIds = await heatService.Query()
             .Where(heat => heat.SwimEventId == _contextEventId.Value && (!_isAdd ? heat.Id != _entity.Id : true))
             .SelectMany(heat => heat.Positions.Select(position => position.EntryId))
             .ToListAsync();
-
         var currentHeatEntryIds = PositionRows
             .Where(row => row.EntryId > 0)
             .Select(row => row.EntryId)
             .Concat(_entity.Positions.Select(position => position.EntryId))
             .ToHashSet();
-
         var entries = await entryService.Query()
             .Where(entry => entry.SwimEventId == _contextEventId.Value)
             .Include(entry => entry.Athlete)
@@ -353,7 +319,6 @@ public partial class HeatAddEditViewModel(
             .OrderBy(entry => entry.EntryTime == null)
             .ThenBy(entry => entry.EntryTime)
             .ToListAsync();
-
         _allEntryItems = entries
             .Where(entry => !assignedEntryIds.Contains(entry.Id) || currentHeatEntryIds.Contains(entry.Id))
             .Select(entry => new SearchableItem
@@ -362,7 +327,6 @@ public partial class HeatAddEditViewModel(
                 DisplayText = FormatEntryDisplay(entry)
             })
             .ToList();
-
         RefreshRowAvailableEntries();
     }
 
@@ -371,7 +335,6 @@ public partial class HeatAddEditViewModel(
         _isRefreshingRowEntries = true;
         foreach (var row in PositionRows)
             row.SuppressSelectionChanges = true;
-
         try
         {
             foreach (var row in PositionRows)
@@ -381,23 +344,19 @@ public partial class HeatAddEditViewModel(
                     .Where(other => other != row && other.EntryId > 0)
                     .Select(other => other.EntryId)
                     .ToHashSet();
-
                 row.AvailableEntries.Clear();
                 foreach (var item in _allEntryItems)
                 {
                     if (item.Value is not Entry entry)
                         continue;
-
                     if (!usedInOtherRows.Contains(entry.Id) || entryId == entry.Id)
                         row.AvailableEntries.Add(item);
                 }
-
                 if (entryId <= 0)
                 {
                     row.SelectedEntry = null;
                     continue;
                 }
-
                 var match = row.AvailableEntries.FirstOrDefault(item =>
                     item.Value is Entry entry && entry.Id == entryId);
                 if (!ReferenceEquals(row.SelectedEntry, match))
@@ -408,7 +367,6 @@ public partial class HeatAddEditViewModel(
         {
             foreach (var row in PositionRows)
                 row.SuppressSelectionChanges = false;
-
             _isRefreshingRowEntries = false;
         }
     }
@@ -433,13 +391,11 @@ public partial class HeatAddEditViewModel(
     {
         if (_swimEvent is null)
             return 1;
-
         foreach (var slot in SwimEventLaneNames.GetLaneSlots(_swimEvent))
         {
             if (PositionRows.All(row => row.Lane != slot.Lane))
                 return slot.Lane;
         }
-
         return SwimEventLaneNames.GetLaneSlotMin(_swimEvent);
     }
 
@@ -449,7 +405,6 @@ public partial class HeatAddEditViewModel(
             _entity.DayTime = null;
         else
             _entity.DayTime = new TimeOnly(hour ?? 0, minute ?? 0);
-
         OnPropertyChanged(nameof(HourText));
         OnPropertyChanged(nameof(MinuteText));
     }
@@ -461,13 +416,11 @@ public partial class HeatAddEditViewModel(
             value = null;
             return true;
         }
-
         if (int.TryParse(text.Trim(), out var parsed) && parsed >= 0 && parsed <= max)
         {
             value = parsed;
             return true;
         }
-
         value = null;
         return false;
     }

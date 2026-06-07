@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using DataLayer.Resources;
 
 namespace DataLayer.EfClasses;
@@ -11,7 +11,6 @@ public class Athlete : IValidatableObject
     public required Gender Gender { get; set; }
     public required int YearOfBirth { get; set; }
     public Category Category { get; set; } = Category.NoCategory;
-
     public int? ClubId { get; set; }
     public Club? Club { get; set; }
     public ICollection<Entry> Entries { get; set; }
@@ -23,17 +22,14 @@ public class Athlete : IValidatableObject
         {
             yield return new ValidationResult(ValidationStrings.Athlete_FirstNameCannotBeEmpty, [nameof(FirstName)]);
         }
-
         if (string.IsNullOrWhiteSpace(LastName))
         {
             yield return new ValidationResult(ValidationStrings.Athlete_LastNameCannotBeEmpty, [nameof(LastName)]);
         }
-
         if (Gender == Gender.Mixed)
         {
             yield return new ValidationResult(ValidationStrings.Athlete_GenderCannotBeMixed, [nameof(Gender)]);
         }
-
         if (YearOfBirth <= 1900)
         {
             yield return new ValidationResult(ValidationStrings.Athlete_YearOfBirthInvalid, [nameof(YearOfBirth)]);

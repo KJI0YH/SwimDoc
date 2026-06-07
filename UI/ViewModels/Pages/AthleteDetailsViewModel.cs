@@ -5,7 +5,6 @@ using ServiceLayer.EntryDocumentReaderService;
 using ServiceLayer.EntryService;
 using ServiceLayer.EventService;
 using ServiceLayer.HeatService;
-using UI.Services;
 using UI.ViewModels.Pages.Data;
 
 namespace UI.ViewModels.Pages;
@@ -17,7 +16,6 @@ public partial class AthleteDetailsViewModel : ViewModelBase, INavigationAware
     private readonly ResultsByAthleteViewModel _resultsTable;
     [ObservableProperty] private string? _title = string.Empty;
     [ObservableProperty] private int _selectedTabIndex;
-
     public AthleteDetailsViewModel(
         IEntryService entryService,
         IEntryDocumentReaderService entryDocumentReaderService,
@@ -33,16 +31,13 @@ public partial class AthleteDetailsViewModel : ViewModelBase, INavigationAware
     public ViewModelBase EntriesTable => _entriesTable;
     public ViewModelBase HeatsTable => _heatsTable;
     public ViewModelBase ResultsTable => _resultsTable;
-
     public void OnNavigatedTo(object? parameter)
     {
         if (NavigationContext.Parse(parameter) is not { } context || context.ResolveId() is not int athleteId)
             return;
-
         var focusEntryId = context.FocusEntryId;
         var focusSwimEventId = context.FocusSwimEventId;
         SelectedTabIndex = context.OpenHeatsTab ? 1 : 0;
-
         _entriesTable.SetAthleteId(athleteId);
         _heatsTable.SetAthleteId(athleteId, focusEntryId, focusSwimEventId);
         _resultsTable.SetAthleteId(athleteId);

@@ -3,7 +3,6 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Windows;
-using BizLogic.HeatLogic;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DataLayer;
@@ -13,9 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.EventService;
 using ServiceLayer.HeatService;
 using ServiceLayer.ReportGeneratorService;
-using UI.Helpers;
 using UI.Resources;
-using UI.Services;
 using UI.ViewModels.Pages.Data;
 using UI.Models.Rows;
 using UI.ViewModels.Dialogs.HeatAllocationParameters;
@@ -31,31 +28,34 @@ namespace UI.ViewModels.Pages;
 public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView, int?>
 {
     protected override PagingPage PagingSettingsPage => PagingPage.Events;
-
-    private readonly IEventService _eventService;
+    private IEventService EventService =>
+        App.Current.Services.GetRequiredService<IEventService>();
     private readonly IAddEditWindowFactory _windowFactory;
-
     [ObservableProperty] private ObservableCollection<EventFilterOption<int>> _distanceFilterOptions = new();
     [ObservableProperty] private ObservableCollection<EventFilterOption<Stroke>> _strokeFilterOptions = new();
     [ObservableProperty] private ObservableCollection<EventFilterOption<Gender>> _genderFilterOptions = new();
     [ObservableProperty] private ObservableCollection<EventFilterOption<SwimEventStatus>> _statusFilterOptions = new();
     [ObservableProperty] private ObservableCollection<EventFilterOption<EventRound>> _roundFilterOptions = new();
     [ObservableProperty] private bool _isFiltersPanelVisible;
-
     public string DistanceFilterText => GetFilterText(DistanceFilterOptions, Strings.Filters_Distance);
     public string StrokeFilterText => GetFilterText(StrokeFilterOptions, Strings.Filters_Stroke);
     public string GenderFilterText => GetFilterText(GenderFilterOptions, Strings.Filters_Gender);
     public string StatusFilterText => GetFilterText(StatusFilterOptions, Strings.Filters_Status);
     public string RoundFilterText => GetFilterText(RoundFilterOptions, Strings.Filters_Round);
-
     public EventsViewModel(IEventService eventService) : base(eventService)
     {
-        _eventService = eventService;
         _windowFactory = App.Current.Services.GetRequiredService<IAddEditWindowFactory>();
         PropertyChanged += OnViewModelPropertyChanged;
         InitializeFilterOptions();
         SubscribeFilterOptions();
         App.Current.Services.GetRequiredService<ILocalizationService>().CultureChanged += OnCultureChanged;
+    }
+
+    protected override void ResetForNewCompetition()
+    {
+        base.ResetForNewCompetition();
+        InitializeFilterOptions();
+        SubscribeFilterOptions();
     }
 
     private void OnCultureChanged(CultureInfo culture)
@@ -74,7 +74,6 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView
             option.DisplayText = Strings.GetEnumDisplay(option.Value);
         foreach (var option in RoundFilterOptions)
             option.DisplayText = Strings.GetEnumDisplay(option.Value);
-
         OnPropertyChanged(nameof(StrokeFilterText));
         OnPropertyChanged(nameof(GenderFilterText));
         OnPropertyChanged(nameof(StatusFilterText));
@@ -95,48 +94,28 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView
     {
         AutoGenerateColumns = false;
         ColumnConfigurations.Clear();
-
         ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Order", Strings.Events_Col_Order, 80));
         ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Date", Strings.Events_Col_Date, 85,
-            (query, direction) =>
-            {
-                return direction == ListSortDirection.Ascending
-                    ? query.OrderBy(e => e.Date)
-                    : query.OrderByDescending(e => e.Date);
-            }));
+            ColumnConfiguration<SwimEvent>.SortBy(e => e.Date)));
         ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Time", Strings.Events_Col_Time, 57));
         ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Round", Strings.Events_Col_Round, 150));
         ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("SwimStyle", Strings.Events_Col_Distance, 300,
-            (query, direction) =>
-            {
-                return direction == ListSortDirection.Ascending
-                    ? query.OrderBy(e => e.SwimStyle.Distance).ThenBy(e => e.SwimStyle.Stroke)
-                        .ThenBy(e => e.SwimStyle.RelayCount)
-                    : query.OrderByDescending(e => e.SwimStyle.Distance).ThenByDescending(e => e.SwimStyle.Stroke)
-                        .ThenBy(e => e.SwimStyle.RelayCount);
-            })
+            ColumnConfiguration<SwimEvent>.SortBy(
+                e => e.SwimStyle.Distance,
+                e => e.SwimStyle.Stroke,
+                e => e.SwimStyle.RelayCount))
         {
             Converter = EntityDisplayConverter.Instance,
             ConverterParameter = EntityDisplayConverter.SwimStyleKind
         });
         ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("AgeGroup", Strings.Events_Col_AgeGroup, 300,
-            (query, direction) =>
-            {
-                return direction == ListSortDirection.Ascending
-                    ? query.OrderBy(e => e.AgeGroup.Name)
-                    : query.OrderByDescending(e => e.AgeGroup.Name);
-            })
+            ColumnConfiguration<SwimEvent>.SortBy(e => e.AgeGroup!.Name))
         {
             Converter = EntityDisplayConverter.Instance,
             ConverterParameter = EntityDisplayConverter.AgeGroupKind
         });
         ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Lanes", Strings.Events_Col_Lanes, 80,
-            (query, direction) =>
-            {
-                return direction == ListSortDirection.Ascending
-                    ? query.OrderBy(e => e.LaneMin).ThenBy(e => e.LaneMax)
-                    : query.OrderByDescending(e => e.LaneMin).ThenByDescending(e => e.LaneMax);
-            }));
+            ColumnConfiguration<SwimEvent>.SortBy(e => e.LaneMin, e => e.LaneMax)));
         ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Status", Strings.Events_Col_Status, 210));
     }
 
@@ -157,51 +136,41 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView
         var distances = DistanceFilterOptions.Where(option => option.IsSelected).Select(option => option.Value).ToArray();
         if (distances.Length > 0)
             query = query.Where(e => distances.Contains(e.SwimStyle.Distance));
-
         var strokes = StrokeFilterOptions.Where(option => option.IsSelected).Select(option => option.Value).ToArray();
         if (strokes.Length > 0)
             query = query.Where(e => strokes.Contains(e.SwimStyle.Stroke));
-
         var genders = GenderFilterOptions.Where(option => option.IsSelected).Select(option => option.Value).ToArray();
         if (genders.Length > 0)
             query = query.Where(e => genders.Contains(e.AgeGroup.Gender));
-
         var statuses = StatusFilterOptions.Where(option => option.IsSelected).Select(option => option.Value).ToArray();
         if (statuses.Length > 0)
             query = query.Where(e => statuses.Contains(e.Status));
-
         var rounds = RoundFilterOptions.Where(option => option.IsSelected).Select(option => option.Value).ToArray();
         if (rounds.Length > 0)
             query = query.Where(e => rounds.Contains(e.Round));
-
         return query;
     }
 
     private void InitializeFilterOptions()
     {
-        var distances = _eventService.Query()
+        var distances = EventService.Query()
             .Select(e => e.SwimStyle.Distance)
             .Distinct()
             .OrderBy(distance => distance)
             .ToList();
-
         DistanceFilterOptions = new ObservableCollection<EventFilterOption<int>>(
             distances.Select(distance => new EventFilterOption<int>(
                 distance,
                 string.Format(Strings.Distance_MetersFormat, distance))));
-
         StrokeFilterOptions = new ObservableCollection<EventFilterOption<Stroke>>(
             Enum.GetValues<Stroke>().Select(stroke =>
                 new EventFilterOption<Stroke>(stroke, Strings.GetEnumDisplay(stroke))));
-
         GenderFilterOptions = new ObservableCollection<EventFilterOption<Gender>>(
             Enum.GetValues<Gender>().Select(gender =>
                 new EventFilterOption<Gender>(gender, Strings.GetEnumDisplay(gender))));
-
         StatusFilterOptions = new ObservableCollection<EventFilterOption<SwimEventStatus>>(
             Enum.GetValues<SwimEventStatus>().Select(status =>
                 new EventFilterOption<SwimEventStatus>(status, Strings.GetEnumDisplay(status))));
-
         RoundFilterOptions = new ObservableCollection<EventFilterOption<EventRound>>(
             Enum.GetValues<EventRound>().Select(round =>
                 new EventFilterOption<EventRound>(round, Strings.GetEnumDisplay(round))));
@@ -226,7 +195,6 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView
     {
         if (e.PropertyName != nameof(IEventFilterOption.IsSelected))
             return;
-
         OnPropertyChanged(nameof(DistanceFilterText));
         OnPropertyChanged(nameof(StrokeFilterText));
         OnPropertyChanged(nameof(GenderFilterText));
@@ -287,14 +255,11 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView
     {
         if (SelectedItems.Count == 0)
             return;
-
         var dialog = _windowFactory.CreateAndShowAndReturn<HeatAllocationParametersWindow>();
         if (dialog.DataContext is not IWindowResult { Result: HeatAllocationParametersResult result })
             return;
-
         var deleteConfirmation = App.Current.Services.GetRequiredService<IConfirmDialogService>();
         var events = SelectedItems.Select(row => row.Entity).OrderBy(swimEvent => swimEvent.Order).ToList();
-
         await using var batch = new HeatAllocationBatchSession(result.HeatOrder, result.MinHeatSize);
         var runResult = await RunMultiItemOperationAsync(
             Strings.Operation_HeatAllocation_Header,
@@ -306,19 +271,15 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView
             async (swimEvent, ct) =>
             {
                 ct.ThrowIfCancellationRequested();
-
                 var confirmed = await Application.Current.Dispatcher.InvokeAsync(
                     () => deleteConfirmation.ConfirmHeatReformIfOfficialResultsExistAsync(
                         swimEvent.Id,
                         EntityDisplayFormatter.FormatSwimEvent(swimEvent)));
-
                 if (!await confirmed)
                     return OperationItemOutcome.Skipped();
-
                 ct.ThrowIfCancellationRequested();
                 return batch.AllocateEvent(swimEvent.Id);
             });
-
         await LoadDataAsync();
     }
 
@@ -329,11 +290,9 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView
     {
         if (SelectedItems.Count == 0)
             return;
-
         var dialog = _windowFactory.CreateAndShowAndReturn<ReportGenerationWindow>();
         if (dialog.DataContext is not IWindowResult { Result: ReportGenerationResult result })
             return;
-
         var options = new ReportExportOptions
         {
             SwimEventIds = SelectedItems.Select(se => se.Id).ToList(),
@@ -342,7 +301,6 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView
             IncludeStartList = result.IncludeStartList,
             IncludeFinishList = result.IncludeFinishList
         };
-
         await RunSingleOperationAsync(
             Strings.Operation_Reports_Header,
             Strings.Operation_Reports_Running_Message,
@@ -361,16 +319,12 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView
                         IncludeStartList = options.IncludeStartList,
                         IncludeFinishList = options.IncludeFinishList
                     };
-
                     using var scope = App.Current.Services.CreateScope();
                     scope.ServiceProvider.GetRequiredService<IReportExportService>()
                         .ExportToExcel(tempOptions);
-
                     ct.ThrowIfCancellationRequested();
-
                     if (File.Exists(options.OutputFilePath))
                         File.Delete(options.OutputFilePath);
-
                     File.Move(tempPath, options.OutputFilePath);
                     return OperationItemOutcome.Success();
                 }
@@ -396,16 +350,13 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView
     {
         if (SelectedItems.Count == 0)
             return;
-
         var dialog = _windowFactory.CreateAndShowAndReturn<StartTimeCalculationWindow>();
         if (dialog.DataContext is not IWindowResult { Result: StartTimeCalculationResult result })
             return;
-
         var swimEventIds = SelectedItems
             .OrderBy(swimEvent => swimEvent.Order)
             .Select(swimEvent => swimEvent.Id)
             .ToList();
-
         await RunSingleOperationAsync(
             Strings.Operation_StartTimes_Header,
             Strings.Operation_StartTimes_Running_Message,
@@ -418,7 +369,6 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView
                     .CalculateStartTimesAsync(swimEventIds, result.ToParameters(), ct);
                 return OperationItemOutcome.Success();
             });
-
         await LoadDataAsync();
     }
 

@@ -32,7 +32,6 @@ public class AgeGroup : IValidatableObject
                 ValidationStrings.AgeGroup_InvalidYearRange,
                 [nameof(BirthYearMin), nameof(BirthYearMax)]);
         }
-
         var existed = currContext?.AgeGroups
             .FirstOrDefault(ageGroup => ageGroup.Gender == Gender &&
                                         ageGroup.BirthYearMin == BirthYearMin &&

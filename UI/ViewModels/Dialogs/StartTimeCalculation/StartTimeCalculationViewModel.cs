@@ -4,7 +4,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ServiceLayer.EventService;
 using UI.Resources;
-using UI.Services;
 
 namespace UI.ViewModels.Dialogs.StartTimeCalculation;
 
@@ -13,7 +12,6 @@ public partial class StartTimeCalculationViewModel : ViewModelBase, IWindowResul
     [ObservableProperty] private int _eventPauseMinutes = 1;
     [ObservableProperty] private int _heatPauseMinutes = 1;
     [ObservableProperty] private ObservableCollection<string> _validationErrors = [];
-
     public StartTimeCalculationViewModel(IEventService eventService)
     {
         ValidationErrors.CollectionChanged += OnValidationErrorsChanged;
@@ -24,17 +22,11 @@ public partial class StartTimeCalculationViewModel : ViewModelBase, IWindowResul
 
     public IReadOnlyList<string> HourOptions { get; } = CreateTimePartOptions(24);
     public IReadOnlyList<string> MinuteOptions { get; } = CreateTimePartOptions(60);
-
     public string WindowTitle => Strings.StartTimes_WindowTitle;
-
     public bool HasErrors => ValidationErrors.Count > 0;
-
     public StartTimeCalculationResult? Result { get; private set; }
-
     object? IWindowResult.Result => Result;
-
     public event EventHandler? CloseRequested;
-
     public string HourText
     {
         get => _hour?.ToString("00") ?? string.Empty;
@@ -42,7 +34,6 @@ public partial class StartTimeCalculationViewModel : ViewModelBase, IWindowResul
         {
             if (!TryParseTimePart(value, 23, out var hour))
                 return;
-
             UpdateTime(hour, _minute);
         }
     }
@@ -54,14 +45,12 @@ public partial class StartTimeCalculationViewModel : ViewModelBase, IWindowResul
         {
             if (!TryParseTimePart(value, 59, out var minute))
                 return;
-
             UpdateTime(_hour, minute);
         }
     }
 
     private int? _hour = 9;
     private int? _minute = 0;
-
     private void OnValidationErrorsChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         OnPropertyChanged(nameof(HasErrors));
@@ -71,25 +60,21 @@ public partial class StartTimeCalculationViewModel : ViewModelBase, IWindowResul
     private void Save()
     {
         ValidationErrors.Clear();
-
         if (!_hour.HasValue || !_minute.HasValue)
         {
             ValidationErrors.Add(Strings.StartTimes_Validation_StartTimeRequired);
             return;
         }
-
         if (HeatPauseMinutes < 0)
         {
             ValidationErrors.Add(Strings.StartTimes_Validation_HeatPauseNonNegative);
             return;
         }
-
         if (EventPauseMinutes < 0)
         {
             ValidationErrors.Add(Strings.StartTimes_Validation_EventPauseNonNegative);
             return;
         }
-
         Result = new StartTimeCalculationResult(
             new TimeOnly(_hour.Value, _minute.Value),
             TimeSpan.FromMinutes(HeatPauseMinutes),
@@ -119,13 +104,11 @@ public partial class StartTimeCalculationViewModel : ViewModelBase, IWindowResul
             value = null;
             return true;
         }
-
         if (int.TryParse(text.Trim(), out var parsed) && parsed >= 0 && parsed <= max)
         {
             value = parsed;
             return true;
         }
-
         value = null;
         return false;
     }

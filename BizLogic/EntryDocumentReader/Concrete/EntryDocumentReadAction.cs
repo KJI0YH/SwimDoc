@@ -1,8 +1,7 @@
-using System.Diagnostics.Contracts;
-using System.IO.Pipes;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using BizDbAccess;
+using BizDbAccess.EntryDocumentReader;
 using BizLogic.GenericInterfaces;
 using BizLogic.Helpers;
 using BizLogic.Resources;
@@ -10,27 +9,23 @@ using DataLayer.EfClasses;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 
-namespace BizLogic.EntryDocumentReaderLogic.Concrete;
+namespace BizLogic.EntryDocumentReader.Concrete;
 
 public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAccess)
     : BizActionErrors, IEntryDocumentReadAction
 {
     private static readonly string[] SettingsWorksheetNames = ["Настройки", "Settings"];
-
     private const string FIRSTNAME_HEADER = "FirstName";
     private const string LASTNAME_HEADER = "LastName";
     private const string BIRTH_YEAR_HEADER = "BirthYear";
     private const string GENDER_HEADER = "Gender";
     private const string CATEGORY_HEADER = "Category";
-
     private const string CLUB_NAME_HEADER = "ClubName";
-
     private static readonly string[] ButterflyNames = ["Баттерфляй", "Butterfly"];
     private static readonly string[] BackstrokeNames = ["На спине", "Backstroke"];
     private static readonly string[] BreaststrokeNames = ["Брасс", "Breaststroke"];
     private static readonly string[] FreestyleNames = ["Вольный стиль", "Freestyle"];
     private static readonly string[] MedleyNames = ["Комплексное плавание", "Medley"];
-
     private static readonly Dictionary<string, string[]> HeaderAliases = new(StringComparer.OrdinalIgnoreCase)
     {
         [FIRSTNAME_HEADER] = ["Имя", "First name", "First Name", "Firstname"],
@@ -40,34 +35,29 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
         [CATEGORY_HEADER] = ["Разряд", "Category"],
         [CLUB_NAME_HEADER] = ["Команда", "Team", "Club", "Team name", "Club name"]
     };
-
     private List<string> _warnings;
     private List<string> _errors;
 
     [GeneratedRegex(@"(?:\d{1,}\D)?[0-5]\d\D\d{2}")]
     private static partial Regex EntryTimeRegex();
-
     public IReadOnlyList<EntryDocument> Action(string dataIn) => Action(dataIn, CancellationToken.None);
-
     public IReadOnlyList<EntryDocument> Action(string dataIn, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         if (!File.Exists(dataIn))
             throw new FileNotFoundException(string.Format(CultureInfo.CurrentUICulture, EntryImportStrings.FileNotFound_Format, dataIn));
-        using var package = new ExcelPackage(dataIn);
+        using var package = OpenEntryFile(dataIn);
         var workBook = package.Workbook;
         var worksheets = workBook.Worksheets
             .Where(worksheet =>
                 !SettingsWorksheetNames.Contains(worksheet.Name?.Trim() ?? string.Empty, StringComparer.OrdinalIgnoreCase))
             .ToList();
-
         var documents = new List<EntryDocument>(worksheets.Count);
         foreach (var worksheet in worksheets)
         {
             cancellationToken.ThrowIfCancellationRequested();
             documents.Add(ReadClubEntry(worksheet, cancellationToken));
         }
-
         return documents;
     }
 
@@ -79,7 +69,6 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
         var athleteHeaders = FindHeaders(workSheet, cancellationToken, FIRSTNAME_HEADER, LASTNAME_HEADER, BIRTH_YEAR_HEADER, GENDER_HEADER, CATEGORY_HEADER);
         var clubHeaders = FindHeaders(workSheet, cancellationToken, CLUB_NAME_HEADER);
         var swimStyleHeaders = FindSwimStyles(workSheet, cancellationToken);
-        _warnings.AddRange(CheckHeaders(workSheet, athleteHeaders, CATEGORY_HEADER));
         _warnings.AddRange(CheckHeaders(workSheet, clubHeaders, CLUB_NAME_HEADER));
         _errors.AddRange(CheckHeaders(workSheet, athleteHeaders, FIRSTNAME_HEADER, LASTNAME_HEADER, BIRTH_YEAR_HEADER,
             GENDER_HEADER));
@@ -90,7 +79,6 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
         {
             return EntryDocument.OfAthletes(athletes, _warnings, _errors);
         }
-
         club.Athletes = athletes;
         return EntryDocument.OfClub(club, _warnings, _errors);
     }
@@ -117,7 +105,6 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
                 }
             }
         }
-
         return headersCols;
     }
 
@@ -129,7 +116,6 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
             if (headers.Contains(cell.Text, StringComparer.OrdinalIgnoreCase))
                 return cell.Start;
         }
-
         return null;
     }
 
@@ -162,7 +148,6 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
                     MessageLocation(workSheet.Name, distanceRow, col)));
                 continue;
             }
-
             var strokeText = workSheet.Cells[strokeRow, col].Text;
             if (string.IsNullOrWhiteSpace(strokeText)) continue;
             if (!TryParseStroke(strokeText, out var style))
@@ -173,11 +158,9 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
                     MessageLocation(workSheet.Name, strokeRow, col)));
                 continue;
             }
-
             var swimStyle = dbAccess.GetOrAddIndividualSwimStyleByParameters(distance, style);
             swimStyles.Add(col, swimStyle);
         }
-
         return swimStyles;
     }
 
@@ -195,7 +178,6 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
                     header));
             }
         }
-
         return errors;
     }
 
@@ -248,7 +230,6 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
                         MessageLocation(workSheet.Name, row, athleteHeaders[FIRSTNAME_HEADER]!.Column)));
                 hasErrors = true;
             }
-
             var lastName = workSheet.Cells[row, athleteHeaders[LASTNAME_HEADER]!.Column].Text;
             if (string.IsNullOrWhiteSpace(lastName))
             {
@@ -259,7 +240,6 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
                         MessageLocation(workSheet.Name, row, athleteHeaders[LASTNAME_HEADER]!.Column)));
                 hasErrors = true;
             }
-
             if (!int.TryParse(workSheet.Cells[row, athleteHeaders[BIRTH_YEAR_HEADER]!.Column].Text,
                     out var yearOfBirth))
             {
@@ -270,7 +250,6 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
                         MessageLocation(workSheet.Name, row, athleteHeaders[BIRTH_YEAR_HEADER]!.Column)));
                 hasErrors = true;
             }
-
             if (!TryParseGender(workSheet.Cells[row, athleteHeaders[GENDER_HEADER]!.Column].Text, out var gender))
             {
                 _warnings.Add(
@@ -280,22 +259,9 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
                         MessageLocation(workSheet.Name, row, athleteHeaders[GENDER_HEADER]!.Column)));
                 hasErrors = true;
             }
-
-            if (!EnumHelper.TryGetEnumByDescription<Category>(
-                    workSheet.Cells[row, athleteHeaders[CATEGORY_HEADER]!.Column]!.Text, out var category))
-            {
-                _warnings.Add(
-                    string.Format(
-                        CultureInfo.CurrentUICulture,
-                        EntryImportStrings.AthleteCategoryInvalid_Format,
-                        MessageLocation(workSheet.Name, row, athleteHeaders[CATEGORY_HEADER]!.Column)));
-                category = Category.NoCategory;
-            }
-
+            var category = ResolveCategory(workSheet, athleteHeaders, row);
             if (hasErrors) continue;
-
             var athlete = dbAccess.GetOrAddAthlete(firstName, lastName, yearOfBirth, gender, category);
-
             var entryCols = swimStyleHeaders.Keys.Where(col => workSheet.Cells[row, col].Value != null &&
                                                                !string.IsNullOrWhiteSpace(
                                                                    workSheet.Cells[row, col].Text));
@@ -310,11 +276,9 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
                         : null);
                 entries.Add(entry);
             }
-
             athlete.Entries = entries;
             athletes.Add(athlete);
         }
-
         return athletes;
     }
 
@@ -323,7 +287,6 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
         if (!clubHeaders.TryGetValue(CLUB_NAME_HEADER, out var colClub)) return null;
         var row = clubHeaders.First(pair => pair.Key == CLUB_NAME_HEADER).Value!.Row;
         var col = colClub!.Column;
-
         var clubName = workSheet.Cells[row, col].Text;
         if (string.Equals(clubName?.Trim(), HeaderAliases[CLUB_NAME_HEADER].First(), StringComparison.OrdinalIgnoreCase) ||
             HeaderAliases[CLUB_NAME_HEADER].Contains(clubName ?? string.Empty, StringComparer.OrdinalIgnoreCase))
@@ -339,7 +302,6 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
                 MessageLocation(workSheet.Name, null, null)));
             return null;
         }
-
         return dbAccess.GetOrAddClub(clubName);
     }
 
@@ -362,5 +324,45 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
     {
         if (++counter % interval == 0)
             cancellationToken.ThrowIfCancellationRequested();
+    }
+
+    private Category ResolveCategory(
+        ExcelWorksheet workSheet,
+        Dictionary<string, ExcelCellAddress?> athleteHeaders,
+        int row)
+    {
+        if (!athleteHeaders.TryGetValue(CATEGORY_HEADER, out var categoryHeader) || categoryHeader is null)
+            return Category.NoCategory;
+
+        var categoryText = workSheet.Cells[row, categoryHeader.Column].Text;
+        if (string.IsNullOrWhiteSpace(categoryText))
+            return Category.NoCategory;
+
+        if (EnumHelper.TryGetEnumByDescription<Category>(categoryText, out var category))
+            return category;
+
+        _warnings.Add(
+            string.Format(
+                CultureInfo.CurrentUICulture,
+                EntryImportStrings.AthleteCategoryInvalid_Format,
+                MessageLocation(workSheet.Name, row, categoryHeader.Column)));
+        return Category.NoCategory;
+    }
+
+    private static ExcelPackage OpenEntryFile(string filePath)
+    {
+        try
+        {
+            return ExcelPackageLoader.Open(filePath);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            throw new IOException(
+                string.Format(
+                    CultureInfo.CurrentUICulture,
+                    EntryImportStrings.FileBusyOrUnavailable_Format,
+                    Path.GetFileName(filePath)),
+                ex);
+        }
     }
 }

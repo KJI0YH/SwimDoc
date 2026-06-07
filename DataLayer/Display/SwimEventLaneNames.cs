@@ -8,7 +8,6 @@ public static class SwimEventLaneNames
     {
         if (string.IsNullOrWhiteSpace(customLaneNames))
             return [];
-
         return customLaneNames
             .Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
             .ToList();
@@ -42,7 +41,6 @@ public static class SwimEventLaneNames
             if (index >= 0 && index < names.Count)
                 return names[index];
         }
-
         return lane.ToString();
     }
 
@@ -58,7 +56,6 @@ public static class SwimEventLaneNames
                 _ => $"{names[0]}-{names[^1]}"
             };
         }
-
         return $"{swimEvent.LaneMin}-{swimEvent.LaneMax}";
     }
 

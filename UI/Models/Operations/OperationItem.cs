@@ -6,7 +6,6 @@ namespace UI.Models.Operations;
 public partial class OperationItem : ObservableObject
 {
     public OperationItem(string eventName) => EventName = eventName;
-
     [ObservableProperty] private string _eventName;
     [ObservableProperty] private bool _isDetailsOpen;
     [ObservableProperty] private bool _isSummaryRow;
@@ -16,7 +15,6 @@ public partial class OperationItem : ObservableObject
     [ObservableProperty] private int _warningsCount;
     [ObservableProperty] private int _errorsCount;
     [ObservableProperty] private int? _heatsCreatedCount;
-
     public string? HeatsCreatedDisplay =>
         HeatsCreatedCount.HasValue ? HeatsCreatedCount.Value.ToString() : null;
 

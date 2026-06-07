@@ -1,9 +1,8 @@
 using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
-using BizDbAccess;
 using BizDbAccess.EntryDocumentReader;
-using BizLogic.EntryDocumentReaderLogic;
-using BizLogic.EntryDocumentReaderLogic.Concrete;
+using BizLogic.EntryDocumentReader;
+using BizLogic.EntryDocumentReader.Concrete;
 using DataLayer.EfClasses;
 using DataLayer.EfCore;
 using Microsoft.EntityFrameworkCore;
@@ -15,8 +14,10 @@ namespace ServiceLayer.EntryDocumentReaderService;
 public class EntryDocumentReaderService(EfCoreContext context) : IEntryDocumentReaderService
 {
     private readonly EfCoreContext _context = context;
+
     private readonly RunnerWriteDbWithValidation<string, IReadOnlyList<EntryDocument>> _runner = new(
         new EntryDocumentReadAction(new EntryDocumentReaderDbAccess(context)), context);
+
     public IImmutableList<ValidationResult> Errors => _runner.Errors;
 
     public IReadOnlyList<EntryDocument> Read(string filePath)
@@ -31,17 +32,12 @@ public class EntryDocumentReaderService(EfCoreContext context) : IEntryDocumentR
         bool saveChanges = true)
     {
         cancellationToken.ThrowIfCancellationRequested();
-
         var action = new EntryDocumentReadAction(new EntryDocumentReaderDbAccess(_context));
         var documents = action.Action(filePath, cancellationToken);
-
         if (action.Errors.Any())
             throw new EntryDocumentReaderException();
-
         cancellationToken.ThrowIfCancellationRequested();
-
         _context.ChangeTracker.DetectChanges();
-
         ImportDocumentStats.CountScanned(
             documents,
             out var clubsScanned,
@@ -50,14 +46,12 @@ public class EntryDocumentReaderService(EfCoreContext context) : IEntryDocumentR
             out var athletesWithErrors,
             out var entriesScanned,
             out var entriesWithErrors);
-
         var clubsAdded = _context.ChangeTracker.Entries<Club>().Count(e => e.State == EntityState.Added);
         var clubsUpdated = _context.ChangeTracker.Entries<Club>().Count(e => e.State == EntityState.Modified);
         var athletesAdded = _context.ChangeTracker.Entries<Athlete>().Count(e => e.State == EntityState.Added);
         var athletesUpdated = _context.ChangeTracker.Entries<Athlete>().Count(e => e.State == EntityState.Modified);
         var entriesAdded = _context.ChangeTracker.Entries<Entry>().Count(e => e.State == EntityState.Added);
         var entriesUpdated = _context.ChangeTracker.Entries<Entry>().Count(e => e.State == EntityState.Modified);
-
         if (saveChanges)
         {
             cancellationToken.ThrowIfCancellationRequested();

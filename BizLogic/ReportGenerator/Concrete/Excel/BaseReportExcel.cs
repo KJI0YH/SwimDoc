@@ -9,5 +9,4 @@ public abstract class BaseReportExcel(EfCoreContext dbContext)
 {
     protected readonly ReportGeneratorDbAccess DbAccess = new ReportGeneratorDbAccess(dbContext);
     public abstract void AddWorksheet(ExcelPackage package, List<int> swimEventIds);
-
 }

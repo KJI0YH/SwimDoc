@@ -13,8 +13,6 @@ using ServiceLayer.EventService;
 using ServiceLayer.HeatService;
 using ServiceLayer.PointScoreProvider;
 using ServiceLayer.SwimStyleService;
-using UI.Helpers;
-using UI.Services;
 using UI.ViewModels;
 using UI.ViewModels.Pages;
 
@@ -25,9 +23,7 @@ public class HeatsByAthleteViewModel : HeatsViewModel
     private int? _athleteId;
     private int? _focusEntryId;
     private int? _focusSwimEventId;
-
     protected override bool UsesHeatPaging => false;
-
     public HeatsByAthleteViewModel(IEventService eventService, IHeatService heatService,
         INavigationService navigationService) : base(eventService, heatService, navigationService)
     {
@@ -44,10 +40,8 @@ public class HeatsByAthleteViewModel : HeatsViewModel
     protected override void OnItemsLoaded(IReadOnlyList<SwimEvent> items)
     {
         base.OnItemsLoaded(items);
-
         if (!_focusSwimEventId.HasValue)
             return;
-
         var focusEvent = items.FirstOrDefault(e => e.Id == _focusSwimEventId.Value);
         if (focusEvent is not null)
             SelectedSwimEvent = focusEvent;
@@ -60,7 +54,6 @@ public class HeatsByAthleteViewModel : HeatsViewModel
             HeatPositions = [];
             return;
         }
-
         IsLoading = true;
         try
         {
@@ -79,7 +72,6 @@ public class HeatsByAthleteViewModel : HeatsViewModel
                 .ToList();
             HeatPositions = new ObservableCollection<HeatPositionView>(heatPositionViews);
             UpdateHeatPaging(heatsForAthlete.Count, resetPage: false);
-
             if (_focusEntryId.HasValue)
             {
                 SelectedHeatPosition = heatPositionViews.FirstOrDefault(p => p.EntryId == _focusEntryId.Value);
@@ -98,23 +90,22 @@ public class HeatsByAthleteViewModel : HeatsViewModel
         query = base.ApplyQuery(query);
         return _athleteId.HasValue
             ? query.Select(se => new SwimEvent
-                {
-                    Id = se.Id,
-                    Date = se.Date,
-                    Time = se.Time,
-                    Order = se.Order,
-                    AgeGroup = se.AgeGroup,
-                    SwimStyle = se.SwimStyle,
-                    LaneMin = se.LaneMin,
-                    LaneMax = se.LaneMax,
-
-                    Heats = se.Heats
+            {
+                Id = se.Id,
+                Date = se.Date,
+                Time = se.Time,
+                Order = se.Order,
+                AgeGroup = se.AgeGroup,
+                SwimStyle = se.SwimStyle,
+                LaneMin = se.LaneMin,
+                LaneMax = se.LaneMax,
+                Heats = se.Heats
                         .Where(heat => heat.Positions.Any(hp =>
                             hp.Entry.AthleteId == _athleteId.Value ||
                             (hp.Entry.Relay != null &&
                              hp.Entry.Relay.Positions.Any(p => p.AthleteId == _athleteId.Value))))
                         .ToList()
-                })
+            })
                 .Where(se => se.Heats.Any())
             : query.Where(_ => false);
     }

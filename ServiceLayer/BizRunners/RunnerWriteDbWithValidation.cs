@@ -9,7 +9,6 @@ public class RunnerWriteDbWithValidation<TIn, TOut>
 {
     private readonly IBizAction<TIn, TOut> _actionClass;
     private readonly EfCoreContext _context;
-
     public RunnerWriteDbWithValidation(IBizAction<TIn, TOut> actionClass, EfCoreContext context)
     {
         _actionClass = actionClass;
@@ -18,7 +17,6 @@ public class RunnerWriteDbWithValidation<TIn, TOut>
 
     public IImmutableList<ValidationResult> Errors { get; private set; }
     public bool HasErrors => Errors.Any();
-
     public TOut RunAction(TIn dataIn)
     {
         var result = _actionClass.Action(dataIn);
@@ -28,7 +26,6 @@ public class RunnerWriteDbWithValidation<TIn, TOut>
             Errors = _context.SaveChangesWithValidation()
                 .ToImmutableList();
         }
-
         return result;
     }
 }

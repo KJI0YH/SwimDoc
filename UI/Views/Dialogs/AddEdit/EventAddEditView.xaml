@@ -3,15 +3,17 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:helpers="clr-namespace:UI.Helpers"
+             xmlns:displayHelpers="clr-namespace:UI.Helpers.Display"
+             xmlns:converters="clr-namespace:UI.Helpers.Converters"
+             xmlns:uiHelpers="clr-namespace:UI.Helpers.Controls"
              xmlns:controls="clr-namespace:UI.Views.Controls"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:searchableComboBox="clr-namespace:UI.Views.Controls.SearchableComboBox"
              xmlns:loc="clr-namespace:UI.Localization"
              mc:Ignorable="d">
     <UserControl.Resources>
-        <helpers:EnumDescriptionConverter x:Key="EnumDescriptionConverter" />
-                <helpers:NullableIntConverter x:Key="NullableIntConverter" />
+        <displayHelpers:EnumDescriptionConverter x:Key="EnumDescriptionConverter" />
+                <converters:NullableIntConverter x:Key="NullableIntConverter" />
     </UserControl.Resources>
     <StackPanel>
                 <Grid Margin="0,5">

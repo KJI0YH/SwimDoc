@@ -1,6 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using UI.Resources;
-using UI.Services;
 using Wpf.Ui.Controls;
 
 namespace UI.ViewModels.Pages;
@@ -8,13 +7,9 @@ namespace UI.ViewModels.Pages;
 public sealed partial class PagingSettingItemViewModel : ObservableObject
 {
     private readonly IPagingSettingsService _pagingSettings;
-
     public PagingPage Page { get; }
-
     public string Title { get; }
-
     public string Description => Strings.Settings_Paging_PageSize;
-
     public SymbolRegular IconSymbol => Page switch
     {
         PagingPage.Events => SymbolRegular.CalendarLtr24,
@@ -26,9 +21,7 @@ public sealed partial class PagingSettingItemViewModel : ObservableObject
         PagingPage.SwimStyles => SymbolRegular.Accessibility24,
         _ => SymbolRegular.Document24
     };
-
     [ObservableProperty] private int _pageSize;
-
     public PagingSettingItemViewModel(IPagingSettingsService pagingSettings, PagingPage page)
     {
         _pagingSettings = pagingSettings;
@@ -49,7 +42,6 @@ public sealed partial class PagingSettingItemViewModel : ObservableObject
     {
         if (page != Page)
             return;
-
         var size = _pagingSettings.GetPageSize(Page);
         if (size != PageSize)
             PageSize = size;

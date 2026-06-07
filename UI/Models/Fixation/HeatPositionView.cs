@@ -1,7 +1,6 @@
 using DataLayer;
 using DataLayer.Display;
 using DataLayer.EfClasses;
-using UI.Helpers;
 using UI.Resources;
 
 namespace UI.Models.Fixation;
@@ -17,9 +16,7 @@ public sealed class HeatPositionView(
     string heatDayTime)
 {
     private HeatPosition HeatPosition { get; set; } = heatPosition;
-
     public Entry Entry => HeatPosition.Entry;
-
     public int HeatId => HeatPosition.HeatId;
     public int EntryId => HeatPosition.EntryId;
     public HeatStatus HeatStatus { get; } = heatStatus;
@@ -32,7 +29,6 @@ public sealed class HeatPositionView(
         heatDayTime,
         heatStatus);
     public int Lane => HeatPosition.Lane;
-
     public string DisplayLane => swimEvent is not null
         ? SwimEventLaneNames.GetLaneDisplay(swimEvent, HeatPosition.Lane)
         : HeatPosition.Lane.ToString();

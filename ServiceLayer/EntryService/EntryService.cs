@@ -23,27 +23,21 @@ public class EntryService(EfCoreContext dbContext) : CrudService<Entry, int?>(db
         CancellationToken cancellationToken = default)
     {
         entity = dbContext.NormalizeEntry(entity);
-
         if (entity.Relay == null && entity.RelayId == null)
             return await UpdateIndividualEntryAsync(entity, cancellationToken);
-
         var id = entity.Id;
         var tracked = await dbContext.Entries
             .Include(e => e.Relay)
             .ThenInclude(r => r.Positions)
             .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
-
         if (tracked == null)
             throw new InvalidOperationException($"Entity with Id {id} was not found in the database.");
-
         var preservedStatus = tracked.Status;
         var heatPosition = await dbContext.HeatPositions
             .FirstOrDefaultAsync(hp => hp.EntryId == id, cancellationToken);
         var swimEventIdBeforeUpdate = tracked.SwimEventId;
-
         dbContext.Entry(tracked).CurrentValues.SetValues(entity);
         ApplyHeatEntryUpdateRules(tracked, preservedStatus, heatPosition, swimEventIdBeforeUpdate);
-
         if (tracked.Relay != null)
         {
             if (entity.Relay != null)
@@ -51,12 +45,9 @@ public class EntryService(EfCoreContext dbContext) : CrudService<Entry, int?>(db
                 tracked.Relay.ClubId = entity.Relay.ClubId;
                 tracked.Relay.Number = entity.Relay.Number;
             }
-
             var incomingPositions = entity.Relay?.Positions?.ToList() ?? [];
-
             tracked.Relay.Positions ??= new List<RelayPosition>();
             tracked.Relay.Positions.Clear();
-
             foreach (var p in incomingPositions.OrderBy(p => p.Order))
             {
                 tracked.Relay.Positions.Add(new RelayPosition
@@ -68,11 +59,9 @@ public class EntryService(EfCoreContext dbContext) : CrudService<Entry, int?>(db
                 });
             }
         }
-
         var errors = await dbContext.SaveChangesWithValidationAsync();
         if (errors.Count > 0)
             await dbContext.Entry(tracked).ReloadAsync(cancellationToken).ConfigureAwait(false);
-
         return (tracked, errors);
     }
 
@@ -84,19 +73,15 @@ public class EntryService(EfCoreContext dbContext) : CrudService<Entry, int?>(db
         var tracked = await dbContext.Entries.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
         if (tracked == null)
             throw new InvalidOperationException($"Entity with Id {id} was not found in the database.");
-
         var preservedStatus = tracked.Status;
         var heatPosition = await dbContext.HeatPositions
             .FirstOrDefaultAsync(hp => hp.EntryId == id, cancellationToken);
         var swimEventIdBeforeUpdate = tracked.SwimEventId;
-
         dbContext.Entry(tracked).CurrentValues.SetValues(entity);
         ApplyHeatEntryUpdateRules(tracked, preservedStatus, heatPosition, swimEventIdBeforeUpdate);
-
         var errors = await dbContext.SaveChangesWithValidationAsync();
         if (errors.Count > 0)
             await dbContext.Entry(tracked).ReloadAsync(cancellationToken).ConfigureAwait(false);
-
         return (tracked, errors);
     }
 
@@ -108,7 +93,6 @@ public class EntryService(EfCoreContext dbContext) : CrudService<Entry, int?>(db
     {
         if (heatPosition is null)
             return;
-
         if (tracked.SwimEventId != swimEventIdBeforeUpdate)
             dbContext.HeatPositions.Remove(heatPosition);
         else
@@ -145,10 +129,8 @@ public class EntryService(EfCoreContext dbContext) : CrudService<Entry, int?>(db
             .Include(se => se.SwimStyle)
             .OrderBy(se => se.Order)
             .ToListAsync();
-
         if (events.Count == 0)
             return new CombinedResultsData([], []);
-
         var eventIds = events.Select(se => se.Id).ToList();
         var entries = await dbContext.Entries
             .AsNoTracking()
@@ -157,14 +139,12 @@ public class EntryService(EfCoreContext dbContext) : CrudService<Entry, int?>(db
             .Include(e => e.Athlete!)
             .ThenInclude(a => a.Club)
             .ToListAsync();
-
         var eventColumns = events
             .Select(se => new CombinedResultsEventColumn(
                 se.Id,
                 LocalizedEntityDisplayFormatter.FormatSwimStyle(se.SwimStyle),
                 entries.Any(entry => entry.SwimEventId == se.Id && entry.Scoring)))
             .ToList();
-
         var athletes = entries
             .GroupBy(e => e.AthleteId!.Value)
             .Select(group =>
@@ -172,20 +152,16 @@ public class EntryService(EfCoreContext dbContext) : CrudService<Entry, int?>(db
                 var athlete = group.First().Athlete!;
                 var pointsByEventId = new Dictionary<int, int?>();
                 var scoringByEventId = new Dictionary<int, bool>();
-
                 foreach (var swimEvent in events)
                 {
                     var entry = group.FirstOrDefault(e => e.SwimEventId == swimEvent.Id);
                     if (entry is null)
                         continue;
-
                     pointsByEventId[swimEvent.Id] = entry.Points;
                     scoringByEventId[swimEvent.Id] = entry.Scoring;
                 }
-
                 var totalPoints = group.Where(e => e.Scoring).Sum(e => e.Points ?? 0);
                 var isInOfficialStandings = group.Any(e => e.Scoring);
-
                 return new CombinedResultsAthleteRow(
                     athlete,
                     pointsByEventId,
@@ -198,7 +174,6 @@ public class EntryService(EfCoreContext dbContext) : CrudService<Entry, int?>(db
             .ThenBy(row => row.Athlete.LastName)
             .ThenBy(row => row.Athlete.FirstName)
             .ToList();
-
         return new CombinedResultsData(eventColumns, athletes);
     }
 
@@ -215,10 +190,8 @@ public class EntryService(EfCoreContext dbContext) : CrudService<Entry, int?>(db
                 CultureInfo.CurrentUICulture,
                 ServiceErrorStrings.Entry_Copy_EventNotFound_Format,
                 targetEventId));
-
         if (targetEvent.RoundParticipantsCount is null or <= 0)
             throw new InvalidOperationException(ServiceErrorStrings.Entry_Copy_RoundParticipantsCountMissing);
-
         var previousEvent = await dbContext.SwimEvents
             .AsNoTracking()
             .FirstOrDefaultAsync(e => e.Id == previousEventId, cancellationToken);
@@ -227,22 +200,17 @@ public class EntryService(EfCoreContext dbContext) : CrudService<Entry, int?>(db
                 CultureInfo.CurrentUICulture,
                 ServiceErrorStrings.Entry_Copy_EventNotFound_Format,
                 previousEventId));
-
         if (previousEvent.Status != SwimEventStatus.OFFICIAL)
             throw new InvalidOperationException(ServiceErrorStrings.Entry_Copy_PreviousEventMustBeOfficial);
-
         var orderedEntries = await GetEntriesByEventIdOrderByFinishTimeAsync(previousEventId);
         var finishers = orderedEntries
             .Where(e => e.Status == EntryStatus.FINISH && e.FinishTime.HasValue)
             .ToList();
-
         var selectedSources = SelectQualifiersByFinishTime(finishers, targetEvent.RoundParticipantsCount.Value);
         if (selectedSources.Count == 0)
             throw new InvalidOperationException(ServiceErrorStrings.Entry_Copy_NoFinishersWithTime);
-
         var created = new List<Entry>();
         var errors = new List<ValidationResult>();
-
         foreach (var source in selectedSources)
         {
             var entry = BuildEntryFromPreviousResult(source, targetEvent);
@@ -252,7 +220,6 @@ public class EntryService(EfCoreContext dbContext) : CrudService<Entry, int?>(db
             else if (entity is not null)
                 created.Add(entity);
         }
-
         return (created, errors);
     }
 
@@ -260,7 +227,6 @@ public class EntryService(EfCoreContext dbContext) : CrudService<Entry, int?>(db
     {
         if (finishers.Count <= participantCount)
             return finishers;
-
         var cutoffFinishTime = finishers[participantCount - 1].FinishTime;
         return finishers
             .TakeWhile((entry, index) =>
@@ -278,16 +244,13 @@ public class EntryService(EfCoreContext dbContext) : CrudService<Entry, int?>(db
             EntryTime = source.FinishTime,
             Comment = source.Comment
         };
-
         if (source.AthleteId.HasValue)
         {
             entry.AthleteId = source.AthleteId;
             return dbContext.NormalizeEntry(entry);
         }
-
         if (source.Relay is null)
             return dbContext.NormalizeEntry(entry);
-
         entry.Relay = new Relay
         {
             ClubId = source.Relay.ClubId,
@@ -302,26 +265,20 @@ public class EntryService(EfCoreContext dbContext) : CrudService<Entry, int?>(db
                 })
                 .ToList()
         };
-
         return dbContext.NormalizeEntry(entry);
     }
 
     public override async Task DeleteAsync(int? id, CancellationToken cancellationToken = default)
     {
         if (id == null) return;
-
         var entry = await dbContext.Entries
             .Include(e => e.Relay)
             .FirstOrDefaultAsync(e => e.Id == id.Value, cancellationToken);
-
         if (entry == null) return;
-
         var relay = entry.Relay;
         dbContext.Entries.Remove(entry);
-
         if (relay != null)
             dbContext.Relays.Remove(relay);
-
         await dbContext.SaveChangesAsync(cancellationToken);
     }
 }
