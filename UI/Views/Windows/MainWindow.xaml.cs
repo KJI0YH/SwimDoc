@@ -106,13 +106,12 @@ public partial class MainWindow : FluentWindow
     {
         if (_isApplyingNavigationState || _navigationService is null)
             return;
-        if (_viewModel is not { IsCompetitionSelected: true })
-            return;
 
         var pageType = args.Page.GetType();
-        if (!NavigationPageRegistry.IsRootPage(pageType))
-            return;
         if (!NavigationPageRegistry.PageTypeToSidebarTag.TryGetValue(pageType, out var tag))
+            return;
+        if (NavigationPageRegistry.RequiresCompetition(pageType)
+            && _viewModel is not { IsCompetitionSelected: true })
             return;
 
         args.Cancel = true;

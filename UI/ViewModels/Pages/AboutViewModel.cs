@@ -2,6 +2,7 @@ using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using UI.Resources;
+using UI.ViewModels;
 using Wpf.Ui;
 using Wpf.Ui.Controls;
 
@@ -9,7 +10,7 @@ namespace UI.ViewModels.Pages;
 
 public sealed partial class AboutViewModel(
     IGitHubUpdateCheckService gitHubUpdateCheckService,
-    IContentDialogService contentDialogService) : ObservableObject
+    IContentDialogService contentDialogService) : ViewModelBase
 {
     public const string ContactEmail = "aliaksei.kryzhanouski@gmail.com";
     public const string GitHubIssuesUrl = "https://github.com/KJI0YH/SwimDoc/issues/new";

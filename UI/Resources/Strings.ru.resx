@@ -119,7 +119,7 @@
   <data name="Import_Col_Warnings" xml:space="preserve"><value>Предупреждения</value></data>
   <data name="Import_Col_Errors" xml:space="preserve"><value>Ошибки</value></data>
   <data name="Import_EventPrev" xml:space="preserve"><value>Предыдущее событие</value></data>
-  <data name="Import_EventCurrent" xml:space="preserve"><value>Текущее событие</value></data>
+  <data name="Import_EventCurrent" xml:space="preserve"><value>Следующее событие</value></data>
   <data name="Import_CreatedEntries" xml:space="preserve"><value>Создано заявок</value></data>
 
   <data name="Operation_Col_Event" xml:space="preserve"><value>Событие</value></data>
@@ -177,7 +177,7 @@
   <data name="Import_Summary_FilesCountFormat" xml:space="preserve"><value>Файлов: {0}</value></data>
 
   <data name="Import_Event_Success_Header" xml:space="preserve"><value>Заявки загружены из события</value></data>
-  <data name="Import_Event_Success_MessageFormat" xml:space="preserve"><value>Создано заявок: {0}. Текущее событие: {1}</value></data>
+  <data name="Import_Event_Success_MessageFormat" xml:space="preserve"><value>Создано заявок: {0}. Следующее событие: {1}</value></data>
   <data name="Import_Event_Partial_Header" xml:space="preserve"><value>Заявки загружены частично</value></data>
   <data name="Import_Event_Partial_MessageFormat" xml:space="preserve"><value>Создано: {0}, ошибок: {1}. Текущее событие: {2}</value></data>
   <data name="Import_Event_Failed_Header" xml:space="preserve"><value>Заявки не загружены</value></data>
@@ -219,8 +219,8 @@
 
   <data name="LoadPrev_WindowTitle" xml:space="preserve"><value>Загрузка заявок из предыдущего события</value></data>
   <data name="LoadPrev_Validation_SelectOfficialPreviousEvent" xml:space="preserve"><value>Выберите предыдущее событие в статусе OFFICIAL.</value></data>
-  <data name="LoadPrev_Validation_SelectCurrentEvent" xml:space="preserve"><value>Выберите текущее событие.</value></data>
-  <data name="LoadPrev_Validation_EventsMustDiffer" xml:space="preserve"><value>Предыдущее и текущее события должны отличаться.</value></data>
+  <data name="LoadPrev_Validation_SelectCurrentEvent" xml:space="preserve"><value>Выберите следующее событие.</value></data>
+  <data name="LoadPrev_Validation_EventsMustDiffer" xml:space="preserve"><value>Предыдущее и следующее события должны отличаться.</value></data>
   <data name="LoadPrev_Validation_RoundParticipantsRequired" xml:space="preserve"><value>Для текущего события задайте количество участников раунда.</value></data>
   <data name="Enum_ImportFileStatus_Pending" xml:space="preserve"><value>В очереди</value></data>
   <data name="Enum_ImportFileStatus_Processing" xml:space="preserve"><value>В обработке</value></data>
@@ -368,7 +368,7 @@
   <data name="Event_Field_CustomLaneNames_Placeholder" xml:space="preserve"><value>Напр. 1,2,3,4,5,6 или 1л,1п,2л,2п (через запятую)</value></data>
 
   <data name="LoadPrev_Field_PreviousEvent" xml:space="preserve"><value>Предыдущее событие</value></data>
-  <data name="LoadPrev_Field_CurrentEvent" xml:space="preserve"><value>Текущее событие</value></data>
+  <data name="LoadPrev_Field_CurrentEvent" xml:space="preserve"><value>Следующее событие</value></data>
 
   <data name="Entry_Tab_Individual" xml:space="preserve"><value>Личная заявка</value></data>
   <data name="Entry_Tab_Relay" xml:space="preserve"><value>Эстафета</value></data>

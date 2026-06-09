@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -6,10 +7,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
 using ServiceLayer.EntryDocumentTemplateService;
 using UI.Resources;
+using UI.ViewModels;
 
 namespace UI.ViewModels.Pages;
 
-public sealed partial class SettingsViewModel : ObservableObject
+public sealed partial class SettingsViewModel : ViewModelBase
 {
     private readonly IEntryDocumentTemplateService _entryDocumentTemplateService;
     private readonly ILocalizationService _localizationService;
@@ -34,11 +36,16 @@ public sealed partial class SettingsViewModel : ObservableObject
         PagingSettings = new ObservableCollection<PagingSettingItemViewModel>(
             PagingSettingsService.NavigationOrder
                 .Select(page => new PagingSettingItemViewModel(pagingSettingsService, page)));
+        _localizationService.CultureChanged += OnCultureChanged;
     }
 
-    partial void OnSelectedLanguageChanged(AppLanguage value)
-    {
+    partial void OnSelectedLanguageChanged(AppLanguage value) =>
         _localizationService.SetLanguage(value);
+
+    private void OnCultureChanged(CultureInfo _)
+    {
+        foreach (var item in PagingSettings)
+            item.RefreshDisplayText();
         BaseTimes.RefreshDisplayNames();
     }
 

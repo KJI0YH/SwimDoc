@@ -5,7 +5,7 @@ namespace UI.Helpers.Navigation;
 
 public static class NavigationPageRegistry
 {
-    public static readonly HashSet<Type> RootViewModelTypes =
+    public static readonly HashSet<Type> CompetitionViewModelTypes =
     [
         typeof(EventsViewModel),
         typeof(EntriesViewModel),
@@ -18,6 +18,13 @@ public static class NavigationPageRegistry
         typeof(SwimStylesViewModel)
     ];
 
+    public static readonly HashSet<Type> RootViewModelTypes =
+    [
+        ..CompetitionViewModelTypes,
+        typeof(SettingsViewModel),
+        typeof(AboutViewModel)
+    ];
+
     public static readonly Dictionary<string, Type> SidebarTagToViewModelType = new()
     {
         ["Events"] = typeof(EventsViewModel),
@@ -28,7 +35,9 @@ public static class NavigationPageRegistry
         ["Athletes"] = typeof(AthletesViewModel),
         ["Clubs"] = typeof(ClubsViewModel),
         ["AgeGroups"] = typeof(AgeGroupsViewModel),
-        ["SwimStyles"] = typeof(SwimStylesViewModel)
+        ["SwimStyles"] = typeof(SwimStylesViewModel),
+        ["Settings"] = typeof(SettingsViewModel),
+        ["About"] = typeof(AboutViewModel)
     };
 
     public static readonly Dictionary<Type, string> ViewModelTypeToSidebarTag =
@@ -61,7 +70,9 @@ public static class NavigationPageRegistry
         [typeof(EntryDetailsViewModel)] = typeof(EntryDetailsPage),
         [typeof(EventDetailsViewModel)] = typeof(EventDetailsPage),
         [typeof(AgeGroupDetailsViewModel)] = typeof(AgeGroupDetailsPage),
-        [typeof(SwimStyleDetailsViewModel)] = typeof(SwimStyleDetailsPage)
+        [typeof(SwimStyleDetailsViewModel)] = typeof(SwimStyleDetailsPage),
+        [typeof(SettingsViewModel)] = typeof(SettingsPage),
+        [typeof(AboutViewModel)] = typeof(AboutPage)
     };
 
     public static readonly Dictionary<Type, string> PageTypeToSidebarTag =
@@ -72,5 +83,12 @@ public static class NavigationPageRegistry
     public static bool IsDetailPage(Type pageType) =>
         ViewModelTypeToPageType.Any(pair => pair.Value == pageType && DetailViewModelTypes.Contains(pair.Key));
 
-    public static bool IsRootPage(Type pageType) => PageTypeToSidebarTag.ContainsKey(pageType);
+    public static bool IsSidebarPage(Type pageType) => PageTypeToSidebarTag.ContainsKey(pageType);
+
+    public static bool RequiresCompetition(Type pageType) =>
+        PageTypeToSidebarTag.TryGetValue(pageType, out var tag) && RequiresCompetitionForTag(tag);
+
+    public static bool RequiresCompetitionForTag(string tag) =>
+        SidebarTagToViewModelType.TryGetValue(tag, out var viewModelType)
+        && CompetitionViewModelTypes.Contains(viewModelType);
 }

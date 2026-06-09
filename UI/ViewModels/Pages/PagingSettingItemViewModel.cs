@@ -8,7 +8,7 @@ public sealed partial class PagingSettingItemViewModel : ObservableObject
 {
     private readonly IPagingSettingsService _pagingSettings;
     public PagingPage Page { get; }
-    public string Title { get; }
+    public string Title => PagingSettingsService.GetPageTitle(Page);
     public string Description => Strings.Settings_Paging_PageSize;
     public SymbolRegular IconSymbol => Page switch
     {
@@ -26,9 +26,14 @@ public sealed partial class PagingSettingItemViewModel : ObservableObject
     {
         _pagingSettings = pagingSettings;
         Page = page;
-        Title = PagingSettingsService.GetPageTitle(page);
         _pageSize = pagingSettings.GetPageSize(page);
         _pagingSettings.PageSizeChanged += OnPagingSettingsChanged;
+    }
+
+    public void RefreshDisplayText()
+    {
+        OnPropertyChanged(nameof(Title));
+        OnPropertyChanged(nameof(Description));
     }
 
     partial void OnPageSizeChanged(int value)
