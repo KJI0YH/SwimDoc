@@ -17,23 +17,6 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0"
-                               Text="{loc:Localizastion SwimStyle_Field_Stroke}"
-                               VerticalAlignment="Center"
-                               Margin="0,0,10,0" />
-                    <ComboBox Grid.Column="1"
-                              ItemsSource="{Binding StrokeOptions}"
-                              SelectedValue="{Binding Stroke}"
-                              SelectedValuePath="Value"
-                              DisplayMemberPath="Display"
-                              Margin="0,2,0,2" />
-                </Grid>
-    
-                <Grid Margin="0,5">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="200" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0"
                                Text="{loc:Localizastion SwimStyle_Field_Distance}"
                                VerticalAlignment="Center"
                                Margin="0,0,10,0" />
@@ -52,6 +35,23 @@
                             </x:Array>
                         </ComboBox.ItemsSource>
                     </ComboBox>
+                </Grid>
+
+                <Grid Margin="0,5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="200" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0"
+                               Text="{loc:Localizastion SwimStyle_Field_Stroke}"
+                               VerticalAlignment="Center"
+                               Margin="0,0,10,0" />
+                    <ComboBox Grid.Column="1"
+                              ItemsSource="{Binding StrokeOptions}"
+                              SelectedValue="{Binding Stroke}"
+                              SelectedValuePath="Value"
+                              DisplayMemberPath="Display"
+                              Margin="0,2,0,2" />
                 </Grid>
     
                 <Grid Margin="0,5">
