@@ -184,4 +184,12 @@
       <None Remove="Assets\BuildAppIcon.ps1" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="Resources\base-times.csv" />
+      <Content Include="Resources\base-times.csv" Link="base-times.csv">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </Content>
+    </ItemGroup>
+
 </Project>

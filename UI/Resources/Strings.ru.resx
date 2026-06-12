@@ -34,7 +34,7 @@
   <data name="About_Section_Support" xml:space="preserve"><value>Контакты и обратная связь</value></data>
   <data name="About_Support_Description" xml:space="preserve"><value>Вопросы, предложения или сообщения об ошибках — напишите на почту или оставьте обращение на GitHub.</value></data>
   <data name="About_Section_License" xml:space="preserve"><value>Лицензия</value></data>
-  <data name="About_License_Text" xml:space="preserve"><value>Программа предоставляется «как есть», без каких-либо гарантий. Сторонние библиотеки распространяются на условиях их собственных лицензий. Исходный код и условия использования опубликованы в репозитории проекта на GitHub.</value></data>
+  <data name="About_License_Text" xml:space="preserve"><value>Бесплатно только для личного и некоммерческого использования (Polyform Noncommercial 1.0.0). Коммерческое использование, перепродажа и платное распространение без разрешения автора запрещены. Программа предоставляется «как есть», без гарантий. Сторонние библиотеки — на условиях их лицензий. Полный текст: github.com/KJI0YH/SwimDoc/blob/main/LICENSE</value></data>
   <data name="About_Action_GitHub_Repository" xml:space="preserve"><value>GitHub</value></data>
   <data name="About_Action_Email" xml:space="preserve"><value>Написать на почту</value></data>
   <data name="About_Action_GitHub" xml:space="preserve"><value>Сообщить об ошибке</value></data>
