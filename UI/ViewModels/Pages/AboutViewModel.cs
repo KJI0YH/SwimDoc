@@ -14,7 +14,6 @@ public sealed partial class AboutViewModel(
 {
     public const string ContactEmail = "aliaksei.kryzhanouski@gmail.com";
     public const string GitHubIssuesUrl = "https://github.com/KJI0YH/SwimDoc/issues/new";
-    public const string GitHubRepositoryUrl = "https://github.com/KJI0YH/SwimDoc";
     public const string GitHubReleasesUrl = "https://github.com/KJI0YH/SwimDoc/releases";
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(CheckForUpdatesCommand))]
@@ -29,11 +28,8 @@ public sealed partial class AboutViewModel(
     public string CopyrightText => Strings.About_Copyright_Text;
     public string SupportSectionTitle => Strings.About_Section_Support;
     public string SupportDescription => Strings.About_Support_Description;
-    public string LicenseSectionTitle => Strings.About_Section_License;
-    public string LicenseText => Strings.About_License_Text;
     public string OpenEmailLabel => Strings.About_Action_Email;
     public string OpenGitHubLabel => Strings.About_Action_GitHub;
-    public string OpenGitHubRepositoryLabel => Strings.About_Action_GitHub_Repository;
     public string CheckForUpdatesLabel =>
         IsCheckingUpdates ? Strings.About_Updates_Checking : Strings.About_Action_CheckUpdates;
 
@@ -47,12 +43,6 @@ public sealed partial class AboutViewModel(
     private void OpenGitHubIssues()
     {
         Process.Start(new ProcessStartInfo(GitHubIssuesUrl) { UseShellExecute = true });
-    }
-
-    [RelayCommand]
-    private void OpenGitHubRepository()
-    {
-        Process.Start(new ProcessStartInfo(GitHubRepositoryUrl) { UseShellExecute = true });
     }
 
     [RelayCommand(CanExecute = nameof(CanCheckForUpdates))]

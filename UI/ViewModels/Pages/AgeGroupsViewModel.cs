@@ -23,9 +23,11 @@ public partial class AgeGroupsViewModel : DataViewModel<AgeGroup, AgeGroupRowVie
 {
     protected override PagingPage PagingSettingsPage => PagingPage.AgeGroups;
     private readonly IAddEditWindowFactory _windowFactory;
-    public AgeGroupsViewModel(IAgeGroupService ageGroupService) : base(ageGroupService)
+    private readonly EfCoreContext _dbContext;
+    public AgeGroupsViewModel(IAgeGroupService ageGroupService, EfCoreContext dbContext) : base(ageGroupService)
     {
         _windowFactory = App.Current.Services.GetRequiredService<IAddEditWindowFactory>();
+        _dbContext = dbContext;
         PropertyChanged += OnViewModelPropertyChanged;
     }
 
@@ -55,11 +57,34 @@ public partial class AgeGroupsViewModel : DataViewModel<AgeGroup, AgeGroupRowVie
             Converter = new BirthYearBoundConverter(),
             ConverterParameter = BirthYearBoundConverter.Max
         });
+        ColumnConfigurations.Add(new ColumnConfiguration<AgeGroup>("ParticipantCount", Strings.AgeGroups_Col_Participants, 120,
+            ColumnConfiguration<AgeGroup>.SortBy(ag => ag.Id)));
+    }
+
+    protected override IQueryable<AgeGroup> ApplyQuery(IQueryable<AgeGroup> query) =>
+        _dbContext.Set<AgeGroup>().AsNoTracking();
+
+    protected override IQueryable<AgeGroup> ApplySorting(IQueryable<AgeGroup> query)
+    {
+        if (!string.Equals(SortColumn, "ParticipantCount", StringComparison.Ordinal))
+            return base.ApplySorting(query);
+
+        var athletes = _dbContext.Set<Athlete>().AsNoTracking();
+        return SortDirection == ListSortDirection.Ascending
+            ? query.OrderBy(ag => athletes.Count(a =>
+                a.YearOfBirth >= (ag.BirthYearMin ?? 0) &&
+                a.YearOfBirth <= (ag.BirthYearMax ?? int.MaxValue) &&
+                (ag.Gender == Gender.Mixed || a.Gender == ag.Gender)))
+            : query.OrderByDescending(ag => athletes.Count(a =>
+                a.YearOfBirth >= (ag.BirthYearMin ?? 0) &&
+                a.YearOfBirth <= (ag.BirthYearMax ?? int.MaxValue) &&
+                (ag.Gender == Gender.Mixed || a.Gender == ag.Gender)));
     }
 
     protected override async Task<List<AgeGroupRowView>> LoadPageRowsAsync(IQueryable<AgeGroup> query)
     {
-        var projections = await RowProjectionQueries.SelectAgeGroup(query).ToListAsync();
+        var athletes = _dbContext.Set<Athlete>().AsNoTracking();
+        var projections = await RowProjectionQueries.SelectAgeGroup(query, athletes).ToListAsync();
         return projections.Select(AgeGroupRowView.FromProjection).ToList();
     }
 

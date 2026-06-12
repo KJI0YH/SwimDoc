@@ -125,6 +125,10 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView
         });
         ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Lanes", Strings.Events_Col_Lanes, 80,
             ColumnConfiguration<SwimEvent>.SortBy(e => e.LaneMin, e => e.LaneMax)));
+        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("EntryCount", Strings.Events_Col_EntryCount, 90,
+            ColumnConfiguration<SwimEvent>.SortBy(e => e.Entries.Count)));
+        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("HeatCount", Strings.Events_Col_HeatCount, 90,
+            ColumnConfiguration<SwimEvent>.SortBy(e => e.Heats.Count)));
         ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Status", Strings.Events_Col_Status, 210,
             ColumnConfiguration<SwimEvent>.SortBy(e => e.Status)));
     }

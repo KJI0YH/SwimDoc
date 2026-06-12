@@ -88,25 +88,12 @@ public class HeatsByAthleteViewModel : HeatsViewModel
     protected override IQueryable<SwimEvent> ApplyQuery(IQueryable<SwimEvent> query)
     {
         query = base.ApplyQuery(query);
-        return _athleteId.HasValue
-            ? query.Select(se => new SwimEvent
-            {
-                Id = se.Id,
-                Date = se.Date,
-                Time = se.Time,
-                Order = se.Order,
-                AgeGroup = se.AgeGroup,
-                SwimStyle = se.SwimStyle,
-                LaneMin = se.LaneMin,
-                LaneMax = se.LaneMax,
-                Heats = se.Heats
-                        .Where(heat => heat.Positions.Any(hp =>
-                            hp.Entry.AthleteId == _athleteId.Value ||
-                            (hp.Entry.Relay != null &&
-                             hp.Entry.Relay.Positions.Any(p => p.AthleteId == _athleteId.Value))))
-                        .ToList()
-            })
-                .Where(se => se.Heats.Any())
-            : query.Where(_ => false);
+        if (!_athleteId.HasValue)
+            return query.Where(_ => false);
+        return query.Where(se => se.Heats.Any(heat =>
+            heat.Positions.Any(hp =>
+                hp.Entry.AthleteId == _athleteId.Value ||
+                (hp.Entry.Relay != null &&
+                 hp.Entry.Relay.Positions.Any(p => p.AthleteId == _athleteId.Value)))));
     }
 }

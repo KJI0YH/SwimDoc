@@ -102,27 +102,12 @@ public partial class CombinedResultsViewModel : ViewModelBase
 
     internal static List<CombinedResultRow> BuildRows(IReadOnlyList<CombinedResultsAthleteRow> athletes)
     {
-        if (athletes.Count == 0)
-            return [];
-        var rows = new List<CombinedResultRow>();
-        var officialAthletes = athletes.Where(row => row.IsInOfficialStandings).ToList();
-        var place = 1;
-        var previousTotal = officialAthletes.Count > 0 ? officialAthletes[0].TotalPoints : 0;
-        foreach (var (athleteRow, index) in officialAthletes.Select((row, index) => (row, index)))
-        {
-            if (index > 0 && athleteRow.TotalPoints != previousTotal)
-            {
-                place = index + 1;
-                previousTotal = athleteRow.TotalPoints;
-            }
-            rows.Add(CreateRow(athleteRow, place, isOutOfScoring: false));
-        }
-        foreach (var athleteRow in athletes.Where(row => !row.IsInOfficialStandings))
-            rows.Add(CreateRow(athleteRow, place: null, isOutOfScoring: true));
-        return rows;
+        return CombinedResultsCalculator.AssignPlaces(athletes)
+            .Select(item => CreateRow(item.AthleteRow, item.Place))
+            .ToList();
     }
 
-    private static CombinedResultRow CreateRow(CombinedResultsAthleteRow athleteRow, int? place, bool isOutOfScoring)
+    private static CombinedResultRow CreateRow(CombinedResultsAthleteRow athleteRow, int place)
     {
         var athlete = athleteRow.Athlete;
         return new CombinedResultRow(
@@ -134,8 +119,7 @@ public partial class CombinedResultsViewModel : ViewModelBase
             EntityDisplayFormatter.FormatAthleteClubName(athlete),
             athleteRow.TotalPoints,
             athleteRow.PointsBySwimStyleId,
-            athleteRow.ScoringBySwimStyleId,
-            isOutOfScoring);
+            athleteRow.ScoringBySwimStyleId);
     }
 
     [RelayCommand]

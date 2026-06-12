@@ -147,7 +147,7 @@ public partial class EntriesViewModel(
         ColumnConfigurations.Clear();
         ColumnConfigurations.Add(new ColumnConfiguration<Entry>("SwimName", Strings.Entries_Col_Distance, 380,
             ColumnConfiguration<Entry>.SortBy(e => e.SwimEvent != null ? e.SwimEvent.Order : int.MaxValue)));
-        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("ParticipantName", Strings.Entries_Col_Participant, 250,
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("ParticipantName", Strings.Entries_Col_Participant, 180,
             ColumnConfiguration<Entry>.SortBy(
                 e => e.Athlete != null ? e.Athlete.LastName : e.Relay != null ? e.Relay.Club!.Name : null,
                 e => e.Athlete != null ? e.Athlete.FirstName : null,
@@ -157,16 +157,16 @@ public partial class EntriesViewModel(
                 q => q.OrderBy(e => e.Athlete != null ? e.Athlete.YearOfBirth : int.MaxValue).ThenBy(e => e.Id),
                 q => q.OrderByDescending(e => e.Athlete != null ? e.Athlete.YearOfBirth : int.MinValue)
                     .ThenByDescending(e => e.Id))));
-        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("ParticipantCategory", Strings.Athletes_Col_Category, 100,
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("ParticipantCategory", Strings.Athletes_Col_Category, 70,
             ColumnConfiguration<Entry>.SortByDirection(
                 q => q.OrderBy(e => e.Athlete != null ? (int)e.Athlete.Category : int.MaxValue).ThenBy(e => e.Id),
                 q => q.OrderByDescending(e => e.Athlete != null ? (int)e.Athlete.Category : int.MinValue)
                     .ThenByDescending(e => e.Id))));
-        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("ParticipantClubName", Strings.Entries_Col_Team, 200,
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("ParticipantClubName", Strings.Entries_Col_Team, 180,
             ColumnConfiguration<Entry>.SortBy(
                 e => e.Athlete != null ? e.Athlete.Club!.Name : e.Relay != null ? e.Relay.Club!.Name : null,
                 e => e.Id)));
-        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("Status", Strings.Entries_Col_Status, 150,
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("Status", Strings.Entries_Col_Status, 170,
             ColumnConfiguration<Entry>.SortBy(e => e.Status)));
         ColumnConfigurations.Add(new ColumnConfiguration<Entry>("EntryTime", Strings.Entries_Col_EntryTime, 95,
             ColumnConfiguration<Entry>.SortBy(e => e.EntryTime ?? SlowestTimeRank, e => e.Id),

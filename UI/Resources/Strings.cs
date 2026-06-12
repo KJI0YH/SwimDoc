@@ -96,6 +96,7 @@ public static class Strings
     public static string Settings_Paging_Description => Get(nameof(Settings_Paging_Description));
     public static string Settings_Paging_PageSize => Get(nameof(Settings_Paging_PageSize));
     public static string Common_Back => Get(nameof(Common_Back));
+    public static string Common_LoadingData => Get(nameof(Common_LoadingData));
     public static string BaseTimes_WorldAquaticsPoints => Get(nameof(BaseTimes_WorldAquaticsPoints));
     public static string BaseTimes_WorldAquaticsPoints_Tooltip => Get(nameof(BaseTimes_WorldAquaticsPoints_Tooltip));
     public static string BaseTimes_Group_Scm => Get(nameof(BaseTimes_Group_Scm));
@@ -235,6 +236,8 @@ public static class Strings
     public static string Events_Col_Distance => Get(nameof(Events_Col_Distance));
     public static string Events_Col_AgeGroup => Get(nameof(Events_Col_AgeGroup));
     public static string Events_Col_Lanes => Get(nameof(Events_Col_Lanes));
+    public static string Events_Col_EntryCount => Get(nameof(Events_Col_EntryCount));
+    public static string Events_Col_HeatCount => Get(nameof(Events_Col_HeatCount));
     public static string Events_Col_Status => Get(nameof(Events_Col_Status));
     public static string WindowMode_Create => Get(nameof(WindowMode_Create));
     public static string WindowMode_Edit => Get(nameof(WindowMode_Edit));
@@ -286,6 +289,7 @@ public static class Strings
     public static string AgeGroups_Col_Gender => Get(nameof(AgeGroups_Col_Gender));
     public static string AgeGroups_Col_BirthYearFrom => Get(nameof(AgeGroups_Col_BirthYearFrom));
     public static string AgeGroups_Col_BirthYearTo => Get(nameof(AgeGroups_Col_BirthYearTo));
+    public static string AgeGroups_Col_Participants => Get(nameof(AgeGroups_Col_Participants));
     public static string AgeGroups_GenerateCombinedResultsReports => Get(nameof(AgeGroups_GenerateCombinedResultsReports));
     public static string Heats_GroupHeader_Format => Get(nameof(Heats_GroupHeader_Format));
     public static string Enum_HeatStatus_NOT_STARTED => Get(nameof(Enum_HeatStatus_NOT_STARTED));

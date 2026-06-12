@@ -69,7 +69,9 @@ public static class RowProjectionQueries
             AgeGroupName = se.AgeGroup.Name,
             AgeGroupGender = se.AgeGroup.Gender,
             AgeGroupBirthYearMin = se.AgeGroup.BirthYearMin,
-            AgeGroupBirthYearMax = se.AgeGroup.BirthYearMax
+            AgeGroupBirthYearMax = se.AgeGroup.BirthYearMax,
+            EntryCount = se.Entries.Count,
+            HeatCount = se.Heats.Count
         });
 
     public static IQueryable<AthleteRowProjection> SelectAthlete(IQueryable<Athlete> query) =>
@@ -96,14 +98,20 @@ public static class RowProjectionQueries
             PointCount = c.Athletes.Sum(a => a.Entries.Where(e => e.Scoring).Sum(e => e.Points ?? 0))
         });
 
-    public static IQueryable<AgeGroupRowProjection> SelectAgeGroup(IQueryable<AgeGroup> query) =>
+    public static IQueryable<AgeGroupRowProjection> SelectAgeGroup(
+        IQueryable<AgeGroup> query,
+        IQueryable<Athlete> athletes) =>
         query.Select(ag => new AgeGroupRowProjection
         {
             Id = ag.Id,
             Name = ag.Name,
             Gender = ag.Gender,
             BirthYearMin = ag.BirthYearMin,
-            BirthYearMax = ag.BirthYearMax
+            BirthYearMax = ag.BirthYearMax,
+            ParticipantCount = athletes.Count(a =>
+                a.YearOfBirth >= (ag.BirthYearMin ?? 0) &&
+                a.YearOfBirth <= (ag.BirthYearMax ?? int.MaxValue) &&
+                (ag.Gender == Gender.Mixed || a.Gender == ag.Gender))
         });
 
     public static IQueryable<SwimStyleRowProjection> SelectSwimStyle(IQueryable<SwimStyle> query) =>

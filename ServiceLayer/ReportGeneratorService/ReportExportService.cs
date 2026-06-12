@@ -57,21 +57,9 @@ public sealed class ReportExportService(EfCoreContext dbContext, IEntryService e
 
     private static CombinedResultsReportData MapReportData(CombinedResultsData data)
     {
-        var officialAthletes = data.Athletes.Where(row => row.IsInOfficialStandings).ToList();
-        var reportAthletes = new List<CombinedResultsReportAthleteRow>();
-        var place = 1;
-        var previousTotal = officialAthletes.FirstOrDefault()?.TotalPoints ?? 0;
-        foreach (var (athleteRow, index) in officialAthletes.Select((row, index) => (row, index)))
-        {
-            if (index > 0 && athleteRow.TotalPoints != previousTotal)
-            {
-                place = index + 1;
-                previousTotal = athleteRow.TotalPoints;
-            }
-            reportAthletes.Add(MapAthleteRow(athleteRow, place));
-        }
-        foreach (var athleteRow in data.Athletes.Where(row => !row.IsInOfficialStandings))
-            reportAthletes.Add(MapAthleteRow(athleteRow, place: null));
+        var reportAthletes = CombinedResultsCalculator.AssignPlaces(data.Athletes)
+            .Select(item => MapAthleteRow(item.AthleteRow, item.Place))
+            .ToList();
         return new CombinedResultsReportData(
             data.EventColumns
                 .Select(column => new CombinedResultsReportEventColumn(
@@ -82,7 +70,7 @@ public sealed class ReportExportService(EfCoreContext dbContext, IEntryService e
             reportAthletes);
     }
 
-    private static CombinedResultsReportAthleteRow MapAthleteRow(CombinedResultsAthleteRow row, int? place) =>
+    private static CombinedResultsReportAthleteRow MapAthleteRow(CombinedResultsAthleteRow row, int place) =>
         new(
             LocalizedEntityDisplayFormatter.FormatAthleteName(row.Athlete),
             row.Athlete.YearOfBirth,

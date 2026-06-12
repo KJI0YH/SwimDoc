@@ -16,9 +16,16 @@ public sealed class SwimEventRowView : IEntityRowView<SwimEvent>
     public AgeGroup AgeGroup => Entity.AgeGroup;
     public string Lanes => EntityDisplayFormatter.FormatSwimEventLanes(Entity);
     public SwimEventStatus Status => Entity.Status;
+    public int EntryCount { get; }
+    public int HeatCount { get; }
 
-    public SwimEventRowView(SwimEvent entity) => Entity = entity;
+    public SwimEventRowView(SwimEvent entity, int entryCount = 0, int heatCount = 0)
+    {
+        Entity = entity;
+        EntryCount = entryCount;
+        HeatCount = heatCount;
+    }
 
     public static SwimEventRowView FromProjection(SwimEventRowProjection projection) =>
-        new(EntityRowStubBuilder.BuildSwimEvent(projection));
+        new(EntityRowStubBuilder.BuildSwimEvent(projection), projection.EntryCount, projection.HeatCount);
 }

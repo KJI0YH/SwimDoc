@@ -15,13 +15,7 @@
         <converters:BoolToVisibilityConverter x:Key="BoolToVis" />
         <Style x:Key="CombinedResultsRowStyle"
                TargetType="DataGridRow"
-               BasedOn="{StaticResource DataGridRowResultsPlaceStyle}">
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding IsOutOfScoring}" Value="True">
-                    <Setter Property="Background" Value="LightGray" />
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
+               BasedOn="{StaticResource DataGridRowResultsPlaceStyle}" />
     </UserControl.Resources>
     <dataView:DefaultDataView>
         <dataView:DefaultDataView.Toolbar>

@@ -86,8 +86,9 @@ public partial class CombinedResultsView : UserControl
 
     private static Style CreateNonScoringCellStyle(int eventId)
     {
-        var style = new Style(typeof(DataGridCell));
-        var trigger = new DataTrigger
+        var style = new Style(typeof(DataGridCell), (Style)Application.Current.FindResource(typeof(DataGridCell)));
+        var nonScoringTrigger = new MultiDataTrigger();
+        nonScoringTrigger.Conditions.Add(new Condition
         {
             Binding = new Binding(".")
             {
@@ -95,9 +96,17 @@ public partial class CombinedResultsView : UserControl
                 ConverterParameter = eventId
             },
             Value = false
-        };
-        trigger.Setters.Add(new Setter(Control.BackgroundProperty, NonScoringCellBrush));
-        style.Triggers.Add(trigger);
+        });
+        nonScoringTrigger.Conditions.Add(new Condition
+        {
+            Binding = new Binding("IsSelected")
+            {
+                RelativeSource = new RelativeSource(RelativeSourceMode.FindAncestor, typeof(DataGridRow), 1)
+            },
+            Value = false
+        });
+        nonScoringTrigger.Setters.Add(new Setter(Control.BackgroundProperty, NonScoringCellBrush));
+        style.Triggers.Add(nonScoringTrigger);
         return style;
     }
 
@@ -106,6 +115,7 @@ public partial class CombinedResultsView : UserControl
         {
             Header = header,
             Width = width,
+            IsReadOnly = true,
             Binding = new Binding(bindingPath)
         };
 }

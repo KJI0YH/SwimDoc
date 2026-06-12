@@ -104,6 +104,7 @@
   <data name="Paging_Last" xml:space="preserve"><value>Last page</value></data>
   <data name="Paging_ItemsInfo_EmptyFormat" xml:space="preserve"><value>0-0 of {0}</value></data>
   <data name="Paging_ItemsInfo_RangeFormat" xml:space="preserve"><value>{0}-{1} of {2}</value></data>
+  <data name="Common_LoadingData" xml:space="preserve"><value>Loading data...</value></data>
 
   <data name="Import_Details" xml:space="preserve"><value>Details</value></data>
   <data name="Import_Cancel" xml:space="preserve"><value>Cancel</value></data>
@@ -242,6 +243,8 @@
   <data name="Events_Col_Distance" xml:space="preserve"><value>Distance</value></data>
   <data name="Events_Col_AgeGroup" xml:space="preserve"><value>Age group</value></data>
   <data name="Events_Col_Lanes" xml:space="preserve"><value>Lanes</value></data>
+  <data name="Events_Col_EntryCount" xml:space="preserve"><value>Entries</value></data>
+  <data name="Events_Col_HeatCount" xml:space="preserve"><value>Heats</value></data>
   <data name="Events_Col_Status" xml:space="preserve"><value>Status</value></data>
 
   <data name="WindowMode_Create" xml:space="preserve"><value>Create</value></data>
@@ -305,6 +308,7 @@
   <data name="AgeGroups_Col_Gender" xml:space="preserve"><value>Gender</value></data>
   <data name="AgeGroups_Col_BirthYearFrom" xml:space="preserve"><value>Birth year from</value></data>
   <data name="AgeGroups_Col_BirthYearTo" xml:space="preserve"><value>Birth year to</value></data>
+  <data name="AgeGroups_Col_Participants" xml:space="preserve"><value>Participants</value></data>
   <data name="AgeGroups_GenerateCombinedResultsReports" xml:space="preserve"><value>Generate combined results report</value></data>
 
   <data name="Heats_GroupHeader_Format" xml:space="preserve"><value>Heat {0} of {1} ({2} of {3}) | {4} | {5}</value></data>

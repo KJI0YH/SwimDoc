@@ -2,7 +2,7 @@ using DataLayer.EfClasses;
 
 namespace ServiceLayer.EntryService;
 
-internal static class CombinedResultsCalculator
+public static class CombinedResultsCalculator
 {
     public static IReadOnlyList<IGrouping<int, SwimEvent>> GroupEventsBySwimStyle(IReadOnlyList<SwimEvent> events) =>
         events
@@ -34,6 +34,25 @@ internal static class CombinedResultsCalculator
 
     public static int GetTotalContribution(Entry? highestRoundEntry) =>
         highestRoundEntry is { Scoring: true } ? highestRoundEntry.Points ?? 0 : 0;
+
+    public static IEnumerable<(CombinedResultsAthleteRow AthleteRow, int Place)> AssignPlaces(
+        IReadOnlyList<CombinedResultsAthleteRow> athletes)
+    {
+        if (athletes.Count == 0)
+            yield break;
+        var place = 1;
+        var previousTotal = athletes[0].TotalPoints;
+        for (var index = 0; index < athletes.Count; index++)
+        {
+            var athleteRow = athletes[index];
+            if (index > 0 && athleteRow.TotalPoints != previousTotal)
+            {
+                place = index + 1;
+                previousTotal = athleteRow.TotalPoints;
+            }
+            yield return (athleteRow, place);
+        }
+    }
 
     private static int GetRoundRank(EventRound round) =>
         round switch

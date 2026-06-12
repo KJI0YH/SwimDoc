@@ -99,7 +99,13 @@ public partial class DataViewModel<TEntity, TRowView, TKey> : DataViewModelBase,
         if (!_needsLoad)
             return;
         _needsLoad = false;
-        _ = LoadDataWithPrepareAsync();
+        var dispatcher = Application.Current?.Dispatcher;
+        if (dispatcher is null)
+        {
+            _ = LoadDataWithPrepareAsync();
+            return;
+        }
+        dispatcher.BeginInvoke(() => _ = LoadDataWithPrepareAsync(), DispatcherPriority.Loaded);
     }
 
     public void RequestReload()
@@ -111,8 +117,18 @@ public partial class DataViewModel<TEntity, TRowView, TKey> : DataViewModelBase,
 
     private async Task LoadDataWithPrepareAsync()
     {
-        await PrepareBeforeLoadAsync();
-        await LoadDataAsync();
+        await _loadGate.WaitAsync();
+        IsLoading = true;
+        try
+        {
+            await PrepareBeforeLoadAsync();
+            await LoadDataCoreAsync();
+        }
+        finally
+        {
+            IsLoading = false;
+            _loadGate.Release();
+        }
     }
 
     protected virtual void ResetForNewCompetition()
@@ -225,38 +241,43 @@ public partial class DataViewModel<TEntity, TRowView, TKey> : DataViewModelBase,
         IsLoading = true;
         try
         {
-            var query = CrudService.Query();
-            query = ApplyQuery(query);
-            query = ApplySearch(query);
-            TotalItems = await query.CountAsync();
-            _suppressPageLoad = true;
-            if (UsesPaging)
-            {
-                TotalPages = (int)Math.Ceiling(TotalItems / (double)PageSize);
-                if (CurrentPage >= TotalPages && TotalPages > 0)
-                    CurrentPage = TotalPages - 1;
-                if (TotalPages <= 0 || CurrentPage < 0)
-                    CurrentPage = 0;
-            }
-            else
-            {
-                TotalPages = TotalItems > 0 ? 1 : 0;
-                CurrentPage = 0;
-            }
-            _suppressPageLoad = false;
-            query = ApplySorting(query);
-            if (UsesPaging)
-                query = query.Page(CurrentPage, PageSize);
-            var rows = await LoadPageRowsAsync(query);
-            Items = new ObservableCollection<TRowView>(rows);
-            OnPropertyChanged(nameof(ItemsInfo));
-            OnItemsLoaded(rows.Select(row => row.Entity).ToList());
+            await LoadDataCoreAsync();
         }
         finally
         {
             IsLoading = false;
             _loadGate.Release();
         }
+    }
+
+    private async Task LoadDataCoreAsync()
+    {
+        var query = CrudService.Query();
+        query = ApplyQuery(query);
+        query = ApplySearch(query);
+        TotalItems = await query.CountAsync();
+        _suppressPageLoad = true;
+        if (UsesPaging)
+        {
+            TotalPages = (int)Math.Ceiling(TotalItems / (double)PageSize);
+            if (CurrentPage >= TotalPages && TotalPages > 0)
+                CurrentPage = TotalPages - 1;
+            if (TotalPages <= 0 || CurrentPage < 0)
+                CurrentPage = 0;
+        }
+        else
+        {
+            TotalPages = TotalItems > 0 ? 1 : 0;
+            CurrentPage = 0;
+        }
+        _suppressPageLoad = false;
+        query = ApplySorting(query);
+        if (UsesPaging)
+            query = query.Page(CurrentPage, PageSize);
+        var rows = await LoadPageRowsAsync(query);
+        Items = new ObservableCollection<TRowView>(rows);
+        OnPropertyChanged(nameof(ItemsInfo));
+        OnItemsLoaded(rows.Select(row => row.Entity).ToList());
     }
 
     protected virtual void OnItemsLoaded(IReadOnlyList<TEntity> items)

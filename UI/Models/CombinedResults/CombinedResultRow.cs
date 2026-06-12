@@ -11,8 +11,7 @@ public sealed class CombinedResultRow
         string clubName,
         int totalPoints,
         IReadOnlyDictionary<int, string> pointsBySwimStyleId,
-        IReadOnlyDictionary<int, bool> scoringBySwimStyleId,
-        bool isOutOfScoring)
+        IReadOnlyDictionary<int, bool> scoringBySwimStyleId)
     {
         Place = place;
         AthleteId = athleteId;
@@ -21,7 +20,6 @@ public sealed class CombinedResultRow
         Category = category;
         ClubName = clubName;
         TotalPoints = totalPoints;
-        IsOutOfScoring = isOutOfScoring;
         _pointsBySwimStyleId = new Dictionary<int, string>(pointsBySwimStyleId);
         _scoringBySwimStyleId = new Dictionary<int, bool>(scoringBySwimStyleId);
     }
@@ -34,7 +32,6 @@ public sealed class CombinedResultRow
     public string Category { get; }
     public string ClubName { get; }
     public int TotalPoints { get; }
-    public bool IsOutOfScoring { get; }
     private readonly Dictionary<int, string> _pointsBySwimStyleId;
     private readonly Dictionary<int, bool> _scoringBySwimStyleId;
     public string this[int swimStyleId] =>

@@ -42,10 +42,6 @@
                 <TextBlock Style="{StaticResource TitleLargeTextBlockStyle}"
                            Text="{loc:Localizastion Nav_Settings}"
                            Margin="0,0,0,8" />
-                <TextBlock Margin="0,0,0,32"
-                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                           TextWrapping="Wrap"
-                           Text="{loc:Localizastion Settings_Page_Subtitle}" />
 
                 <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
                            Text="{loc:Localizastion Settings_Section_General}"
@@ -157,10 +153,6 @@
                         <StackPanel Grid.Column="1" Margin="16,0,16,0">
                             <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}"
                                        Text="{loc:Localizastion Templates_EntryDoc_Title}" />
-                            <TextBlock Margin="0,4,0,0"
-                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                       TextWrapping="Wrap"
-                                       Text="{loc:Localizastion Templates_EntryDoc_Subtitle}" />
                         </StackPanel>
 
                         <Button Grid.Column="2"

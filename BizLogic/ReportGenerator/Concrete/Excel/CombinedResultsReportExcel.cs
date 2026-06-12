@@ -88,8 +88,6 @@ public static class CombinedResultsReportExcel
                 dataRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
                 dataRange.Style.Border.Left.Style = ExcelBorderStyle.Thin;
                 dataRange.Style.Border.Right.Style = ExcelBorderStyle.Thin;
-                if (!athleteRow.IsInOfficialStandings)
-                    ReportExcelScoringHelper.ApplyNonScoringFill(dataRange);
                 row += 1;
             }
         }

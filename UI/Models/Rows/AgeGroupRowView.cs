@@ -12,9 +12,16 @@ public sealed class AgeGroupRowView : IEntityRowView<AgeGroup>
     public Gender Gender => Entity.Gender;
     public int? BirthYearMin => Entity.BirthYearMin;
     public int? BirthYearMax => Entity.BirthYearMax;
+    public int ParticipantCount { get; }
 
     public AgeGroupRowView(AgeGroup entity) => Entity = entity;
 
     public static AgeGroupRowView FromProjection(AgeGroupRowProjection projection) =>
-        new(EntityRowStubBuilder.BuildAgeGroup(projection));
+        new(EntityRowStubBuilder.BuildAgeGroup(projection), projection.ParticipantCount);
+
+    private AgeGroupRowView(AgeGroup entity, int participantCount)
+    {
+        Entity = entity;
+        ParticipantCount = participantCount;
+    }
 }

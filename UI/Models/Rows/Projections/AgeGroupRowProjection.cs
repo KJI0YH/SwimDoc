@@ -9,4 +9,5 @@ public sealed class AgeGroupRowProjection
     public Gender Gender { get; init; }
     public int? BirthYearMin { get; init; }
     public int? BirthYearMax { get; init; }
+    public int ParticipantCount { get; init; }
 }

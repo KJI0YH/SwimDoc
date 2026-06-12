@@ -38,7 +38,7 @@
                       SelectedItem="{Binding SelectedResultEntry}"
                       MouseDoubleClick="ResultsGrid_MouseDoubleClick"
                       AutoGenerateColumns="False"
-                      IsReadOnly="False"
+                      IsReadOnly="True"
                       RowStyle="{StaticResource DataGridRowResultsPlaceStyle}">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="{loc:Localizastion Results_Col_Place}" Binding="{Binding Place}" IsReadOnly="True" Width="80" />
