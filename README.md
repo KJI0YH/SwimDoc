@@ -8,6 +8,8 @@ Desktop application for managing swimming competitions — from entries to heats
 
 SwimDoc helps swimming clubs, schools, and meet organizers run competitions with less manual work. The app covers the full meet workflow in a single Windows interface.
 
+**User guide (RU):** [docs/WIKI.md](docs/WIKI.md)
+
 **Features**
 
 - Reference data: athletes, clubs, age groups, swim styles, events
@@ -18,6 +20,9 @@ SwimDoc helps swimming clubs, schools, and meet organizers run competitions with
 
 # Visuals
 
+<p align="center">
+  <img src="docs/images/main.png" alt="SwimDoc start window" width="800" />
+</p>
 <p align="center">
   <img src="docs/images/events.png" alt="SwimDoc events window" width="800" />
 </p>
