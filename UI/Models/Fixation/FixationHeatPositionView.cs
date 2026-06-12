@@ -107,7 +107,7 @@ public sealed partial class FixationHeatPositionView : ObservableObject
     private void CalculatePoints()
     {
         var points = 0;
-        if (Entry.Scoring && Entry.Status == EntryStatus.FINISH)
+        if (Entry.Status == EntryStatus.FINISH)
         {
             var swimStyle = Entry.SwimStyle ?? _swimEvent.SwimStyle;
             points = _pointScoreProvider.CalculatePoints(

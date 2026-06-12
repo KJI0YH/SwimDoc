@@ -147,11 +147,10 @@ public partial class MainWindow : FluentWindow
 
     private void UpdateBackButtonState(bool canGoBack)
     {
-        var showBack = _viewModel is { IsCompetitionSelected: true } && canGoBack;
-        NavigationView.IsBackButtonVisible = showBack
+        NavigationView.IsBackButtonVisible = canGoBack
             ? NavigationViewBackButtonVisible.Visible
             : NavigationViewBackButtonVisible.Collapsed;
-        NavigationView.SetCurrentValue(NavigationView.IsBackEnabledProperty, showBack);
+        NavigationView.SetCurrentValue(NavigationView.IsBackEnabledProperty, canGoBack);
     }
 
     private void MinimizeButton_Click(object sender, RoutedEventArgs e) =>
