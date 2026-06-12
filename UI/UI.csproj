@@ -9,6 +9,8 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <UseWPF>true</UseWPF>
         <LangVersion>14</LangVersion>
+        <AssemblyName>SwimDoc</AssemblyName>
+        <Product>SwimDoc</Product>
         <ApplicationIcon>Assets\AppIcon.ico</ApplicationIcon>
     </PropertyGroup>
 
