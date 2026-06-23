@@ -45,6 +45,6 @@ public class EventsByAgeGroupViewModel : EventsViewModel
         var context = _ageGroupId.HasValue ? new NavigationContext { AgeGroupId = _ageGroupId.Value } : null;
         var result = _windowFactory.CreateAndShow<EventAddEditWindow>(id, context);
         if (result == true)
-            _ = LoadDataAsync();
+            _ = RefreshAfterAddEditAsync();
     }
 }

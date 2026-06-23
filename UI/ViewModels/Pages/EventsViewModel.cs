@@ -215,6 +215,39 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView
             option.PropertyChanged += OnFilterOptionPropertyChanged;
     }
 
+    private void UnsubscribeFilterOptions<T>(IEnumerable<EventFilterOption<T>> options)
+    {
+        foreach (var option in options)
+            option.PropertyChanged -= OnFilterOptionPropertyChanged;
+    }
+
+    private async Task RefreshDistanceFilterOptionsAsync()
+    {
+        var selectedDistances = DistanceFilterOptions
+            .Where(option => option.IsSelected)
+            .Select(option => option.Value)
+            .ToHashSet();
+        UnsubscribeFilterOptions(DistanceFilterOptions);
+        var swimStyleService = App.Current.Services.GetRequiredService<ISwimStyleService>();
+        var distances = await swimStyleService.Query()
+            .Select(swimStyle => swimStyle.Distance)
+            .Distinct()
+            .OrderBy(distance => distance)
+            .ToListAsync();
+        DistanceFilterOptions = new ObservableCollection<EventFilterOption<int>>(
+            distances.Select(distance =>
+            {
+                var option = new EventFilterOption<int>(
+                    distance,
+                    string.Format(Strings.Distance_MetersFormat, distance));
+                option.IsSelected = selectedDistances.Contains(distance);
+                return option;
+            }));
+        SubscribeFilterOptions(DistanceFilterOptions);
+        OnPropertyChanged(nameof(DistanceFilterText));
+        ClearFiltersCommand.NotifyCanExecuteChanged();
+    }
+
     private void OnFilterOptionPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName != nameof(IEventFilterOption.IsSelected))
@@ -271,7 +304,13 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView
     protected override void ShowAddEditDialog(int? id = default)
     {
         var result = _windowFactory.CreateAndShow<EventAddEditWindow>(id);
-        if (result == true) _ = LoadDataAsync();
+        if (result == true) _ = RefreshAfterAddEditAsync();
+    }
+
+    protected async Task RefreshAfterAddEditAsync()
+    {
+        await RefreshDistanceFilterOptionsAsync();
+        await LoadDataAsync();
     }
 
     [RelayCommand(CanExecute = nameof(CanAllocateHeats))]

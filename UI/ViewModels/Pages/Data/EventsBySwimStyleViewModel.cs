@@ -45,6 +45,6 @@ public class EventsBySwimStyleViewModel : EventsViewModel
         var context = _swimStyleId.HasValue ? new NavigationContext { SwimStyleId = _swimStyleId.Value } : null;
         var result = _windowFactory.CreateAndShow<EventAddEditWindow>(id, context);
         if (result == true)
-            _ = LoadDataAsync();
+            _ = RefreshAfterAddEditAsync();
     }
 }
