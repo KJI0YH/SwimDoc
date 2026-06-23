@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using BizLogic.Helpers;
+using DataLayer.Display;
 using DataLayer.EfClasses;
 using DataLayer.EfCore;
 using Microsoft.EntityFrameworkCore;
@@ -99,9 +100,9 @@ public class EntryService(EfCoreContext dbContext) : CrudService<Entry, int?>(db
             tracked.Status = preservedStatus;
     }
 
-    public Task<List<Entry>> GetEntriesByEventIdOrderByFinishTimeAsync(int eventId)
+    public async Task<List<Entry>> GetEntriesByEventIdOrderByFinishTimeAsync(int eventId)
     {
-        return dbContext.Entries
+        var entries = await dbContext.Entries
             .AsNoTracking()
             .Where(e => e.SwimEventId == eventId)
             .Include(e => e.SwimEvent!)
@@ -116,9 +117,8 @@ public class EntryService(EfCoreContext dbContext) : CrudService<Entry, int?>(db
             .ThenInclude(a => a.Club)
             .Include(e => e.Relay!)
             .ThenInclude(r => r.Club)
-            .OrderBy(e => e.Status > EntryStatus.FINISH ? 1 : 0)
-            .ThenBy(e => e.Status == EntryStatus.FINISH ? (e.FinishTime ?? int.MaxValue) : int.MaxValue)
             .ToListAsync();
+        return EntryPlaceAssignment.OrderForResults(entries).ToList();
     }
 
     public async Task<CombinedResultsData> GetCombinedResultsByAgeGroupAsync(int ageGroupId)

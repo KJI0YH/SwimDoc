@@ -14,7 +14,10 @@ public static class EntryTimeDisplay
             EntryStatus.FINISH => entry.FinishTime.HasValue
                 ? FormatHundredths(entry.FinishTime.Value)
                 : string.Empty,
-            EntryStatus.DNF or EntryStatus.DNS or EntryStatus.DSQ => entry.Status.ToString(),
+            EntryStatus.DSQ => entry.FinishTime.HasValue
+                ? $"{EntryStatus.DSQ} ({FormatHundredths(entry.FinishTime.Value)})"
+                : EntryStatus.DSQ.ToString(),
+            EntryStatus.DNF or EntryStatus.DNS => entry.Status.ToString(),
             _ => string.Empty
         };
 

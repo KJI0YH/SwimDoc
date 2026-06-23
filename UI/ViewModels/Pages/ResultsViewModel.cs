@@ -3,6 +3,7 @@ using System.Windows.Documents;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DataLayer.EfClasses;
+using DataLayer.Display;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.AgeGroupService;
@@ -347,18 +348,9 @@ public partial class ResultsViewModel(
     {
         if (entries.Count == 0)
             return [];
-        var place = 1;
-        List<ResultEntryView> orderedEntries = [new(place++, entries[0])];
-        var prevResult = orderedEntries[0];
-        foreach (var entry in entries.Skip(1))
-        {
-            orderedEntries.Add(entry.FinishTime == prevResult.Entry.FinishTime
-                ? new ResultEntryView(prevResult.Place, entry)
-                : new ResultEntryView(place, entry));
-            prevResult = orderedEntries[^1];
-            place++;
-        }
-        return orderedEntries;
+        return EntryPlaceAssignment.AssignPlaces(entries)
+            .Select(item => new ResultEntryView(item.Place, item.Entry))
+            .ToList();
     }
 
     internal static ResultEntryView? FindAthleteResult(

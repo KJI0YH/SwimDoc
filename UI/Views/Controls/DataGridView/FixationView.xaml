@@ -19,15 +19,15 @@
         <dataView:DefaultDataView.Toolbar>
             <DockPanel LastChildFill="True">
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
-                    <ComboBox uiHelpers:ComboBoxAutoWidthHelper.Enable="True"
+                    <ComboBox Style="{StaticResource SwimDocSwimEventComboBoxStyle}"
                               ItemsSource="{Binding SwimEventOptions}"
                               SelectedValue="{Binding SelectedSwimEvent}"
                               SelectedValuePath="Value"
                               Margin="0,5,6,5" />
-                    <ComboBox uiHelpers:ComboBoxAutoWidthHelper.Enable="True"
+                    <ComboBox Style="{StaticResource SwimDocHeatNumberComboBoxStyle}"
                               ItemsSource="{Binding EventHeats}"
                               SelectedItem="{Binding SelectedHeatItem}"
-                              DisplayMemberPath="DisplayNumberWithTime"
+                              DisplayMemberPath="Entity.Number"
                               Margin="0,5,6,5" />
                     <Button Content="{ui:SymbolIcon ArrowPrevious24}"
                             Command="{Binding GoToPrevEventCommand}"

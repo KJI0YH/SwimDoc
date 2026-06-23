@@ -21,7 +21,7 @@
         <dataView:DefaultDataView.Toolbar>
             <DockPanel Visibility="{Binding ShowAgeGroupSelector, Converter={StaticResource BoolToVis}}">
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
-                    <ComboBox uiHelpers:ComboBoxAutoWidthHelper.Enable="True"
+                    <ComboBox Style="{StaticResource SwimDocAgeGroupComboBoxStyle}"
                               ItemsSource="{Binding AgeGroupOptions}"
                               SelectedValue="{Binding SelectedAgeGroup}"
                               SelectedValuePath="Value"

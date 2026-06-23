@@ -71,20 +71,10 @@ public class FinishListReportExcel(EfCoreContext dbContext) : BaseReportExcel(db
             row += 1;
             if (swimEvent.Entries.Count == 0)
                 continue;
-            var place = 1;
-            var prevEntry = swimEvent.Entries.First();
-            var prevPlace = 1;
-            foreach (var entry in swimEvent.Entries)
+            var entries = EntryPlaceAssignment.OrderForResults(swimEvent.Entries);
+            foreach (var (entry, entryPlace) in EntryPlaceAssignment.AssignPlaces(entries))
             {
-                if (prevEntry.FinishTime == entry.FinishTime)
-                {
-                    worksheet.Cells[row, colNo].Value = prevPlace;
-                }
-                else
-                {
-                    worksheet.Cells[row, colNo].Value = place;
-                    prevPlace = place;
-                }
+                worksheet.Cells[row, colNo].Value = entryPlace;
                 worksheet.Cells[row, colParticipant].Value = LocalizedEntityDisplayFormatter.FormatEntryParticipantName(entry);
                 worksheet.Cells[row, colBirthYear].Value = LocalizedEntityDisplayFormatter.FormatEntryParticipantBirthYear(entry);
                 worksheet.Cells[row, colTeam].Value = LocalizedEntityDisplayFormatter.FormatEntryParticipantClubName(entry);
@@ -98,8 +88,6 @@ public class FinishListReportExcel(EfCoreContext dbContext) : BaseReportExcel(db
                 dataRange.Style.Border.Right.Style = ExcelBorderStyle.Thin;
                 if (ReportExcelScoringHelper.IsNonScoringEntry(entry))
                     ReportExcelScoringHelper.ApplyNonScoringFill(dataRange);
-                prevEntry = entry;
-                place++;
                 row += 1;
             }
         }

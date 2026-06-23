@@ -29,35 +29,35 @@
                             ItemsSource="{Binding RoundFilterOptions}"
                             DisplayText="{Binding RoundFilterText}"
                             ItemTemplate="{StaticResource EventFilterOptionTemplate}"
-                            MinWidth="190"
+                            FilterWidth="{StaticResource SwimDocFilterRoundWidth}"
                             Margin="5,0,5,5" />
 
                         <eventFilterComboBox:EventFilterComboBox
                             ItemsSource="{Binding DistanceFilterOptions}"
                             DisplayText="{Binding DistanceFilterText}"
                             ItemTemplate="{StaticResource EventFilterOptionTemplate}"
-                            MinWidth="150"
+                            FilterWidth="{StaticResource SwimDocFilterDistanceWidth}"
                             Margin="5,0,5,5" />
 
                         <eventFilterComboBox:EventFilterComboBox
                             ItemsSource="{Binding StrokeFilterOptions}"
                             DisplayText="{Binding StrokeFilterText}"
                             ItemTemplate="{StaticResource EventFilterOptionTemplate}"
-                            MinWidth="190"
+                            FilterWidth="{StaticResource SwimDocFilterStrokeWidth}"
                             Margin="5,0,5,5" />
 
                         <eventFilterComboBox:EventFilterComboBox
                             ItemsSource="{Binding GenderFilterOptions}"
                             DisplayText="{Binding GenderFilterText}"
                             ItemTemplate="{StaticResource EventFilterOptionTemplate}"
-                            MinWidth="160"
+                            FilterWidth="{StaticResource SwimDocFilterGenderWidth}"
                             Margin="5,0,5,5" />
 
                         <eventFilterComboBox:EventFilterComboBox
                             ItemsSource="{Binding StatusFilterOptions}"
                             DisplayText="{Binding StatusFilterText}"
                             ItemTemplate="{StaticResource EventFilterOptionTemplate}"
-                            MinWidth="160"
+                            FilterWidth="{StaticResource SwimDocFilterStatusWidth}"
                             Margin="5,0,5,5" />
 
                         <Button

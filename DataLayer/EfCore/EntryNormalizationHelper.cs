@@ -21,8 +21,9 @@ public static class EntryNormalizationHelper
     {
         if (entry.Status is not (EntryStatus.DSQ or EntryStatus.DNS or EntryStatus.DNF))
             return entry;
-        entry.FinishTime = null;
         entry.Points = 0;
+        if (entry.Status is EntryStatus.DNS or EntryStatus.DNF)
+            entry.FinishTime = null;
         return entry;
     }
 

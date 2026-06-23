@@ -159,7 +159,7 @@
                         </StackPanel>
 
                         <ComboBox Grid.Column="2"
-                                  Width="280"
+                                  Width="200"
                                   VerticalAlignment="Center"
                                   ItemsSource="{Binding HighlightScoringModes}"
                                   SelectedItem="{Binding HighlightScoringMode}">
@@ -182,13 +182,15 @@
 
                         <Border Grid.Column="0"
                                 Style="{StaticResource SettingsIconBadgeStyle}"
-                                VerticalAlignment="Top">
+                                VerticalAlignment="Center">
                             <ui:SymbolIcon Symbol="DocumentArrowRight24"
                                            HorizontalAlignment="Center"
                                            VerticalAlignment="Center" />
                         </Border>
 
-                        <StackPanel Grid.Column="1" Margin="16,0,16,0">
+                        <StackPanel Grid.Column="1"
+                                    Margin="16,0,16,0"
+                                    VerticalAlignment="Center">
                             <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}"
                                        Text="{loc:Localizastion Templates_EntryDoc_Title}" />
                         </StackPanel>

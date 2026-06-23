@@ -44,7 +44,7 @@
                     Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
 
         <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-            <ComboBox uiHelpers:ComboBoxAutoWidthHelper.Enable="True"
+            <ComboBox Style="{StaticResource SwimDocSwimEventComboBoxStyle}"
                       ItemsSource="{Binding SwimEventOptions}"
                       SelectedValue="{Binding SelectedSwimEvent}"
                       SelectedValuePath="Value"

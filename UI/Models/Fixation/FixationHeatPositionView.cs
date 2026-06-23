@@ -54,6 +54,12 @@ public sealed partial class FixationHeatPositionView : ObservableObject
             if (Entry.Status == value)
                 return;
             Entry.Status = value;
+            if (value is EntryStatus.DNS or EntryStatus.DNF)
+            {
+                Entry.FinishTime = null;
+                _finishTimeText = string.Empty;
+                OnPropertyChanged(nameof(FinishTimeText));
+            }
             OnPropertyChanged();
             OnPropertyChanged(nameof(FinishTimeDisplay));
             CalculatePoints();

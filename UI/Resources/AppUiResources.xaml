@@ -20,6 +20,34 @@
     </Style>
 
     
+    <system:Double x:Key="SwimDocFilterRoundWidth">108</system:Double>
+    <system:Double x:Key="SwimDocFilterDistanceWidth">168</system:Double>
+    <system:Double x:Key="SwimDocFilterStrokeWidth">168</system:Double>
+    <system:Double x:Key="SwimDocFilterGenderWidth">120</system:Double>
+    <system:Double x:Key="SwimDocFilterStatusWidth">172</system:Double>
+    <system:Double x:Key="SwimDocSwimEventComboBoxWidth">500</system:Double>
+    <system:Double x:Key="SwimDocHeatNumberComboBoxWidth">72</system:Double>
+    <system:Double x:Key="SwimDocAgeGroupComboBoxWidth">500</system:Double>
+
+    <Style x:Key="SwimDocSwimEventComboBoxStyle"
+           TargetType="ComboBox"
+           BasedOn="{StaticResource {x:Type ComboBox}}">
+        <Setter Property="uiHelpers:ComboBoxFixedWidthHelper.Width" Value="{StaticResource SwimDocSwimEventComboBoxWidth}" />
+    </Style>
+
+    <Style x:Key="SwimDocHeatNumberComboBoxStyle"
+           TargetType="ComboBox"
+           BasedOn="{StaticResource {x:Type ComboBox}}">
+        <Setter Property="uiHelpers:ComboBoxFixedWidthHelper.Width" Value="{StaticResource SwimDocHeatNumberComboBoxWidth}" />
+    </Style>
+
+    <Style x:Key="SwimDocAgeGroupComboBoxStyle"
+           TargetType="ComboBox"
+           BasedOn="{StaticResource {x:Type ComboBox}}">
+        <Setter Property="uiHelpers:ComboBoxFixedWidthHelper.Width" Value="{StaticResource SwimDocAgeGroupComboBoxWidth}" />
+    </Style>
+
+    
     <system:Double x:Key="SwimDocFontSizeCaption">16</system:Double>
     <system:Double x:Key="SwimDocFontSizeBody">16</system:Double>
     <system:Double x:Key="SwimDocFontSizeSubtitle">16</system:Double>

@@ -32,6 +32,13 @@ public partial class EventFilterComboBox : UserControl
             typeof(EventFilterComboBox),
             new PropertyMetadata(null));
 
+    public static readonly DependencyProperty FilterWidthProperty =
+        DependencyProperty.Register(
+            nameof(FilterWidth),
+            typeof(double),
+            typeof(EventFilterComboBox),
+            new PropertyMetadata(double.NaN, OnFilterWidthChanged));
+
     public EventFilterComboBox()
     {
         InitializeComponent();
@@ -54,6 +61,21 @@ public partial class EventFilterComboBox : UserControl
     {
         get => (DataTemplate?)GetValue(ItemTemplateProperty);
         set => SetValue(ItemTemplateProperty, value);
+    }
+
+    public double FilterWidth
+    {
+        get => (double)GetValue(FilterWidthProperty);
+        set => SetValue(FilterWidthProperty, value);
+    }
+
+    private static void OnFilterWidthChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is not EventFilterComboBox control || e.NewValue is not double width || double.IsNaN(width))
+            return;
+        control.Width = width;
+        control.MinWidth = width;
+        control.MaxWidth = width;
     }
 
     private void OnDropDownOpened()
