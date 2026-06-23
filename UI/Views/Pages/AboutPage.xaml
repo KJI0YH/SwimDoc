@@ -41,7 +41,7 @@
                            Text="{Binding ApplicationName}" />
                 <TextBlock Margin="0,4,0,0"
                            Style="{StaticResource BodyStrongTextBlockStyle}"
-                           FontSize="{StaticResource SwimDocFontSizeBody}"
+                           FontSize="{DynamicResource SwimDocFontSizeBody}"
                            Text="{Binding VersionText}" />
             </StackPanel>
         </Grid>
@@ -63,7 +63,7 @@
                     Style="{StaticResource SettingsCardBorderStyle}">
                 <StackPanel>
                     <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}"
-                               FontSize="{StaticResource SwimDocFontSizeBody}"
+                               FontSize="{DynamicResource SwimDocFontSizeBody}"
                                Text="{Binding VersionSectionTitle}" />
                     <TextBlock Margin="0,8,0,0"
                                TextWrapping="Wrap"
@@ -83,11 +83,11 @@
                     Style="{StaticResource SettingsCardBorderStyle}">
                 <StackPanel>
                     <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}"
-                               FontSize="{StaticResource SwimDocFontSizeBody}"
+                               FontSize="{DynamicResource SwimDocFontSizeBody}"
                                Text="{Binding AuthorSectionTitle}" />
                     <TextBlock Margin="0,8,0,0"
                                Style="{StaticResource BodyStrongTextBlockStyle}"
-                               FontSize="{StaticResource SwimDocFontSizeBody}"
+                               FontSize="{DynamicResource SwimDocFontSizeBody}"
                                Text="{Binding AuthorName}" />
                     <TextBlock Margin="0,2,0,0"
                                Foreground="{DynamicResource TextFillColorSecondaryBrush}"
@@ -113,7 +113,7 @@
                     <StackPanel Grid.Column="0"
                                 VerticalAlignment="Center">
                         <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}"
-                                   FontSize="{StaticResource SwimDocFontSizeBody}"
+                                   FontSize="{DynamicResource SwimDocFontSizeBody}"
                                    Text="{Binding SupportSectionTitle}" />
                         <TextBlock Margin="0,8,0,0"
                                    TextWrapping="Wrap"

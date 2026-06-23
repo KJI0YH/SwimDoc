@@ -9,6 +9,7 @@ using BizLogic.EntryDocumentReader;
 using ServiceLayer.EntryDocumentTemplateService;
 using ServiceLayer.EntryImportSettings;
 using UI.Resources;
+using UI.Services.FontScale;
 using UI.ViewModels;
 
 namespace UI.ViewModels.Pages;
@@ -18,6 +19,7 @@ public sealed partial class SettingsViewModel : ViewModelBase
     private readonly IEntryDocumentTemplateService _entryDocumentTemplateService;
     private readonly ILocalizationService _localizationService;
     private readonly IEntryImportSettingsService _entryImportSettingsService;
+    private readonly IFontScaleService _fontScaleService;
     public ObservableCollection<AppLanguage> AvailableLanguages { get; } =
         new([AppLanguage.Russian, AppLanguage.English]);
 
@@ -27,24 +29,42 @@ public sealed partial class SettingsViewModel : ViewModelBase
     [ObservableProperty] private AppLanguage _selectedLanguage;
     [ObservableProperty] private bool _isBaseTimesOpen;
     [ObservableProperty] private EntryImportHighlightScoringMode _highlightScoringMode;
+    [ObservableProperty] private int _fontSize;
     public Array HighlightScoringModes => Enum.GetValues<EntryImportHighlightScoringMode>();
     public SettingsViewModel(
         IEntryDocumentTemplateService entryDocumentTemplateService,
         ILocalizationService localizationService,
         IEntryImportSettingsService entryImportSettingsService,
+        IFontScaleService fontScaleService,
         IPagingSettingsService pagingSettingsService,
         BaseTimesSettingsViewModel baseTimesSettingsViewModel)
     {
         _entryDocumentTemplateService = entryDocumentTemplateService;
         _localizationService = localizationService;
         _entryImportSettingsService = entryImportSettingsService;
+        _fontScaleService = fontScaleService;
         BaseTimes = baseTimesSettingsViewModel;
         _selectedLanguage = localizationService.CurrentLanguage;
         _highlightScoringMode = entryImportSettingsService.HighlightScoringMode;
+        _fontSize = fontScaleService.CurrentFontSize;
         PagingSettings = new ObservableCollection<PagingSettingItemViewModel>(
             PagingSettingsService.NavigationOrder
                 .Select(page => new PagingSettingItemViewModel(pagingSettingsService, page)));
         _localizationService.CultureChanged += OnCultureChanged;
+        _fontScaleService.FontSizeChanged += OnFontScaleChanged;
+    }
+
+    partial void OnFontSizeChanged(int value)
+    {
+        var normalized = _fontScaleService.SetFontSize(value);
+        if (normalized != value)
+            FontSize = normalized;
+    }
+
+    private void OnFontScaleChanged(int fontSize)
+    {
+        if (fontSize != FontSize)
+            FontSize = fontSize;
     }
 
     partial void OnSelectedLanguageChanged(AppLanguage value) =>

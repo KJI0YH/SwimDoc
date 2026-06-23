@@ -59,24 +59,24 @@
     <system:Double x:Key="ContentControlFontSize">16</system:Double>
 
     <Style TargetType="Window">
-        <Setter Property="FontSize" Value="{StaticResource SwimDocFontSizeBody}" />
+        <Setter Property="FontSize" Value="{DynamicResource SwimDocFontSizeBody}" />
     </Style>
 
     <Style TargetType="{x:Type ui:FluentWindow}"
            BasedOn="{StaticResource {x:Type ui:FluentWindow}}">
-        <Setter Property="FontSize" Value="{StaticResource SwimDocFontSizeBody}" />
+        <Setter Property="FontSize" Value="{DynamicResource SwimDocFontSizeBody}" />
     </Style>
 
     <Style TargetType="Page">
-        <Setter Property="FontSize" Value="{StaticResource SwimDocFontSizeBody}" />
+        <Setter Property="FontSize" Value="{DynamicResource SwimDocFontSizeBody}" />
     </Style>
 
     <Style TargetType="UserControl">
-        <Setter Property="FontSize" Value="{StaticResource SwimDocFontSizeBody}" />
+        <Setter Property="FontSize" Value="{DynamicResource SwimDocFontSizeBody}" />
     </Style>
 
     <Style TargetType="TextBlock">
-        <Setter Property="FontSize" Value="{StaticResource SwimDocFontSizeBody}" />
+        <Setter Property="FontSize" Value="{DynamicResource SwimDocFontSizeBody}" />
     </Style>
 
     <Style x:Key="SwimDocAccentProgressBarStyle" TargetType="ProgressBar">
@@ -89,98 +89,98 @@
     <Style x:Key="CaptionTextBlockStyle"
            TargetType="TextBlock"
            BasedOn="{StaticResource {x:Type TextBlock}}">
-        <Setter Property="FontSize" Value="{StaticResource SwimDocFontSizeCaption}" />
+        <Setter Property="FontSize" Value="{DynamicResource SwimDocFontSizeCaption}" />
     </Style>
 
     <Style x:Key="BodyTextBlockStyle"
            TargetType="TextBlock"
            BasedOn="{StaticResource {x:Type TextBlock}}">
-        <Setter Property="FontSize" Value="{StaticResource SwimDocFontSizeBody}" />
+        <Setter Property="FontSize" Value="{DynamicResource SwimDocFontSizeBody}" />
     </Style>
 
     <Style x:Key="BodyStrongTextBlockStyle"
            TargetType="TextBlock"
            BasedOn="{StaticResource {x:Type TextBlock}}">
-        <Setter Property="FontSize" Value="{StaticResource SwimDocFontSizeBody}" />
+        <Setter Property="FontSize" Value="{DynamicResource SwimDocFontSizeBody}" />
         <Setter Property="FontWeight" Value="SemiBold" />
     </Style>
 
     <Style x:Key="SubtitleTextBlockStyle"
            TargetType="TextBlock"
            BasedOn="{StaticResource {x:Type TextBlock}}">
-        <Setter Property="FontSize" Value="{StaticResource SwimDocFontSizeSubtitle}" />
+        <Setter Property="FontSize" Value="{DynamicResource SwimDocFontSizeSubtitle}" />
         <Setter Property="FontWeight" Value="SemiBold" />
     </Style>
 
     <Style x:Key="TitleTextBlockStyle"
            TargetType="TextBlock"
            BasedOn="{StaticResource {x:Type TextBlock}}">
-        <Setter Property="FontSize" Value="{StaticResource SwimDocFontSizeTitle}" />
+        <Setter Property="FontSize" Value="{DynamicResource SwimDocFontSizeTitle}" />
         <Setter Property="FontWeight" Value="SemiBold" />
     </Style>
 
     <Style x:Key="TitleLargeTextBlockStyle"
            TargetType="TextBlock"
            BasedOn="{StaticResource {x:Type TextBlock}}">
-        <Setter Property="FontSize" Value="{StaticResource SwimDocFontSizeDisplay}" />
+        <Setter Property="FontSize" Value="{DynamicResource SwimDocFontSizeDisplay}" />
         <Setter Property="FontWeight" Value="SemiBold" />
     </Style>
 
     <Style x:Key="DisplayTextBlockStyle"
            TargetType="TextBlock"
            BasedOn="{StaticResource {x:Type TextBlock}}">
-        <Setter Property="FontSize" Value="{StaticResource SwimDocFontSizeDisplay}" />
+        <Setter Property="FontSize" Value="{DynamicResource SwimDocFontSizeDisplay}" />
         <Setter Property="FontWeight" Value="SemiBold" />
     </Style>
 
     <Style TargetType="TextBox"
            BasedOn="{StaticResource {x:Type TextBox}}">
-        <Setter Property="FontSize" Value="{StaticResource SwimDocFontSizeBody}" />
+        <Setter Property="FontSize" Value="{DynamicResource SwimDocFontSizeBody}" />
     </Style>
 
     <Style TargetType="ComboBox"
            BasedOn="{StaticResource {x:Type ComboBox}}">
-        <Setter Property="FontSize" Value="{StaticResource SwimDocFontSizeBody}" />
+        <Setter Property="FontSize" Value="{DynamicResource SwimDocFontSizeBody}" />
     </Style>
 
     <Style TargetType="Label"
            BasedOn="{StaticResource {x:Type Label}}">
-        <Setter Property="FontSize" Value="{StaticResource SwimDocFontSizeBody}" />
+        <Setter Property="FontSize" Value="{DynamicResource SwimDocFontSizeBody}" />
     </Style>
 
     <Style TargetType="Menu"
            BasedOn="{StaticResource {x:Type Menu}}">
-        <Setter Property="FontSize" Value="{StaticResource SwimDocFontSizeBody}" />
+        <Setter Property="FontSize" Value="{DynamicResource SwimDocFontSizeBody}" />
     </Style>
 
     <Style TargetType="MenuItem"
            BasedOn="{StaticResource {x:Type MenuItem}}">
-        <Setter Property="FontSize" Value="{StaticResource SwimDocFontSizeBody}" />
+        <Setter Property="FontSize" Value="{DynamicResource SwimDocFontSizeBody}" />
     </Style>
 
     <Style TargetType="GroupBox"
            BasedOn="{StaticResource {x:Type GroupBox}}">
-        <Setter Property="FontSize" Value="{StaticResource SwimDocFontSizeBody}" />
+        <Setter Property="FontSize" Value="{DynamicResource SwimDocFontSizeBody}" />
     </Style>
 
     <Style TargetType="TabControl"
            BasedOn="{StaticResource {x:Type TabControl}}">
-        <Setter Property="FontSize" Value="{StaticResource SwimDocFontSizeBody}" />
+        <Setter Property="FontSize" Value="{DynamicResource SwimDocFontSizeBody}" />
     </Style>
 
     <Style TargetType="TabItem"
            BasedOn="{StaticResource {x:Type TabItem}}">
-        <Setter Property="FontSize" Value="{StaticResource SwimDocFontSizeBody}" />
+        <Setter Property="FontSize" Value="{DynamicResource SwimDocFontSizeBody}" />
     </Style>
 
     <Style TargetType="CheckBox"
            BasedOn="{StaticResource {x:Type CheckBox}}">
-        <Setter Property="FontSize" Value="{StaticResource SwimDocFontSizeBody}" />
+        <Setter Property="FontSize" Value="{DynamicResource SwimDocFontSizeBody}" />
     </Style>
 
     <Style TargetType="Button"
            BasedOn="{StaticResource {x:Type Button}}">
-        <Setter Property="FontSize" Value="{StaticResource SwimDocFontSizeBody}" />
+        <Setter Property="FontSize" Value="{DynamicResource SwimDocFontSizeBody}" />
     </Style>
 
     <SolidColorBrush x:Key="DataGridSelectedRowBackgroundBrush" Color="#FFE3F2FD" />
@@ -309,7 +309,7 @@
 
     
     <Style x:Key="SwimDocDataGridTextColumnElementStyle" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="{StaticResource SwimDocFontSizeBody}" />
+        <Setter Property="FontSize" Value="{DynamicResource SwimDocFontSizeBody}" />
         <Setter Property="Padding" Value="4,0" />
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="TextTrimming" Value="CharacterEllipsis" />
@@ -319,7 +319,7 @@
     <Style x:Key="SwimDocDataGridTextColumnEditingElementStyle"
            TargetType="TextBox"
            BasedOn="{StaticResource {x:Type TextBox}}">
-        <Setter Property="FontSize" Value="{StaticResource SwimDocFontSizeBody}" />
+        <Setter Property="FontSize" Value="{DynamicResource SwimDocFontSizeBody}" />
         <Setter Property="Padding" Value="4,1" />
         <Setter Property="MinHeight" Value="22" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
@@ -330,7 +330,7 @@
     <Style x:Key="SwimDocDataGridInlineTextBoxStyle"
            TargetType="ui:TextBox"
            BasedOn="{StaticResource {x:Type ui:TextBox}}">
-        <Setter Property="FontSize" Value="{StaticResource SwimDocFontSizeBody}" />
+        <Setter Property="FontSize" Value="{DynamicResource SwimDocFontSizeBody}" />
         <Setter Property="Padding" Value="4,1" />
         <Setter Property="MinHeight" Value="22" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
@@ -339,7 +339,7 @@
     <Style x:Key="SwimDocDataGridInlineComboBoxStyle"
            TargetType="ComboBox"
            BasedOn="{StaticResource {x:Type ComboBox}}">
-        <Setter Property="FontSize" Value="{StaticResource SwimDocFontSizeBody}" />
+        <Setter Property="FontSize" Value="{DynamicResource SwimDocFontSizeBody}" />
         <Setter Property="Padding" Value="4,1" />
         <Setter Property="MinHeight" Value="22" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
@@ -382,12 +382,12 @@
                 </Rectangle>
                 <TextBlock Margin="8,0,0,0"
                            Text="{Binding DisplayText}"
-                           FontSize="{StaticResource SwimDocFontSizeBody}"
+                           FontSize="{DynamicResource SwimDocFontSizeBody}"
                            Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                            VerticalAlignment="Center">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
-                            <Setter Property="FontSize" Value="{StaticResource SwimDocFontSizeBody}" />
+                            <Setter Property="FontSize" Value="{DynamicResource SwimDocFontSizeBody}" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding IsSelected}" Value="True">
                                     <Setter Property="FontWeight" Value="SemiBold" />
@@ -402,7 +402,7 @@
 
     <Style TargetType="DataGridColumnHeader"
            BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
-        <Setter Property="FontSize" Value="{StaticResource SwimDocFontSizeBody}" />
+        <Setter Property="FontSize" Value="{DynamicResource SwimDocFontSizeBody}" />
         <Setter Property="Padding" Value="6,4" />
         <Setter Property="MinHeight" Value="28" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -474,7 +474,7 @@
 
     <Style TargetType="DataGrid"
            BasedOn="{StaticResource {x:Type DataGrid}}">
-        <Setter Property="FontSize" Value="{StaticResource SwimDocFontSizeBody}" />
+        <Setter Property="FontSize" Value="{DynamicResource SwimDocFontSizeBody}" />
         <Setter Property="HeadersVisibility" Value="Column" />
         <Setter Property="GridLinesVisibility" Value="Horizontal" />
         <Setter Property="HorizontalGridLinesBrush" Value="{StaticResource SwimDocDataGridHorizontalLineBrush}" />
@@ -487,7 +487,7 @@
 
     <Style TargetType="{x:Type ui:DataGrid}"
            BasedOn="{StaticResource {x:Type ui:DataGrid}}">
-        <Setter Property="FontSize" Value="{StaticResource SwimDocFontSizeBody}" />
+        <Setter Property="FontSize" Value="{DynamicResource SwimDocFontSizeBody}" />
         <Setter Property="HeadersVisibility" Value="Column" />
         <Setter Property="GridLinesVisibility" Value="Horizontal" />
         <Setter Property="HorizontalGridLinesBrush" Value="{StaticResource SwimDocDataGridHorizontalLineBrush}" />

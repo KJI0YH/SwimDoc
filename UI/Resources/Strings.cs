@@ -91,6 +91,10 @@ public static class Strings
     public static string Settings_Section_Files => Get(nameof(Settings_Section_Files));
     public static string Settings_Section_Competition => Get(nameof(Settings_Section_Competition));
     public static string Settings_Language_Description => Get(nameof(Settings_Language_Description));
+    public static string Settings_FontSize_Title => Get(nameof(Settings_FontSize_Title));
+    public static string Settings_FontSize_Description => Get(nameof(Settings_FontSize_Description));
+    public static string Settings_FontSize_Increase => Get(nameof(Settings_FontSize_Increase));
+    public static string Settings_FontSize_Decrease => Get(nameof(Settings_FontSize_Decrease));
     public static string Settings_BaseTimes_Description => Get(nameof(Settings_BaseTimes_Description));
     public static string Settings_Section_Paging => Get(nameof(Settings_Section_Paging));
     public static string Settings_Paging_Description => Get(nameof(Settings_Paging_Description));

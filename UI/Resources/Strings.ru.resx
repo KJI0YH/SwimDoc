@@ -59,6 +59,10 @@
   <data name="Settings_Section_Files" xml:space="preserve"><value>Файлы</value></data>
   <data name="Settings_Section_Competition" xml:space="preserve"><value>Соревнование</value></data>
   <data name="Settings_Language_Description" xml:space="preserve"><value>Язык интерфейса. Применяется сразу.</value></data>
+  <data name="Settings_FontSize_Title" xml:space="preserve"><value>Размер шрифта</value></data>
+  <data name="Settings_FontSize_Description" xml:space="preserve"><value>Размер текста во всём приложении. Применяется сразу.</value></data>
+  <data name="Settings_FontSize_Increase" xml:space="preserve"><value>Увеличить шрифт</value></data>
+  <data name="Settings_FontSize_Decrease" xml:space="preserve"><value>Уменьшить шрифт</value></data>
   <data name="Settings_BaseTimes_Description" xml:space="preserve"><value>Эталонное время World Aquatics для рассчёта очков</value></data>
   <data name="Settings_Section_Paging" xml:space="preserve"><value>Пагинация</value></data>
   <data name="Settings_Paging_Description" xml:space="preserve"><value>Количество элементов на странице для каждого списка. Применяется сразу.</value></data>

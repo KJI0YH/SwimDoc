@@ -21,6 +21,7 @@ using ServiceLayer.SwimStyleService;
 using System.Globalization;
 using System.Net.Http;
 using UI.Localization;
+using UI.Services.FontScale;
 using UI.ViewModels.Pages;
 using UI.Views.Controls.DataGridView;
 using UI.Views.Pages;
@@ -66,6 +67,7 @@ public partial class App : Application
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+        Services.GetRequiredService<IFontScaleService>().ApplyCurrent();
         var mainWindow = new MainWindow();
         mainWindow.Show();
     }
@@ -116,6 +118,7 @@ public partial class App : Application
         services.AddTransient<IErrorDialogService, ErrorDialogService>();
         services.AddSingleton<IAppSettingsStore, AppSettingsStore>();
         services.AddSingleton<ILocalizationService, LocalizationService>();
+        services.AddSingleton<IFontScaleService, FontScaleService>();
         services.AddSingleton<IEntryImportSettingsService, EntryImportSettingsService>();
         services.AddSingleton<IPagingSettingsService, PagingSettingsService>();
         services.AddSingleton<IGitHubUpdateCheckService>(_ =>

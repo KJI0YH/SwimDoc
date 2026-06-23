@@ -62,6 +62,7 @@ public sealed class AppSettingsStore : IAppSettingsStore
         new()
         {
             Language = settings.Language,
+            FontSize = settings.FontSize,
             PageSizes = settings.PageSizes is null
                 ? null
                 : new Dictionary<string, int>(settings.PageSizes),

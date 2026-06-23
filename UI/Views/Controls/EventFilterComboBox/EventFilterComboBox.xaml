@@ -36,7 +36,7 @@
                 <TextBlock x:Name="CaptionText"
                            Grid.Column="0"
                            Text="{Binding DisplayText, ElementName=Root}"
-                           FontSize="{StaticResource SwimDocFontSizeBody}"
+                           FontSize="{DynamicResource SwimDocFontSizeBody}"
                            Foreground="{DynamicResource ComboBoxForeground}"
                            VerticalAlignment="Center"
                            TextTrimming="CharacterEllipsis" />
@@ -71,7 +71,7 @@
                                   HorizontalScrollBarVisibility="Disabled"
                                   Background="{DynamicResource ComboBoxDropDownBackground}"
                                   BorderThickness="0">
-                        <ItemsControl FontSize="{StaticResource SwimDocFontSizeBody}"
+                        <ItemsControl FontSize="{DynamicResource SwimDocFontSizeBody}"
                                       ItemsSource="{Binding ItemsSource, ElementName=Root}"
                                       ItemTemplate="{Binding ItemTemplate, ElementName=Root}" />
                     </ScrollViewer>
