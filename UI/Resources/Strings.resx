@@ -286,6 +286,7 @@
   <data name="Heat_Validation_EventRequired" xml:space="preserve"><value>An event must be selected to create a heat.</value></data>
   <data name="Heat_Validation_MinHeatNumber" xml:space="preserve"><value>Heat number must be at least 1.</value></data>
   <data name="Heat_Validation_MaxPositionsFormat" xml:space="preserve"><value>A heat cannot have more than {0} positions (lanes {1}).</value></data>
+  <data name="Heat_EntryHeatPlacement_Format" xml:space="preserve"><value>{0} of {1} ({2} of {3})</value></data>
 
   <data name="Clubs_Col_Name" xml:space="preserve"><value>Name</value></data>
   <data name="Clubs_Col_Athletes" xml:space="preserve"><value>Athletes</value></data>

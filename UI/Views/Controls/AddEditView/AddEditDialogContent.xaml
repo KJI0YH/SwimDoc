@@ -5,7 +5,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              mc:Ignorable="d"
-             MinWidth="480">
+             MinWidth="{Binding ContentMinWidth, FallbackValue=480}">
     <StackPanel>
         <ContentControl Content="{Binding EditorContent, RelativeSource={RelativeSource AncestorType=UserControl}}" />
 

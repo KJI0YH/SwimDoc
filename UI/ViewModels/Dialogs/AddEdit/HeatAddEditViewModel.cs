@@ -30,6 +30,7 @@ public partial class HeatAddEditViewModel(
     [ObservableProperty] private ObservableCollection<string> _validationErrors = new();
     [ObservableProperty] private ObservableCollection<HeatPositionEditorRow> _positionRows = new();
     private List<SearchableItem> _allEntryItems = [];
+    private Dictionary<int, EntryHeatPlacement> _entryHeatPlacements = [];
     private bool _isRefreshingRowEntries;
     [ObservableProperty] private string _swimEventDisplayName = string.Empty;
     [ObservableProperty] private int _laneMin = 1;
@@ -47,6 +48,7 @@ public partial class HeatAddEditViewModel(
     public bool IsReadOnly => false;
     public bool CanEditFields => true;
     public string WindowTitle => _isAdd ? Strings.WindowTitle_CreateHeat : Strings.WindowTitle_EditHeat;
+    public double ContentMinWidth => 400;
     object? IWindowResult.Result => _entity;
     public event EventHandler<DialogCloseEventArgs>? CloseRequested;
     public IReadOnlyList<string> HourOptions { get; } = CreateTimePartOptions(24);
@@ -298,18 +300,28 @@ public partial class HeatAddEditViewModel(
         if (!_contextEventId.HasValue)
         {
             _allEntryItems = [];
+            _entryHeatPlacements = [];
             RefreshRowAvailableEntries();
             return;
         }
-        var assignedEntryIds = await heatService.Query()
-            .Where(heat => heat.SwimEventId == _contextEventId.Value && (!_isAdd ? heat.Id != _entity.Id : true))
-            .SelectMany(heat => heat.Positions.Select(position => position.EntryId))
+        var heatsInEvent = await heatService.Query()
+            .Where(heat => heat.SwimEventId == _contextEventId.Value)
+            .CountAsync();
+        var heatsTotal = heatService.GetTotalHeats();
+        var heats = await heatService.Query()
+            .Where(heat => heat.SwimEventId == _contextEventId.Value)
+            .Include(heat => heat.Positions)
             .ToListAsync();
-        var currentHeatEntryIds = PositionRows
-            .Where(row => row.EntryId > 0)
-            .Select(row => row.EntryId)
-            .Concat(_entity.Positions.Select(position => position.EntryId))
-            .ToHashSet();
+        _entryHeatPlacements = heats
+            .SelectMany(heat => heat.Positions.Select(position => new
+            {
+                position.EntryId,
+                heat.Number,
+                heat.Order
+            }))
+            .ToDictionary(
+                x => x.EntryId,
+                x => new EntryHeatPlacement(x.Number, heatsInEvent, x.Order, heatsTotal));
         var entries = await entryService.Query()
             .Where(entry => entry.SwimEventId == _contextEventId.Value)
             .Include(entry => entry.Athlete)
@@ -320,11 +332,10 @@ public partial class HeatAddEditViewModel(
             .ThenBy(entry => entry.EntryTime)
             .ToListAsync();
         _allEntryItems = entries
-            .Where(entry => !assignedEntryIds.Contains(entry.Id) || currentHeatEntryIds.Contains(entry.Id))
             .Select(entry => new SearchableItem
             {
                 Value = entry,
-                DisplayText = FormatEntryDisplay(entry)
+                DisplayText = FormatEntryDisplay(entry, GetEntryHeatPlacement(entry.Id))
             })
             .ToList();
         RefreshRowAvailableEntries();
@@ -380,7 +391,7 @@ public partial class HeatAddEditViewModel(
             SelectedEntry = new SearchableItem
             {
                 Value = position.Entry,
-                DisplayText = FormatEntryDisplay(position.Entry)
+                DisplayText = FormatEntryDisplay(position.Entry, GetEntryHeatPlacement(position.EntryId))
             },
             RemoveCommand = new RelayCommand<HeatPositionEditorRow>(RemovePositionRow)
         };
@@ -428,6 +439,23 @@ public partial class HeatAddEditViewModel(
     private static List<string> CreateTimePartOptions(int count) =>
         Enumerable.Range(0, count).Select(value => value.ToString("00")).ToList();
 
-    private static string FormatEntryDisplay(Entry entry) =>
-        $"{EntityDisplayFormatter.FormatEntryParticipantName(entry)} ({EntityDisplayFormatter.FormatEntryTime(entry)})";
+    private EntryHeatPlacement? GetEntryHeatPlacement(int entryId) =>
+        _entryHeatPlacements.TryGetValue(entryId, out var placement) ? placement : null;
+
+    private static string FormatEntryDisplay(Entry entry, EntryHeatPlacement? placement = null)
+    {
+        var baseText =
+            $"{EntityDisplayFormatter.FormatEntryParticipantName(entry)} ({EntityDisplayFormatter.FormatEntryTime(entry)})";
+        if (placement is null)
+            return baseText;
+        var heatInfo = string.Format(
+            Strings.Heat_EntryHeatPlacement_Format,
+            placement.HeatNumber,
+            placement.HeatsInEvent,
+            placement.HeatOrder,
+            placement.HeatsTotal);
+        return $"{baseText} — {heatInfo}";
+    }
+
+    private sealed record EntryHeatPlacement(int HeatNumber, int HeatsInEvent, int HeatOrder, int HeatsTotal);
 }

@@ -107,9 +107,11 @@ public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbCo
                 CultureInfo.CurrentUICulture,
                 ServiceErrorStrings.Heat_Save_SwimEventNotFound_Format,
                 heat.SwimEventId))]);
-        var validationErrors = ValidateHeatWithPositions(heat, swimEvent, isAdd);
+        var validationErrors = ValidateHeatWithPositions(heat, swimEvent);
         if (validationErrors.Count > 0)
             return (null, validationErrors);
+        var entryIds = (heat.Positions ?? []).Select(position => position.EntryId).ToList();
+        await RemoveEntriesFromOtherHeatsAsync(entryIds, isAdd ? null : heat.Id);
         if (isAdd)
         {
             heat.Status = HeatStatus.NOT_STARTED;
@@ -186,7 +188,7 @@ public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbCo
         heatEntry.State = EntityState.Detached;
     }
 
-    private ImmutableList<ValidationResult> ValidateHeatWithPositions(Heat heat, SwimEvent swimEvent, bool isAdd)
+    private ImmutableList<ValidationResult> ValidateHeatWithPositions(Heat heat, SwimEvent swimEvent)
     {
         var errors = new List<ValidationResult>();
         if (heat.Number < 1)
@@ -235,17 +237,22 @@ public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbCo
                         ServiceErrorStrings.Heat_Validation_EntryNotInEvent_Format,
                         position.EntryId),
                     [nameof(HeatPosition.EntryId)]));
-            var entryInOtherHeat = dbContext.HeatPositions.Any(existing =>
-                existing.EntryId == position.EntryId &&
-                existing.HeatId != (isAdd ? 0 : heat.Id));
-            if (entryInOtherHeat)
-                errors.Add(new ValidationResult(string.Format(
-                        CultureInfo.CurrentUICulture,
-                        ServiceErrorStrings.Heat_Validation_EntryAlreadyInOtherHeat_Format,
-                        position.EntryId),
-                    [nameof(HeatPosition.EntryId)]));
         }
         return errors.ToImmutableList();
+    }
+
+    private async Task RemoveEntriesFromOtherHeatsAsync(IReadOnlyCollection<int> entryIds, int? exceptHeatId)
+    {
+        if (entryIds.Count == 0)
+            return;
+        var query = dbContext.HeatPositions.Where(position => entryIds.Contains(position.EntryId));
+        if (exceptHeatId.HasValue)
+            query = query.Where(position => position.HeatId != exceptHeatId.Value);
+        var positionsToRemove = await query.ToListAsync();
+        if (positionsToRemove.Count == 0)
+            return;
+        dbContext.HeatPositions.RemoveRange(positionsToRemove);
+        await dbContext.SaveChangesAsync();
     }
 
     public Task<List<Heat>> GetHeatsByEventIdAsync(int eventId) =>

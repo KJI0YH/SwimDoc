@@ -14,10 +14,10 @@
         <displayHelpers:EnumDescriptionConverter x:Key="EnumDescriptionConverter" />
                 <converters:BoolToVisibilityConverter x:Key="BoolToVis" />
     </UserControl.Resources>
-    <StackPanel Margin="0,0,0,15">
+    <StackPanel Margin="0,0,0,15" MaxWidth="420">
                 <Grid Margin="0,5">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="200" />
+                        <ColumnDefinition Width="140" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
     
@@ -34,7 +34,7 @@
                 
                 <Grid Margin="0,5">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="200" />
+                        <ColumnDefinition Width="140" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
     
@@ -60,7 +60,7 @@
                 
                 <Grid Margin="0,5">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="200" />
+                        <ColumnDefinition Width="140" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
     
@@ -99,7 +99,7 @@
                           Margin="0,0,0,5">
                     <DataGrid.Columns>
     
-                        <DataGridTemplateColumn Header="{loc:Localizastion Heat_Col_Lane}" Width="130">
+                        <DataGridTemplateColumn Header="{loc:Localizastion Heat_Col_Lane}" Width="165">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <Grid>

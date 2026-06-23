@@ -270,6 +270,7 @@ public static class Strings
     public static string Heat_Validation_EventRequired => Get(nameof(Heat_Validation_EventRequired));
     public static string Heat_Validation_MinHeatNumber => Get(nameof(Heat_Validation_MinHeatNumber));
     public static string Heat_Validation_MaxPositionsFormat => Get(nameof(Heat_Validation_MaxPositionsFormat));
+    public static string Heat_EntryHeatPlacement_Format => Get(nameof(Heat_EntryHeatPlacement_Format));
     public static string Clubs_Col_Name => Get(nameof(Clubs_Col_Name));
     public static string Clubs_Col_Athletes => Get(nameof(Clubs_Col_Athletes));
     public static string Clubs_Col_Entries => Get(nameof(Clubs_Col_Entries));

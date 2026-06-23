@@ -286,6 +286,7 @@
   <data name="Heat_Validation_EventRequired" xml:space="preserve"><value>Для создания заплыва необходимо выбрать событие.</value></data>
   <data name="Heat_Validation_MinHeatNumber" xml:space="preserve"><value>Номер заплыва должен быть не меньше 1.</value></data>
   <data name="Heat_Validation_MaxPositionsFormat" xml:space="preserve"><value>В заплыве может быть не более {0} позиций (дорожки {1}).</value></data>
+  <data name="Heat_EntryHeatPlacement_Format" xml:space="preserve"><value>{0} из {1} ({2} из {3})</value></data>
 
   <data name="Clubs_Col_Name" xml:space="preserve"><value>Название</value></data>
   <data name="Clubs_Col_Athletes" xml:space="preserve"><value>Спортсмены</value></data>
