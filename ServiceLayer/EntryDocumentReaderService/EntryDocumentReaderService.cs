@@ -6,24 +6,28 @@ using BizLogic.EntryDocumentReader.Concrete;
 using DataLayer.EfClasses;
 using DataLayer.EfCore;
 using Microsoft.EntityFrameworkCore;
-using ServiceLayer.BizRunners;
 using ServiceLayer.EntryDocumentReaderService.Exceptions;
+using ServiceLayer.EntryImportSettings;
 
 namespace ServiceLayer.EntryDocumentReaderService;
 
-public class EntryDocumentReaderService(EfCoreContext context) : IEntryDocumentReaderService
+public class EntryDocumentReaderService(
+    EfCoreContext context,
+    IEntryImportSettingsService importSettings) : IEntryDocumentReaderService
 {
     private readonly EfCoreContext _context = context;
+    private readonly IEntryImportSettingsService _importSettings = importSettings;
 
-    private readonly RunnerWriteDbWithValidation<string, IReadOnlyList<EntryDocument>> _runner = new(
-        new EntryDocumentReadAction(new EntryDocumentReaderDbAccess(context)), context);
-
-    public IImmutableList<ValidationResult> Errors => _runner.Errors;
+    public IImmutableList<ValidationResult> Errors { get; private set; } = ImmutableList<ValidationResult>.Empty;
 
     public IReadOnlyList<EntryDocument> Read(string filePath)
     {
-        var result = _runner.RunAction(filePath);
-        return _runner.HasErrors ? throw new EntryDocumentReaderException() : result;
+        var action = CreateReadAction();
+        var result = action.Action(filePath);
+        Errors = action.Errors.ToImmutableList();
+        if (action.Errors.Any())
+            throw new EntryDocumentReaderException();
+        return result;
     }
 
     public (IReadOnlyList<EntryDocument> documents, EntryImportStats stats) ReadWithStats(
@@ -32,8 +36,9 @@ public class EntryDocumentReaderService(EfCoreContext context) : IEntryDocumentR
         bool saveChanges = true)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        var action = new EntryDocumentReadAction(new EntryDocumentReaderDbAccess(_context));
+        var action = CreateReadAction();
         var documents = action.Action(filePath, cancellationToken);
+        Errors = action.Errors.ToImmutableList();
         if (action.Errors.Any())
             throw new EntryDocumentReaderException();
         cancellationToken.ThrowIfCancellationRequested();
@@ -74,4 +79,7 @@ public class EntryDocumentReaderService(EfCoreContext context) : IEntryDocumentR
             entriesAdded,
             entriesUpdated));
     }
+
+    private EntryDocumentReadAction CreateReadAction() =>
+        new(new EntryDocumentReaderDbAccess(_context), _importSettings.HighlightScoringMode);
 }

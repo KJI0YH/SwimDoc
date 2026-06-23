@@ -95,6 +95,8 @@ public static class Strings
     public static string Settings_Section_Paging => Get(nameof(Settings_Section_Paging));
     public static string Settings_Paging_Description => Get(nameof(Settings_Paging_Description));
     public static string Settings_Paging_PageSize => Get(nameof(Settings_Paging_PageSize));
+    public static string Settings_EntryImport_HighlightScoring_Title => Get(nameof(Settings_EntryImport_HighlightScoring_Title));
+    public static string Settings_EntryImport_HighlightScoring_Description => Get(nameof(Settings_EntryImport_HighlightScoring_Description));
     public static string Common_Back => Get(nameof(Common_Back));
     public static string Common_LoadingData => Get(nameof(Common_LoadingData));
     public static string BaseTimes_WorldAquaticsPoints => Get(nameof(BaseTimes_WorldAquaticsPoints));

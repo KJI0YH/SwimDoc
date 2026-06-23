@@ -63,6 +63,10 @@
   <data name="Settings_Section_Paging" xml:space="preserve"><value>Pagination</value></data>
   <data name="Settings_Paging_Description" xml:space="preserve"><value>Number of items loaded per page for each list. Applied immediately.</value></data>
   <data name="Settings_Paging_PageSize" xml:space="preserve"><value>Page size</value></data>
+  <data name="Settings_EntryImport_HighlightScoring_Title" xml:space="preserve"><value>Highlighted entries</value></data>
+  <data name="Settings_EntryImport_HighlightScoring_Description" xml:space="preserve"><value>How yellow-highlighted cells in entry documents are interpreted during import. Applied to the next import.</value></data>
+  <data name="Enum_EntryImportHighlightScoringMode_HighlightedInCompetition" xml:space="preserve"><value>In competition (scoring)</value></data>
+  <data name="Enum_EntryImportHighlightScoringMode_HighlightedOutOfCompetition" xml:space="preserve"><value>Out of competition (non-scoring)</value></data>
   <data name="Common_Back" xml:space="preserve"><value>Back</value></data>
   <data name="BaseTimes_WorldAquaticsPoints" xml:space="preserve"><value>World Aquatics Points</value></data>
   <data name="BaseTimes_WorldAquaticsPoints_Tooltip" xml:space="preserve"><value>Open World Aquatics base times and points table (worldaquatics.com)</value></data>

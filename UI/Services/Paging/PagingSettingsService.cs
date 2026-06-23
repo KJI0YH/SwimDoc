@@ -1,5 +1,4 @@
-using System.IO;
-using System.Text.Json;
+using ServiceLayer.AppSettings;
 using UI.Resources;
 
 namespace UI.Services.Paging;
@@ -16,7 +15,6 @@ public sealed class PagingSettingsService : IPagingSettingsService
         PagingPage.AgeGroups,
         PagingPage.SwimStyles
     ];
-    private const string SettingsFileName = "ui-paging-settings.json";
     private const int MinPageSize = 1;
     private const int MaxPageSize = 500;
     private static readonly IReadOnlyDictionary<PagingPage, int> Defaults =
@@ -31,11 +29,14 @@ public sealed class PagingSettingsService : IPagingSettingsService
             [PagingPage.Heats] = 10
         };
 
+    private readonly IAppSettingsStore _settingsStore;
     private readonly Dictionary<PagingPage, int> _pageSizes = new(Defaults);
     public event Action<PagingPage>? PageSizeChanged;
-    public PagingSettingsService()
+
+    public PagingSettingsService(IAppSettingsStore settingsStore)
     {
-        LoadFromDisk();
+        _settingsStore = settingsStore;
+        LoadFromStore();
     }
 
     public int GetPageSize(PagingPage page) => _pageSizes[page];
@@ -46,7 +47,7 @@ public sealed class PagingSettingsService : IPagingSettingsService
         if (_pageSizes[page] == normalized)
             return normalized;
         _pageSizes[page] = normalized;
-        SaveToDisk();
+        SaveToStore();
         PageSizeChanged?.Invoke(page);
         return normalized;
     }
@@ -65,47 +66,27 @@ public sealed class PagingSettingsService : IPagingSettingsService
         };
 
     private static int Normalize(int pageSize) => Math.Clamp(pageSize, MinPageSize, MaxPageSize);
-    private void LoadFromDisk()
+
+    private void LoadFromStore()
     {
-        try
+        var pageSizes = _settingsStore.Get().PageSizes;
+        if (pageSizes is null)
+            return;
+        foreach (var (key, value) in pageSizes)
         {
-            var path = GetSettingsPath();
-            if (!File.Exists(path))
-                return;
-            var json = File.ReadAllText(path);
-            var dto = JsonSerializer.Deserialize<PagingSettingsDto>(json);
-            if (dto?.PageSizes is null)
-                return;
-            foreach (var (key, value) in dto.PageSizes)
-            {
-                if (!Enum.TryParse<PagingPage>(key, ignoreCase: true, out var page))
-                    continue;
-                _pageSizes[page] = Normalize(value);
-            }
-        }
-        catch
-        {
+            if (!Enum.TryParse<PagingPage>(key, ignoreCase: true, out var page))
+                continue;
+            _pageSizes[page] = Normalize(value);
         }
     }
 
-    private void SaveToDisk()
+    private void SaveToStore()
     {
-        try
+        _settingsStore.Update(settings =>
         {
-            var dto = new PagingSettingsDto
-            {
-                PageSizes = _pageSizes.ToDictionary(
-                    pair => pair.Key.ToString(),
-                    pair => pair.Value)
-            };
-            var json = JsonSerializer.Serialize(dto, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(GetSettingsPath(), json);
-        }
-        catch
-        {
-        }
+            settings.PageSizes = _pageSizes.ToDictionary(
+                pair => pair.Key.ToString(),
+                pair => pair.Value);
+        });
     }
-
-    private static string GetSettingsPath() =>
-        Path.Combine(Directory.GetCurrentDirectory(), SettingsFileName);
 }

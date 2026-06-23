@@ -1,17 +1,20 @@
 using System.Globalization;
-using System.IO;
+using ServiceLayer.AppSettings;
 
 namespace UI.Services.Localization;
 
 public sealed class LocalizationService : ILocalizationService
 {
-    private const string SettingsFileName = "ui-language.txt";
+    private readonly IAppSettingsStore _settingsStore;
     private AppLanguage _currentLanguage;
+
     public event Action<CultureInfo>? CultureChanged;
     public AppLanguage CurrentLanguage => _currentLanguage;
-    public LocalizationService()
+
+    public LocalizationService(IAppSettingsStore settingsStore)
     {
-        _currentLanguage = LoadLanguageFromDisk() ?? AppLanguage.Russian;
+        _settingsStore = settingsStore;
+        _currentLanguage = LoadLanguageFromStore() ?? AppLanguage.Russian;
         ApplyCulture(_currentLanguage);
     }
 
@@ -20,7 +23,7 @@ public sealed class LocalizationService : ILocalizationService
         if (_currentLanguage == language)
             return;
         _currentLanguage = language;
-        SaveLanguageToDisk(language);
+        SaveLanguageToStore(language);
         ApplyCulture(language);
     }
 
@@ -36,31 +39,16 @@ public sealed class LocalizationService : ILocalizationService
         CultureChanged?.Invoke(culture);
     }
 
-    private static AppLanguage? LoadLanguageFromDisk()
+    private AppLanguage? LoadLanguageFromStore()
     {
-        try
-        {
-            var path = Path.Combine(Directory.GetCurrentDirectory(), SettingsFileName);
-            if (!File.Exists(path))
-                return null;
-            var text = File.ReadAllText(path).Trim();
-            return Enum.TryParse<AppLanguage>(text, ignoreCase: true, out var value) ? value : null;
-        }
-        catch
-        {
+        var languageText = _settingsStore.Get().Language;
+        if (string.IsNullOrWhiteSpace(languageText))
             return null;
-        }
+        return Enum.TryParse<AppLanguage>(languageText, ignoreCase: true, out var value) ? value : null;
     }
 
-    private static void SaveLanguageToDisk(AppLanguage language)
+    private void SaveLanguageToStore(AppLanguage language)
     {
-        try
-        {
-            var path = Path.Combine(Directory.GetCurrentDirectory(), SettingsFileName);
-            File.WriteAllText(path, language.ToString());
-        }
-        catch
-        {
-        }
+        _settingsStore.Update(settings => settings.Language = language.ToString());
     }
 }

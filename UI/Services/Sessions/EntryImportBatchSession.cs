@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.EntryDocumentReaderService;
 using ServiceLayer.EntryDocumentReaderService.Exceptions;
+using ServiceLayer.EntryImportSettings;
 
 namespace UI.Services.Sessions;
 
@@ -16,7 +17,8 @@ public sealed class EntryImportBatchSession : IAsyncDisposable
     public EntryImportBatchSession()
     {
         _dbContext = _scope.ServiceProvider.GetRequiredService<EfCoreContext>();
-        _reader = new EntryDocumentReaderService(_dbContext);
+        var importSettings = _scope.ServiceProvider.GetRequiredService<IEntryImportSettingsService>();
+        _reader = new EntryDocumentReaderService(_dbContext, importSettings);
     }
 
     public (IReadOnlyList<EntryDocument> documents, EntryImportStats stats) ImportFile(

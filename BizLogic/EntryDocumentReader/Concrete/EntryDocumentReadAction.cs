@@ -11,7 +11,7 @@ using OfficeOpenXml.Style;
 
 namespace BizLogic.EntryDocumentReader.Concrete;
 
-public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAccess)
+public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAccess, EntryImportHighlightScoringMode highlightScoringMode)
     : BizActionErrors, IEntryDocumentReadAction
 {
     private static readonly string[] SettingsWorksheetNames = ["Настройки", "Settings"];
@@ -42,6 +42,7 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
 
     private List<string> _warnings;
     private List<string> _errors;
+    private readonly EntryImportHighlightScoringMode _highlightScoringMode = highlightScoringMode;
 
     [GeneratedRegex(@"^\s*(?:\d{1,}\D)?[0-5]\d(?:\D\d{1,2})?\s*$")]
     private static partial Regex EntryTimeRegex();
@@ -262,8 +263,9 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 var cellText = workSheet.Cells[row, col].Text.Trim();
+                var cell = workSheet.Cells[row, col];
                 var entry = dbAccess.GetOrAddEntry(athlete, swimStyleHeaders[col],
-                    workSheet.Cells[row, col].Style.Fill.PatternType == ExcelFillStyle.None,
+                    ResolveScoring(cell),
                     EntryTimeRegex().IsMatch(cellText)
                         ? ConvertEntryTimeToHundreds(cellText)
                         : null);
@@ -321,6 +323,14 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
         var secondsOnly = int.Parse(matches[^1].Value);
         var minutesOnly = matches.Count > 1 ? int.Parse(matches[0].Value) : 0;
         return minutesOnly * 6000 + secondsOnly * 100;
+    }
+
+    private bool ResolveScoring(ExcelRange cell)
+    {
+        var isHighlighted = cell.Style.Fill.PatternType != ExcelFillStyle.None;
+        return _highlightScoringMode == EntryImportHighlightScoringMode.HighlightedInCompetition
+            ? isHighlighted
+            : !isHighlighted;
     }
 
     private string MessageLocation(string worksheetName, int? row, int? col)

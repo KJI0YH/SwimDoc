@@ -11,6 +11,7 @@
     <Page.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
         <displayHelpers:AppLanguageDisplayConverter x:Key="AppLanguageDisplayConverter" />
+        <displayHelpers:EnumDescriptionConverter x:Key="EnumDescriptionConverter" />
     </Page.Resources>
 
     <Grid HorizontalAlignment="Stretch"
@@ -133,6 +134,43 @@
                 <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
                            Text="{loc:Localizastion Settings_Section_Files}"
                            Margin="0,8,0,12" />
+
+                <Border Style="{StaticResource SettingsCardBorderStyle}" Margin="0,0,0,12">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Column="0" Style="{StaticResource SettingsIconBadgeStyle}">
+                            <ui:SymbolIcon Symbol="Highlight24"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" />
+                        </Border>
+
+                        <StackPanel Grid.Column="1" Margin="16,0,16,0" VerticalAlignment="Center">
+                            <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}"
+                                       Text="{loc:Localizastion Settings_EntryImport_HighlightScoring_Title}" />
+                            <TextBlock Margin="0,4,0,0"
+                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                       TextWrapping="Wrap"
+                                       Text="{loc:Localizastion Settings_EntryImport_HighlightScoring_Description}" />
+                        </StackPanel>
+
+                        <ComboBox Grid.Column="2"
+                                  Width="280"
+                                  VerticalAlignment="Center"
+                                  ItemsSource="{Binding HighlightScoringModes}"
+                                  SelectedItem="{Binding HighlightScoringMode}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </Grid>
+                </Border>
 
                 <Border Style="{StaticResource SettingsCardBorderStyle}">
                     <Grid>

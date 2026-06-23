@@ -2,6 +2,8 @@
 using DataLayer.EfCore;
 using Microsoft.EntityFrameworkCore;
 using ServiceLayer.EntryDocumentReaderService;
+using ServiceLayer.AppSettings;
+using ServiceLayer.EntryImportSettings;
 using Tests.TestInfrastructure;
 
 namespace Tests.EntryDocumentReader;
@@ -17,7 +19,9 @@ public class EntryDocumentReaderTest : DatabaseTestFixture
     [SetUp]
     public void SetUpService()
     {
-        _service = new EntryDocumentReaderService(Context);
+        _service = new EntryDocumentReaderService(
+            Context,
+            new EntryImportSettingsService(new AppSettingsStore()));
     }
 
     [TearDown]

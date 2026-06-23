@@ -5,7 +5,9 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
+using BizLogic.EntryDocumentReader;
 using ServiceLayer.EntryDocumentTemplateService;
+using ServiceLayer.EntryImportSettings;
 using UI.Resources;
 using UI.ViewModels;
 
@@ -15,6 +17,7 @@ public sealed partial class SettingsViewModel : ViewModelBase
 {
     private readonly IEntryDocumentTemplateService _entryDocumentTemplateService;
     private readonly ILocalizationService _localizationService;
+    private readonly IEntryImportSettingsService _entryImportSettingsService;
     public ObservableCollection<AppLanguage> AvailableLanguages { get; } =
         new([AppLanguage.Russian, AppLanguage.English]);
 
@@ -23,16 +26,21 @@ public sealed partial class SettingsViewModel : ViewModelBase
 
     [ObservableProperty] private AppLanguage _selectedLanguage;
     [ObservableProperty] private bool _isBaseTimesOpen;
+    [ObservableProperty] private EntryImportHighlightScoringMode _highlightScoringMode;
+    public Array HighlightScoringModes => Enum.GetValues<EntryImportHighlightScoringMode>();
     public SettingsViewModel(
         IEntryDocumentTemplateService entryDocumentTemplateService,
         ILocalizationService localizationService,
+        IEntryImportSettingsService entryImportSettingsService,
         IPagingSettingsService pagingSettingsService,
         BaseTimesSettingsViewModel baseTimesSettingsViewModel)
     {
         _entryDocumentTemplateService = entryDocumentTemplateService;
         _localizationService = localizationService;
+        _entryImportSettingsService = entryImportSettingsService;
         BaseTimes = baseTimesSettingsViewModel;
         _selectedLanguage = localizationService.CurrentLanguage;
+        _highlightScoringMode = entryImportSettingsService.HighlightScoringMode;
         PagingSettings = new ObservableCollection<PagingSettingItemViewModel>(
             PagingSettingsService.NavigationOrder
                 .Select(page => new PagingSettingItemViewModel(pagingSettingsService, page)));
@@ -42,11 +50,15 @@ public sealed partial class SettingsViewModel : ViewModelBase
     partial void OnSelectedLanguageChanged(AppLanguage value) =>
         _localizationService.SetLanguage(value);
 
+    partial void OnHighlightScoringModeChanged(EntryImportHighlightScoringMode value) =>
+        _entryImportSettingsService.SetHighlightScoringMode(value);
+
     private void OnCultureChanged(CultureInfo _)
     {
         foreach (var item in PagingSettings)
             item.RefreshDisplayText();
         BaseTimes.RefreshDisplayNames();
+        OnPropertyChanged(nameof(HighlightScoringModes));
     }
 
     [RelayCommand]

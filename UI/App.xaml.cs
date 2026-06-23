@@ -9,6 +9,8 @@ using ServiceLayer.BaseTimeRepository;
 using ServiceLayer.ClubService;
 using ServiceLayer.ConnectionService;
 using ServiceLayer.EntryDocumentReaderService;
+using ServiceLayer.AppSettings;
+using ServiceLayer.EntryImportSettings;
 using ServiceLayer.EntryDocumentTemplateService;
 using ServiceLayer.EntryService;
 using ServiceLayer.EventService;
@@ -112,7 +114,9 @@ public partial class App : Application
         services.AddSingleton<Wpf.Ui.IContentDialogService, Wpf.Ui.ContentDialogService>();
         services.AddTransient<IConfirmDialogService, ConfirmDialogService>();
         services.AddTransient<IErrorDialogService, ErrorDialogService>();
+        services.AddSingleton<IAppSettingsStore, AppSettingsStore>();
         services.AddSingleton<ILocalizationService, LocalizationService>();
+        services.AddSingleton<IEntryImportSettingsService, EntryImportSettingsService>();
         services.AddSingleton<IPagingSettingsService, PagingSettingsService>();
         services.AddSingleton<IGitHubUpdateCheckService>(_ =>
         {
