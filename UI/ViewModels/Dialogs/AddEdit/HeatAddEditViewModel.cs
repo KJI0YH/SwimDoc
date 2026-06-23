@@ -48,7 +48,7 @@ public partial class HeatAddEditViewModel(
     public bool IsReadOnly => false;
     public bool CanEditFields => true;
     public string WindowTitle => _isAdd ? Strings.WindowTitle_CreateHeat : Strings.WindowTitle_EditHeat;
-    public double ContentMinWidth => 400;
+    public override double ContentWidth => 640;
     object? IWindowResult.Result => _entity;
     public event EventHandler<DialogCloseEventArgs>? CloseRequested;
     public IReadOnlyList<string> HourOptions { get; } = CreateTimePartOptions(24);

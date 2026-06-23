@@ -22,6 +22,7 @@ public partial class EntryViewModel(
     IEventService eventService)
     : AddEditViewModel<Entry, int?>(id, entryService), INavigationContextAware
 {
+    public override double ContentWidth => 580;
     private bool _initialized;
     private bool _suppressRelaySync;
     private bool _suppressIndividualFilterSync;

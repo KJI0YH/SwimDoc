@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using UI.Helpers.Dialogs;
 using UI.Resources;
 using UI.ViewModels;
 using Wpf.Ui;
@@ -76,10 +77,10 @@ public sealed partial class AboutViewModel(
                 var dialog = new ContentDialog
                 {
                     Title = Strings.About_Updates_Title,
-                    Content = string.Format(
+                    Content = DialogContentFactory.CreateMessageContent(string.Format(
                         Strings.About_Updates_Available,
                         NormalizeVersionLabel(result.LatestVersion),
-                        AppVersionInformation.Display),
+                        AppVersionInformation.Display)),
                     PrimaryButtonText = Strings.About_Updates_Download,
                     CloseButtonText = Strings.Common_Cancel,
                     DefaultButton = ContentDialogButton.Primary
@@ -104,7 +105,7 @@ public sealed partial class AboutViewModel(
         var dialog = new ContentDialog
         {
             Title = title,
-            Content = content,
+            Content = DialogContentFactory.CreateMessageContent(content),
             CloseButtonText = Strings.Common_Ok,
             DefaultButton = ContentDialogButton.Close
         };

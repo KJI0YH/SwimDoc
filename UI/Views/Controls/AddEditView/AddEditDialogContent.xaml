@@ -5,9 +5,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              mc:Ignorable="d"
-             MinWidth="{Binding ContentMinWidth, FallbackValue=480}">
+             HorizontalAlignment="Stretch"
+             Width="{Binding ContentWidth, FallbackValue=520}"
+             MinWidth="{Binding ContentWidth, FallbackValue=520}"
+             MaxWidth="{Binding ContentWidth, FallbackValue=520}">
     <StackPanel>
-        <ContentControl Content="{Binding EditorContent, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+        <ContentControl HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Stretch"
+                        Content="{Binding EditorContent, RelativeSource={RelativeSource AncestorType=UserControl}}" />
 
         <Border Margin="0,12,0,0"
                 Padding="12,10"

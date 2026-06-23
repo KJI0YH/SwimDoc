@@ -1,6 +1,7 @@
 using DataLayer.EfClasses;
 using DataLayer.EfCore;
 using Microsoft.EntityFrameworkCore;
+using UI.Helpers.Dialogs;
 using UI.Resources;
 using Wpf.Ui;
 using Wpf.Ui.Controls;
@@ -94,7 +95,7 @@ public class ConfirmDialogService(
         var dialog = new ContentDialog
         {
             Title = title,
-            Content = content,
+            Content = DialogContentFactory.CreateMessageContent(content),
             PrimaryButtonText = primaryButtonText,
             CloseButtonText = Strings.Common_Cancel,
             DefaultButton = ContentDialogButton.Close

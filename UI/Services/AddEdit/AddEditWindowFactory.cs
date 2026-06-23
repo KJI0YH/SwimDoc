@@ -39,6 +39,7 @@ public class AddEditWindowFactory(IContentDialogService contentDialogService) : 
         if (viewModel is EntryViewModel entryViewModel && !entryViewModel.IsInitialized)
             await entryViewModel.InitializeAsync();
         var view = definition.CreateView();
+        view.HorizontalAlignment = HorizontalAlignment.Stretch;
         view.DataContext = viewModel;
         return await ShowDialogAsync(viewModel, view);
     }
@@ -48,6 +49,7 @@ public class AddEditWindowFactory(IContentDialogService contentDialogService) : 
         var viewModel = _registry.CreateGenericViewModel(id, crudService);
         await InitializeIfNeededAsync(viewModel);
         var view = _registry.CreateGenericView();
+        view.HorizontalAlignment = HorizontalAlignment.Stretch;
         view.DataContext = viewModel;
         return await ShowDialogAsync(viewModel, view);
     }

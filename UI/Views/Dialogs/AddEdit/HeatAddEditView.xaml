@@ -14,7 +14,7 @@
         <displayHelpers:EnumDescriptionConverter x:Key="EnumDescriptionConverter" />
                 <converters:BoolToVisibilityConverter x:Key="BoolToVis" />
     </UserControl.Resources>
-    <StackPanel Margin="0,0,0,15" MaxWidth="420">
+    <StackPanel Margin="0,0,0,15">
                 <Grid Margin="0,5">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="140" />

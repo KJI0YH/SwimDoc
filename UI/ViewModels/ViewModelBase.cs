@@ -4,4 +4,5 @@ namespace UI.ViewModels;
 
 public class ViewModelBase : ObservableObject
 {
+    public virtual double ContentWidth => 520;
 }
