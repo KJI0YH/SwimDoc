@@ -32,6 +32,7 @@ public partial class SearchableComboBox : UserControl
 
     private bool _isSearchActive;
     private bool _isSyncingSelection;
+    private bool _isUpdatingText;
     private bool _isOpeningDropDownForSearch;
     private ICollectionView? _itemsView;
     private ObservableCollection<SearchableItem>? _boundItemsSource;
@@ -94,7 +95,8 @@ public partial class SearchableComboBox : UserControl
     private void OnBoundItemsSourceChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         _itemsView?.Refresh();
-        SyncSelectedItem();
+        if (!_isSearchActive)
+            SyncSelectedItem();
     }
 
     private void SyncSelectedItem()
@@ -166,16 +168,36 @@ public partial class SearchableComboBox : UserControl
 
     private void ComboBoxControl_OnTextChanged(object sender, TextChangedEventArgs e)
     {
-        if (_itemsView == null) return;
+        if (_itemsView == null || _isUpdatingText) return;
         if (!_isSearchActive) return;
         var typedText = ComboBoxControl.Text ?? string.Empty;
+        if (typedText == _searchText)
+            return;
         _searchText = typedText;
         _itemsView.Refresh();
+        ClearSelectionDuringSearch();
         if (!ComboBoxControl.IsKeyboardFocusWithin)
             return;
         _isOpeningDropDownForSearch = true;
         ComboBoxControl.IsDropDownOpen = true;
-        RestoreEditableText(typedText);
+        if (ComboBoxControl.Text != typedText)
+            RestoreEditableText(typedText);
+    }
+
+    private void ClearSelectionDuringSearch()
+    {
+        if (!_isSearchActive || ComboBoxControl.SelectedItem == null)
+            return;
+        _isSyncingSelection = true;
+        try
+        {
+            ComboBoxControl.SelectedItem = null;
+            SelectedItem = null;
+        }
+        finally
+        {
+            _isSyncingSelection = false;
+        }
     }
 
     private void BeginSearch(bool clearSelection)
@@ -207,10 +229,23 @@ public partial class SearchableComboBox : UserControl
     {
         if (GetEditableTextBox() is not { } textBox)
             return;
-        if (textBox.Text != text)
+        if (textBox.Text == text)
+        {
+            textBox.CaretIndex = text.Length;
+            textBox.SelectionLength = 0;
+            return;
+        }
+        _isUpdatingText = true;
+        try
+        {
             textBox.Text = text;
-        textBox.CaretIndex = text.Length;
-        textBox.SelectionLength = 0;
+            textBox.CaretIndex = text.Length;
+            textBox.SelectionLength = 0;
+        }
+        finally
+        {
+            _isUpdatingText = false;
+        }
     }
 
     private bool FilterItem(object obj)

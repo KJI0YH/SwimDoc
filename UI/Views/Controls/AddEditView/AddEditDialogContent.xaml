@@ -30,12 +30,19 @@
                     </Style.Triggers>
                 </Style>
             </Border.Style>
-            <StackPanel Orientation="Horizontal">
-                <ui:SymbolIcon Symbol="ErrorCircle24"
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <ui:SymbolIcon Grid.Column="0"
+                               Symbol="ErrorCircle24"
                                Foreground="{DynamicResource SystemFillColorCriticalBrush}"
                                Margin="0,0,10,0"
                                VerticalAlignment="Top" />
-                <ItemsControl ItemsSource="{Binding ValidationErrors}">
+                <ItemsControl Grid.Column="1"
+                              HorizontalAlignment="Stretch"
+                              ItemsSource="{Binding ValidationErrors}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Foreground="{DynamicResource SystemFillColorCriticalBrush}"
@@ -45,7 +52,7 @@
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
-            </StackPanel>
+            </Grid>
         </Border>
     </StackPanel>
 </UserControl>

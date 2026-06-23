@@ -592,9 +592,12 @@ public partial class EntryViewModel(
             Entity.AthleteId = athlete.Id;
             Entity.RelayId = null;
             Entity.Relay = null;
+            RefreshIndividualEntryOptions();
+            return;
         }
-        else
-            Entity.AthleteId = null;
+        if (value is null)
+            return;
+        Entity.AthleteId = null;
         RefreshIndividualEntryOptions();
     }
 
@@ -606,9 +609,12 @@ public partial class EntryViewModel(
         {
             Entity.SwimEventId = swimEvent.Id;
             Entity.SwimStyleId = swimEvent.SwimStyleId;
+            RefreshIndividualEntryOptions();
+            return;
         }
-        else
-            Entity.SwimEventId = null;
+        if (value is null)
+            return;
+        Entity.SwimEventId = null;
         RefreshIndividualEntryOptions();
     }
 
