@@ -3,24 +3,35 @@ using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
 using DataLayer.EfClasses;
+using ServiceLayer.Logging;
 
 namespace ServiceLayer.BaseTimeRepository;
 
 public sealed class CsvBaseTimeRepository : IBaseTimeRepository
 {
     private readonly string _filePath;
+    private readonly IAppLog _log;
     private readonly object _ioLock = new();
     private readonly
         ConcurrentDictionary<(Course course, int meters, Stroke stroke, int relayCount, Gender gender), int> _store =
             new();
 
-    public CsvBaseTimeRepository() : this(ApplicationPaths.EnsureUserDataFileFromBundle("base-times.csv"))
+    public CsvBaseTimeRepository() : this(ApplicationPaths.EnsureUserDataFileFromBundle("base-times.csv"), NullAppLog.Instance)
     {
     }
 
-    public CsvBaseTimeRepository(string filePath)
+    public CsvBaseTimeRepository(string filePath) : this(filePath, NullAppLog.Instance)
+    {
+    }
+
+    public CsvBaseTimeRepository(IAppLog log) : this(ApplicationPaths.EnsureUserDataFileFromBundle("base-times.csv"), log)
+    {
+    }
+
+    public CsvBaseTimeRepository(string filePath, IAppLog log)
     {
         _filePath = filePath;
+        _log = log;
         LoadFromFile();
     }
 
@@ -43,6 +54,7 @@ public sealed class CsvBaseTimeRepository : IBaseTimeRepository
     {
         lock (_ioLock)
             SaveToFileLocked();
+        _log.Info($"Saved base times: {_filePath} ({_store.Count} values)");
     }
 
     private void LoadFromFile()

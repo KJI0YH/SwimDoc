@@ -8,6 +8,7 @@ using Microsoft.Win32;
 using BizLogic.EntryDocumentReader;
 using ServiceLayer.EntryDocumentTemplateService;
 using ServiceLayer.EntryImportSettings;
+using ServiceLayer.Logging;
 using UI.Resources;
 using UI.Services.FontScale;
 using UI.ViewModels;
@@ -113,6 +114,7 @@ public sealed partial class SettingsViewModel : ViewModelBase
         {
             var bytes = _entryDocumentTemplateService.CreateTemplate();
             File.WriteAllBytes(dialog.FileName, bytes);
+            App.Current.Services.GetRequiredService<IAppLog>().Info($"Saved entry document template: \"{dialog.FileName}\"");
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {

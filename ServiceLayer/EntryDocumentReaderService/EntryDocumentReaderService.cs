@@ -8,12 +8,14 @@ using DataLayer.EfCore;
 using Microsoft.EntityFrameworkCore;
 using ServiceLayer.EntryDocumentReaderService.Exceptions;
 using ServiceLayer.EntryImportSettings;
+using ServiceLayer.Logging;
 
 namespace ServiceLayer.EntryDocumentReaderService;
 
 public class EntryDocumentReaderService(
     EfCoreContext context,
-    IEntryImportSettingsService importSettings) : IEntryDocumentReaderService
+    IEntryImportSettingsService importSettings,
+    IAppLog log) : IEntryDocumentReaderService
 {
     private readonly EfCoreContext _context = context;
     private readonly IEntryImportSettingsService _importSettings = importSettings;
@@ -27,6 +29,7 @@ public class EntryDocumentReaderService(
         Errors = action.Errors.ToImmutableList();
         if (action.Errors.Any())
             throw new EntryDocumentReaderException();
+        log.Info($"Read entry document (no save): \"{filePath}\", documents={result.Count}");
         return result;
     }
 
@@ -57,15 +60,7 @@ public class EntryDocumentReaderService(
         var athletesUpdated = _context.ChangeTracker.Entries<Athlete>().Count(e => e.State == EntityState.Modified);
         var entriesAdded = _context.ChangeTracker.Entries<Entry>().Count(e => e.State == EntityState.Added);
         var entriesUpdated = _context.ChangeTracker.Entries<Entry>().Count(e => e.State == EntityState.Modified);
-        if (saveChanges)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            var errors = _context.SaveChangesWithValidation();
-            if (errors.Any())
-                throw new EntryDocumentReaderException();
-        }
-
-        return (documents, new EntryImportStats(
+        var stats = new EntryImportStats(
             clubsScanned,
             clubsWithErrors,
             clubsAdded,
@@ -77,9 +72,31 @@ public class EntryDocumentReaderService(
             entriesScanned,
             entriesWithErrors,
             entriesAdded,
-            entriesUpdated));
+            entriesUpdated);
+        LogPendingImportChanges(filePath);
+        if (saveChanges)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var errors = _context.SaveChangesWithValidation();
+            if (errors.Any())
+                throw new EntryDocumentReaderException();
+            log.Info(EntityLogFormatter.FormatImportStats(filePath, stats));
+        }
+        else
+        {
+            log.Info($"{EntityLogFormatter.FormatImportStats(filePath, stats)} (pending save)");
+        }
+
+        return (documents, stats);
     }
 
     private EntryDocumentReadAction CreateReadAction() =>
-        new(new EntryDocumentReaderDbAccess(_context), _importSettings.HighlightScoringMode);
+        new(new EntryDocumentReaderDbAccess(_context), _importSettings.HighlightScoringMode, new AppBizLog(log));
+
+    private void LogPendingImportChanges(string filePath)
+    {
+        var fileName = Path.GetFileName(filePath);
+        log.Info($"Import pending changes from \"{fileName}\":");
+        EntityLogFormatter.LogChangeTrackerChanges(log, _context);
+    }
 }

@@ -3,12 +3,13 @@ using DataLayer.EfCore;
 using Microsoft.EntityFrameworkCore;
 using ServiceLayer.BaseTimeRepository;
 using ServiceLayer.Crud;
+using ServiceLayer.Logging;
 using DataLayer;
 
 namespace ServiceLayer.EventService;
 
-public class EventService(EfCoreContext dbContext, IBaseTimeRepository baseTimeRepository)
-    : CrudService<SwimEvent, int?>(dbContext), IEventService
+public class EventService(EfCoreContext dbContext, IBaseTimeRepository baseTimeRepository, IAppLog log)
+    : CrudService<SwimEvent, int?>(dbContext, log), IEventService
 {
     public int GetNextOrderNumber()
     {
@@ -115,6 +116,10 @@ public class EventService(EfCoreContext dbContext, IBaseTimeRepository baseTimeR
             cancellationToken.ThrowIfCancellationRequested();
             await dbContext.SaveChangesAsync(cancellationToken);
             await transaction.CommitAsync(cancellationToken);
+            foreach (var swimEvent in events)
+                log.Info(EntityLogFormatter.FormatOperation("Update", swimEvent));
+            log.Info(
+                $"Calculate start times: {events.Count} events, start={parameters.StartTime:HH\\:mm}, heatPause={parameters.HeatPause}, eventPause={parameters.EventPause}, swimEventIds=[{EntityLogFormatter.FormatIdList(swimEventIds)}]");
         }
         catch
         {

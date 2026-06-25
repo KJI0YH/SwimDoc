@@ -1,4 +1,5 @@
 using ServiceLayer.AppSettings;
+using ServiceLayer.Logging;
 using UI.Resources;
 
 namespace UI.Services.Paging;
@@ -30,12 +31,14 @@ public sealed class PagingSettingsService : IPagingSettingsService
         };
 
     private readonly IAppSettingsStore _settingsStore;
+    private readonly IAppLog _log;
     private readonly Dictionary<PagingPage, int> _pageSizes = new(Defaults);
     public event Action<PagingPage>? PageSizeChanged;
 
-    public PagingSettingsService(IAppSettingsStore settingsStore)
+    public PagingSettingsService(IAppSettingsStore settingsStore, IAppLog log)
     {
         _settingsStore = settingsStore;
+        _log = log;
         LoadFromStore();
     }
 
@@ -49,6 +52,7 @@ public sealed class PagingSettingsService : IPagingSettingsService
         _pageSizes[page] = normalized;
         SaveToStore();
         PageSizeChanged?.Invoke(page);
+        _log.Info($"Changed page size for \"{GetPageTitle(page)}\": {normalized}");
         return normalized;
     }
 

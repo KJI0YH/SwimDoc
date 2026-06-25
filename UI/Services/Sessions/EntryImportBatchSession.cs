@@ -5,20 +5,29 @@ using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.EntryDocumentReaderService;
 using ServiceLayer.EntryDocumentReaderService.Exceptions;
 using ServiceLayer.EntryImportSettings;
+using ServiceLayer.Logging;
 
 namespace UI.Services.Sessions;
 
+/// <summary>
+/// Batch import must use a single <see cref="EfCoreContext"/> for parsing and commit.
+/// Do not resolve <see cref="IEntryDocumentReaderService"/> from DI here — it would get a different context.
+/// </summary>
 public sealed class EntryImportBatchSession : IAsyncDisposable
 {
     private readonly IServiceScope _scope = App.Current.Services.CreateScope();
     private readonly EfCoreContext _dbContext;
-    private readonly EntryDocumentReaderService _reader;
+    private readonly IEntryDocumentReaderService _reader;
+    private readonly IAppLog _log;
 
     public EntryImportBatchSession()
     {
         _dbContext = _scope.ServiceProvider.GetRequiredService<EfCoreContext>();
-        var importSettings = _scope.ServiceProvider.GetRequiredService<IEntryImportSettingsService>();
-        _reader = new EntryDocumentReaderService(_dbContext, importSettings);
+        _log = _scope.ServiceProvider.GetRequiredService<IAppLog>();
+        _reader = new EntryDocumentReaderService(
+            _dbContext,
+            _scope.ServiceProvider.GetRequiredService<IEntryImportSettingsService>(),
+            _log);
     }
 
     public (IReadOnlyList<EntryDocument> documents, EntryImportStats stats) ImportFile(
@@ -35,12 +44,14 @@ public sealed class EntryImportBatchSession : IAsyncDisposable
             if (errors.Count > 0)
                 throw new EntryDocumentReaderException();
             transaction.Commit();
+            _log.Info($"Entry import committed to database: \"{filePath}\"");
             return result;
         }
         catch
         {
             transaction.Rollback();
             _dbContext.ChangeTracker.Clear();
+            _log.Warning($"Entry import rolled back: \"{filePath}\"");
             throw;
         }
     }

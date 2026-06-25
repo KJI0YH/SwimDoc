@@ -335,8 +335,8 @@
   <data name="Common_All" xml:space="preserve"><value>Все</value></data>
   <data name="Common_Min" xml:space="preserve"><value>Мин.</value></data>
   <data name="Common_Max" xml:space="preserve"><value>Макс.</value></data>
-  <data name="Common_AbsoluteMin" xml:space="preserve"><value>Г.р. от</value></data>
-  <data name="Common_AbsoluteMax" xml:space="preserve"><value>Г.р. до</value></data>
+  <data name="Common_AbsoluteMin" xml:space="preserve"><value>старше</value></data>
+  <data name="Common_AbsoluteMax" xml:space="preserve"><value>моложе</value></data>
   <data name="Common_Individual" xml:space="preserve"><value>Личная</value></data>
   <data name="Common_NoTime" xml:space="preserve"><value>N.T.</value></data>
   <data name="Common_Ok" xml:space="preserve"><value>OK</value></data>

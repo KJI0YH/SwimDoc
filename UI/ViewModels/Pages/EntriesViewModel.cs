@@ -16,6 +16,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
 using ServiceLayer.EntryDocumentReaderService;
 using ServiceLayer.EntryService;
+using ServiceLayer.Logging;
 using ServiceLayer.SwimStyleService;
 using UI.Resources;
 using UI.ViewModels.Pages.Data;
@@ -426,6 +427,8 @@ public partial class EntriesViewModel(
             context: GetLoadEntriesFromPreviousEventContext());
         if (dialog.DataContext is not IWindowResult { Result: LoadEntriesFromPreviousEventResult selection })
             return;
+        App.Current.Services.GetRequiredService<IAppLog>().Info(
+            $"Copy entries requested: \"{selection.PreviousEventDisplayName}\" -> \"{selection.TargetEventDisplayName}\"");
         try
         {
             var (created, errors) = await entryService.CopyEntriesFromPreviousEventAsync(
@@ -509,6 +512,8 @@ public partial class EntriesViewModel(
     [RelayCommand(CanExecute = nameof(CanCancelImport))]
     private void CancelImport()
     {
+        App.Current.Services.GetRequiredService<IAppLog>().Info(
+            $"Entry import canceled by user ({ImportProcessedFiles}/{ImportTotalFiles})");
         _importCts?.Cancel();
     }
 
@@ -553,6 +558,7 @@ public partial class EntriesViewModel(
     private async Task StartImportAsync(string[] files)
     {
         if (files.Length == 0) return;
+        App.Current.Services.GetRequiredService<IAppLog>().Info($"Started entry import: {files.Length} files");
         _importCts?.Cancel();
         _importCts = new CancellationTokenSource();
         _suppressImportUiUpdates = false;

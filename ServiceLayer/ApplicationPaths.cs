@@ -22,6 +22,16 @@ public static class ApplicationPaths
     public static string GetUserDataFilePath(string fileName) =>
         Path.Combine(UserDataDirectory, fileName);
 
+    public static string LogDirectory
+    {
+        get
+        {
+            var path = Path.Combine(UserDataDirectory, "logs");
+            Directory.CreateDirectory(path);
+            return path;
+        }
+    }
+
     public static string GetBundledFilePath(string fileName) =>
         Path.Combine(InstallDirectory, fileName);
 

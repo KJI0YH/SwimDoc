@@ -2,16 +2,19 @@ using DataLayer.EfClasses;
 using DataLayer.EfCore;
 using Microsoft.EntityFrameworkCore;
 using ServiceLayer.Crud;
+using ServiceLayer.Logging;
 
 namespace ServiceLayer.AthleteService;
 
-public class AthleteService(EfCoreContext dbContext) : CrudService<Athlete, int?>(dbContext), IAthleteService
+public class AthleteService(EfCoreContext dbContext, IAppLog log) : CrudService<Athlete, int?>(dbContext, log), IAthleteService
 {
-    public Task<List<Athlete>> GetAthletesByClubIdAsync(int clubId)
+    public async Task<List<Athlete>> GetAthletesByClubIdAsync(int clubId)
     {
-        return dbContext.Athletes
+        var athletes = await dbContext.Athletes
             .AsNoTracking()
             .Where(a => a.ClubId == clubId)
             .ToListAsync();
+        log.Info($"Read Athletes by ClubId={clubId}: {athletes.Count} items");
+        return athletes;
     }
 }

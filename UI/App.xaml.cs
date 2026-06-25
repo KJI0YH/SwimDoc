@@ -8,6 +8,8 @@ using ServiceLayer.AthleteService;
 using ServiceLayer.BaseTimeRepository;
 using ServiceLayer.ClubService;
 using ServiceLayer.ConnectionService;
+using ServiceLayer.Logging;
+using ServiceLayer.DependencyInjection;
 using ServiceLayer.EntryDocumentReaderService;
 using ServiceLayer.AppSettings;
 using ServiceLayer.EntryImportSettings;
@@ -74,14 +76,27 @@ public partial class App : Application
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+        var log = Services.GetRequiredService<IAppLog>();
+        RegisterExceptionLogging(log);
+        log.Info($"Application startup. Install directory: {ServiceLayer.ApplicationPaths.InstallDirectory}");
+        if (e.Args.Length > 0)
+            log.Info($"Command line arguments: {string.Join(' ', e.Args)}");
+
         StartupCompetitionFilePath = CompetitionFile.ResolveStartupPath(e.Args);
+        if (StartupCompetitionFilePath is not null)
+            log.Info($"Startup competition file requested: {StartupCompetitionFilePath}");
+
         Services.GetRequiredService<IFontScaleService>().ApplyCurrent();
         var mainWindow = new MainWindow();
         mainWindow.Show();
+        log.Info("Main window shown.");
     }
 
     protected override void OnExit(ExitEventArgs e)
     {
+        if (Services.GetService<IAppLog>() is { } log)
+            log.Info("Application exit.");
+
         if (_installerMutex is not null)
         {
             _installerMutex.ReleaseMutex();
@@ -92,14 +107,36 @@ public partial class App : Application
         base.OnExit(e);
     }
 
+    private static void RegisterExceptionLogging(IAppLog log)
+    {
+        AppDomain.CurrentDomain.UnhandledException += (_, args) =>
+        {
+            if (args.ExceptionObject is Exception ex)
+                log.Error("Unhandled application exception.", ex);
+            else
+                log.Error($"Unhandled application exception: {args.ExceptionObject}");
+        };
+
+        TaskScheduler.UnobservedTaskException += (_, args) =>
+        {
+            log.Error("Unobserved task exception.", args.Exception);
+            args.SetObserved();
+        };
+
+        Current.DispatcherUnhandledException += (_, args) =>
+        {
+            log.Error("Unhandled UI thread exception.", args.Exception);
+        };
+    }
+
     private IServiceProvider ConfigureServiceProvider()
     {
         var serviceCollection = new ServiceCollection();
-        serviceCollection.AddDbContext<EfCoreContext>(
-            options => options.UseSwimDocSqlite(),
-            ServiceLifetime.Transient,
-            ServiceLifetime.Singleton);
         ConfigureServices(serviceCollection);
+        serviceCollection.AddDbContext<EfCoreContext>((_, options) =>
+        {
+            options.UseSwimDocSqlite();
+        }, ServiceLifetime.Transient, ServiceLifetime.Singleton);
         ConfigureViewModels(serviceCollection);
         var provider = serviceCollection.BuildServiceProvider();
         var localization = provider.GetRequiredService<ILocalizationService>();
@@ -128,11 +165,12 @@ public partial class App : Application
 
     private static void ConfigureServices(IServiceCollection services)
     {
+        services.AddSingleton<IAppLog, FileAppLog>();
         services.AddSingleton<IDatabaseConnection, DatabaseConnectionService>();
         services.AddTransient<ICompetitionDatabaseService, CompetitionDatabaseService>();
         services.AddSingleton<INavigationService, NavigationService>();
         services.AddSingleton<IAddEditWindowFactory, AddEditWindowFactory>();
-        services.AddSingleton<IBaseTimeRepository, CsvBaseTimeRepository>();
+        services.AddSingleton<IBaseTimeRepository>(sp => new CsvBaseTimeRepository(sp.GetRequiredService<IAppLog>()));
         services.AddSingleton<IPointScoreProvider, PointScoreProvider>();
         services.AddSingleton<Wpf.Ui.IContentDialogService, Wpf.Ui.ContentDialogService>();
         services.AddTransient<IConfirmDialogService, ConfirmDialogService>();
@@ -140,7 +178,8 @@ public partial class App : Application
         services.AddSingleton<IAppSettingsStore, AppSettingsStore>();
         services.AddSingleton<ILocalizationService, LocalizationService>();
         services.AddSingleton<IFontScaleService, FontScaleService>();
-        services.AddSingleton<IEntryImportSettingsService, EntryImportSettingsService>();
+        services.AddSingleton<IEntryImportSettingsService>(sp =>
+            new EntryImportSettingsService(sp.GetRequiredService<IAppSettingsStore>(), sp.GetRequiredService<IAppLog>()));
         services.AddSingleton<IPagingSettingsService, PagingSettingsService>();
         services.AddSingleton<IGitHubUpdateCheckService>(_ =>
         {
@@ -157,7 +196,7 @@ public partial class App : Application
         services.AddTransient<IEntryService, EntryService>();
         services.AddTransient<IEventService, EventService>();
         services.AddTransient<IHeatService, HeatService>();
-        services.AddTransient<IReportExportService, ReportExportService>();
+        services.AddTransient<IReportExportService>(SharedDbContextServices.CreateReportExportService);
         services.AddTransient<ISwimStyleService, SwimStyleService>();
     }
 

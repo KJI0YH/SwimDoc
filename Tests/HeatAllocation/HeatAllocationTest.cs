@@ -3,6 +3,7 @@ using DataLayer.EfClasses;
 using DataLayer.EfCore;
 using Microsoft.EntityFrameworkCore;
 using ServiceLayer.HeatService;
+using ServiceLayer.Logging;
 using Tests.TestInfrastructure;
 
 namespace Tests.HeatAllocation;
@@ -16,7 +17,7 @@ public class HeatAllocationTest : DatabaseTestFixture
     [SetUp]
     public void SetUpServices()
     {
-        _heatService = new HeatService(Context);
+        _heatService = new HeatService(Context, NullAppLog.Instance);
         _seeder = new TestDataSeeder(Context);
     }
 

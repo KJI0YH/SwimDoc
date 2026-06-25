@@ -28,9 +28,7 @@ public class AgeGroup : IValidatableObject
         var currContext = validationContext.GetService(typeof(DbContext)) as EfCoreContext;
         if (BirthYearMin.HasValue && BirthYearMax.HasValue && BirthYearMin.Value > BirthYearMax.Value)
         {
-            yield return new ValidationResult(
-                ValidationStrings.AgeGroup_InvalidYearRange,
-                [nameof(BirthYearMin), nameof(BirthYearMax)]);
+            (BirthYearMin, BirthYearMax) = (BirthYearMax, BirthYearMin);
         }
         var existed = currContext?.AgeGroups
             .FirstOrDefault(ageGroup => ageGroup.Gender == Gender &&

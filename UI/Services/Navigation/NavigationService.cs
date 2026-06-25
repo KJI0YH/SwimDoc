@@ -1,12 +1,13 @@
 using System.Windows.Controls;
 using Microsoft.Extensions.DependencyInjection;
+using ServiceLayer.Logging;
 using UI.Helpers.Navigation;
 using UI.ViewModels;
 using UI.ViewModels.Pages;
 
 namespace UI.Services.Navigation;
 
-public class NavigationService(IServiceProvider serviceProvider) : INavigationService
+public class NavigationService(IServiceProvider serviceProvider, IAppLog log) : INavigationService
 {
     private readonly Stack<NavigationFrame> _backStack = new();
     private readonly Dictionary<Type, object?> _navigationParameters = new();
@@ -29,6 +30,7 @@ public class NavigationService(IServiceProvider serviceProvider) : INavigationSe
         _navigationParameters[typeof(TViewModel)] = context;
         var frame = CreateFrame(viewModel, typeof(TViewModel), ResolveSidebarTag(typeof(TViewModel)), context);
         MoveTo(frame, addCurrentToBackStack: true, isRestore: false);
+        log.Info($"Navigation: forward -> {typeof(TViewModel).Name}");
     }
 
     public void NavigateTo<TViewModel>(NavigationContext context) where TViewModel : ViewModelBase =>
@@ -48,6 +50,7 @@ public class NavigationService(IServiceProvider serviceProvider) : INavigationSe
             NavigationPageRegistry.ViewModelTypeToSidebarTag.GetValueOrDefault(typeof(TViewModel)),
             null);
         EnterFrame(_currentFrame, isRestore: false);
+        log.Info($"Navigation: root -> {typeof(TViewModel).Name}");
         PublishState(NavigationTransition.Root);
     }
 
@@ -64,6 +67,7 @@ public class NavigationService(IServiceProvider serviceProvider) : INavigationSe
             null,
             null);
         EnterFrame(_currentFrame, isRestore: false);
+        log.Info("Navigation: competition selection");
         PublishState(NavigationTransition.Root);
     }
 
@@ -79,6 +83,7 @@ public class NavigationService(IServiceProvider serviceProvider) : INavigationSe
         _navigationParameters.Remove(viewModelType);
         var frame = CreateFrame(viewModel, viewModelType, tag, null);
         MoveTo(frame, addCurrentToBackStack: _currentFrame is not null, isRestore: false);
+        log.Info($"Navigation: sidebar -> {viewModelType.Name} ({tag})");
     }
 
     public NavigationContext? GetNavigationContext<TViewModel>() where TViewModel : ViewModelBase =>
@@ -96,6 +101,7 @@ public class NavigationService(IServiceProvider serviceProvider) : INavigationSe
         _currentFrame = _backStack.Pop();
         RestoreNavigationParameter(_currentFrame);
         EnterFrame(_currentFrame, isRestore: true);
+        log.Info($"Navigation: back -> {_currentFrame.ViewModelType.Name}");
         PublishState(NavigationTransition.Back);
     }
 

@@ -6,13 +6,16 @@ using BizLogic.GenericInterfaces;
 using BizLogic.Helpers;
 using BizLogic.Resources;
 using DataLayer.EfClasses;
+using DataLayer.Logging;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 
 namespace BizLogic.EntryDocumentReader.Concrete;
 
-public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAccess, EntryImportHighlightScoringMode highlightScoringMode)
-    : BizActionErrors, IEntryDocumentReadAction
+public partial class EntryDocumentReadAction(
+    IEntryDocumentReaderDbAccess dbAccess,
+    EntryImportHighlightScoringMode highlightScoringMode,
+    IBizLog log) : BizActionErrors, IEntryDocumentReadAction
 {
     private static readonly string[] SettingsWorksheetNames = ["Настройки", "Settings"];
     private const string FIRSTNAME_HEADER = "FirstName";
@@ -55,6 +58,7 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
         if (!File.Exists(dataIn))
             throw new FileNotFoundException(string.Format(CultureInfo.CurrentUICulture,
                 EntryImportStrings.FileNotFound_Format, dataIn));
+        log.Info($"Parse entry document: \"{Path.GetFileName(dataIn)}\"");
         using var package = OpenEntryFile(dataIn);
         var workBook = package.Workbook;
         var worksheets = workBook.Worksheets
@@ -69,12 +73,14 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
             documents.Add(ReadClubEntry(worksheet, cancellationToken));
         }
 
+        log.Info($"Parse entry document finished: \"{Path.GetFileName(dataIn)}\", worksheets={documents.Count}");
         return documents;
     }
 
     private EntryDocument ReadClubEntry(ExcelWorksheet workSheet, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
+        log.Info($"Parse worksheet: \"{workSheet.Name}\"");
         _warnings = [];
         _errors = [];
         var athleteHeaders = FindHeaders(workSheet, cancellationToken, FIRSTNAME_HEADER, LASTNAME_HEADER,
@@ -84,15 +90,21 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
         _warnings.AddRange(CheckHeaders(workSheet, clubHeaders, CLUB_NAME_HEADER));
         _errors.AddRange(CheckHeaders(workSheet, athleteHeaders, FIRSTNAME_HEADER, LASTNAME_HEADER, BIRTH_YEAR_HEADER,
             GENDER_HEADER));
-        if (_errors.Count != 0) return EntryDocument.OfError(_warnings, _errors);
+        if (_errors.Count != 0)
+        {
+            LogWorksheetMessages(workSheet.Name);
+            return EntryDocument.OfError(_warnings, _errors);
+        }
         var athletes = ReadAthletes(workSheet, athleteHeaders, swimStyleHeaders, cancellationToken);
         var club = ReadClub(workSheet, clubHeaders);
         if (club is null)
         {
+            LogWorksheetMessages(workSheet.Name);
             return EntryDocument.OfAthletes(athletes, _warnings, _errors);
         }
 
         club.Athletes = athletes;
+        LogWorksheetMessages(workSheet.Name);
         return EntryDocument.OfClub(club, _warnings, _errors);
     }
 
@@ -170,6 +182,7 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
             }
 
             var swimStyle = dbAccess.GetOrAddIndividualSwimStyleByParameters(distance, style);
+            log.Info(EntityLogFormatter.FormatOperation("Resolve", swimStyle));
             swimStyles.Add(col, swimStyle);
         }
 
@@ -255,6 +268,7 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
             var category = ResolveCategory(workSheet, athleteHeaders, row);
             if (hasErrors) continue;
             var athlete = dbAccess.GetOrAddAthlete(firstName, lastName, yearOfBirth, gender, category);
+            log.Info(EntityLogFormatter.FormatOperation("Resolve", athlete));
             var entryCols = swimStyleHeaders.Keys.Where(col => workSheet.Cells[row, col].Value != null &&
                                                                !string.IsNullOrWhiteSpace(
                                                                    workSheet.Cells[row, col].Text));
@@ -270,6 +284,7 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
                         ? ConvertEntryTimeToHundreds(cellText)
                         : null);
                 entries.Add(entry);
+                log.Info(EntityLogFormatter.FormatOperation("Resolve", entry));
             }
 
             athlete.Entries = entries;
@@ -302,7 +317,17 @@ public partial class EntryDocumentReadAction(IEntryDocumentReaderDbAccess dbAcce
             return null;
         }
 
-        return dbAccess.GetOrAddClub(clubName);
+        var club = dbAccess.GetOrAddClub(clubName);
+        log.Info(EntityLogFormatter.FormatOperation("Resolve", club));
+        return club;
+    }
+
+    private void LogWorksheetMessages(string worksheetName)
+    {
+        foreach (var warning in _warnings)
+            log.Warning($"Entry import worksheet \"{worksheetName}\": {warning}");
+        foreach (var error in _errors)
+            log.Warning($"Entry import worksheet \"{worksheetName}\" error: {error}");
     }
 
     private static int ConvertEntryTimeToHundreds(string entryTime)

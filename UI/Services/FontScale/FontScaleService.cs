@@ -1,5 +1,6 @@
 using System.Windows;
 using ServiceLayer.AppSettings;
+using ServiceLayer.Logging;
 
 namespace UI.Services.FontScale;
 
@@ -21,10 +22,12 @@ public sealed class FontScaleService : IFontScaleService
     ];
 
     private readonly IAppSettingsStore _settingsStore;
+    private readonly IAppLog _log;
 
-    public FontScaleService(IAppSettingsStore settingsStore)
+    public FontScaleService(IAppSettingsStore settingsStore, IAppLog log)
     {
         _settingsStore = settingsStore;
+        _log = log;
         CurrentFontSize = Normalize(LoadFontSizeFromStore() ?? DefaultFontSize);
     }
 
@@ -46,6 +49,7 @@ public sealed class FontScaleService : IFontScaleService
         SaveFontSizeToStore(fontSize);
         Apply(fontSize);
         FontSizeChanged?.Invoke(fontSize);
+        _log.Info($"Changed font size: {fontSize}");
         return fontSize;
     }
 

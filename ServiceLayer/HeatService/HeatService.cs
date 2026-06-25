@@ -5,6 +5,7 @@ using BizDbAccess;
 using BizDbAccess.HeatAllocation;
 using BizLogic.HeatAllocation;
 using BizLogic.HeatAllocation.Concrete;
+using ServiceLayer.Logging;
 using DataLayer;
 using DataLayer.Display;
 using DataLayer.EfClasses;
@@ -14,15 +15,16 @@ using Microsoft.EntityFrameworkCore;
 using ServiceLayer.BizRunners;
 using ServiceLayer.Crud;
 using ServiceLayer.HeatService.Exceptions;
+using ServiceLayer.Logging;
 using ServiceLayer.Resources;
 using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
 
 namespace ServiceLayer.HeatService;
 
-public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbContext), IHeatService
+public class HeatService(EfCoreContext dbContext, IAppLog log) : CrudService<Heat, int?>(dbContext, log), IHeatService
 {
     private readonly RunnerWriteDb<HeatAllocationInDto, HeatAllocationOutDto> _runner = new(
-        new HeatAllocationAction(new HeatAllocationDbAccess(dbContext)),
+        new HeatAllocationAction(new HeatAllocationDbAccess(dbContext), new AppBizLog(log)),
         dbContext);
 
     public HeatAllocationOutDto AllocateEntriesToHeats(HeatAllocationParameters parameters, bool saveChanges = true)
@@ -34,7 +36,18 @@ public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbCo
             if (swimEvent is null) throw new EntityNotFoundException($"No such swim event: {parameters.SwimEventId}");
             var dataIn = new HeatAllocationInDto(parameters, swimEvent);
             var result = _runner.RunAction(dataIn, saveChanges);
-            return _runner.HasErrors ? throw new HeatAllocationException(_runner.Errors) : result;
+            if (_runner.HasErrors)
+                throw new HeatAllocationException(_runner.Errors);
+            if (saveChanges)
+            {
+                log.Info(
+                    $"Allocate heats SwimEventId={parameters.SwimEventId}, heatOrder={parameters.HeatOrder}, minWeakHeatSize={parameters.MinHeatSize}, created={result.Heats.Count}");
+                foreach (var heat in result.Heats)
+                    log.Info(EntityLogFormatter.FormatOperation("Create", heat));
+                foreach (var warning in result.Warnings)
+                    log.Warning($"Allocate heats SwimEventId={parameters.SwimEventId}: {warning}");
+            }
+            return result;
         }
         finally
         {
@@ -45,6 +58,7 @@ public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbCo
 
     public async Task DeleteSwimEventHeatsAsync(int swimEventId)
     {
+        var heatCount = await dbContext.Heats.CountAsync(heat => heat.SwimEventId == swimEventId);
         var entriesInEventHeats = await dbContext.Entries
             .Include(e => e.HeatPosition)
             .Where(e => e.HeatPosition != null && e.HeatPosition.Heat.SwimEventId == swimEventId)
@@ -56,6 +70,7 @@ public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbCo
         }
         dbContext.Heats.RemoveRange(dbContext.Heats.Where(heat => heat.SwimEventId == swimEventId));
         await dbContext.SaveChangesAsync();
+        log.Info($"Delete all heats SwimEventId={swimEventId}: {heatCount} heats");
     }
 
     public async Task DeleteHeatPositionAsync(int heatId, int entryId)
@@ -65,6 +80,7 @@ public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbCo
             .FirstOrDefaultAsync(heatPosition => heatPosition.HeatId == heatId && heatPosition.EntryId == entryId);
         if (position is null)
             return;
+        log.Info(EntityLogFormatter.FormatOperation("Delete", position));
         position.Entry.ClearHeatResultData();
         dbContext.HeatPositions.Remove(position);
         await dbContext.SaveChangesAsync();
@@ -78,6 +94,7 @@ public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbCo
             .FirstOrDefaultAsync(h => h.Id == heatId);
         if (heat is null)
             return;
+        log.Info(EntityLogFormatter.FormatOperation("Delete", heat));
         foreach (var position in heat.Positions)
             position.Entry.ClearHeatResultData();
         foreach (var position in heat.Positions)
@@ -122,6 +139,7 @@ public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbCo
             await dbContext.SaveChangesAsync();
             await RecalculateHeatOrdersAsync();
             await dbContext.Entry(heat).ReloadAsync();
+            log.Info(EntityLogFormatter.FormatOperation("Create", heat));
             return (heat, ImmutableList<ValidationResult>.Empty);
         }
         DetachHeatGraphIfTracked(heat);
@@ -152,6 +170,7 @@ public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbCo
         await dbContext.SaveChangesAsync();
         await RecalculateHeatOrdersAsync();
         await dbContext.Entry(trackedHeat).ReloadAsync();
+        log.Info(EntityLogFormatter.FormatOperation("Update", heat));
         return (trackedHeat, ImmutableList<ValidationResult>.Empty);
     }
 
@@ -329,6 +348,7 @@ public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbCo
         }
         trackedHeat.Status = HeatStatus.OFFICIAL;
         await dbContext.SaveChangesAsync();
+        log.Info(EntityLogFormatter.FormatOperation("Approve", trackedHeat));
     }
 
     public async Task UnapproveHeatAsync(int heatId)
@@ -338,6 +358,7 @@ public class HeatService(EfCoreContext dbContext) : CrudService<Heat, int?>(dbCo
         if (heat.Status != HeatStatus.OFFICIAL) return;
         heat.Status = HeatStatus.UNOFFICIAL;
         await dbContext.SaveChangesAsync();
+        log.Info(EntityLogFormatter.FormatOperation("Unapprove", heat));
     }
 
     public int GetTotalHeats()

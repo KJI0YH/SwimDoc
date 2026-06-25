@@ -335,8 +335,8 @@
   <data name="Common_All" xml:space="preserve"><value>All</value></data>
   <data name="Common_Min" xml:space="preserve"><value>Min</value></data>
   <data name="Common_Max" xml:space="preserve"><value>Max</value></data>
-  <data name="Common_AbsoluteMin" xml:space="preserve"><value>Birth year from</value></data>
-  <data name="Common_AbsoluteMax" xml:space="preserve"><value>Birth year to</value></data>
+  <data name="Common_AbsoluteMin" xml:space="preserve"><value>older</value></data>
+  <data name="Common_AbsoluteMax" xml:space="preserve"><value>younger</value></data>
   <data name="Common_Individual" xml:space="preserve"><value>Individual</value></data>
   <data name="Common_NoTime" xml:space="preserve"><value>N.T.</value></data>
   <data name="Common_Ok" xml:space="preserve"><value>OK</value></data>

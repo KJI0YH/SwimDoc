@@ -1,10 +1,11 @@
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
+using ServiceLayer.Logging;
 using ServiceLayer.Resources;
 
 namespace ServiceLayer.EntryDocumentTemplateService;
 
-public sealed class EntryDocumentTemplateService : IEntryDocumentTemplateService
+public sealed class EntryDocumentTemplateService(IAppLog log) : IEntryDocumentTemplateService
 {
     private const int FirstSwimStyleColumn = 6;
     private const int FirstEntryRow = 4;
@@ -18,6 +19,7 @@ public sealed class EntryDocumentTemplateService : IEntryDocumentTemplateService
         var settingsSheet = package.Workbook.Worksheets.Add(TemplateStrings.Sheet_Settings);
         BuildSettingsSheet(settingsSheet);
         ApplyValidations(entriesSheet);
+        log.Info("Created entry document template (Excel)");
         return package.GetAsByteArray();
     }
 

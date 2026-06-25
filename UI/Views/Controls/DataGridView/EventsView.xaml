@@ -78,15 +78,15 @@
                             Margin="5"
                             Padding="9" />
                         <Button
-                            Content="{ui:SymbolIcon Print24}"
-                            ToolTip="{loc:Localizastion Events_GenerateReports}"
-                            Command="{Binding GenerateReportsCommand}"
-                            Margin="5"
-                            Padding="9" />
-                        <Button
                             Content="{ui:SymbolIcon Clock24}"
                             ToolTip="{loc:Localizastion Events_CalculateStartTimes}"
                             Command="{Binding CalculateStartTimesCommand}"
+                            Margin="5"
+                            Padding="9" />
+                        <Button
+                            Content="{ui:SymbolIcon Print24}"
+                            ToolTip="{loc:Localizastion Events_GenerateReports}"
+                            Command="{Binding GenerateReportsCommand}"
                             Margin="5"
                             Padding="9" />
                     </StackPanel>

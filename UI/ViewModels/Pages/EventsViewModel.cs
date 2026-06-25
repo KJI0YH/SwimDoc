@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.EventService;
 using ServiceLayer.HeatService;
+using ServiceLayer.Logging;
 using ServiceLayer.SwimStyleService;
 using ServiceLayer.ReportGeneratorService;
 using UI.Resources;
@@ -323,6 +324,8 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView
             return;
         var deleteConfirmation = App.Current.Services.GetRequiredService<IConfirmDialogService>();
         var events = SelectedItems.Select(row => row.Entity).OrderBy(swimEvent => swimEvent.Order).ToList();
+        App.Current.Services.GetRequiredService<IAppLog>().Info(
+            $"Started batch heat allocation for {events.Count} events (heatOrder={result.HeatOrder}, minWeakHeatSize={result.MinHeatSize})");
         await using var batch = new HeatAllocationBatchSession(result.HeatOrder, result.MinHeatSize);
         var runResult = await RunMultiItemOperationAsync(
             Strings.Operation_HeatAllocation_Header,

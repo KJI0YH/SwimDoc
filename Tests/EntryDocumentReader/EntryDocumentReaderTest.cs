@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using ServiceLayer.EntryDocumentReaderService;
 using ServiceLayer.AppSettings;
 using ServiceLayer.EntryImportSettings;
+using BizLogic.GenericInterfaces;
+using ServiceLayer.Logging;
 using Tests.TestInfrastructure;
 
 namespace Tests.EntryDocumentReader;
@@ -21,7 +23,8 @@ public class EntryDocumentReaderTest : DatabaseTestFixture
     {
         _service = new EntryDocumentReaderService(
             Context,
-            new EntryImportSettingsService(new AppSettingsStore()));
+            new EntryImportSettingsService(new AppSettingsStore()),
+            NullAppLog.Instance);
     }
 
     [TearDown]

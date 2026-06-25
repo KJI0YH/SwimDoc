@@ -1,5 +1,6 @@
 using BizLogic.EntryDocumentReader;
 using ServiceLayer.AppSettings;
+using ServiceLayer.Logging;
 
 namespace ServiceLayer.EntryImportSettings;
 
@@ -9,13 +10,20 @@ public sealed class EntryImportSettingsService : IEntryImportSettingsService
         EntryImportHighlightScoringMode.HighlightedInCompetition;
 
     private readonly IAppSettingsStore _settingsStore;
+    private readonly IAppLog _log;
     private EntryImportHighlightScoringMode _highlightScoringMode = DefaultMode;
 
     public EntryImportHighlightScoringMode HighlightScoringMode => _highlightScoringMode;
 
     public EntryImportSettingsService(IAppSettingsStore settingsStore)
+        : this(settingsStore, NullAppLog.Instance)
+    {
+    }
+
+    public EntryImportSettingsService(IAppSettingsStore settingsStore, IAppLog log)
     {
         _settingsStore = settingsStore;
+        _log = log;
         LoadFromStore();
     }
 
@@ -25,6 +33,7 @@ public sealed class EntryImportSettingsService : IEntryImportSettingsService
             return mode;
         _highlightScoringMode = mode;
         SaveToStore();
+        _log.Info($"Changed entry import highlight scoring mode: {mode}");
         return mode;
     }
 

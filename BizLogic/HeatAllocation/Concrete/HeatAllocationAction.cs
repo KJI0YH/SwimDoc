@@ -2,28 +2,35 @@ using BizDbAccess.HeatAllocation;
 using BizLogic.GenericInterfaces;
 using BizLogic.Helpers;
 using DataLayer.EfClasses;
+using DataLayer.Logging;
 
 namespace BizLogic.HeatAllocation.Concrete;
 
-public class HeatAllocationAction(IHeatAllocationDbAccess dbAccess) :
+public class HeatAllocationAction(IHeatAllocationDbAccess dbAccess, IBizLog log) :
     BizActionErrors,
     IHeatAllocationAction
 {
     private List<string> _errors = [];
     private List<string> _warnings = [];
+
     public HeatAllocationOutDto Action(HeatAllocationInDto dataIn)
     {
         _warnings = [];
         _errors = [];
+        log.Info(
+            $"Heat allocation started: SwimEventId={dataIn.SwimEventId}, heatOrder={dataIn.HeatOrder}, minWeakHeatSize={dataIn.MinHeatSize}, lanes={dataIn.LaneMin}-{dataIn.LaneMax}");
         if (dbAccess.IsHeatsAllocated(dataIn.SwimEventId))
         {
             _warnings.Add(HeatAllocationMessageKeys.HeatsReallocated);
+            log.Warning($"Heat allocation SwimEventId={dataIn.SwimEventId}: existing heats will be removed");
             dbAccess.DeleteExistedHeats(dataIn.SwimEventId);
         }
         var entries = new BufferedCollection<Entry>(dbAccess.GetOrderedEntriesByEventId(dataIn.SwimEventId));
+        log.Info($"Heat allocation SwimEventId={dataIn.SwimEventId}: {entries.Count} entries to allocate");
         if (entries.Count == 0)
         {
             _warnings.Add(HeatAllocationMessageKeys.NoEntriesForEvent);
+            LogWarnings(dataIn.SwimEventId);
             return new HeatAllocationOutDto([], _warnings, _errors);
         }
         var heatNumbers = OrderHeatNumbers(entries.Count, dataIn.LaneCount, dataIn.HeatOrder);
@@ -42,8 +49,18 @@ public class HeatAllocationAction(IHeatAllocationDbAccess dbAccess) :
                 dataIn.SwimEventId);
             heats.Add(heat);
         }
+        foreach (var heat in heats)
+            log.Info(EntityLogFormatter.FormatOperation("Plan", heat));
         dbAccess.AddHeats(heats);
+        LogWarnings(dataIn.SwimEventId);
+        log.Info($"Heat allocation finished: SwimEventId={dataIn.SwimEventId}, planned heats={heats.Count}");
         return new HeatAllocationOutDto(heats, _warnings, _errors);
+    }
+
+    private void LogWarnings(int swimEventId)
+    {
+        foreach (var warning in _warnings)
+            log.Warning($"Heat allocation SwimEventId={swimEventId}: {warning}");
     }
 
     private Heat CreateHeat(IEnumerable<Entry> entries, int[] laneNumbers, int heatNumber, int swimEventId)
@@ -95,8 +112,6 @@ public class HeatAllocationAction(IHeatAllocationDbAccess dbAccess) :
         return laneNumbers.ToArray();
     }
 
-    private bool IsWeakHeatFull(int entryCount, int laneCount)
-    {
-        return entryCount % laneCount == 0;
-    }
+    private bool IsWeakHeatFull(int entryCount, int laneCount) =>
+        entryCount % laneCount == 0;
 }

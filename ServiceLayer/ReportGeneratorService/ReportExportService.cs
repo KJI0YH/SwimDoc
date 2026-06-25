@@ -6,11 +6,12 @@ using DataLayer.EfCore;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
 using ServiceLayer.EntryService;
+using ServiceLayer.Logging;
 using ServiceLayer.Resources;
 
 namespace ServiceLayer.ReportGeneratorService;
 
-public sealed class ReportExportService(EfCoreContext dbContext, IEntryService entryService) : IReportExportService
+public sealed class ReportExportService(EfCoreContext dbContext, IEntryService entryService, IAppLog log) : IReportExportService
 {
     public void ExportToExcel(ReportExportOptions options)
     {
@@ -29,6 +30,8 @@ public sealed class ReportExportService(EfCoreContext dbContext, IEntryService e
         if (options.IncludeFinishList)
             new FinishListReportExcel(dbContext).AddWorksheet(package, options.SwimEventIds.ToList());
         package.SaveAs(new FileInfo(options.OutputFilePath));
+        log.Info(
+            $"Export reports to Excel: file=\"{options.OutputFilePath}\", swimEventIds=[{EntityLogFormatter.FormatIdList(options.SwimEventIds)}], entryList={options.IncludeEntryList}, startList={options.IncludeStartList}, finishList={options.IncludeFinishList}");
     }
 
     public void ExportCombinedResultsToExcel(CombinedResultsExportOptions options)
@@ -53,6 +56,8 @@ public sealed class ReportExportService(EfCoreContext dbContext, IEntryService e
         var worksheet = package.Workbook.Worksheets.Add(ReportExcelStrings.Sheet_CombinedResults);
         CombinedResultsReportExcel.RenderToWorksheet(worksheet, sections);
         package.SaveAs(new FileInfo(options.OutputFilePath));
+        log.Info(
+            $"Export combined results to Excel: file=\"{options.OutputFilePath}\", ageGroupIds=[{EntityLogFormatter.FormatIdList(options.AgeGroupIds)}]");
     }
 
     private static CombinedResultsReportData MapReportData(CombinedResultsData data)

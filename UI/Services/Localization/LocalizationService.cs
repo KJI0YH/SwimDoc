@@ -1,19 +1,22 @@
 using System.Globalization;
 using ServiceLayer.AppSettings;
+using ServiceLayer.Logging;
 
 namespace UI.Services.Localization;
 
 public sealed class LocalizationService : ILocalizationService
 {
     private readonly IAppSettingsStore _settingsStore;
+    private readonly IAppLog _log;
     private AppLanguage _currentLanguage;
 
     public event Action<CultureInfo>? CultureChanged;
     public AppLanguage CurrentLanguage => _currentLanguage;
 
-    public LocalizationService(IAppSettingsStore settingsStore)
+    public LocalizationService(IAppSettingsStore settingsStore, IAppLog log)
     {
         _settingsStore = settingsStore;
+        _log = log;
         _currentLanguage = LoadLanguageFromStore() ?? AppLanguage.Russian;
         ApplyCulture(_currentLanguage);
     }
@@ -25,6 +28,7 @@ public sealed class LocalizationService : ILocalizationService
         _currentLanguage = language;
         SaveLanguageToStore(language);
         ApplyCulture(language);
+        _log.Info($"Changed UI language: {language}");
     }
 
     private void ApplyCulture(AppLanguage language)

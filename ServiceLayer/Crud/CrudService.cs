@@ -2,10 +2,11 @@ using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using DataLayer.EfCore;
 using Microsoft.EntityFrameworkCore;
+using ServiceLayer.Logging;
 
 namespace ServiceLayer.Crud;
 
-public class CrudService<TEntity, TKey>(EfCoreContext dbContext) : ICrudService<TEntity, TKey>
+public class CrudService<TEntity, TKey>(EfCoreContext dbContext, IAppLog log) : ICrudService<TEntity, TKey>
     where TEntity : class
 {
     public virtual IQueryable<TEntity> Query(bool asNoTracking = true)
@@ -18,6 +19,8 @@ public class CrudService<TEntity, TKey>(EfCoreContext dbContext) : ICrudService<
     {
         if (id == null) return null;
         var entity = await dbContext.FindAsync<TEntity>([id], cancellationToken);
+        if (entity is not null)
+            log.Info(EntityLogFormatter.FormatOperation("Read", entity));
         return entity;
     }
 
@@ -27,6 +30,8 @@ public class CrudService<TEntity, TKey>(EfCoreContext dbContext) : ICrudService<
         var errors = await dbContext.SaveChangesWithValidationAsync();
         if (errors.Count > 0)
             dbContext.Entry(entity).State = EntityState.Detached;
+        else
+            log.Info(EntityLogFormatter.FormatOperation("Create", entity));
         return (entity, errors);
     }
 
@@ -53,13 +58,16 @@ public class CrudService<TEntity, TKey>(EfCoreContext dbContext) : ICrudService<
         var errors = await dbContext.SaveChangesWithValidationAsync();
         if (errors.Count > 0)
             await dbContext.Entry(trackedEntity).ReloadAsync(cancellationToken).ConfigureAwait(false);
+        else
+            log.Info(EntityLogFormatter.FormatOperation("Update", trackedEntity));
         return (trackedEntity, errors);
     }
 
     public virtual async Task DeleteAsync(TKey id, CancellationToken cancellationToken = default)
     {
-        var entity = await FindAsync(id, cancellationToken);
+        var entity = await dbContext.FindAsync<TEntity>([id!], cancellationToken);
         if (entity == null) return;
+        log.Info(EntityLogFormatter.FormatOperation("Delete", entity));
         dbContext.Set<TEntity>().Remove(entity);
         await dbContext.SaveChangesAsync(cancellationToken);
     }

@@ -13,6 +13,7 @@ using DataLayer.QueryObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.Crud;
+using ServiceLayer.Logging;
 using UI.Resources;
 using UI.Models.Rows;
 using UI.Services.Navigation;
@@ -278,6 +279,26 @@ public partial class DataViewModel<TEntity, TRowView, TKey> : DataViewModelBase,
         Items = new ObservableCollection<TRowView>(rows);
         OnPropertyChanged(nameof(ItemsInfo));
         OnItemsLoaded(rows.Select(row => row.Entity).ToList());
+        LogListRead(rows.Count);
+    }
+
+    private void LogListRead(int loadedCount)
+    {
+        var criteria = BuildListReadCriteria();
+        App.Current.Services.GetRequiredService<IAppLog>().Info(
+            EntityLogFormatter.FormatListRead(typeof(TEntity), TotalItems, loadedCount, criteria));
+    }
+
+    private string BuildListReadCriteria()
+    {
+        var parts = new List<string>();
+        if (!string.IsNullOrWhiteSpace(SearchText))
+            parts.Add($"search=\"{SearchText.Trim()}\"");
+        if (!string.IsNullOrWhiteSpace(SortColumn))
+            parts.Add($"sort={SortColumn} {SortDirection}");
+        if (UsesPaging && TotalPages > 0)
+            parts.Add($"page={CurrentPage + 1}/{TotalPages}");
+        return parts.Count == 0 ? string.Empty : $"({string.Join(", ", parts)})";
     }
 
     protected virtual void OnItemsLoaded(IReadOnlyList<TEntity> items)

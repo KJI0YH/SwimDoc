@@ -171,6 +171,7 @@ public static class EntityDisplay
         var maxLabel = ageGroup.BirthYearMax.HasValue
             ? ageGroup.BirthYearMax.Value.ToString(texts.Culture)
             : texts.AgeGroupYearRangeYoungerThan;
-        return $"{minLabel}-{maxLabel}";
+        
+        return ageGroup.BirthYearMin == null ? $"{maxLabel}-{minLabel}" : $"{minLabel}-{maxLabel}";
     }
 }

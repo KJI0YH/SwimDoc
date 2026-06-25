@@ -7,11 +7,12 @@ using DataLayer.EfClasses;
 using DataLayer.EfCore;
 using Microsoft.EntityFrameworkCore;
 using ServiceLayer.Crud;
+using ServiceLayer.Logging;
 using ServiceLayer.Resources;
 
 namespace ServiceLayer.EntryService;
 
-public class EntryService(EfCoreContext dbContext) : CrudService<Entry, int?>(dbContext), IEntryService
+public class EntryService(EfCoreContext dbContext, IAppLog log) : CrudService<Entry, int?>(dbContext, log), IEntryService
 {
     public override Task<(Entry? entity, ImmutableList<ValidationResult> errors)> CreateAsync(Entry entity,
         CancellationToken cancellationToken = default)
@@ -63,6 +64,8 @@ public class EntryService(EfCoreContext dbContext) : CrudService<Entry, int?>(db
         var errors = await dbContext.SaveChangesWithValidationAsync();
         if (errors.Count > 0)
             await dbContext.Entry(tracked).ReloadAsync(cancellationToken).ConfigureAwait(false);
+        else
+            log.Info(EntityLogFormatter.FormatOperation("Update", entity));
         return (tracked, errors);
     }
 
@@ -83,6 +86,8 @@ public class EntryService(EfCoreContext dbContext) : CrudService<Entry, int?>(db
         var errors = await dbContext.SaveChangesWithValidationAsync();
         if (errors.Count > 0)
             await dbContext.Entry(tracked).ReloadAsync(cancellationToken).ConfigureAwait(false);
+        else
+            log.Info(EntityLogFormatter.FormatOperation("Update", entity));
         return (tracked, errors);
     }
 
@@ -238,6 +243,8 @@ public class EntryService(EfCoreContext dbContext) : CrudService<Entry, int?>(db
             else if (entity is not null)
                 created.Add(entity);
         }
+        log.Info(
+            $"Copy entries from SwimEventId={previousEventId} to SwimEventId={targetEventId}: created {created.Count}, errors {errors.Count}");
         return (created, errors);
     }
 
@@ -300,8 +307,10 @@ public class EntryService(EfCoreContext dbContext) : CrudService<Entry, int?>(db
         if (id == null) return;
         var entry = await dbContext.Entries
             .Include(e => e.Relay)
+            .ThenInclude(r => r!.Positions)
             .FirstOrDefaultAsync(e => e.Id == id.Value, cancellationToken);
         if (entry == null) return;
+        log.Info(EntityLogFormatter.FormatOperation("Delete", entry));
         var relay = entry.Relay;
         dbContext.Entries.Remove(entry);
         if (relay != null)
