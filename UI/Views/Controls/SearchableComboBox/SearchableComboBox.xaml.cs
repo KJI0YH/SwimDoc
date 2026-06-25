@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Threading;
 using UI.Helpers.Controls;
 using UI.Resources;
 
@@ -105,7 +106,7 @@ public partial class SearchableComboBox : UserControl
 
     private void SyncComboBoxSelection()
     {
-        if (_itemsView is null)
+        if (_itemsView is null || _isSearchActive)
             return;
         _isSyncingSelection = true;
         try
@@ -180,13 +181,20 @@ public partial class SearchableComboBox : UserControl
     {
         if (d is not SearchableComboBox control) return;
         if (control._isSyncingSelection) return;
-        if (e.NewValue is SearchableItem) control.SyncSelectedItem();
+        if (e.NewValue is SearchableItem)
+        {
+            control.ResetSearchState();
+            control.SyncSelectedItem();
+            return;
+        }
+        if (!control._isSearchActive)
+            control.SyncComboBoxSelection();
     }
 
     private void ComboBoxControl_OnPreviewKeyDown(object sender, KeyEventArgs e)
     {
         if (e.Key is Key.Back or Key.Delete)
-            BeginSearch(clearSelection: ComboBoxControl.SelectedItem != null);
+            _isSearchActive = true;
         if (e.Key == Key.Enter)
         {
             ComboBoxControl.IsDropDownOpen = false;
@@ -196,7 +204,7 @@ public partial class SearchableComboBox : UserControl
 
     private void ComboBoxControl_OnPreviewTextInput(object sender, TextCompositionEventArgs e)
     {
-        BeginSearch(clearSelection: ComboBoxControl.SelectedItem != null);
+        _isSearchActive = true;
     }
 
     private void ComboBoxControl_OnDropDownOpened(object sender, EventArgs e)
@@ -206,9 +214,15 @@ public partial class SearchableComboBox : UserControl
             _isOpeningDropDownForSearch = false;
             return;
         }
-        _isSearchActive = false;
-        _searchText = string.Empty;
-        _itemsView?.Refresh();
+        ResetSearchState();
+    }
+
+    private void ComboBoxControl_OnDropDownClosed(object sender, EventArgs e)
+    {
+        if (!_isSearchActive)
+            return;
+        ResetSearchState();
+        SyncComboBoxSelection();
     }
 
     private void ComboBoxControl_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -217,6 +231,7 @@ public partial class SearchableComboBox : UserControl
             return;
         if (ComboBoxControl.SelectedItem is SearchableItem selected)
         {
+            ResetSearchState();
             var itemInSource = ItemsSource?.FirstOrDefault(i =>
                                     ReferenceEquals(i, selected) ||
                                     AreValuesEqual(i.Value, selected.Value))
@@ -234,53 +249,74 @@ public partial class SearchableComboBox : UserControl
         if (_itemsView == null || _isUpdatingText) return;
         if (!_isSearchActive) return;
         var typedText = ComboBoxControl.Text ?? string.Empty;
-        CollapseEditableTextSelection();
         if (typedText == _searchText)
+        {
+            ScheduleCaretToEnd(typedText);
             return;
+        }
+        _searchText = typedText;
+        ClearComboBoxSelectionDuringSearch();
+        typedText = ComboBoxControl.Text ?? _searchText;
         _searchText = typedText;
         _itemsView.Refresh();
-        ClearSelectionDuringSearch();
         if (!ComboBoxControl.IsKeyboardFocusWithin)
             return;
         _isOpeningDropDownForSearch = true;
         ComboBoxControl.IsDropDownOpen = true;
-        RestoreEditableText(typedText);
+        ScheduleCaretToEnd(typedText);
     }
 
-    private void ClearSelectionDuringSearch()
+    private void ClearComboBoxSelectionDuringSearch()
     {
         if (!_isSearchActive || ComboBoxControl.SelectedItem == null)
             return;
+        var preservedText = ComboBoxControl.Text ?? _searchText;
         _isSyncingSelection = true;
         try
         {
             ComboBoxControl.SelectedItem = null;
-            SelectedItem = null;
         }
         finally
         {
             _isSyncingSelection = false;
         }
+        if (!string.IsNullOrEmpty(preservedText) && ComboBoxControl.Text != preservedText)
+            RestoreEditableText(preservedText);
     }
 
-    private void BeginSearch(bool clearSelection)
+    private void ResetSearchState()
     {
-        _isSearchActive = true;
-        if (!clearSelection)
-            return;
-        _isSyncingSelection = true;
-        ComboBoxControl.SelectedItem = null;
-        SelectedItem = null;
-        _isSyncingSelection = false;
+        _isSearchActive = false;
+        _searchText = string.Empty;
+        _itemsView?.Refresh();
     }
 
     private void HookEditableTextBox()
     {
+        ComboBoxControl.ApplyTemplate();
         EditableComboBoxBehavior.SetIsEnabled(ComboBoxControl, true);
+        if (GetEditableTextBox() is not { } textBox)
+            return;
+        textBox.GotFocus += (_, _) =>
+        {
+            if (_isSearchActive)
+                RestoreEditableText(ComboBoxControl.Text ?? string.Empty);
+        };
     }
 
-    private void CollapseEditableTextSelection() =>
-        EditableComboBoxBehavior.CollapseSelectionToEnd(GetEditableTextBox());
+    private void ScheduleCaretToEnd(string text)
+    {
+        if (GetEditableTextBox() is not { } textBox)
+            return;
+        textBox.Dispatcher.BeginInvoke(
+            () =>
+            {
+                if (!_isSearchActive)
+                    return;
+                RestoreEditableText(text);
+            },
+            DispatcherPriority.Input);
+    }
 
     private TextBox? GetEditableTextBox() =>
         ComboBoxControl.Template?.FindName("PART_EditableTextBox", ComboBoxControl) as TextBox;
@@ -294,7 +330,7 @@ public partial class SearchableComboBox : UserControl
         {
             if (textBox.Text != text)
                 textBox.Text = text;
-            EditableComboBoxBehavior.CollapseSelectionToEnd(textBox);
+            EditableComboBoxBehavior.MoveCaretToEnd(textBox);
         }
         finally
         {

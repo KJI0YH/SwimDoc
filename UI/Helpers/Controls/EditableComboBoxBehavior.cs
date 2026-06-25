@@ -96,4 +96,12 @@ public static class EditableComboBoxBehavior
     textBox.CaretIndex = textBox.SelectionStart + textBox.SelectionLength;
     textBox.SelectionLength = 0;
   }
+
+  public static void MoveCaretToEnd(TextBox? textBox)
+  {
+    if (textBox is null)
+      return;
+    textBox.CaretIndex = textBox.Text.Length;
+    textBox.SelectionLength = 0;
+  }
 }
