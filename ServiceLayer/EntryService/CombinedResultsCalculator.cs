@@ -1,4 +1,5 @@
 using DataLayer.EfClasses;
+using DataLayer.Scoring;
 
 namespace ServiceLayer.EntryService;
 
@@ -20,7 +21,7 @@ public static class CombinedResultsCalculator
         {
             if (!entriesByEventId.TryGetValue(swimEvent.Id, out var entry))
                 continue;
-            var roundRank = GetRoundRank(swimEvent.Round);
+            var roundRank = ScoringPointsCalculator.GetRoundRank(swimEvent.Round);
             if (roundRank <= highestRoundRank)
                 continue;
             highestRoundRank = roundRank;
@@ -53,15 +54,4 @@ public static class CombinedResultsCalculator
             yield return (athleteRow, place);
         }
     }
-
-    private static int GetRoundRank(EventRound round) =>
-        round switch
-        {
-            EventRound.FIN => 5,
-            EventRound.SOS => 4,
-            EventRound.SEM => 3,
-            EventRound.SOP => 2,
-            EventRound.PRE => 1,
-            _ => 0
-        };
 }

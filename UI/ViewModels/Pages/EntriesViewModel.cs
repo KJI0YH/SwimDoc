@@ -583,10 +583,13 @@ public partial class EntriesViewModel(
         CancelImportCommand.NotifyCanExecuteChanged();
         var importCanceled = false;
         var token = _importCts.Token;
+        var importCulture = CultureInfo.CurrentUICulture;
         try
         {
             await Task.Run(async () =>
             {
+                CultureInfo.CurrentCulture = importCulture;
+                CultureInfo.CurrentUICulture = importCulture;
                 foreach (var file in filesToImport)
                 {
                     token.ThrowIfCancellationRequested();

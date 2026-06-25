@@ -25,7 +25,7 @@ public sealed class ClubRowView : IEntityRowView<Club>
         PointCount = EntityDisplayFormatter.FormatClubPointCount(Entity);
     }
 
-    public static ClubRowView FromProjection(ClubRowProjection projection)
+    public static ClubRowView FromProjection(ClubRowProjection projection, int pointCount = 0)
     {
         var entity = EntityRowStubBuilder.BuildClub(projection);
         return new ClubRowView(
@@ -37,7 +37,7 @@ public sealed class ClubRowView : IEntityRowView<Club>
             EntityDisplayFormatter.FormatScoringPersonalCount(
                 projection.RelayScoringCount,
                 projection.RelayPersonalCount),
-            projection.PointCount);
+            pointCount);
     }
 
     private ClubRowView(Club entity, int athleteCount, string entryCount, string relayCount, int pointCount)

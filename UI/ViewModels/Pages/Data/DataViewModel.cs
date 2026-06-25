@@ -135,6 +135,13 @@ public partial class DataViewModel<TEntity, TRowView, TKey> : DataViewModelBase,
                 await PrepareBeforeLoadAsync().ConfigureAwait(false);
             await loadWork().ConfigureAwait(false);
         }
+        catch (Exception ex)
+        {
+            RequestReload();
+            App.Current.Services.GetRequiredService<IAppLog>()
+                .Error($"Failed to load {typeof(TEntity).Name} list data.", ex);
+            throw;
+        }
         finally
         {
             await DispatcherUiHelper.InvokeOnUiAsync(() => IsLoading = false);

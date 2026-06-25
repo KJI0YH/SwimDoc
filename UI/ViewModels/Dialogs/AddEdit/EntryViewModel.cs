@@ -242,10 +242,15 @@ public partial class EntryViewModel(
             OnPropertyChanged(nameof(RelayNumber));
             BuildRelayLegsFromEntity();
             ApplyRelaySelectionsFromEntityPositions();
+            SyncRelayPositionsFromLegs();
             RefreshRelayLegAthleteOptions();
         }
         if (IsAdd)
+        {
             ApplyAddContextUiState();
+            if (SelectedTabIndex == 1 || _contextClubId.HasValue)
+                await EnsureRelayClubAndAthletesAsync();
+        }
         RefreshIndividualEntryOptions();
         _initialized = true;
     }
@@ -343,6 +348,7 @@ public partial class EntryViewModel(
         BuildRelayRowsForCount(swimEvent.SwimStyle.RelayCount);
         SelectedTabIndex = 1;
         IsIndividualTabEnabled = false;
+        _ = EnsureRelayClubAndAthletesAsync();
         _ = TryAssignDefaultRelayNumberAsync();
     }
 
@@ -628,7 +634,7 @@ public partial class EntryViewModel(
         Entity.SwimStyleId = swimEvent.SwimStyleId;
         Entity.AthleteId = null;
         BuildRelayRowsForCount(swimEvent.SwimStyle.RelayCount);
-        RefreshRelayLegAthleteOptions();
+        _ = EnsureRelayClubAndAthletesAsync();
         _ = TryAssignDefaultRelayNumberAsync();
     }
 
@@ -646,6 +652,7 @@ public partial class EntryViewModel(
         Entity.Relay!.ClubId = club.Id;
         await LoadRelayAthletesAsync();
         await EnsureRelayAthletesContainRelayPositionAthletesAsync();
+        ClearRelayLegAthletesNotInClub();
         RefreshRelayLegAthleteOptions();
         if (!_initialized && !IsAdd && (Entity.Relay?.Positions?.Count ?? 0) > 0 && RelayLegs.Count == 0)
             return;
@@ -673,6 +680,8 @@ public partial class EntryViewModel(
             Entity.AthleteId = null;
             if (IsAdd)
                 Entity.EntryTime = null;
+            if (!_initialized)
+                return;
             if (SelectedRelaySwimEvent?.Value is SwimEvent swimEvent)
             {
                 Entity.SwimEventId = swimEvent.Id;
@@ -683,6 +692,48 @@ public partial class EntryViewModel(
                 BuildRelayRowsForCount(Entity.SwimStyle.RelayCount);
             else
                 RefreshRelayLegAthleteOptions();
+            _ = EnsureRelayClubAndAthletesAsync();
+        }
+    }
+
+    private async Task EnsureRelayClubAndAthletesAsync()
+    {
+        EnsureRelayEntity();
+        var clubId = Entity.Relay!.ClubId > 0
+            ? Entity.Relay.ClubId
+            : _contextClubId;
+        if (clubId is null or 0)
+            return;
+
+        if (SelectedClub?.Value is not Club selectedClub || selectedClub.Id != clubId)
+        {
+            _suppressRelaySync = true;
+            SelectedClub = Clubs.FirstOrDefault(item => item.Value is Club club && club.Id == clubId);
+            _suppressRelaySync = false;
+            if (SelectedClub?.Value is Club club)
+                Entity.Relay.ClubId = club.Id;
+        }
+
+        if (SelectedClub?.Value is not Club)
+            return;
+
+        await LoadRelayAthletesAsync();
+        await EnsureRelayAthletesContainRelayPositionAthletesAsync();
+        ClearRelayLegAthletesNotInClub();
+        RefreshRelayLegAthleteOptions();
+    }
+
+    private void ClearRelayLegAthletesNotInClub()
+    {
+        var clubAthleteIds = RelayAthletes
+            .Select(item => (item.Value as Athlete)?.Id)
+            .Where(id => id.HasValue)
+            .Select(id => id!.Value)
+            .ToHashSet();
+        foreach (var leg in RelayLegs)
+        {
+            if (leg.SelectedAthlete?.Value is Athlete athlete && !clubAthleteIds.Contains(athlete.Id))
+                leg.SetSelectedAthleteSilently(null);
         }
     }
 
@@ -818,7 +869,7 @@ public partial class EntryViewModel(
 
     private IEnumerable<SearchableItem> GetEligibleRelayAthletes(AgeGroup? ageGroup) =>
         ageGroup is null
-            ? []
+            ? RelayAthletes
             : RelayAthletes.Where(item =>
                 item.Value is Athlete athlete &&
                 ageGroup.Contains(athlete.YearOfBirth, athlete.Gender));
@@ -848,11 +899,12 @@ public partial class EntryViewModel(
                 if (currentAthleteId is > 0)
                 {
                     var currentSelection = RelayAthletes.FirstOrDefault(item =>
-                                              item.Value is Athlete athlete && athlete.Id == currentAthleteId)
-                                          ?? leg.SelectedAthlete;
+                        item.Value is Athlete athlete && athlete.Id == currentAthleteId);
                     if (currentSelection is not null &&
                         available.All(item => item.Value is not Athlete athlete || athlete.Id != currentAthleteId))
                         available.Insert(0, currentSelection);
+                    else if (currentSelection is null)
+                        leg.SetSelectedAthleteSilently(null);
                 }
                 leg.SetAvailableAthletes(available);
                 if (currentAthleteId is > 0)
@@ -888,6 +940,16 @@ public partial class EntryViewModel(
                 EntryTime = leg.EntryTime
             });
         }
+    }
+
+    protected override bool ValidateBeforeSave()
+    {
+        if (SelectedTabIndex == 1 || Entity.RelayId is not null || Entity.Relay is not null)
+        {
+            EnsureRelayEntity();
+            SyncRelayPositionsFromLegs();
+        }
+        return true;
     }
 
     [RelayCommand]

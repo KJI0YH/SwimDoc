@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.AthleteService;
 using ServiceLayer.ClubService;
+using ServiceLayer.EntryService;
 using UI.Resources;
 using UI.ViewModels.Pages.Data;
 using UI.Models.Rows;
@@ -30,11 +31,11 @@ public class ClubsViewModel : DataViewModel<Club, ClubRowView, int?>
             ColumnConfiguration<Club>.SortBy(club => club.Name)));
         ColumnConfigurations.Add(new ColumnConfiguration<Club>("AthleteCount", Strings.Clubs_Col_Athletes, 150,
             ColumnConfiguration<Club>.SortBy(club => club.Athletes.Count)));
-        ColumnConfigurations.Add(new ColumnConfiguration<Club>("EntryCount", Strings.Clubs_Col_Entries, 170,
+        ColumnConfigurations.Add(new ColumnConfiguration<Club>("EntryCount", Strings.Clubs_Col_Entries, 200,
             ColumnConfiguration<Club>.SortBy(club =>
                 club.Athletes.Sum(athlete => athlete.Entries.Count(e => e.Scoring)),
                 club => club.Athletes.Sum(athlete => athlete.Entries.Count(e => !e.Scoring)))));
-        ColumnConfigurations.Add(new ColumnConfiguration<Club>("RelayCount", Strings.Clubs_Col_Relays, 170,
+        ColumnConfigurations.Add(new ColumnConfiguration<Club>("RelayCount", Strings.Clubs_Col_Relays, 200,
             ColumnConfiguration<Club>.SortBy(club =>
                 club.Relays.Count(r => r.Entry != null && r.Entry.Scoring),
                 club => club.Relays.Count(r => r.Entry != null && !r.Entry.Scoring))));
@@ -48,7 +49,16 @@ public class ClubsViewModel : DataViewModel<Club, ClubRowView, int?>
         IServiceProvider serviceProvider)
     {
         var projections = await RowProjectionQueries.SelectClub(query).ToListAsync().ConfigureAwait(false);
-        return projections.Select(ClubRowView.FromProjection).ToList();
+        var clubIds = projections.Select(projection => projection.Id).ToList();
+        var dbContext = serviceProvider.GetRequiredService<EfCoreContext>();
+        var pointCounts = await ScoringPointCountQueries
+            .GetClubPointCountsAsync(dbContext, clubIds)
+            .ConfigureAwait(false);
+        return projections
+            .Select(projection => ClubRowView.FromProjection(
+                projection,
+                pointCounts.GetValueOrDefault(projection.Id)))
+            .ToList();
     }
 
     protected override IQueryable<Club> ApplySearch(IQueryable<Club> query)

@@ -15,6 +15,7 @@
                   PreviewTextInput="ComboBoxControl_OnPreviewTextInput"
                   DropDownOpened="ComboBoxControl_OnDropDownOpened"
                   TextBoxBase.TextChanged="ComboBoxControl_OnTextChanged"
+                  SelectionChanged="ComboBoxControl_OnSelectionChanged"
                   SelectedItem="{Binding SelectedItem, ElementName=Root, Mode=TwoWay}"
                   DisplayMemberPath="{Binding DisplayMemberPath, ElementName=Root}" />
     </Grid>

@@ -40,6 +40,7 @@ public partial class EntryDocumentReadAction(
         [LASTNAME_HEADER] = ["Фамилия", "Last name", "Last Name", "Lastname"],
         [FULLNAME_HEADER] =
         [
+            "Имя Фамилия", "First name Last name", "First Name Last Name",
             "Фамилия Имя", "ФИО", "Full name", "Full Name", "Fullname", "Name", "Participant",
             "Last name First name", "Last Name First Name"
         ],
@@ -51,6 +52,7 @@ public partial class EntryDocumentReadAction(
 
     private List<string> _warnings;
     private List<string> _errors;
+    private bool _fullNameIsFirstNameFirst;
     private readonly EntryImportHighlightScoringMode _highlightScoringMode = highlightScoringMode;
 
     [GeneratedRegex(@"^\s*(?:\d{1,}\D)?[0-5]\d(?:\D\d{1,2})?\s*$")]
@@ -91,6 +93,8 @@ public partial class EntryDocumentReadAction(
         _errors = [];
         var athleteHeaders = FindHeaders(workSheet, cancellationToken, FULLNAME_HEADER, FIRSTNAME_HEADER,
             LASTNAME_HEADER, BIRTH_YEAR_HEADER, GENDER_HEADER, CATEGORY_HEADER);
+        _fullNameIsFirstNameFirst = athleteHeaders[FULLNAME_HEADER] is { } fullNameAddr
+                                    && IsFirstNameFirstFullNameHeader(workSheet.Cells[fullNameAddr.Address].Text);
         var clubHeaders = FindHeaders(workSheet, cancellationToken, CLUB_NAME_HEADER);
         var swimStyleHeaders = FindSwimStyles(workSheet, cancellationToken);
         _warnings.AddRange(CheckHeaders(workSheet, clubHeaders, CLUB_NAME_HEADER));
@@ -231,11 +235,9 @@ public partial class EntryDocumentReadAction(
         if (hasFullName)
         {
             if (hasFirstName && !hasLastName)
-                errors.Add(string.Format(CultureInfo.CurrentUICulture, EntryImportStrings.HeaderNotFound_Format,
-                    LASTNAME_HEADER));
+                errors.Add(EntryImportStrings.FormatHeaderNotFound(LASTNAME_HEADER));
             if (hasLastName && !hasFirstName)
-                errors.Add(string.Format(CultureInfo.CurrentUICulture, EntryImportStrings.HeaderNotFound_Format,
-                    FIRSTNAME_HEADER));
+                errors.Add(EntryImportStrings.FormatHeaderNotFound(FIRSTNAME_HEADER));
             return errors;
         }
 
@@ -249,12 +251,7 @@ public partial class EntryDocumentReadAction(
         foreach (var header in headers)
         {
             if (foundHeads.TryGetValue(header, out var cell) && cell is null)
-            {
-                errors.Add(string.Format(
-                    CultureInfo.CurrentUICulture,
-                    EntryImportStrings.HeaderNotFound_Format,
-                    header));
-            }
+                errors.Add(EntryImportStrings.FormatHeaderNotFound(header));
         }
 
         return errors;
@@ -267,12 +264,7 @@ public partial class EntryDocumentReadAction(
         foreach (var header in headers)
         {
             if (foundHeads.TryGetValue(header, out var cell) && cell is null)
-            {
-                errors.Add(string.Format(
-                    CultureInfo.CurrentUICulture,
-                    EntryImportStrings.HeaderNotFound_Format,
-                    header));
-            }
+                errors.Add(EntryImportStrings.FormatHeaderNotFound(header));
         }
 
         return errors;
@@ -291,7 +283,8 @@ public partial class EntryDocumentReadAction(
         {
             cancellationToken.ThrowIfCancellationRequested();
             var hasErrors = false;
-            if (!TryResolveAthleteName(workSheet, row, athleteHeaders, out var firstName, out var lastName))
+            if (!TryResolveAthleteName(workSheet, row, athleteHeaders, _fullNameIsFirstNameFirst, out var firstName,
+                    out var lastName))
             {
                 if (athleteHeaders[FULLNAME_HEADER] is not null)
                 {
@@ -418,10 +411,20 @@ public partial class EntryDocumentReadAction(
         return athleteHeaders[LASTNAME_HEADER]!.Column;
     }
 
+    private static bool IsFirstNameFirstFullNameHeader(string? headerText)
+    {
+        if (string.IsNullOrWhiteSpace(headerText))
+            return false;
+        return headerText.Equals("Имя Фамилия", StringComparison.OrdinalIgnoreCase)
+               || headerText.Equals("First name Last name", StringComparison.OrdinalIgnoreCase)
+               || headerText.Equals("First Name Last Name", StringComparison.OrdinalIgnoreCase);
+    }
+
     private static bool TryResolveAthleteName(
         ExcelWorksheet workSheet,
         int row,
         Dictionary<string, ExcelCellAddress?> athleteHeaders,
+        bool fullNameIsFirstNameFirst,
         out string firstName,
         out string lastName)
     {
@@ -444,7 +447,7 @@ public partial class EntryDocumentReadAction(
             var fullName = workSheet.Cells[row, athleteHeaders[FULLNAME_HEADER]!.Column].Text.Trim();
             if (!string.IsNullOrWhiteSpace(fullName))
             {
-                (lastName, firstName) = AthleteNameImportParser.SplitFullName(fullName);
+                (lastName, firstName) = AthleteNameImportParser.SplitFullName(fullName, fullNameIsFirstNameFirst);
                 return true;
             }
         }

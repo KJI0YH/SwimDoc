@@ -15,6 +15,22 @@ public static class EntryImportStrings
     public static string FileNotFound_Format => Get(nameof(FileNotFound_Format));
     public static string FileBusyOrUnavailable_Format => Get(nameof(FileBusyOrUnavailable_Format));
     public static string HeaderNotFound_Format => Get(nameof(HeaderNotFound_Format));
+
+    public static string FormatHeaderNotFound(string canonicalHeader) =>
+        string.Format(CultureInfo.CurrentUICulture, HeaderNotFound_Format, GetHeaderDisplayName(canonicalHeader));
+
+    public static string GetHeaderDisplayName(string canonicalHeader) =>
+        canonicalHeader switch
+        {
+            "FirstName" => Get("Header_FirstName"),
+            "LastName" => Get("Header_LastName"),
+            "FullName" => Get("Header_FullName"),
+            "BirthYear" => Get("Header_BirthYear"),
+            "Gender" => Get("Header_Gender"),
+            "Category" => Get("Header_Category"),
+            "ClubName" => Get("Header_ClubName"),
+            _ => canonicalHeader
+        };
     public static string ClubNameNotFound_PersonalScoring_Format => Get(nameof(ClubNameNotFound_PersonalScoring_Format));
     public static string DistanceParseFailed_Format => Get(nameof(DistanceParseFailed_Format));
     public static string StrokeParseFailed_Format => Get(nameof(StrokeParseFailed_Format));

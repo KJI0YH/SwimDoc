@@ -16,4 +16,17 @@ public class AthleteNameImportParserTest
         Assert.That(lastName, Is.EqualTo(expectedLastName));
         Assert.That(firstName, Is.EqualTo(expectedFirstName));
     }
+
+    [TestCase("Алексей Крыжановский", "Крыжановский", "Алексей")]
+    [TestCase("John Smith", "Smith", "John")]
+    [TestCase("Алексей Сергеевич Крыжановский", "Крыжановский", "Алексей Сергеевич")]
+    public void SplitFullName_SplitsFirstNameAndLastName_WhenFirstNameFirst(
+        string fullName,
+        string expectedLastName,
+        string expectedFirstName)
+    {
+        var (lastName, firstName) = AthleteNameImportParser.SplitFullName(fullName, firstNameFirst: true);
+        Assert.That(lastName, Is.EqualTo(expectedLastName));
+        Assert.That(firstName, Is.EqualTo(expectedFirstName));
+    }
 }

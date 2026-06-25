@@ -148,6 +148,11 @@
     <Style TargetType="ComboBox"
            BasedOn="{StaticResource {x:Type ComboBox}}">
         <Setter Property="FontSize" Value="{DynamicResource SwimDocFontSizeBody}" />
+        <Style.Triggers>
+            <Trigger Property="IsEditable" Value="True">
+                <Setter Property="uiHelpers:EditableComboBoxBehavior.IsEnabled" Value="True" />
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <Style TargetType="Label"

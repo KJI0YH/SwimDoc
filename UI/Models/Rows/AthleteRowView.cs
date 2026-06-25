@@ -29,12 +29,12 @@ public sealed class AthleteRowView : IEntityRowView<Athlete>
         PointCount = EntityDisplayFormatter.FormatAthletePointCount(Entity);
     }
 
-    public static AthleteRowView FromProjection(AthleteRowProjection projection)
+    public static AthleteRowView FromProjection(AthleteRowProjection projection, int pointCount = 0)
     {
         var entity = EntityRowStubBuilder.BuildAthlete(projection);
         return new AthleteRowView(
             entity,
-            projection.PointCount,
+            pointCount,
             projection.ClubName ?? EntityDisplayFormatter.FormatAthleteClubName(entity));
     }
 

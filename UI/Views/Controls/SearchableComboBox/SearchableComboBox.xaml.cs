@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using UI.Helpers.Controls;
 using UI.Resources;
 
 namespace UI.Views.Controls.SearchableComboBox;
@@ -210,11 +211,30 @@ public partial class SearchableComboBox : UserControl
         _itemsView?.Refresh();
     }
 
+    private void ComboBoxControl_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_isSyncingSelection)
+            return;
+        if (ComboBoxControl.SelectedItem is SearchableItem selected)
+        {
+            var itemInSource = ItemsSource?.FirstOrDefault(i =>
+                                    ReferenceEquals(i, selected) ||
+                                    AreValuesEqual(i.Value, selected.Value))
+                                ?? selected;
+            if (!ReferenceEquals(SelectedItem, itemInSource))
+                SelectedItem = itemInSource;
+            return;
+        }
+        if (ComboBoxControl.SelectedItem is null && SelectedItem is not null && !_isSearchActive)
+            SelectedItem = null;
+    }
+
     private void ComboBoxControl_OnTextChanged(object sender, TextChangedEventArgs e)
     {
         if (_itemsView == null || _isUpdatingText) return;
         if (!_isSearchActive) return;
         var typedText = ComboBoxControl.Text ?? string.Empty;
+        CollapseEditableTextSelection();
         if (typedText == _searchText)
             return;
         _searchText = typedText;
@@ -224,8 +244,7 @@ public partial class SearchableComboBox : UserControl
             return;
         _isOpeningDropDownForSearch = true;
         ComboBoxControl.IsDropDownOpen = true;
-        if (ComboBoxControl.Text != typedText)
-            RestoreEditableText(typedText);
+        RestoreEditableText(typedText);
     }
 
     private void ClearSelectionDuringSearch()
@@ -257,14 +276,11 @@ public partial class SearchableComboBox : UserControl
 
     private void HookEditableTextBox()
     {
-        if (GetEditableTextBox() is not { } textBox)
-            return;
-        textBox.GotFocus += (_, _) =>
-        {
-            if (_isSearchActive)
-                RestoreEditableText(ComboBoxControl.Text ?? string.Empty);
-        };
+        EditableComboBoxBehavior.SetIsEnabled(ComboBoxControl, true);
     }
+
+    private void CollapseEditableTextSelection() =>
+        EditableComboBoxBehavior.CollapseSelectionToEnd(GetEditableTextBox());
 
     private TextBox? GetEditableTextBox() =>
         ComboBoxControl.Template?.FindName("PART_EditableTextBox", ComboBoxControl) as TextBox;
@@ -273,18 +289,12 @@ public partial class SearchableComboBox : UserControl
     {
         if (GetEditableTextBox() is not { } textBox)
             return;
-        if (textBox.Text == text)
-        {
-            textBox.CaretIndex = text.Length;
-            textBox.SelectionLength = 0;
-            return;
-        }
         _isUpdatingText = true;
         try
         {
-            textBox.Text = text;
-            textBox.CaretIndex = text.Length;
-            textBox.SelectionLength = 0;
+            if (textBox.Text != text)
+                textBox.Text = text;
+            EditableComboBoxBehavior.CollapseSelectionToEnd(textBox);
         }
         finally
         {

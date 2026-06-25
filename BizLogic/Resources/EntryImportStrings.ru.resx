@@ -15,7 +15,14 @@
 
   <data name="FileNotFound_Format" xml:space="preserve"><value>Файл не найден: {0}</value></data>
   <data name="FileBusyOrUnavailable_Format" xml:space="preserve"><value>Не удалось открыть «{0}»: файл занят другим процессом или недоступен. Закройте файл в Excel или другой программе и повторите попытку.</value></data>
-  <data name="HeaderNotFound_Format" xml:space="preserve"><value>Заголовок "{0}" не найден.</value></data>
+  <data name="HeaderNotFound_Format" xml:space="preserve"><value>Заголовок «{0}» не найден.</value></data>
+  <data name="Header_FirstName" xml:space="preserve"><value>Имя</value></data>
+  <data name="Header_LastName" xml:space="preserve"><value>Фамилия</value></data>
+  <data name="Header_FullName" xml:space="preserve"><value>Имя Фамилия</value></data>
+  <data name="Header_BirthYear" xml:space="preserve"><value>Год рождения</value></data>
+  <data name="Header_Gender" xml:space="preserve"><value>Пол</value></data>
+  <data name="Header_Category" xml:space="preserve"><value>Разряд</value></data>
+  <data name="Header_ClubName" xml:space="preserve"><value>Команда</value></data>
   <data name="ClubNameNotFound_PersonalScoring_Format" xml:space="preserve"><value>Имя клуба не найдено, спортсмены добавлены в личный зачёт: {0}</value></data>
 
   <data name="DistanceParseFailed_Format" xml:space="preserve"><value>Не удалось обработать дистанцию: {0}</value></data>

@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DataLayer.Display;
 using DataLayer.EfClasses;
 using DataLayer.EfCore;
 using Microsoft.EntityFrameworkCore;
@@ -62,32 +63,37 @@ public partial class AgeGroupsViewModel : DataViewModel<AgeGroup, AgeGroupRowVie
 
     protected override IQueryable<AgeGroup> ApplyQuery(IQueryable<AgeGroup> query) => query;
 
-    protected override IQueryable<AgeGroup> ApplySorting(IQueryable<AgeGroup> query)
-    {
-        if (!string.Equals(SortColumn, "ParticipantCount", StringComparison.Ordinal))
-            return base.ApplySorting(query);
-
-        var db = (LoadServiceProvider ?? App.Current.Services).GetRequiredService<EfCoreContext>();
-        var athletes = db.Set<Athlete>().AsNoTracking();
-        return SortDirection == ListSortDirection.Ascending
-            ? query.OrderBy(ag => athletes.Count(a =>
-                a.YearOfBirth >= (ag.BirthYearMin ?? 0) &&
-                a.YearOfBirth <= (ag.BirthYearMax ?? int.MaxValue) &&
-                (ag.Gender == Gender.Mixed || a.Gender == ag.Gender)))
-            : query.OrderByDescending(ag => athletes.Count(a =>
-                a.YearOfBirth >= (ag.BirthYearMin ?? 0) &&
-                a.YearOfBirth <= (ag.BirthYearMax ?? int.MaxValue) &&
-                (ag.Gender == Gender.Mixed || a.Gender == ag.Gender)));
-    }
-
     protected override async Task<List<AgeGroupRowView>> LoadPageRowsAsync(
         IQueryable<AgeGroup> query,
         IServiceProvider serviceProvider)
     {
+        var projections = await RowProjectionQueries.SelectAgeGroup(query).ToListAsync().ConfigureAwait(false);
+        if (projections.Count == 0)
+            return [];
+
         var db = serviceProvider.GetRequiredService<EfCoreContext>();
-        var athletes = db.Set<Athlete>().AsNoTracking();
-        var projections = await RowProjectionQueries.SelectAgeGroup(query, athletes).ToListAsync().ConfigureAwait(false);
-        return projections.Select(AgeGroupRowView.FromProjection).ToList();
+        var athletes = await db.Athletes
+            .AsNoTracking()
+            .Select(a => new { a.YearOfBirth, a.Gender })
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        var rows = projections
+            .Select(projection => AgeGroupRowView.FromProjection(
+                projection,
+                AgeGroupParticipantCounter.Count(
+                    projection.BirthYearMin,
+                    projection.BirthYearMax,
+                    projection.Gender,
+                    athletes.Select(a => (a.YearOfBirth, a.Gender)))))
+            .ToList();
+
+        if (!string.Equals(SortColumn, "ParticipantCount", StringComparison.Ordinal))
+            return rows;
+
+        return SortDirection == ListSortDirection.Ascending
+            ? rows.OrderBy(row => row.ParticipantCount).ToList()
+            : rows.OrderByDescending(row => row.ParticipantCount).ToList();
     }
 
     protected override IQueryable<AgeGroup> ApplySearch(IQueryable<AgeGroup> query)

@@ -48,13 +48,16 @@ public class EntryService(EfCoreContext dbContext, IAppLog log) : CrudService<En
                 tracked.Relay.Number = entity.Relay.Number;
             }
             var incomingPositions = entity.Relay?.Positions?.ToList() ?? [];
-            tracked.Relay.Positions ??= new List<RelayPosition>();
+            var relayId = tracked.Relay.Id;
+            var existingPositions = tracked.Relay.Positions.ToList();
+            if (existingPositions.Count > 0)
+                dbContext.RelayPositions.RemoveRange(existingPositions);
             tracked.Relay.Positions.Clear();
             foreach (var p in incomingPositions.OrderBy(p => p.Order))
             {
                 tracked.Relay.Positions.Add(new RelayPosition
                 {
-                    RelayId = tracked.Relay.Id,
+                    RelayId = relayId,
                     AthleteId = p.AthleteId,
                     Order = p.Order,
                     EntryTime = p.EntryTime

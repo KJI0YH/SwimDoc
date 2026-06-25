@@ -22,17 +22,9 @@ public partial class RelayRowViewModel : ObservableObject
 
     public void SetAvailableAthletes(IEnumerable<SearchableItem> items)
     {
-        var nextItems = items.ToList();
-        for (var index = AvailableAthletes.Count - 1; index >= 0; index--)
-        {
-            if (!nextItems.Contains(AvailableAthletes[index]))
-                AvailableAthletes.RemoveAt(index);
-        }
-        foreach (var item in nextItems)
-        {
-            if (!AvailableAthletes.Contains(item))
-                AvailableAthletes.Add(item);
-        }
+        AvailableAthletes.Clear();
+        foreach (var item in items)
+            AvailableAthletes.Add(item);
     }
 
     public void SetSelectedAthleteSilently(SearchableItem? athlete)

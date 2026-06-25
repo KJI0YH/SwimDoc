@@ -16,8 +16,8 @@ public sealed class AgeGroupRowView : IEntityRowView<AgeGroup>
 
     public AgeGroupRowView(AgeGroup entity) => Entity = entity;
 
-    public static AgeGroupRowView FromProjection(AgeGroupRowProjection projection) =>
-        new(EntityRowStubBuilder.BuildAgeGroup(projection), projection.ParticipantCount);
+    public static AgeGroupRowView FromProjection(AgeGroupRowProjection projection, int participantCount = 0) =>
+        new(EntityRowStubBuilder.BuildAgeGroup(projection), participantCount);
 
     private AgeGroupRowView(AgeGroup entity, int participantCount)
     {

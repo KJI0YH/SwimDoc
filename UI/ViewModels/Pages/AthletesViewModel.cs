@@ -4,6 +4,7 @@ using DataLayer.EfCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.AthleteService;
+using ServiceLayer.EntryService;
 using UI.Resources;
 using UI.ViewModels.Pages.Data;
 using UI.Models.Rows;
@@ -49,7 +50,16 @@ public class AthletesViewModel : DataViewModel<Athlete, AthleteRowView, int?>
         IServiceProvider serviceProvider)
     {
         var projections = await RowProjectionQueries.SelectAthlete(query).ToListAsync().ConfigureAwait(false);
-        return projections.Select(AthleteRowView.FromProjection).ToList();
+        var athleteIds = projections.Select(projection => projection.Id).ToList();
+        var dbContext = serviceProvider.GetRequiredService<EfCoreContext>();
+        var pointCounts = await ScoringPointCountQueries
+            .GetAthletePointCountsAsync(dbContext, athleteIds)
+            .ConfigureAwait(false);
+        return projections
+            .Select(projection => AthleteRowView.FromProjection(
+                projection,
+                pointCounts.GetValueOrDefault(projection.Id)))
+            .ToList();
     }
 
     protected override IQueryable<Athlete> ApplySearch(IQueryable<Athlete> query)

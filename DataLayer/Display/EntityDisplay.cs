@@ -1,4 +1,5 @@
 using DataLayer.EfClasses;
+using DataLayer.Scoring;
 
 namespace DataLayer.Display;
 
@@ -11,7 +12,7 @@ public static class EntityDisplay
         athlete?.Club?.Name ?? texts.PersonalParen;
 
     public static int FormatAthletePointCount(Athlete? athlete) =>
-        athlete?.Entries?.Where(e => e.Scoring).Sum(e => e.Points ?? 0) ?? 0;
+        athlete?.Entries is null ? 0 : ScoringPointsCalculator.CalculateAthleteScoringPoints(athlete.Entries);
 
     public static int FormatClubAthleteCount(Club? club) => club?.Athletes.Count ?? 0;
     public static int FormatClubRelayCount(Club? club) => club?.Relays.Count ?? 0;
@@ -33,7 +34,7 @@ public static class EntityDisplay
                 club.Relays.Count(r => r.Entry is { Scoring: false }));
 
     public static int FormatClubPointCount(Club? club) =>
-        club?.Athletes.Sum(a => a.Entries.Where(e => e.Scoring).Sum(e => e.Points ?? 0)) ?? 0;
+        club?.Athletes.Sum(a => ScoringPointsCalculator.CalculateAthleteScoringPoints(a.Entries)) ?? 0;
 
     public static string FormatRelayName(Relay? relay, IEntityDisplayTexts texts)
     {
