@@ -2,14 +2,22 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 ; Non-commercial use only
 
+#ifndef RepoRoot
+  #define RepoRoot ".."
+#endif
+
 #define MyAppName "SwimDoc"
-#define MyAppVersion "1.0.0"
 #define MyAppPublisher "Aliaksei Kryzhanouski"
 #define MyAppURL "https://github.com/KJI0YH/SwimDoc"
 #define MyAppExeName "SwimDoc.exe"
-#define MyAppAssocName MyAppName + " File"
 #define MyAppAssocExt ".swimdb"
-#define MyAppAssocKey StringChange(MyAppAssocName, " ", "") + MyAppAssocExt
+#define MyAppAssocKey "SwimDoc.CompetitionDb"
+#define MyAppAssocName "SwimDoc competition file"
+#define MyAppIdGuid "06F6DAE8-9B05-41C5-AE43-51FBD9684B9A"
+#define MyUninstallRegKey "Software\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppIdGuid}_is1"
+#define PublishDir RepoRoot + "\Artifacts\Publish\win-x64"
+
+#include "Version.iss"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
@@ -17,7 +25,14 @@
 AppId={{06F6DAE8-9B05-41C5-AE43-51FBD9684B9A}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
-;AppVerName={#MyAppName} {#MyAppVersion}
+AppVerName={#MyAppName} {#MyAppVersion}
+AppMutex={#MyAppName}.{#MyAppIdGuid},old
+CloseApplications=yes
+RestartApplications=yes
+UsePreviousAppDir=yes
+UsePreviousTasks=yes
+UsePreviousLanguage=yes
+DisableDirPage=auto
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
@@ -34,12 +49,12 @@ ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 ChangesAssociations=yes
 DisableProgramGroupPage=yes
-LicenseFile=C:\Users\edin\RiderProjects\SwimDoc\LICENSE
+LicenseFile={#RepoRoot}\LICENSE
 ; Uncomment the following line to run in non administrative install mode (install for current user only).
 ;PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
-OutputDir=C:\Users\edin\RiderProjects\SwimDoc\Installer
-OutputBaseFilename=SwimDocSetup
+OutputDir=.
+OutputBaseFilename=SwimDocSetup-{#MyAppVersion}
 SolidCompression=yes
 WizardStyle=modern dynamic
 
@@ -47,16 +62,20 @@ WizardStyle=modern dynamic
 Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "russian"; MessagesFile: "compiler:Languages\Russian.isl"
 
+[CustomMessages]
+english.UpgradeDifferentFolder=SwimDoc is already installed in:%n%n%1%n%nChoose that folder to update the existing copy. Installing to another folder will keep both versions on the computer.%n%nContinue with the selected folder?
+russian.UpgradeDifferentFolder=SwimDoc уже установлен в:%n%n%1%n%nВыберите эту папку, чтобы обновить существующую копию. Установка в другую папку оставит обе версии программы на компьютере.%n%nПродолжить установку в выбранную папку?
+
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "C:\Users\edin\RiderProjects\SwimDoc\Artifacts\Publish\win-x64\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\edin\RiderProjects\SwimDoc\Artifacts\Publish\win-x64\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#PublishDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Registry]
 Root: HKA; Subkey: "Software\Classes\{#MyAppAssocExt}\OpenWithProgids"; ValueType: string; ValueName: "{#MyAppAssocKey}"; ValueData: ""; Flags: uninsdeletevalue
+Root: HKA; Subkey: "Software\Classes\{#MyAppAssocExt}"; ValueType: string; ValueName: ""; ValueData: "{#MyAppAssocKey}"; Flags: uninsdeletevalue
 Root: HKA; Subkey: "Software\Classes\{#MyAppAssocKey}"; ValueType: string; ValueName: ""; ValueData: "{#MyAppAssocName}"; Flags: uninsdeletekey
 Root: HKA; Subkey: "Software\Classes\{#MyAppAssocKey}\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\{#MyAppExeName},0"
 Root: HKA; Subkey: "Software\Classes\{#MyAppAssocKey}\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" ""%1"""
@@ -68,3 +87,30 @@ Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: de
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
+[Code]
+function GetInstalledPath(): String;
+var
+  Path: String;
+begin
+  Result := '';
+  if RegQueryStringValue(HKLM, '{#MyUninstallRegKey}', 'InstallLocation', Path) or
+     RegQueryStringValue(HKCU, '{#MyUninstallRegKey}', 'InstallLocation', Path) then
+    Result := Path;
+end;
+
+function NextButtonClick(CurPageID: Integer): Boolean;
+var
+  InstalledPath: String;
+begin
+  Result := True;
+  if CurPageID <> wpSelectDir then
+    Exit;
+
+  InstalledPath := GetInstalledPath();
+  if (InstalledPath = '') or (CompareText(InstalledPath, WizardDirValue) = 0) then
+    Exit;
+
+  if MsgBox(FmtMessage(CustomMessage('UpgradeDifferentFolder'), [InstalledPath]),
+    mbConfirmation, MB_YESNO or MB_DEFBUTTON2) = IDNO then
+    Result := False;
+end;

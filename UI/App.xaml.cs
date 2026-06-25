@@ -47,9 +47,14 @@ namespace UI;
 
 public partial class App : Application
 {
+    private const string InstallerMutexName = "SwimDoc.06F6DAE8-9B05-41C5-AE43-51FBD9684B9A";
+
     private readonly IServiceProvider? _serviceProvider;
+    private static Mutex? _installerMutex;
+
     public App()
     {
+        _installerMutex = new Mutex(true, InstallerMutexName, out _);
         ExcelPackage.License.SetNonCommercialPersonal("Aliaksei Kryzhanouski");
         _serviceProvider = ConfigureServiceProvider();
         RegisterViewModelMappings();
@@ -73,6 +78,18 @@ public partial class App : Application
         Services.GetRequiredService<IFontScaleService>().ApplyCurrent();
         var mainWindow = new MainWindow();
         mainWindow.Show();
+    }
+
+    protected override void OnExit(ExitEventArgs e)
+    {
+        if (_installerMutex is not null)
+        {
+            _installerMutex.ReleaseMutex();
+            _installerMutex.Dispose();
+            _installerMutex = null;
+        }
+
+        base.OnExit(e);
     }
 
     private IServiceProvider ConfigureServiceProvider()

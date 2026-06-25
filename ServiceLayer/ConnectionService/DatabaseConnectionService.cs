@@ -1,10 +1,11 @@
 using DataLayer.EfCore;
+using ServiceLayer;
 
 namespace ServiceLayer.ConnectionService;
 
 public class DatabaseConnectionService : IDatabaseConnection
 {
-    private string _connection = $"Data Source={Path.Combine(Directory.GetCurrentDirectory(), "Default.swimdb")}";
+    private string _connection = $"Data Source={ApplicationPaths.GetUserDataFilePath("Default.swimdb")}";
     public string? CurrentConnection()
     {
         return _connection;

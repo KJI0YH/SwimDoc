@@ -14,7 +14,7 @@ public sealed class CsvBaseTimeRepository : IBaseTimeRepository
         ConcurrentDictionary<(Course course, int meters, Stroke stroke, int relayCount, Gender gender), int> _store =
             new();
 
-    public CsvBaseTimeRepository() : this(Path.Combine(Directory.GetCurrentDirectory(), "base-times.csv"))
+    public CsvBaseTimeRepository() : this(ApplicationPaths.EnsureUserDataFileFromBundle("base-times.csv"))
     {
     }
 

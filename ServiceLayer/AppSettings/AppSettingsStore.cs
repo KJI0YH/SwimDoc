@@ -70,5 +70,5 @@ public sealed class AppSettingsStore : IAppSettingsStore
         };
 
     private static string GetSettingsPath() =>
-        Path.Combine(Directory.GetCurrentDirectory(), SettingsFileName);
+        ApplicationPaths.GetUserDataFilePath(SettingsFileName);
 }
