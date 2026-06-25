@@ -4,15 +4,8 @@ using CommunityToolkit.Mvvm.Input;
 using DataLayer.EfClasses;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using ServiceLayer.AgeGroupService;
-using ServiceLayer.AthleteService;
-using ServiceLayer.ClubService;
-using ServiceLayer.EntryDocumentReaderService;
 using ServiceLayer.EntryService;
-using ServiceLayer.EventService;
-using ServiceLayer.HeatService;
-using ServiceLayer.PointScoreProvider;
-using ServiceLayer.SwimStyleService;
+using UI.Helpers.Threading;
 using UI.ViewModels;
 using UI.ViewModels.Pages;
 
@@ -27,6 +20,7 @@ public partial class ResultsByClubViewModel(IEntryService entryService) : ViewMo
     [ObservableProperty] private bool _isLoading;
     [ObservableProperty] private ObservableCollection<ParticipantResultEntryView> _results = new();
     [ObservableProperty] private ParticipantResultEntryView? _selectedResult;
+
     public void SetClubId(int? clubId)
     {
         _clubId = clubId;
@@ -41,11 +35,17 @@ public partial class ResultsByClubViewModel(IEntryService entryService) : ViewMo
             Results = [];
             return;
         }
-        IsLoading = true;
+
+        await DispatcherUiHelper.InvokeOnUiAsync(() => IsLoading = true);
+        await YieldLoadingUiAsync();
         try
         {
             var clubId = _clubId.Value;
-            var eventIds = await entryService.Query()
+            await YieldToBackgroundAsync();
+
+            await using var scope = App.Current.Services.CreateAsyncScope();
+            var scopedEntryService = scope.ServiceProvider.GetRequiredService<IEntryService>();
+            var eventIds = await scopedEntryService.Query()
                 .Where(e => e.SwimEventId != null)
                 .Where(e =>
                     (e.Athlete != null && e.Athlete.ClubId == clubId) ||
@@ -55,20 +55,26 @@ public partial class ResultsByClubViewModel(IEntryService entryService) : ViewMo
                 .OrderBy(e => e.SwimEvent!.Order)
                 .Select(e => e.SwimEventId!.Value)
                 .Distinct()
-                .ToListAsync();
+                .ToListAsync()
+                .ConfigureAwait(false);
+
             var rows = new List<ParticipantResultEntryView>();
             foreach (var eventId in eventIds)
             {
-                var eventEntries = await entryService.GetEntriesByEventIdOrderByFinishTimeAsync(eventId);
+                var eventEntries = await scopedEntryService
+                    .GetEntriesByEventIdOrderByFinishTimeAsync(eventId)
+                    .ConfigureAwait(false);
                 var eventResults = ResultsViewModel.BuildResultEntryViews(eventEntries);
                 foreach (var clubResult in ResultsViewModel.FindClubResults(eventResults, clubId))
                     rows.Add(new ParticipantResultEntryView(clubResult));
             }
-            Results = new ObservableCollection<ParticipantResultEntryView>(rows);
+
+            await DispatcherUiHelper.InvokeOnUiAsync(() =>
+                Results = new ObservableCollection<ParticipantResultEntryView>(rows));
         }
         finally
         {
-            IsLoading = false;
+            await DispatcherUiHelper.InvokeOnUiAsync(() => IsLoading = false);
         }
     }
 

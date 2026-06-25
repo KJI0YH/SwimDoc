@@ -20,4 +20,6 @@ public interface IHeatService : ICrudService<Heat, int?>
     public Task<(Heat? heat, ImmutableList<ValidationResult> errors)> SaveHeatWithPositionsAsync(Heat heat, bool isAdd);
     public int GetTotalHeats();
     public int GetTotalHeatsInEvent(int swimEventId);
+    public Task<int> GetTotalHeatsAsync();
+    public Task<int> GetTotalHeatsInEventAsync(int swimEventId);
 }

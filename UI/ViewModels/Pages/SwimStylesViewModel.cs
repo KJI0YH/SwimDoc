@@ -33,9 +33,11 @@ public class SwimStylesViewModel : DataViewModel<SwimStyle, SwimStyleRowView, in
             ColumnConfiguration<SwimStyle>.SortBy(e => e.Stroke)));
     }
 
-    protected override async Task<List<SwimStyleRowView>> LoadPageRowsAsync(IQueryable<SwimStyle> query)
+    protected override async Task<List<SwimStyleRowView>> LoadPageRowsAsync(
+        IQueryable<SwimStyle> query,
+        IServiceProvider serviceProvider)
     {
-        var projections = await RowProjectionQueries.SelectSwimStyle(query).ToListAsync();
+        var projections = await RowProjectionQueries.SelectSwimStyle(query).ToListAsync().ConfigureAwait(false);
         return projections.Select(SwimStyleRowView.FromProjection).ToList();
     }
 

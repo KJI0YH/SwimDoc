@@ -154,6 +154,7 @@ public static class Strings
     public static string Import_EventCurrent => Get(nameof(Import_EventCurrent));
     public static string Import_CreatedEntries => Get(nameof(Import_CreatedEntries));
     public static string Filters_Clear => Get(nameof(Filters_Clear));
+    public static string Filters_Date => Get(nameof(Filters_Date));
     public static string Filters_Round => Get(nameof(Filters_Round));
     public static string Filters_Distance => Get(nameof(Filters_Distance));
     public static string Filters_Stroke => Get(nameof(Filters_Stroke));
@@ -260,6 +261,7 @@ public static class Strings
     public static string Heats_DeleteTooltip_Heat => Get(nameof(Heats_DeleteTooltip_Heat));
     public static string Heats_DeleteTooltip_Position => Get(nameof(Heats_DeleteTooltip_Position));
     public static string Fixation_SelectedHeatHeader_Format => Get(nameof(Fixation_SelectedHeatHeader_Format));
+    public static string Fixation_HeatListItem_Format => Get(nameof(Fixation_HeatListItem_Format));
     public static string WindowTitle_CreateClub => Get(nameof(WindowTitle_CreateClub));
     public static string WindowTitle_EditClub => Get(nameof(WindowTitle_EditClub));
     public static string WindowTitle_CreateAthlete => Get(nameof(WindowTitle_CreateAthlete));
@@ -276,6 +278,7 @@ public static class Strings
     public static string WindowTitle_EditAgeGroup => Get(nameof(WindowTitle_EditAgeGroup));
     public static string Common_NoneParen => Get(nameof(Common_NoneParen));
     public static string Common_PersonalParen => Get(nameof(Common_PersonalParen));
+    public static string Common_ScoringPersonalCount_Format => Get(nameof(Common_ScoringPersonalCount_Format));
     public static string HeatAlloc_WindowTitle => Get(nameof(HeatAlloc_WindowTitle));
     public static string HeatAlloc_Validation_MinHeatSize => Get(nameof(HeatAlloc_Validation_MinHeatSize));
     public static string Heat_Validation_EventRequired => Get(nameof(Heat_Validation_EventRequired));

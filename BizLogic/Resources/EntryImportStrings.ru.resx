@@ -23,6 +23,7 @@
 
   <data name="AthleteFirstNameInvalid_Format" xml:space="preserve"><value>Некорректное имя спортсмена: {0}</value></data>
   <data name="AthleteLastNameInvalid_Format" xml:space="preserve"><value>Некорректная фамилия спортсмена: {0}</value></data>
+  <data name="AthleteFullNameInvalid_Format" xml:space="preserve"><value>Некорректное ФИО спортсмена: {0}</value></data>
   <data name="AthleteBirthYearInvalid_Format" xml:space="preserve"><value>Некорректный год рождения спортсмена: {0}</value></data>
   <data name="AthleteGenderInvalid_Format" xml:space="preserve"><value>Некорректный пол спортсмена: {0}</value></data>
   <data name="AthleteCategoryInvalid_Format" xml:space="preserve"><value>Некорректный разряд спортсмена: {0}</value></data>

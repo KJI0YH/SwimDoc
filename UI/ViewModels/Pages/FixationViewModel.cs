@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.EventService;
 using ServiceLayer.HeatService;
 using ServiceLayer.PointScoreProvider;
+using UI.Helpers.Threading;
 using UI.Resources;
 using UI.ViewModels.Pages.Data;
 using UI.Models.Rows;
@@ -23,12 +24,15 @@ public partial class FixationViewModel(
     INavigationService navigationService)
     : DataViewModel<SwimEvent, SwimEventRowView, int?>(eventService)
 {
+    protected override bool UsesPaging => false;
+
     private IHeatService HeatService =>
         App.Current.Services.GetRequiredService<IHeatService>();
     private IPointScoreProvider PointScoreProvider =>
         App.Current.Services.GetRequiredService<IPointScoreProvider>();
     public event Action<int>? EventResultsChanged;
     [ObservableProperty] private SwimEvent? _selectedSwimEvent;
+    [ObservableProperty] private SearchableItem? _selectedSwimEventOption;
     [ObservableProperty] private ObservableCollection<SearchableItem> _swimEventOptions = new();
     [ObservableProperty] private HeatListItemView? _selectedHeatItem;
     [ObservableProperty] private ObservableCollection<HeatListItemView> _eventHeats = new();
@@ -61,6 +65,7 @@ public partial class FixationViewModel(
     {
         base.ResetForNewCompetition();
         SelectedSwimEvent = null;
+        SelectedSwimEventOption = null;
         SwimEventOptions = [];
         EventHeats = [];
         SelectedHeatItem = null;
@@ -70,9 +75,11 @@ public partial class FixationViewModel(
     protected override IQueryable<SwimEvent> ApplyQuery(IQueryable<SwimEvent> query) =>
         query.OrderBy(se => se.Order);
 
-    protected override async Task<List<SwimEventRowView>> LoadPageRowsAsync(IQueryable<SwimEvent> query)
+    protected override async Task<List<SwimEventRowView>> LoadPageRowsAsync(
+        IQueryable<SwimEvent> query,
+        IServiceProvider serviceProvider)
     {
-        var projections = await RowProjectionQueries.SelectSwimEvent(query).ToListAsync();
+        var projections = await RowProjectionQueries.SelectSwimEvent(query).ToListAsync().ConfigureAwait(false);
         return projections.Select(SwimEventRowView.FromProjection).ToList();
     }
 
@@ -81,6 +88,7 @@ public partial class FixationViewModel(
         if (items.Count == 0)
         {
             SelectedSwimEvent = null;
+            SelectedSwimEventOption = null;
             SwimEventOptions = [];
             EventHeats = [];
             SelectedHeatItem = null;
@@ -94,14 +102,40 @@ public partial class FixationViewModel(
                 Value = e,
                 DisplayText = EntityDisplayFormatter.FormatSwimEvent(e)
             }));
+        if (SelectedSwimEvent is not null && items.Any(e => e.Id == SelectedSwimEvent.Id))
+        {
+            SyncSelectedSwimEventOption();
+            return;
+        }
+        SelectedSwimEvent ??= items.OrderBy(e => e.Order).FirstOrDefault();
+    }
+
+    private void SyncSelectedSwimEventOption()
+    {
+        if (SelectedSwimEvent?.Id is int eventId)
+        {
+            var option = SwimEventOptions.FirstOrDefault(o =>
+                o.Value is SwimEvent swim && swim.Id == eventId);
+            if (!ReferenceEquals(SelectedSwimEventOption, option))
+                SelectedSwimEventOption = option;
+        }
+        else if (SelectedSwimEventOption is not null)
+            SelectedSwimEventOption = null;
     }
 
     partial void OnSelectedSwimEventChanged(SwimEvent? value)
     {
+        SyncSelectedSwimEventOption();
         _ = LoadEventHeatsAsync();
         OnPropertyChanged(nameof(SelectedHeatHeader));
         OnPropertyChanged(nameof(SelectedHeatStatus));
         OnPropertyChanged(nameof(CanEditHeat));
+    }
+
+    partial void OnSelectedSwimEventOptionChanged(SearchableItem? value)
+    {
+        if (value?.Value is SwimEvent swimEvent && SelectedSwimEvent?.Id != swimEvent.Id)
+            SelectedSwimEvent = swimEvent;
     }
 
     partial void OnSelectedHeatItemChanged(HeatListItemView? value)
@@ -123,24 +157,31 @@ public partial class FixationViewModel(
             FixationHeatPositionViews = [];
             return;
         }
-        IsLoading = true;
+        await DispatcherUiHelper.InvokeOnUiAsync(() => IsLoading = true);
+        await YieldLoadingUiAsync();
         try
         {
+            await YieldToBackgroundAsync();
             var keepHeatId = SelectedHeat?.Id;
+            var eventIdCopy = eventId;
             _fixationSwimEvent = await CrudService.Query()
                 .Include(se => se.SwimStyle)
                 .Include(se => se.AgeGroup)
                 .AsNoTracking()
-                .FirstOrDefaultAsync(se => se.Id == eventId);
-            var heats = await HeatService.GetHeatsByEventIdAsync(eventId);
-            EventHeats = new ObservableCollection<HeatListItemView>(heats.Select(h => new HeatListItemView(h)));
-            SelectedHeatItem = keepHeatId is int id
-                ? EventHeats.FirstOrDefault(h => h.Entity.Id == id) ?? EventHeats.FirstOrDefault()
-                : EventHeats.FirstOrDefault();
+                .FirstOrDefaultAsync(se => se.Id == eventIdCopy)
+                .ConfigureAwait(false);
+            var heats = await HeatService.GetHeatsByEventIdAsync(eventIdCopy).ConfigureAwait(false);
+            await DispatcherUiHelper.InvokeOnUiAsync(() =>
+            {
+                EventHeats = new ObservableCollection<HeatListItemView>(heats.Select(h => new HeatListItemView(h)));
+                SelectedHeatItem = keepHeatId is int id
+                    ? EventHeats.FirstOrDefault(h => h.Entity.Id == id) ?? EventHeats.FirstOrDefault()
+                    : EventHeats.FirstOrDefault();
+            });
         }
         finally
         {
-            IsLoading = false;
+            await DispatcherUiHelper.InvokeOnUiAsync(() => IsLoading = false);
         }
     }
 

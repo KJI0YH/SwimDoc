@@ -12,6 +12,7 @@ using ServiceLayer.EventService;
 using UI.ViewModels.Pages.Data;
 using UI.Models.Rows;
 using UI.Models.Rows.Projections;
+using UI.Helpers.Threading;
 using UI.Models;
 using UI.Services.Navigation;
 
@@ -24,6 +25,8 @@ public partial class ResultsViewModel(
     INavigationService navigationService) :
     DataViewModel<SwimEvent, SwimEventRowView, int?>(eventService), INavigationAware, INavigationTabState
 {
+    protected override bool UsesPaging => false;
+
     private int? _navigatedEventId;
     private bool _navigatedEventPageAdjusted;
     private int? _persistedSwimEventId;
@@ -85,9 +88,11 @@ public partial class ResultsViewModel(
     protected override IQueryable<SwimEvent> ApplyQuery(IQueryable<SwimEvent> query) =>
         query.OrderBy(se => se.Order);
 
-    protected override async Task<List<SwimEventRowView>> LoadPageRowsAsync(IQueryable<SwimEvent> query)
+    protected override async Task<List<SwimEventRowView>> LoadPageRowsAsync(
+        IQueryable<SwimEvent> query,
+        IServiceProvider serviceProvider)
     {
-        var projections = await RowProjectionQueries.SelectSwimEvent(query).ToListAsync();
+        var projections = await RowProjectionQueries.SelectSwimEvent(query).ToListAsync().ConfigureAwait(false);
         return projections.Select(SwimEventRowView.FromProjection).ToList();
     }
 
@@ -332,15 +337,19 @@ public partial class ResultsViewModel(
 
     private async Task LoadEntriesCoreAsync(int eventId)
     {
-        IsLoading = true;
+        await DispatcherUiHelper.InvokeOnUiAsync(() => IsLoading = true);
+        await YieldLoadingUiAsync();
         try
         {
-            var entries = await EntryService.GetEntriesByEventIdOrderByFinishTimeAsync(eventId);
-            Entries = new ObservableCollection<ResultEntryView>(BuildResultEntryViews(entries));
+            await YieldToBackgroundAsync();
+            var entries = await EntryService.GetEntriesByEventIdOrderByFinishTimeAsync(eventId).ConfigureAwait(false);
+            var views = BuildResultEntryViews(entries);
+            await DispatcherUiHelper.InvokeOnUiAsync(() =>
+                Entries = new ObservableCollection<ResultEntryView>(views));
         }
         finally
         {
-            IsLoading = false;
+            await DispatcherUiHelper.InvokeOnUiAsync(() => IsLoading = false);
         }
     }
 

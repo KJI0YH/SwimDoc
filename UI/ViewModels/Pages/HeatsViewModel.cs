@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.EventService;
 using ServiceLayer.HeatService;
+using UI.Helpers.Threading;
 using UI.Resources;
 using UI.ViewModels.Pages.Data;
 using UI.Models.Rows;
@@ -72,6 +73,7 @@ public partial class HeatsViewModel(
     }
 
     [ObservableProperty] private SwimEvent? _selectedSwimEvent;
+    [ObservableProperty] private SearchableItem? _selectedSwimEventOption;
     [ObservableProperty] private ObservableCollection<SearchableItem> _swimEventOptions = new();
     [ObservableProperty] private HeatPositionView? _selectedHeatPosition;
     [ObservableProperty] private int? _selectedHeatId;
@@ -121,6 +123,7 @@ public partial class HeatsViewModel(
     {
         base.ResetForNewCompetition();
         SelectedSwimEvent = null;
+        SelectedSwimEventOption = null;
         SwimEventOptions = [];
         HeatPositions = [];
         SelectedHeatPosition = null;
@@ -131,9 +134,11 @@ public partial class HeatsViewModel(
     protected override IQueryable<SwimEvent> ApplyQuery(IQueryable<SwimEvent> query) =>
         query.OrderBy(se => se.Order);
 
-    protected override async Task<List<SwimEventRowView>> LoadPageRowsAsync(IQueryable<SwimEvent> query)
+    protected override async Task<List<SwimEventRowView>> LoadPageRowsAsync(
+        IQueryable<SwimEvent> query,
+        IServiceProvider serviceProvider)
     {
-        var projections = await RowProjectionQueries.SelectSwimEvent(query).ToListAsync();
+        var projections = await RowProjectionQueries.SelectSwimEvent(query).ToListAsync().ConfigureAwait(false);
         return projections.Select(SwimEventRowView.FromProjection).ToList();
     }
 
@@ -144,6 +149,7 @@ public partial class HeatsViewModel(
         if (items.Count == 0)
         {
             SelectedSwimEvent = null;
+            SelectedSwimEventOption = null;
             SwimEventOptions = [];
             HeatPositions = [];
             UpdateHeatPaging(0);
@@ -156,16 +162,39 @@ public partial class HeatsViewModel(
                 DisplayText = EntityDisplayFormatter.FormatSwimEvent(e)
             }));
         if (SelectedSwimEvent is not null && items.Any(e => e.Id == SelectedSwimEvent.Id))
+        {
+            SyncSelectedSwimEventOption();
             return;
+        }
         SelectedSwimEvent ??= items.OrderBy(e => e.Order).FirstOrDefault();
+    }
+
+    private void SyncSelectedSwimEventOption()
+    {
+        if (SelectedSwimEvent?.Id is int eventId)
+        {
+            var option = SwimEventOptions.FirstOrDefault(o =>
+                o.Value is SwimEvent swim && swim.Id == eventId);
+            if (!ReferenceEquals(SelectedSwimEventOption, option))
+                SelectedSwimEventOption = option;
+        }
+        else if (SelectedSwimEventOption is not null)
+            SelectedSwimEventOption = null;
     }
 
     public Task RefreshAsync() => LoadHeatPositionsAsync();
     partial void OnSelectedSwimEventChanged(SwimEvent? value)
     {
+        SyncSelectedSwimEventOption();
         CreateHeatCommand.NotifyCanExecuteChanged();
         ResetHeatPaging();
         _ = LoadHeatPositionsAsync();
+    }
+
+    partial void OnSelectedSwimEventOptionChanged(SearchableItem? value)
+    {
+        if (value?.Value is SwimEvent swimEvent && SelectedSwimEvent?.Id != swimEvent.Id)
+            SelectedSwimEvent = swimEvent;
     }
 
     partial void OnHeatPositionsChanged(ObservableCollection<HeatPositionView> value)
@@ -208,27 +237,35 @@ public partial class HeatsViewModel(
             UpdateHeatPaging(0);
             return;
         }
-        IsLoading = true;
+        await DispatcherUiHelper.InvokeOnUiAsync(() => IsLoading = true);
+        await YieldLoadingUiAsync();
         try
         {
-            var heatsInEvent = HeatService.GetTotalHeatsInEvent(eventId);
-            var heatsTotal = HeatService.GetTotalHeats();
+            await YieldToBackgroundAsync();
+            var heatCurrentPage = HeatCurrentPage;
+            var heatPageSize = HeatPageSize;
+            var searchText = SearchText;
+            var heatsInEvent = await HeatService.GetTotalHeatsInEventAsync(eventId).ConfigureAwait(false);
+            var heatsTotal = await HeatService.GetTotalHeatsAsync().ConfigureAwait(false);
             List<Heat> heats;
-            if (!UsesHeatPaging || !string.IsNullOrWhiteSpace(SearchText))
+            if (!UsesHeatPaging || !string.IsNullOrWhiteSpace(searchText))
             {
-                heats = await HeatService.GetHeatsByEventIdAsync(eventId);
-                UpdateHeatPaging(heatsInEvent, resetPage: false);
+                heats = await HeatService.GetHeatsByEventIdAsync(eventId).ConfigureAwait(false);
+                await DispatcherUiHelper.InvokeOnUiAsync(() => UpdateHeatPaging(heatsInEvent, resetPage: false));
             }
             else
             {
-                UpdateHeatPaging(heatsInEvent, resetPage: false);
+                await DispatcherUiHelper.InvokeOnUiAsync(() => UpdateHeatPaging(heatsInEvent, resetPage: false));
                 if (heatsInEvent == 0)
                 {
-                    HeatPositions = [];
+                    await DispatcherUiHelper.InvokeOnUiAsync(() => HeatPositions = []);
                     return;
                 }
-                heats = await HeatService.GetHeatsByEventIdPagedAsync(eventId, HeatCurrentPage, HeatPageSize);
+
+                heats = await HeatService.GetHeatsByEventIdPagedAsync(eventId, heatCurrentPage, heatPageSize)
+                    .ConfigureAwait(false);
             }
+
             var swimEvent = SelectedSwimEvent;
             var heatPositionViews = heats.SelectMany(h =>
                 h.Positions.Select(p => new HeatPositionView(
@@ -240,12 +277,13 @@ public partial class HeatsViewModel(
                     heatsTotal,
                     h.Status,
                     EntityDisplayFormatter.FormatHeatDayTime(h))));
-            HeatPositions = new ObservableCollection<HeatPositionView>(
-                FilterHeatPositions(heatPositionViews));
+            var filtered = FilterHeatPositions(heatPositionViews).ToList();
+            await DispatcherUiHelper.InvokeOnUiAsync(() =>
+                HeatPositions = new ObservableCollection<HeatPositionView>(filtered));
         }
         finally
         {
-            IsLoading = false;
+            await DispatcherUiHelper.InvokeOnUiAsync(() => IsLoading = false);
         }
     }
 

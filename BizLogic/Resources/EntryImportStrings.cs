@@ -20,6 +20,7 @@ public static class EntryImportStrings
     public static string StrokeParseFailed_Format => Get(nameof(StrokeParseFailed_Format));
     public static string AthleteFirstNameInvalid_Format => Get(nameof(AthleteFirstNameInvalid_Format));
     public static string AthleteLastNameInvalid_Format => Get(nameof(AthleteLastNameInvalid_Format));
+    public static string AthleteFullNameInvalid_Format => Get(nameof(AthleteFullNameInvalid_Format));
     public static string AthleteBirthYearInvalid_Format => Get(nameof(AthleteBirthYearInvalid_Format));
     public static string AthleteGenderInvalid_Format => Get(nameof(AthleteGenderInvalid_Format));
     public static string AthleteCategoryInvalid_Format => Get(nameof(AthleteCategoryInvalid_Format));

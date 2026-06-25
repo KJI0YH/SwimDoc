@@ -18,6 +18,7 @@ using ServiceLayer.EntryDocumentReaderService;
 using ServiceLayer.EntryService;
 using ServiceLayer.Logging;
 using ServiceLayer.SwimStyleService;
+using UI.Helpers.Threading;
 using UI.Resources;
 using UI.ViewModels.Pages.Data;
 using UI.Models.Rows;
@@ -185,12 +186,13 @@ public partial class EntriesViewModel(
             ColumnConfiguration<Entry>.SortBy(e => e.Comment)));
     }
 
-    protected override async Task<List<EntryRowView>> LoadPageRowsAsync(IQueryable<Entry> query)
+    protected override async Task<List<EntryRowView>> LoadPageRowsAsync(
+        IQueryable<Entry> query,
+        IServiceProvider serviceProvider)
     {
-        var projections = await RowProjectionQueries.SelectEntry(query).ToListAsync();
-        await using var scope = App.Current.Services.CreateAsyncScope();
-        var db = scope.ServiceProvider.GetRequiredService<EfCoreContext>();
-        await EntryRelayPositionEnricher.EnrichAsync(projections, db);
+        var projections = await RowProjectionQueries.SelectEntry(query).ToListAsync().ConfigureAwait(false);
+        var db = serviceProvider.GetRequiredService<EfCoreContext>();
+        await EntryRelayPositionEnricher.EnrichAsync(projections, db).ConfigureAwait(false);
         return projections.Select(EntryRowView.FromProjection).ToList();
     }
 
@@ -253,8 +255,7 @@ public partial class EntriesViewModel(
         if (_filterOptionsInitialized)
             return;
         _filterOptionsInitialized = true;
-        await InitializeFilterOptionsAsync();
-        SubscribeFilterOptions();
+        await InitializeFilterOptionsAsync().ConfigureAwait(false);
         EnsureCultureSubscription();
     }
 
@@ -319,23 +320,29 @@ public partial class EntriesViewModel(
             .Select(swimStyle => swimStyle.Distance)
             .Distinct()
             .OrderBy(distance => distance)
-            .ToListAsync();
-        DistanceFilterOptions = new ObservableCollection<EventFilterOption<int>>(
-            distances.Select(distance => new EventFilterOption<int>(
-                distance,
-                string.Format(Strings.Distance_MetersFormat, distance))));
-        RoundFilterOptions = new ObservableCollection<EventFilterOption<EventRound>>(
-            Enum.GetValues<EventRound>().Select(round =>
-                new EventFilterOption<EventRound>(round, Strings.GetEnumDisplay(round))));
-        StrokeFilterOptions = new ObservableCollection<EventFilterOption<Stroke>>(
-            Enum.GetValues<Stroke>().Select(stroke =>
-                new EventFilterOption<Stroke>(stroke, Strings.GetEnumDisplay(stroke))));
-        GenderFilterOptions = new ObservableCollection<EventFilterOption<Gender>>(
-            Enum.GetValues<Gender>().Select(gender =>
-                new EventFilterOption<Gender>(gender, Strings.GetEnumDisplay(gender))));
-        StatusFilterOptions = new ObservableCollection<EventFilterOption<EntryStatus>>(
-            Enum.GetValues<EntryStatus>().Select(status =>
-                new EventFilterOption<EntryStatus>(status, Strings.GetEnumDisplay(status))));
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        await DispatcherUiHelper.InvokeOnUiAsync(() =>
+        {
+            DistanceFilterOptions = new ObservableCollection<EventFilterOption<int>>(
+                distances.Select(distance => new EventFilterOption<int>(
+                    distance,
+                    string.Format(Strings.Distance_MetersFormat, distance))));
+            RoundFilterOptions = new ObservableCollection<EventFilterOption<EventRound>>(
+                Enum.GetValues<EventRound>().Select(round =>
+                    new EventFilterOption<EventRound>(round, Strings.GetEnumDisplay(round))));
+            StrokeFilterOptions = new ObservableCollection<EventFilterOption<Stroke>>(
+                Enum.GetValues<Stroke>().Select(stroke =>
+                    new EventFilterOption<Stroke>(stroke, Strings.GetEnumDisplay(stroke))));
+            GenderFilterOptions = new ObservableCollection<EventFilterOption<Gender>>(
+                Enum.GetValues<Gender>().Select(gender =>
+                    new EventFilterOption<Gender>(gender, Strings.GetEnumDisplay(gender))));
+            StatusFilterOptions = new ObservableCollection<EventFilterOption<EntryStatus>>(
+                Enum.GetValues<EntryStatus>().Select(status =>
+                    new EventFilterOption<EntryStatus>(status, Strings.GetEnumDisplay(status))));
+            SubscribeFilterOptions();
+        });
     }
 
     private void SubscribeFilterOptions()

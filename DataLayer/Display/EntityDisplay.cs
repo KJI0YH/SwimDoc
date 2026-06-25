@@ -18,6 +18,20 @@ public static class EntityDisplay
     public static int FormatClubEntryCount(Club? club) =>
         club?.Athletes.Sum(a => a.Entries.Count) ?? 0;
 
+    public static (int Scoring, int Personal) GetClubEntryCounts(Club? club) =>
+        club is null
+            ? (0, 0)
+            : (
+                club.Athletes.Sum(a => a.Entries.Count(e => e.Scoring)),
+                club.Athletes.Sum(a => a.Entries.Count(e => !e.Scoring)));
+
+    public static (int Scoring, int Personal) GetClubRelayCounts(Club? club) =>
+        club is null
+            ? (0, 0)
+            : (
+                club.Relays.Count(r => r.Entry is { Scoring: true }),
+                club.Relays.Count(r => r.Entry is { Scoring: false }));
+
     public static int FormatClubPointCount(Club? club) =>
         club?.Athletes.Sum(a => a.Entries.Where(e => e.Scoring).Sum(e => e.Points ?? 0)) ?? 0;
 

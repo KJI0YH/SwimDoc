@@ -20,6 +20,7 @@ public partial class EntryDocumentReadAction(
     private static readonly string[] SettingsWorksheetNames = ["Настройки", "Settings"];
     private const string FIRSTNAME_HEADER = "FirstName";
     private const string LASTNAME_HEADER = "LastName";
+    private const string FULLNAME_HEADER = "FullName";
     private const string BIRTH_YEAR_HEADER = "BirthYear";
     private const string GENDER_HEADER = "Gender";
     private const string CATEGORY_HEADER = "Category";
@@ -37,6 +38,11 @@ public partial class EntryDocumentReadAction(
     {
         [FIRSTNAME_HEADER] = ["Имя", "First name", "First Name", "Firstname"],
         [LASTNAME_HEADER] = ["Фамилия", "Last name", "Last Name", "Lastname"],
+        [FULLNAME_HEADER] =
+        [
+            "Фамилия Имя", "ФИО", "Full name", "Full Name", "Fullname", "Name", "Participant",
+            "Last name First name", "Last Name First Name"
+        ],
         [BIRTH_YEAR_HEADER] = ["Год рождения", "Birth year", "Birth Year", "Year of birth", "Year Of Birth"],
         [GENDER_HEADER] = ["Пол", "Gender"],
         [CATEGORY_HEADER] = ["Разряд", "Category"],
@@ -83,13 +89,12 @@ public partial class EntryDocumentReadAction(
         log.Info($"Parse worksheet: \"{workSheet.Name}\"");
         _warnings = [];
         _errors = [];
-        var athleteHeaders = FindHeaders(workSheet, cancellationToken, FIRSTNAME_HEADER, LASTNAME_HEADER,
-            BIRTH_YEAR_HEADER, GENDER_HEADER, CATEGORY_HEADER);
+        var athleteHeaders = FindHeaders(workSheet, cancellationToken, FULLNAME_HEADER, FIRSTNAME_HEADER,
+            LASTNAME_HEADER, BIRTH_YEAR_HEADER, GENDER_HEADER, CATEGORY_HEADER);
         var clubHeaders = FindHeaders(workSheet, cancellationToken, CLUB_NAME_HEADER);
         var swimStyleHeaders = FindSwimStyles(workSheet, cancellationToken);
         _warnings.AddRange(CheckHeaders(workSheet, clubHeaders, CLUB_NAME_HEADER));
-        _errors.AddRange(CheckHeaders(workSheet, athleteHeaders, FIRSTNAME_HEADER, LASTNAME_HEADER, BIRTH_YEAR_HEADER,
-            GENDER_HEADER));
+        _errors.AddRange(ValidateAthleteHeaders(athleteHeaders));
         if (_errors.Count != 0)
         {
             LogWorksheetMessages(workSheet.Name);
@@ -154,13 +159,21 @@ public partial class EntryDocumentReadAction(
         if (startCell is null) return swimStyles;
         var startCol = startCell.Column;
         var endCol = workSheet.Dimension.End.Column;
-        var distanceRow = startCell.Row - 1;
         var strokeRow = startCell.Row;
+        var distanceRow = ResolveDistanceRow(workSheet, strokeRow, startCol, endCol);
+        string? currentStrokeText = null;
         for (var col = startCol; col <= endCol; col++)
         {
             cancellationToken.ThrowIfCancellationRequested();
+            var strokeCellText = workSheet.Cells[strokeRow, col].Text.Trim();
+            if (!string.IsNullOrWhiteSpace(strokeCellText))
+                currentStrokeText = strokeCellText;
+            if (string.IsNullOrWhiteSpace(currentStrokeText))
+                continue;
+
             var distanceText = workSheet.Cells[distanceRow, col].Text;
-            if (string.IsNullOrWhiteSpace(distanceText)) continue;
+            if (string.IsNullOrWhiteSpace(distanceText))
+                continue;
             if (!int.TryParse(distanceText, out var distance))
             {
                 _warnings.Add(string.Format(
@@ -170,9 +183,7 @@ public partial class EntryDocumentReadAction(
                 continue;
             }
 
-            var strokeText = workSheet.Cells[strokeRow, col].Text;
-            if (string.IsNullOrWhiteSpace(strokeText)) continue;
-            if (!EntryDocumentEnumParser.TryParseStroke(strokeText, out var style))
+            if (!EntryDocumentEnumParser.TryParseStroke(currentStrokeText, out var style))
             {
                 _warnings.Add(string.Format(
                     CultureInfo.CurrentUICulture,
@@ -187,6 +198,66 @@ public partial class EntryDocumentReadAction(
         }
 
         return swimStyles;
+    }
+
+    private static int ResolveDistanceRow(ExcelWorksheet workSheet, int strokeRow, int startCol, int endCol)
+    {
+        if (RowHasDistanceValues(workSheet, strokeRow + 1, startCol, endCol))
+            return strokeRow + 1;
+        if (RowHasDistanceValues(workSheet, strokeRow - 1, startCol, endCol))
+            return strokeRow - 1;
+        return strokeRow + 1;
+    }
+
+    private static bool RowHasDistanceValues(ExcelWorksheet workSheet, int row, int startCol, int endCol)
+    {
+        if (row < 1)
+            return false;
+        for (var col = startCol; col <= endCol; col++)
+        {
+            if (int.TryParse(workSheet.Cells[row, col].Text, out _))
+                return true;
+        }
+
+        return false;
+    }
+
+    private List<string> ValidateAthleteHeaders(Dictionary<string, ExcelCellAddress?> foundHeads)
+    {
+        var errors = CheckHeaders(foundHeads, BIRTH_YEAR_HEADER, GENDER_HEADER);
+        var hasFullName = foundHeads.TryGetValue(FULLNAME_HEADER, out var fullNameCell) && fullNameCell is not null;
+        var hasFirstName = foundHeads.TryGetValue(FIRSTNAME_HEADER, out var firstNameCell) && firstNameCell is not null;
+        var hasLastName = foundHeads.TryGetValue(LASTNAME_HEADER, out var lastNameCell) && lastNameCell is not null;
+        if (hasFullName)
+        {
+            if (hasFirstName && !hasLastName)
+                errors.Add(string.Format(CultureInfo.CurrentUICulture, EntryImportStrings.HeaderNotFound_Format,
+                    LASTNAME_HEADER));
+            if (hasLastName && !hasFirstName)
+                errors.Add(string.Format(CultureInfo.CurrentUICulture, EntryImportStrings.HeaderNotFound_Format,
+                    FIRSTNAME_HEADER));
+            return errors;
+        }
+
+        errors.AddRange(CheckHeaders(foundHeads, FIRSTNAME_HEADER, LASTNAME_HEADER));
+        return errors;
+    }
+
+    private static List<string> CheckHeaders(Dictionary<string, ExcelCellAddress?> foundHeads, params string[] headers)
+    {
+        List<string> errors = [];
+        foreach (var header in headers)
+        {
+            if (foundHeads.TryGetValue(header, out var cell) && cell is null)
+            {
+                errors.Add(string.Format(
+                    CultureInfo.CurrentUICulture,
+                    EntryImportStrings.HeaderNotFound_Format,
+                    header));
+            }
+        }
+
+        return errors;
     }
 
     private List<string> CheckHeaders(ExcelWorksheet workSheet, Dictionary<string, ExcelCellAddress?> foundHeads,
@@ -214,32 +285,63 @@ public partial class EntryDocumentReadAction(
         CancellationToken cancellationToken)
     {
         List<Athlete> athletes = [];
-        var fromRowAthlete = athleteHeaders.First(pair => pair.Key == FIRSTNAME_HEADER).Value!.Row + 1;
-        while (workSheet.Cells[fromRowAthlete, athleteHeaders[FIRSTNAME_HEADER]!.Column].IsEmpty()) fromRowAthlete++;
+        var fromRowAthlete = GetAthleteDataStartRow(workSheet, athleteHeaders);
         var toRowAthlete = workSheet.Dimension.End.Row;
         for (var row = fromRowAthlete; row <= toRowAthlete; row++)
         {
             cancellationToken.ThrowIfCancellationRequested();
             var hasErrors = false;
-            var firstName = workSheet.Cells[row, athleteHeaders[FIRSTNAME_HEADER]!.Column].Text;
-            if (string.IsNullOrWhiteSpace(firstName))
+            if (!TryResolveAthleteName(workSheet, row, athleteHeaders, out var firstName, out var lastName))
+            {
+                if (athleteHeaders[FULLNAME_HEADER] is not null)
+                {
+                    _warnings.Add(
+                        string.Format(
+                            CultureInfo.CurrentUICulture,
+                            EntryImportStrings.AthleteFullNameInvalid_Format,
+                            MessageLocation(workSheet.Name, row, athleteHeaders[FULLNAME_HEADER]!.Column)));
+                }
+                else
+                {
+                    if (string.IsNullOrWhiteSpace(firstName))
+                    {
+                        _warnings.Add(
+                            string.Format(
+                                CultureInfo.CurrentUICulture,
+                                EntryImportStrings.AthleteFirstNameInvalid_Format,
+                                MessageLocation(workSheet.Name, row, athleteHeaders[FIRSTNAME_HEADER]!.Column)));
+                    }
+
+                    if (string.IsNullOrWhiteSpace(lastName))
+                    {
+                        _warnings.Add(
+                            string.Format(
+                                CultureInfo.CurrentUICulture,
+                                EntryImportStrings.AthleteLastNameInvalid_Format,
+                                MessageLocation(workSheet.Name, row, athleteHeaders[LASTNAME_HEADER]!.Column)));
+                    }
+                }
+
+                hasErrors = true;
+            }
+            else if (string.IsNullOrWhiteSpace(firstName))
             {
                 _warnings.Add(
                     string.Format(
                         CultureInfo.CurrentUICulture,
                         EntryImportStrings.AthleteFirstNameInvalid_Format,
-                        MessageLocation(workSheet.Name, row, athleteHeaders[FIRSTNAME_HEADER]!.Column)));
+                        MessageLocation(workSheet.Name, row,
+                            athleteHeaders[FULLNAME_HEADER]?.Column ?? athleteHeaders[FIRSTNAME_HEADER]!.Column)));
                 hasErrors = true;
             }
-
-            var lastName = workSheet.Cells[row, athleteHeaders[LASTNAME_HEADER]!.Column].Text;
-            if (string.IsNullOrWhiteSpace(lastName))
+            else if (string.IsNullOrWhiteSpace(lastName))
             {
                 _warnings.Add(
                     string.Format(
                         CultureInfo.CurrentUICulture,
                         EntryImportStrings.AthleteLastNameInvalid_Format,
-                        MessageLocation(workSheet.Name, row, athleteHeaders[LASTNAME_HEADER]!.Column)));
+                        MessageLocation(workSheet.Name, row,
+                            athleteHeaders[FULLNAME_HEADER]?.Column ?? athleteHeaders[LASTNAME_HEADER]!.Column)));
                 hasErrors = true;
             }
 
@@ -292,6 +394,68 @@ public partial class EntryDocumentReadAction(
         }
 
         return athletes;
+    }
+
+    private static int GetAthleteDataStartRow(ExcelWorksheet workSheet,
+        Dictionary<string, ExcelCellAddress?> athleteHeaders)
+    {
+        var headerRow = athleteHeaders.Values.Where(address => address is not null).Select(address => address!.Row)
+            .DefaultIfEmpty(0).Max();
+        var fromRowAthlete = headerRow + 1;
+        var nameColumn = GetNameColumnForRowScan(athleteHeaders);
+        while (fromRowAthlete <= workSheet.Dimension.End.Row &&
+               workSheet.Cells[fromRowAthlete, nameColumn].IsEmpty())
+            fromRowAthlete++;
+        return fromRowAthlete;
+    }
+
+    private static int GetNameColumnForRowScan(Dictionary<string, ExcelCellAddress?> athleteHeaders)
+    {
+        if (athleteHeaders.TryGetValue(FULLNAME_HEADER, out var fullName) && fullName is not null)
+            return fullName.Column;
+        if (athleteHeaders.TryGetValue(FIRSTNAME_HEADER, out var firstName) && firstName is not null)
+            return firstName.Column;
+        return athleteHeaders[LASTNAME_HEADER]!.Column;
+    }
+
+    private static bool TryResolveAthleteName(
+        ExcelWorksheet workSheet,
+        int row,
+        Dictionary<string, ExcelCellAddress?> athleteHeaders,
+        out string firstName,
+        out string lastName)
+    {
+        firstName = string.Empty;
+        lastName = string.Empty;
+        var hasFirstNameHeader = athleteHeaders[FIRSTNAME_HEADER] is not null;
+        var hasLastNameHeader = athleteHeaders[LASTNAME_HEADER] is not null;
+        var hasFullNameHeader = athleteHeaders[FULLNAME_HEADER] is not null;
+
+        if (hasFirstNameHeader && hasLastNameHeader)
+        {
+            firstName = workSheet.Cells[row, athleteHeaders[FIRSTNAME_HEADER]!.Column].Text.Trim();
+            lastName = workSheet.Cells[row, athleteHeaders[LASTNAME_HEADER]!.Column].Text.Trim();
+            if (!string.IsNullOrWhiteSpace(firstName) && !string.IsNullOrWhiteSpace(lastName))
+                return true;
+        }
+
+        if (hasFullNameHeader)
+        {
+            var fullName = workSheet.Cells[row, athleteHeaders[FULLNAME_HEADER]!.Column].Text.Trim();
+            if (!string.IsNullOrWhiteSpace(fullName))
+            {
+                (lastName, firstName) = AthleteNameImportParser.SplitFullName(fullName);
+                return true;
+            }
+        }
+
+        if (hasFirstNameHeader && hasLastNameHeader)
+        {
+            firstName = workSheet.Cells[row, athleteHeaders[FIRSTNAME_HEADER]!.Column].Text.Trim();
+            lastName = workSheet.Cells[row, athleteHeaders[LASTNAME_HEADER]!.Column].Text.Trim();
+        }
+
+        return false;
     }
 
     private Club? ReadClub(ExcelWorksheet workSheet, Dictionary<string, ExcelCellAddress?> clubHeaders)

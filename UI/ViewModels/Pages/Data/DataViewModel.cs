@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.Crud;
 using ServiceLayer.Logging;
+using UI.Helpers.Threading;
 using UI.Resources;
 using UI.Models.Rows;
 using UI.Services.Navigation;
@@ -23,7 +24,10 @@ public partial class DataViewModel<TEntity, TRowView, TKey> : DataViewModelBase,
     where TEntity : class
     where TRowView : IEntityRowView<TEntity>
 {
+    private readonly Type _crudServiceType;
     private readonly Func<ICrudService<TEntity, TKey>> _resolveCrudService;
+    private IServiceProvider? _loadServiceProvider;
+    protected IServiceProvider? LoadServiceProvider => _loadServiceProvider;
     private readonly INavigationService _navigationService;
     protected INavigationService NavigationService => _navigationService;
     private readonly SemaphoreSlim _loadGate = new(1, 1);
@@ -70,6 +74,7 @@ public partial class DataViewModel<TEntity, TRowView, TKey> : DataViewModelBase,
     public DataViewModel(ICrudService<TEntity, TKey> crudService)
     {
         var serviceType = ResolveServiceType(crudService);
+        _crudServiceType = serviceType;
         _resolveCrudService = () => (ICrudService<TEntity, TKey>)App.Current.Services.GetRequiredService(serviceType);
         _navigationService = App.Current.Services.GetRequiredService<INavigationService>();
         var databaseConnection = App.Current.Services.GetRequiredService<IDatabaseConnection>();
@@ -116,19 +121,33 @@ public partial class DataViewModel<TEntity, TRowView, TKey> : DataViewModelBase,
 
     protected virtual Task PrepareBeforeLoadAsync() => Task.CompletedTask;
 
+    protected ICrudService<TEntity, TKey> CreateScopedCrudService(IServiceProvider serviceProvider) =>
+        (ICrudService<TEntity, TKey>)serviceProvider.GetRequiredService(_crudServiceType);
+
+    private async Task BeginLoadAsync()
+    {
+        await _loadGate.WaitAsync().ConfigureAwait(false);
+        await DispatcherUiHelper.InvokeOnUiAsync(() => IsLoading = true);
+        await YieldLoadingUiAsync();
+    }
+
+    private async Task EndLoadAsync()
+    {
+        await DispatcherUiHelper.InvokeOnUiAsync(() => IsLoading = false);
+        _loadGate.Release();
+    }
+
     private async Task LoadDataWithPrepareAsync()
     {
-        await _loadGate.WaitAsync();
-        IsLoading = true;
+        await BeginLoadAsync();
         try
         {
-            await PrepareBeforeLoadAsync();
-            await LoadDataCoreAsync();
+            await PrepareBeforeLoadAsync().ConfigureAwait(false);
+            await LoadDataCoreAsync().ConfigureAwait(false);
         }
         finally
         {
-            IsLoading = false;
-            _loadGate.Release();
+            await EndLoadAsync();
         }
     }
 
@@ -172,9 +191,14 @@ public partial class DataViewModel<TEntity, TRowView, TKey> : DataViewModelBase,
         AutoGenerateColumns = true;
     }
 
-    protected virtual async Task<List<TRowView>> LoadPageRowsAsync(IQueryable<TEntity> query)
+    protected virtual Task<List<TRowView>> LoadPageRowsAsync(IQueryable<TEntity> query) =>
+        LoadPageRowsAsync(query, App.Current.Services);
+
+    protected virtual async Task<List<TRowView>> LoadPageRowsAsync(
+        IQueryable<TEntity> query,
+        IServiceProvider serviceProvider)
     {
-        var entities = await query.ToListAsync();
+        var entities = await query.ToListAsync().ConfigureAwait(false);
         return entities.Select(CreateRowView).ToList();
     }
 
@@ -238,48 +262,75 @@ public partial class DataViewModel<TEntity, TRowView, TKey> : DataViewModelBase,
     [RelayCommand(CanExecute = nameof(CanLoadData))]
     protected virtual async Task LoadDataAsync()
     {
-        await _loadGate.WaitAsync();
-        IsLoading = true;
+        await BeginLoadAsync();
         try
         {
-            await LoadDataCoreAsync();
+            await LoadDataCoreAsync().ConfigureAwait(false);
         }
         finally
         {
-            IsLoading = false;
-            _loadGate.Release();
+            await EndLoadAsync();
         }
     }
 
     private async Task LoadDataCoreAsync()
     {
-        var query = CrudService.Query();
-        query = ApplyQuery(query);
-        query = ApplySearch(query);
-        TotalItems = await query.CountAsync();
-        _suppressPageLoad = true;
-        if (UsesPaging)
+        await YieldToBackgroundAsync();
+
+        var pageSize = PageSize;
+        var currentPage = CurrentPage;
+        var usesPaging = UsesPaging;
+
+        await using var scope = App.Current.Services.CreateAsyncScope();
+        _loadServiceProvider = scope.ServiceProvider;
+        try
         {
-            TotalPages = (int)Math.Ceiling(TotalItems / (double)PageSize);
-            if (CurrentPage >= TotalPages && TotalPages > 0)
-                CurrentPage = TotalPages - 1;
-            if (TotalPages <= 0 || CurrentPage < 0)
-                CurrentPage = 0;
+            var crudService = CreateScopedCrudService(scope.ServiceProvider);
+            var query = crudService.Query();
+            query = ApplyQuery(query);
+            query = ApplySearch(query);
+            var totalItems = await query.CountAsync().ConfigureAwait(false);
+
+            int totalPages;
+            var resolvedPage = currentPage;
+            if (usesPaging)
+            {
+                totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+                if (resolvedPage >= totalPages && totalPages > 0)
+                    resolvedPage = totalPages - 1;
+                if (totalPages <= 0 || resolvedPage < 0)
+                    resolvedPage = 0;
+            }
+            else
+            {
+                totalPages = totalItems > 0 ? 1 : 0;
+                resolvedPage = 0;
+            }
+
+            query = ApplySorting(query);
+            if (usesPaging)
+                query = query.Page(resolvedPage, pageSize);
+            var rows = await LoadPageRowsAsync(query, scope.ServiceProvider).ConfigureAwait(false);
+            var entities = rows.Select(row => row.Entity).ToList();
+            var loadedCount = rows.Count;
+
+            await DispatcherUiHelper.InvokeOnUiAsync(() =>
+            {
+                TotalItems = totalItems;
+                _suppressPageLoad = true;
+                TotalPages = totalPages;
+                CurrentPage = resolvedPage;
+                _suppressPageLoad = false;
+                Items = new ObservableCollection<TRowView>(rows);
+                OnPropertyChanged(nameof(ItemsInfo));
+                OnItemsLoaded(entities);
+                LogListRead(loadedCount);
+            });
         }
-        else
+        finally
         {
-            TotalPages = TotalItems > 0 ? 1 : 0;
-            CurrentPage = 0;
+            _loadServiceProvider = null;
         }
-        _suppressPageLoad = false;
-        query = ApplySorting(query);
-        if (UsesPaging)
-            query = query.Page(CurrentPage, PageSize);
-        var rows = await LoadPageRowsAsync(query);
-        Items = new ObservableCollection<TRowView>(rows);
-        OnPropertyChanged(nameof(ItemsInfo));
-        OnItemsLoaded(rows.Select(row => row.Entity).ToList());
-        LogListRead(rows.Count);
     }
 
     private void LogListRead(int loadedCount)

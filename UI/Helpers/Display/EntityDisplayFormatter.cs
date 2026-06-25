@@ -29,6 +29,21 @@ public static class EntityDisplayFormatter
     public static int FormatClubEntryCount(Club? club) =>
         EntityDisplay.FormatClubEntryCount(club);
 
+    public static string FormatClubEntryCountDisplay(Club? club)
+    {
+        var (scoring, personal) = EntityDisplay.GetClubEntryCounts(club);
+        return FormatScoringPersonalCount(scoring, personal);
+    }
+
+    public static string FormatClubRelayCountDisplay(Club? club)
+    {
+        var (scoring, personal) = EntityDisplay.GetClubRelayCounts(club);
+        return FormatScoringPersonalCount(scoring, personal);
+    }
+
+    public static string FormatScoringPersonalCount(int scoringCount, int personalCount) =>
+        string.Format(Strings.Common_ScoringPersonalCount_Format, scoringCount, personalCount);
+
     public static int FormatClubPointCount(Club? club) =>
         EntityDisplay.FormatClubPointCount(club);
 

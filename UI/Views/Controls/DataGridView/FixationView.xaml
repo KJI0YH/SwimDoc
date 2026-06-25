@@ -7,6 +7,7 @@
              xmlns:displayHelpers="clr-namespace:UI.Helpers.Display"
              xmlns:converters="clr-namespace:UI.Helpers.Converters"
              xmlns:uiHelpers="clr-namespace:UI.Helpers.Controls"
+             xmlns:searchableComboBox="clr-namespace:UI.Views.Controls.SearchableComboBox"
              xmlns:dataGridView="clr-namespace:UI.Views.Controls.DataGridView"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:loc="clr-namespace:UI.Localization"
@@ -19,15 +20,14 @@
         <dataView:DefaultDataView.Toolbar>
             <DockPanel LastChildFill="True">
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
-                    <ComboBox Style="{StaticResource SwimDocSwimEventComboBoxStyle}"
-                              ItemsSource="{Binding SwimEventOptions}"
-                              SelectedValue="{Binding SelectedSwimEvent}"
-                              SelectedValuePath="Value"
-                              Margin="0,5,6,5" />
+                    <searchableComboBox:SearchableComboBox Style="{StaticResource SwimDocSwimEventSearchableComboBoxStyle}"
+                                                          ItemsSource="{Binding SwimEventOptions}"
+                                                          SelectedItem="{Binding SelectedSwimEventOption, Mode=TwoWay}"
+                                                          Margin="0,5,6,5" />
                     <ComboBox Style="{StaticResource SwimDocHeatNumberComboBoxStyle}"
                               ItemsSource="{Binding EventHeats}"
                               SelectedItem="{Binding SelectedHeatItem}"
-                              DisplayMemberPath="Entity.Number"
+                              DisplayMemberPath="DisplayNumber"
                               Margin="0,5,6,5" />
                     <Button Content="{ui:SymbolIcon ArrowPrevious24}"
                             Command="{Binding GoToPrevEventCommand}"

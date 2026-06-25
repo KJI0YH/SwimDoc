@@ -70,6 +70,7 @@ public static class RowProjectionQueries
             AgeGroupGender = se.AgeGroup.Gender,
             AgeGroupBirthYearMin = se.AgeGroup.BirthYearMin,
             AgeGroupBirthYearMax = se.AgeGroup.BirthYearMax,
+            RoundParticipantsCount = se.RoundParticipantsCount,
             EntryCount = se.Entries.Count,
             HeatCount = se.Heats.Count
         });
@@ -93,8 +94,10 @@ public static class RowProjectionQueries
             Id = c.Id,
             Name = c.Name,
             AthleteCount = c.Athletes.Count,
-            EntryCount = c.Athletes.Sum(a => a.Entries.Count),
-            RelayCount = c.Relays.Count,
+            EntryScoringCount = c.Athletes.Sum(a => a.Entries.Count(e => e.Scoring)),
+            EntryPersonalCount = c.Athletes.Sum(a => a.Entries.Count(e => !e.Scoring)),
+            RelayScoringCount = c.Relays.Count(r => r.Entry.Scoring),
+            RelayPersonalCount = c.Relays.Count(r => !r.Entry.Scoring),
             PointCount = c.Athletes.Sum(a => a.Entries.Where(e => e.Scoring).Sum(e => e.Points ?? 0))
         });
 

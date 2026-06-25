@@ -7,6 +7,7 @@
              xmlns:toolbar="clr-namespace:UI.Views.Controls.Toolbar"
              xmlns:converters="clr-namespace:UI.Helpers.Converters"
              xmlns:loc="clr-namespace:UI.Localization"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              ScrollViewer.VerticalScrollBarVisibility="Disabled"
              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
              mc:Ignorable="d"
@@ -52,14 +53,26 @@
             <ContentPresenter Content="{Binding ElementName=Root, Path=MainContent}" />
 
             <Border Background="#CCFFFFFF"
-                    Visibility="{Binding IsLoading, Converter={StaticResource BoolToVis}}">
+                    Panel.ZIndex="1"
+                    IsHitTestVisible="{Binding IsLoading}">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="Opacity" Value="0" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsLoading}" Value="True">
+                                <Setter Property="Opacity" Value="1" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
                 <StackPanel VerticalAlignment="Center"
                             HorizontalAlignment="Center"
                             MinWidth="220">
-                    <ProgressBar IsIndeterminate="True"
-                                 Height="4"
-                                 Margin="0,0,0,12"
-                                 Style="{StaticResource SwimDocAccentProgressBarStyle}" />
+                    <ui:ProgressRing Width="40"
+                                     Height="40"
+                                     Margin="0,0,0,12"
+                                     HorizontalAlignment="Center"
+                                     IsIndeterminate="{Binding IsLoading}" />
                     <TextBlock Text="{loc:Localizastion Common_LoadingData}"
                                HorizontalAlignment="Center"
                                Opacity="0.85" />

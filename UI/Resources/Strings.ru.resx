@@ -156,6 +156,7 @@
   <data name="Operation_Reports_Canceled_Header" xml:space="preserve"><value>Формирование отчётов прервано</value></data>
 
   <data name="Filters_Clear" xml:space="preserve"><value>Очистить фильтры</value></data>
+  <data name="Filters_Date" xml:space="preserve"><value>Дата</value></data>
   <data name="Filters_Round" xml:space="preserve"><value>Этап</value></data>
   <data name="Filters_Distance" xml:space="preserve"><value>Дистанция</value></data>
   <data name="Filters_Stroke" xml:space="preserve"><value>Стиль</value></data>
@@ -274,6 +275,7 @@
 
   <data name="Fixation_SelectedHeatHeader_Format" xml:space="preserve"><value>{0} — Заплыв {1} из {2} ({3} из {4}) — {5}</value></data>
   <data name="Fixation_SelectedHeatHeader_NoEvent_Format" xml:space="preserve"><value>Заплыв {0} из {1} ({2} из {3}) — {4}</value></data>
+  <data name="Fixation_HeatListItem_Format" xml:space="preserve"><value>{0} ({1})</value></data>
 
   <data name="WindowTitle_CreateClub" xml:space="preserve"><value>Создание команды</value></data>
   <data name="WindowTitle_EditClub" xml:space="preserve"><value>Редактирование команды</value></data>
@@ -292,6 +294,7 @@
 
   <data name="Common_NoneParen" xml:space="preserve"><value>(Нет)</value></data>
   <data name="Common_PersonalParen" xml:space="preserve"><value>(Лично)</value></data>
+  <data name="Common_ScoringPersonalCount_Format" xml:space="preserve"><value>{0} / {1}</value></data>
 
   <data name="HeatAlloc_WindowTitle" xml:space="preserve"><value>Параметры формирования заплывов</value></data>
   <data name="HeatAlloc_Validation_MinHeatSize" xml:space="preserve"><value>Минимальный размер заплыва должен быть больше или равен 1.</value></data>
@@ -303,8 +306,8 @@
 
   <data name="Clubs_Col_Name" xml:space="preserve"><value>Название</value></data>
   <data name="Clubs_Col_Athletes" xml:space="preserve"><value>Спортсмены</value></data>
-  <data name="Clubs_Col_Entries" xml:space="preserve"><value>Заявки</value></data>
-  <data name="Clubs_Col_Relays" xml:space="preserve"><value>Эстафеты</value></data>
+  <data name="Clubs_Col_Entries" xml:space="preserve"><value>Заявки (в зачёт / лично)</value></data>
+  <data name="Clubs_Col_Relays" xml:space="preserve"><value>Эстафеты (в зачёт / лично)</value></data>
   <data name="Clubs_Col_Points" xml:space="preserve"><value>Очки</value></data>
   <data name="Athletes_Col_FirstName" xml:space="preserve"><value>Имя</value></data>
   <data name="Athletes_Col_LastName" xml:space="preserve"><value>Фамилия</value></data>
@@ -374,10 +377,10 @@
   <data name="Event_Field_Time" xml:space="preserve"><value>Время</value></data>
   <data name="Event_Field_SwimStyle" xml:space="preserve"><value>Стиль плавания</value></data>
   <data name="Event_Field_AgeGroup" xml:space="preserve"><value>Возрастная группа</value></data>
-  <data name="Event_Field_Course" xml:space="preserve"><value>Длина бассейна</value></data>
+  <data name="Event_Field_Course" xml:space="preserve"><value>Бассейн</value></data>
   <data name="Event_Field_Round" xml:space="preserve"><value>Раунд</value></data>
   <data name="Event_Field_PreviousEvent" xml:space="preserve"><value>Предыдущее событие</value></data>
-  <data name="Event_Field_RoundParticipantsCount" xml:space="preserve"><value>Количество участников</value></data>
+  <data name="Event_Field_RoundParticipantsCount" xml:space="preserve"><value>Участников</value></data>
   <data name="Event_Field_AvailableLanes" xml:space="preserve"><value>Доступные дорожки</value></data>
   <data name="Event_Lanes_Tab_Range" xml:space="preserve"><value>Диапазон</value></data>
   <data name="Event_Lanes_Tab_Custom" xml:space="preserve"><value>Свои названия</value></data>

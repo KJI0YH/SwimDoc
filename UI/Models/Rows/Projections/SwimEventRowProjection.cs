@@ -24,6 +24,7 @@ public sealed class SwimEventRowProjection
     public Gender AgeGroupGender { get; init; }
     public int? AgeGroupBirthYearMin { get; init; }
     public int? AgeGroupBirthYearMax { get; init; }
+    public int? RoundParticipantsCount { get; init; }
     public int EntryCount { get; init; }
     public int HeatCount { get; init; }
 }

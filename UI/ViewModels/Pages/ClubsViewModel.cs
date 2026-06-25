@@ -30,18 +30,24 @@ public class ClubsViewModel : DataViewModel<Club, ClubRowView, int?>
             ColumnConfiguration<Club>.SortBy(club => club.Name)));
         ColumnConfigurations.Add(new ColumnConfiguration<Club>("AthleteCount", Strings.Clubs_Col_Athletes, 150,
             ColumnConfiguration<Club>.SortBy(club => club.Athletes.Count)));
-        ColumnConfigurations.Add(new ColumnConfiguration<Club>("EntryCount", Strings.Clubs_Col_Entries, 150,
-            ColumnConfiguration<Club>.SortBy(club => club.Athletes.Sum(athlete => athlete.Entries.Count))));
-        ColumnConfigurations.Add(new ColumnConfiguration<Club>("RelayCount", Strings.Clubs_Col_Relays, 150,
-            ColumnConfiguration<Club>.SortBy(club => club.Relays.Count)));
+        ColumnConfigurations.Add(new ColumnConfiguration<Club>("EntryCount", Strings.Clubs_Col_Entries, 170,
+            ColumnConfiguration<Club>.SortBy(club =>
+                club.Athletes.Sum(athlete => athlete.Entries.Count(e => e.Scoring)),
+                club => club.Athletes.Sum(athlete => athlete.Entries.Count(e => !e.Scoring)))));
+        ColumnConfigurations.Add(new ColumnConfiguration<Club>("RelayCount", Strings.Clubs_Col_Relays, 170,
+            ColumnConfiguration<Club>.SortBy(club =>
+                club.Relays.Count(r => r.Entry.Scoring),
+                club => club.Relays.Count(r => !r.Entry.Scoring))));
         ColumnConfigurations.Add(new ColumnConfiguration<Club>("PointCount", Strings.Clubs_Col_Points, 150,
             ColumnConfiguration<Club>.SortBy(club => club.Athletes.Sum(athlete =>
                 athlete.Entries.Where(entry => entry.Scoring).Sum(entry => entry.Points ?? 0)))));
     }
 
-    protected override async Task<List<ClubRowView>> LoadPageRowsAsync(IQueryable<Club> query)
+    protected override async Task<List<ClubRowView>> LoadPageRowsAsync(
+        IQueryable<Club> query,
+        IServiceProvider serviceProvider)
     {
-        var projections = await RowProjectionQueries.SelectClub(query).ToListAsync();
+        var projections = await RowProjectionQueries.SelectClub(query).ToListAsync().ConfigureAwait(false);
         return projections.Select(ClubRowView.FromProjection).ToList();
     }
 

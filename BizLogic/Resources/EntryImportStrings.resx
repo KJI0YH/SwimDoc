@@ -23,6 +23,7 @@
 
   <data name="AthleteFirstNameInvalid_Format" xml:space="preserve"><value>Invalid athlete first name: {0}</value></data>
   <data name="AthleteLastNameInvalid_Format" xml:space="preserve"><value>Invalid athlete last name: {0}</value></data>
+  <data name="AthleteFullNameInvalid_Format" xml:space="preserve"><value>Invalid athlete full name: {0}</value></data>
   <data name="AthleteBirthYearInvalid_Format" xml:space="preserve"><value>Invalid athlete birth year: {0}</value></data>
   <data name="AthleteGenderInvalid_Format" xml:space="preserve"><value>Invalid athlete gender: {0}</value></data>
   <data name="AthleteCategoryInvalid_Format" xml:space="preserve"><value>Invalid athlete category: {0}</value></data>

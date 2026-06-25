@@ -10,8 +10,8 @@ public sealed class ClubRowView : IEntityRowView<Club>
     public int Id { get; }
     public string Name { get; }
     public int AthleteCount { get; }
-    public int EntryCount { get; }
-    public int RelayCount { get; }
+    public string EntryCount { get; }
+    public string RelayCount { get; }
     public int PointCount { get; }
 
     public ClubRowView(Club entity)
@@ -20,19 +20,27 @@ public sealed class ClubRowView : IEntityRowView<Club>
         Id = Entity.Id;
         Name = Entity.Name;
         AthleteCount = EntityDisplayFormatter.FormatClubAthleteCount(Entity);
-        EntryCount = EntityDisplayFormatter.FormatClubEntryCount(Entity);
-        RelayCount = EntityDisplayFormatter.FormatClubRelayCount(Entity);
+        EntryCount = EntityDisplayFormatter.FormatClubEntryCountDisplay(Entity);
+        RelayCount = EntityDisplayFormatter.FormatClubRelayCountDisplay(Entity);
         PointCount = EntityDisplayFormatter.FormatClubPointCount(Entity);
     }
 
     public static ClubRowView FromProjection(ClubRowProjection projection)
     {
         var entity = EntityRowStubBuilder.BuildClub(projection);
-        return new ClubRowView(entity, projection.AthleteCount, projection.EntryCount, projection.RelayCount,
+        return new ClubRowView(
+            entity,
+            projection.AthleteCount,
+            EntityDisplayFormatter.FormatScoringPersonalCount(
+                projection.EntryScoringCount,
+                projection.EntryPersonalCount),
+            EntityDisplayFormatter.FormatScoringPersonalCount(
+                projection.RelayScoringCount,
+                projection.RelayPersonalCount),
             projection.PointCount);
     }
 
-    private ClubRowView(Club entity, int athleteCount, int entryCount, int relayCount, int pointCount)
+    private ClubRowView(Club entity, int athleteCount, string entryCount, string relayCount, int pointCount)
     {
         Entity = entity;
         Id = entity.Id;

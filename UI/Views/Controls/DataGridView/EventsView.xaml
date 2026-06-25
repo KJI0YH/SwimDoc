@@ -25,6 +25,13 @@
                 <WrapPanel Margin="0,0,0,4"
                            Visibility="{Binding IsFiltersPanelVisible, Converter={StaticResource BoolToVis}}">
                     <eventFilterComboBox:EventFilterComboBox
+                        ItemsSource="{Binding DateFilterOptions}"
+                        DisplayText="{Binding DateFilterText}"
+                        ItemTemplate="{StaticResource EventFilterOptionTemplate}"
+                        FilterWidth="{StaticResource SwimDocFilterDateWidth}"
+                        Margin="5,0,5,5" />
+
+                    <eventFilterComboBox:EventFilterComboBox
                         ItemsSource="{Binding RoundFilterOptions}"
                         DisplayText="{Binding RoundFilterText}"
                         ItemTemplate="{StaticResource EventFilterOptionTemplate}"

@@ -14,6 +14,7 @@ using ServiceLayer.HeatService;
 using ServiceLayer.Logging;
 using ServiceLayer.SwimStyleService;
 using ServiceLayer.ReportGeneratorService;
+using UI.Helpers.Threading;
 using UI.Resources;
 using UI.ViewModels.Pages.Data;
 using UI.Models.Rows;
@@ -34,12 +35,14 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView
     private IEventService EventService =>
         App.Current.Services.GetRequiredService<IEventService>();
     private readonly IAddEditWindowFactory _windowFactory;
+    [ObservableProperty] private ObservableCollection<EventFilterOption<DateOnly>> _dateFilterOptions = new();
     [ObservableProperty] private ObservableCollection<EventFilterOption<int>> _distanceFilterOptions = new();
     [ObservableProperty] private ObservableCollection<EventFilterOption<Stroke>> _strokeFilterOptions = new();
     [ObservableProperty] private ObservableCollection<EventFilterOption<Gender>> _genderFilterOptions = new();
     [ObservableProperty] private ObservableCollection<EventFilterOption<SwimEventStatus>> _statusFilterOptions = new();
     [ObservableProperty] private ObservableCollection<EventFilterOption<EventRound>> _roundFilterOptions = new();
     [ObservableProperty] private bool _isFiltersPanelVisible;
+    public string DateFilterText => GetFilterText(DateFilterOptions, Strings.Filters_Date);
     public string DistanceFilterText => GetFilterText(DistanceFilterOptions, Strings.Filters_Distance);
     public string StrokeFilterText => GetFilterText(StrokeFilterOptions, Strings.Filters_Stroke);
     public string GenderFilterText => GetFilterText(GenderFilterOptions, Strings.Filters_Gender);
@@ -73,6 +76,8 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView
 
     private void RefreshLocalizedEnumFilterOptions()
     {
+        foreach (var option in DateFilterOptions)
+            option.DisplayText = option.Value.ToString("d", CultureInfo.CurrentUICulture);
         foreach (var option in StrokeFilterOptions)
             option.DisplayText = Strings.GetEnumDisplay(option.Value);
         foreach (var option in GenderFilterOptions)
@@ -81,6 +86,7 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView
             option.DisplayText = Strings.GetEnumDisplay(option.Value);
         foreach (var option in RoundFilterOptions)
             option.DisplayText = Strings.GetEnumDisplay(option.Value);
+        OnPropertyChanged(nameof(DateFilterText));
         OnPropertyChanged(nameof(StrokeFilterText));
         OnPropertyChanged(nameof(GenderFilterText));
         OnPropertyChanged(nameof(StatusFilterText));
@@ -107,6 +113,8 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView
             ColumnConfiguration<SwimEvent>.SortBy(e => e.Date)));
         ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Time", Strings.Events_Col_Time, 57,
             ColumnConfiguration<SwimEvent>.SortBy(e => e.Time)));
+        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Course", Strings.Event_Field_Course, 80,
+            ColumnConfiguration<SwimEvent>.SortBy(e => e.Course)));
         ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Round", Strings.Events_Col_Round, 150,
             ColumnConfiguration<SwimEvent>.SortBy(e => e.Round)));
         ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("SwimStyle", Strings.Events_Col_Distance, 300,
@@ -124,11 +132,13 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView
             Converter = EntityDisplayConverter.Instance,
             ConverterParameter = EntityDisplayConverter.AgeGroupKind
         });
+        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("RoundParticipantsCount", Strings.Event_Field_RoundParticipantsCount, 100,
+            ColumnConfiguration<SwimEvent>.SortBy(e => e.RoundParticipantsCount)));
         ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Lanes", Strings.Events_Col_Lanes, 80,
             ColumnConfiguration<SwimEvent>.SortBy(e => e.LaneMin, e => e.LaneMax)));
-        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("EntryCount", Strings.Events_Col_EntryCount, 90,
+        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("EntryCount", Strings.Events_Col_EntryCount, 70,
             ColumnConfiguration<SwimEvent>.SortBy(e => e.Entries.Count)));
-        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("HeatCount", Strings.Events_Col_HeatCount, 90,
+        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("HeatCount", Strings.Events_Col_HeatCount, 80,
             ColumnConfiguration<SwimEvent>.SortBy(e => e.Heats.Count)));
         ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Status", Strings.Events_Col_Status, 210,
             ColumnConfiguration<SwimEvent>.SortBy(e => e.Status)));
@@ -137,9 +147,11 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView
     protected override IQueryable<SwimEvent> ApplyQuery(IQueryable<SwimEvent> query) =>
         query.OrderBy(se => se.Order);
 
-    protected override async Task<List<SwimEventRowView>> LoadPageRowsAsync(IQueryable<SwimEvent> query)
+    protected override async Task<List<SwimEventRowView>> LoadPageRowsAsync(
+        IQueryable<SwimEvent> query,
+        IServiceProvider serviceProvider)
     {
-        var projections = await RowProjectionQueries.SelectSwimEvent(query).ToListAsync();
+        var projections = await RowProjectionQueries.SelectSwimEvent(query).ToListAsync().ConfigureAwait(false);
         return projections.Select(SwimEventRowView.FromProjection).ToList();
     }
 
@@ -148,6 +160,9 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView
 
     private IQueryable<SwimEvent> ApplySelectedFilters(IQueryable<SwimEvent> query)
     {
+        var dates = DateFilterOptions.Where(option => option.IsSelected).Select(option => option.Value).ToArray();
+        if (dates.Length > 0)
+            query = query.Where(e => dates.Contains(e.Date));
         var distances = DistanceFilterOptions.Where(option => option.IsSelected).Select(option => option.Value).ToArray();
         if (distances.Length > 0)
             query = query.Where(e => distances.Contains(e.SwimStyle.Distance));
@@ -171,38 +186,54 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView
         if (_filterOptionsInitialized)
             return;
         _filterOptionsInitialized = true;
-        await InitializeFilterOptionsAsync();
-        SubscribeFilterOptions();
+        await InitializeFilterOptionsAsync().ConfigureAwait(false);
     }
 
     private async Task InitializeFilterOptionsAsync()
     {
+        var eventDates = await EventService.Query()
+            .Select(swimEvent => swimEvent.Date)
+            .Distinct()
+            .OrderBy(date => date)
+            .ToListAsync()
+            .ConfigureAwait(false);
         var swimStyleService = App.Current.Services.GetRequiredService<ISwimStyleService>();
         var distances = await swimStyleService.Query()
             .Select(swimStyle => swimStyle.Distance)
             .Distinct()
             .OrderBy(distance => distance)
-            .ToListAsync();
-        DistanceFilterOptions = new ObservableCollection<EventFilterOption<int>>(
-            distances.Select(distance => new EventFilterOption<int>(
-                distance,
-                string.Format(Strings.Distance_MetersFormat, distance))));
-        StrokeFilterOptions = new ObservableCollection<EventFilterOption<Stroke>>(
-            Enum.GetValues<Stroke>().Select(stroke =>
-                new EventFilterOption<Stroke>(stroke, Strings.GetEnumDisplay(stroke))));
-        GenderFilterOptions = new ObservableCollection<EventFilterOption<Gender>>(
-            Enum.GetValues<Gender>().Select(gender =>
-                new EventFilterOption<Gender>(gender, Strings.GetEnumDisplay(gender))));
-        StatusFilterOptions = new ObservableCollection<EventFilterOption<SwimEventStatus>>(
-            Enum.GetValues<SwimEventStatus>().Select(status =>
-                new EventFilterOption<SwimEventStatus>(status, Strings.GetEnumDisplay(status))));
-        RoundFilterOptions = new ObservableCollection<EventFilterOption<EventRound>>(
-            Enum.GetValues<EventRound>().Select(round =>
-                new EventFilterOption<EventRound>(round, Strings.GetEnumDisplay(round))));
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        await DispatcherUiHelper.InvokeOnUiAsync(() =>
+        {
+            DateFilterOptions = new ObservableCollection<EventFilterOption<DateOnly>>(
+                eventDates.Select(date => new EventFilterOption<DateOnly>(
+                    date,
+                    date.ToString("d", CultureInfo.CurrentUICulture))));
+            DistanceFilterOptions = new ObservableCollection<EventFilterOption<int>>(
+                distances.Select(distance => new EventFilterOption<int>(
+                    distance,
+                    string.Format(Strings.Distance_MetersFormat, distance))));
+            StrokeFilterOptions = new ObservableCollection<EventFilterOption<Stroke>>(
+                Enum.GetValues<Stroke>().Select(stroke =>
+                    new EventFilterOption<Stroke>(stroke, Strings.GetEnumDisplay(stroke))));
+            GenderFilterOptions = new ObservableCollection<EventFilterOption<Gender>>(
+                Enum.GetValues<Gender>().Select(gender =>
+                    new EventFilterOption<Gender>(gender, Strings.GetEnumDisplay(gender))));
+            StatusFilterOptions = new ObservableCollection<EventFilterOption<SwimEventStatus>>(
+                Enum.GetValues<SwimEventStatus>().Select(status =>
+                    new EventFilterOption<SwimEventStatus>(status, Strings.GetEnumDisplay(status))));
+            RoundFilterOptions = new ObservableCollection<EventFilterOption<EventRound>>(
+                Enum.GetValues<EventRound>().Select(round =>
+                    new EventFilterOption<EventRound>(round, Strings.GetEnumDisplay(round))));
+            SubscribeFilterOptions();
+        });
     }
 
     private void SubscribeFilterOptions()
     {
+        SubscribeFilterOptions(DateFilterOptions);
         SubscribeFilterOptions(DistanceFilterOptions);
         SubscribeFilterOptions(StrokeFilterOptions);
         SubscribeFilterOptions(GenderFilterOptions);
@@ -220,6 +251,32 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView
     {
         foreach (var option in options)
             option.PropertyChanged -= OnFilterOptionPropertyChanged;
+    }
+
+    private async Task RefreshDateFilterOptionsAsync()
+    {
+        var selectedDates = DateFilterOptions
+            .Where(option => option.IsSelected)
+            .Select(option => option.Value)
+            .ToHashSet();
+        UnsubscribeFilterOptions(DateFilterOptions);
+        var eventDates = await EventService.Query()
+            .Select(swimEvent => swimEvent.Date)
+            .Distinct()
+            .OrderBy(date => date)
+            .ToListAsync();
+        DateFilterOptions = new ObservableCollection<EventFilterOption<DateOnly>>(
+            eventDates.Select(date =>
+            {
+                var option = new EventFilterOption<DateOnly>(
+                    date,
+                    date.ToString("d", CultureInfo.CurrentUICulture));
+                option.IsSelected = selectedDates.Contains(date);
+                return option;
+            }));
+        SubscribeFilterOptions(DateFilterOptions);
+        OnPropertyChanged(nameof(DateFilterText));
+        ClearFiltersCommand.NotifyCanExecuteChanged();
     }
 
     private async Task RefreshDistanceFilterOptionsAsync()
@@ -253,6 +310,7 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView
     {
         if (e.PropertyName != nameof(IEventFilterOption.IsSelected))
             return;
+        OnPropertyChanged(nameof(DateFilterText));
         OnPropertyChanged(nameof(DistanceFilterText));
         OnPropertyChanged(nameof(StrokeFilterText));
         OnPropertyChanged(nameof(GenderFilterText));
@@ -268,6 +326,7 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView
     [RelayCommand(CanExecute = nameof(HasActiveFilters))]
     private void ClearFilters()
     {
+        ClearFilterOptions(DateFilterOptions);
         ClearFilterOptions(DistanceFilterOptions);
         ClearFilterOptions(StrokeFilterOptions);
         ClearFilterOptions(GenderFilterOptions);
@@ -276,6 +335,7 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView
     }
 
     private bool HasActiveFilters() =>
+        DateFilterOptions.Any(option => option.IsSelected) ||
         DistanceFilterOptions.Any(option => option.IsSelected) ||
         StrokeFilterOptions.Any(option => option.IsSelected) ||
         GenderFilterOptions.Any(option => option.IsSelected) ||
@@ -310,6 +370,7 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView
 
     protected async Task RefreshAfterAddEditAsync()
     {
+        await RefreshDateFilterOptionsAsync();
         await RefreshDistanceFilterOptionsAsync();
         await LoadDataAsync();
     }

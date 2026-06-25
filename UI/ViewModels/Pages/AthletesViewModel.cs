@@ -27,10 +27,10 @@ public class AthletesViewModel : DataViewModel<Athlete, AthleteRowView, int?>
     {
         AutoGenerateColumns = false;
         ColumnConfigurations.Clear();
-        ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("FirstName", Strings.Athletes_Col_FirstName, 200,
-            ColumnConfiguration<Athlete>.SortBy(e => e.FirstName)));
         ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("LastName", Strings.Athletes_Col_LastName, 200,
             ColumnConfiguration<Athlete>.SortBy(e => e.LastName)));
+        ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("FirstName", Strings.Athletes_Col_FirstName, 200,
+            ColumnConfiguration<Athlete>.SortBy(e => e.FirstName)));
         ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("Gender", Strings.Athletes_Col_Gender, 90,
             ColumnConfiguration<Athlete>.SortBy(e => e.Gender)));
         ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("YearOfBirth", Strings.Athletes_Col_BirthYear, 120,
@@ -44,9 +44,11 @@ public class AthletesViewModel : DataViewModel<Athlete, AthleteRowView, int?>
                 e.Entries.Where(entry => entry.Scoring).Sum(entry => entry.Points ?? 0))));
     }
 
-    protected override async Task<List<AthleteRowView>> LoadPageRowsAsync(IQueryable<Athlete> query)
+    protected override async Task<List<AthleteRowView>> LoadPageRowsAsync(
+        IQueryable<Athlete> query,
+        IServiceProvider serviceProvider)
     {
-        var projections = await RowProjectionQueries.SelectAthlete(query).ToListAsync();
+        var projections = await RowProjectionQueries.SelectAthlete(query).ToListAsync().ConfigureAwait(false);
         return projections.Select(AthleteRowView.FromProjection).ToList();
     }
 

@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.AgeGroupService;
 using ServiceLayer.EntryService;
+using UI.Helpers.Threading;
 using UI.Models;
 using UI.Services.Navigation;
 
@@ -40,25 +41,38 @@ public partial class CombinedResultsViewModel : ViewModelBase
 
     public async Task InitializeAsync()
     {
-        var ageGroups = await AgeGroupService.Query()
+        await YieldToBackgroundAsync();
+        await using var scope = App.Current.Services.CreateAsyncScope();
+        var ageGroupService = scope.ServiceProvider.GetRequiredService<IAgeGroupService>();
+        var ageGroups = await ageGroupService.Query()
             .OrderBy(ag => ag.Name)
             .ThenBy(ag => ag.Gender)
             .ThenBy(ag => ag.BirthYearMin)
-            .ToListAsync();
-        AgeGroupOptions = new ObservableCollection<SearchableItem>(
-            ageGroups.Select(ageGroup => new SearchableItem
-            {
-                Value = ageGroup,
-                DisplayText = EntityDisplayFormatter.FormatAgeGroup(ageGroup)
-            }));
+            .ToListAsync()
+            .ConfigureAwait(false);
+
         AgeGroup? target = null;
         if (_preferredAgeGroupId is int preferredId)
             target = ageGroups.FirstOrDefault(ageGroup => ageGroup.Id == preferredId);
-        if (target is null && SelectedAgeGroup is not null &&
-            ageGroups.Any(ageGroup => ageGroup.Id == SelectedAgeGroup.Id))
-            target = SelectedAgeGroup;
-        SelectedAgeGroup = target ?? ageGroups.FirstOrDefault();
-        _preferredAgeGroupId = null;
+        var selectedAgeGroup = SelectedAgeGroup;
+        if (target is null && selectedAgeGroup is not null &&
+            ageGroups.Any(ageGroup => ageGroup.Id == selectedAgeGroup.Id))
+            target = selectedAgeGroup;
+        target ??= ageGroups.FirstOrDefault();
+        var preferredCleared = _preferredAgeGroupId is not null;
+        if (preferredCleared)
+            _preferredAgeGroupId = null;
+
+        await DispatcherUiHelper.InvokeOnUiAsync(() =>
+        {
+            AgeGroupOptions = new ObservableCollection<SearchableItem>(
+                ageGroups.Select(ageGroup => new SearchableItem
+                {
+                    Value = ageGroup,
+                    DisplayText = EntityDisplayFormatter.FormatAgeGroup(ageGroup)
+                }));
+            SelectedAgeGroup = target;
+        });
     }
 
     partial void OnSelectedAgeGroupChanged(AgeGroup? value) => _ = LoadRowsAsync();
@@ -71,18 +85,26 @@ public partial class CombinedResultsViewModel : ViewModelBase
             SelectedRow = null;
             return;
         }
-        IsLoading = true;
+        await DispatcherUiHelper.InvokeOnUiAsync(() => IsLoading = true);
+        await YieldLoadingUiAsync();
         try
         {
-            var data = await EntryService.GetCombinedResultsByAgeGroupAsync(ageGroupId);
-            EventColumns = new ObservableCollection<CombinedResultsEventColumnView>(
-                data.EventColumns.Select(column => new CombinedResultsEventColumnView(column.SwimStyleId, column.Header)));
-            Rows = new ObservableCollection<CombinedResultRow>(BuildRows(data.Athletes));
-            SelectedRow = null;
+            await YieldToBackgroundAsync();
+            var data = await EntryService.GetCombinedResultsByAgeGroupAsync(ageGroupId).ConfigureAwait(false);
+            var columns = data.EventColumns
+                .Select(column => new CombinedResultsEventColumnView(column.SwimStyleId, column.Header))
+                .ToList();
+            var rows = BuildRows(data.Athletes);
+            await DispatcherUiHelper.InvokeOnUiAsync(() =>
+            {
+                EventColumns = new ObservableCollection<CombinedResultsEventColumnView>(columns);
+                Rows = new ObservableCollection<CombinedResultRow>(rows);
+                SelectedRow = null;
+            });
         }
         finally
         {
-            IsLoading = false;
+            await DispatcherUiHelper.InvokeOnUiAsync(() => IsLoading = false);
         }
     }
 

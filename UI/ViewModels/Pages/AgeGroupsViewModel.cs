@@ -23,11 +23,10 @@ public partial class AgeGroupsViewModel : DataViewModel<AgeGroup, AgeGroupRowVie
 {
     protected override PagingPage PagingSettingsPage => PagingPage.AgeGroups;
     private readonly IAddEditWindowFactory _windowFactory;
-    private readonly EfCoreContext _dbContext;
     public AgeGroupsViewModel(IAgeGroupService ageGroupService, EfCoreContext dbContext) : base(ageGroupService)
     {
+        _ = dbContext;
         _windowFactory = App.Current.Services.GetRequiredService<IAddEditWindowFactory>();
-        _dbContext = dbContext;
         PropertyChanged += OnViewModelPropertyChanged;
     }
 
@@ -61,15 +60,15 @@ public partial class AgeGroupsViewModel : DataViewModel<AgeGroup, AgeGroupRowVie
             ColumnConfiguration<AgeGroup>.SortBy(ag => ag.Id)));
     }
 
-    protected override IQueryable<AgeGroup> ApplyQuery(IQueryable<AgeGroup> query) =>
-        _dbContext.Set<AgeGroup>().AsNoTracking();
+    protected override IQueryable<AgeGroup> ApplyQuery(IQueryable<AgeGroup> query) => query;
 
     protected override IQueryable<AgeGroup> ApplySorting(IQueryable<AgeGroup> query)
     {
         if (!string.Equals(SortColumn, "ParticipantCount", StringComparison.Ordinal))
             return base.ApplySorting(query);
 
-        var athletes = _dbContext.Set<Athlete>().AsNoTracking();
+        var db = (LoadServiceProvider ?? App.Current.Services).GetRequiredService<EfCoreContext>();
+        var athletes = db.Set<Athlete>().AsNoTracking();
         return SortDirection == ListSortDirection.Ascending
             ? query.OrderBy(ag => athletes.Count(a =>
                 a.YearOfBirth >= (ag.BirthYearMin ?? 0) &&
@@ -81,10 +80,13 @@ public partial class AgeGroupsViewModel : DataViewModel<AgeGroup, AgeGroupRowVie
                 (ag.Gender == Gender.Mixed || a.Gender == ag.Gender)));
     }
 
-    protected override async Task<List<AgeGroupRowView>> LoadPageRowsAsync(IQueryable<AgeGroup> query)
+    protected override async Task<List<AgeGroupRowView>> LoadPageRowsAsync(
+        IQueryable<AgeGroup> query,
+        IServiceProvider serviceProvider)
     {
-        var athletes = _dbContext.Set<Athlete>().AsNoTracking();
-        var projections = await RowProjectionQueries.SelectAgeGroup(query, athletes).ToListAsync();
+        var db = serviceProvider.GetRequiredService<EfCoreContext>();
+        var athletes = db.Set<Athlete>().AsNoTracking();
+        var projections = await RowProjectionQueries.SelectAgeGroup(query, athletes).ToListAsync().ConfigureAwait(false);
         return projections.Select(AgeGroupRowView.FromProjection).ToList();
     }
 

@@ -156,6 +156,7 @@
   <data name="Operation_Reports_Canceled_Header" xml:space="preserve"><value>Report generation canceled</value></data>
 
   <data name="Filters_Clear" xml:space="preserve"><value>Clear filters</value></data>
+  <data name="Filters_Date" xml:space="preserve"><value>Date</value></data>
   <data name="Filters_Round" xml:space="preserve"><value>Round</value></data>
   <data name="Filters_Distance" xml:space="preserve"><value>Distance</value></data>
   <data name="Filters_Stroke" xml:space="preserve"><value>Stroke</value></data>
@@ -274,6 +275,7 @@
 
   <data name="Fixation_SelectedHeatHeader_Format" xml:space="preserve"><value>{0} — Heat {1} of {2} ({3} of {4}) — {5}</value></data>
   <data name="Fixation_SelectedHeatHeader_NoEvent_Format" xml:space="preserve"><value>Heat {0} of {1} ({2} of {3}) — {4}</value></data>
+  <data name="Fixation_HeatListItem_Format" xml:space="preserve"><value>{0} ({1})</value></data>
 
   <data name="WindowTitle_CreateClub" xml:space="preserve"><value>Create club</value></data>
   <data name="WindowTitle_EditClub" xml:space="preserve"><value>Edit club</value></data>
@@ -292,6 +294,7 @@
 
   <data name="Common_NoneParen" xml:space="preserve"><value>(None)</value></data>
   <data name="Common_PersonalParen" xml:space="preserve"><value>(Personal)</value></data>
+  <data name="Common_ScoringPersonalCount_Format" xml:space="preserve"><value>{0} / {1}</value></data>
 
   <data name="HeatAlloc_WindowTitle" xml:space="preserve"><value>Heat allocation parameters</value></data>
   <data name="HeatAlloc_Validation_MinHeatSize" xml:space="preserve"><value>Minimum heat size must be at least 1.</value></data>
@@ -303,8 +306,8 @@
 
   <data name="Clubs_Col_Name" xml:space="preserve"><value>Name</value></data>
   <data name="Clubs_Col_Athletes" xml:space="preserve"><value>Athletes</value></data>
-  <data name="Clubs_Col_Entries" xml:space="preserve"><value>Entries</value></data>
-  <data name="Clubs_Col_Relays" xml:space="preserve"><value>Relays</value></data>
+  <data name="Clubs_Col_Entries" xml:space="preserve"><value>Entries (team / individual)</value></data>
+  <data name="Clubs_Col_Relays" xml:space="preserve"><value>Relays (team / individual)</value></data>
   <data name="Clubs_Col_Points" xml:space="preserve"><value>Points</value></data>
   <data name="Athletes_Col_FirstName" xml:space="preserve"><value>First name</value></data>
   <data name="Athletes_Col_LastName" xml:space="preserve"><value>Last name</value></data>
@@ -377,10 +380,10 @@
   <data name="Event_Field_Time" xml:space="preserve"><value>Time</value></data>
   <data name="Event_Field_SwimStyle" xml:space="preserve"><value>Distance</value></data>
   <data name="Event_Field_AgeGroup" xml:space="preserve"><value>Age group</value></data>
-  <data name="Event_Field_Course" xml:space="preserve"><value>Pool length</value></data>
+  <data name="Event_Field_Course" xml:space="preserve"><value>Pool</value></data>
   <data name="Event_Field_Round" xml:space="preserve"><value>Round</value></data>
   <data name="Event_Field_PreviousEvent" xml:space="preserve"><value>Previous event</value></data>
-  <data name="Event_Field_RoundParticipantsCount" xml:space="preserve"><value>Participants count</value></data>
+  <data name="Event_Field_RoundParticipantsCount" xml:space="preserve"><value>Participants</value></data>
   <data name="Event_Field_AvailableLanes" xml:space="preserve"><value>Available lanes</value></data>
   <data name="Event_Lanes_Tab_Range" xml:space="preserve"><value>Lane range</value></data>
   <data name="Event_Lanes_Tab_Custom" xml:space="preserve"><value>Custom names</value></data>

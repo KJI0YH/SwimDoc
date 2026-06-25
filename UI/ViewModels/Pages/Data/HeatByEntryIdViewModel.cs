@@ -13,6 +13,7 @@ using ServiceLayer.EventService;
 using ServiceLayer.HeatService;
 using ServiceLayer.PointScoreProvider;
 using ServiceLayer.SwimStyleService;
+using UI.Helpers.Threading;
 using UI.ViewModels;
 using UI.ViewModels.Pages;
 
@@ -41,26 +42,35 @@ public class HeatByEntryIdViewModel : HeatsViewModel
             UpdateHeatPaging(0);
             return;
         }
-        IsLoading = true;
+        await DispatcherUiHelper.InvokeOnUiAsync(() => IsLoading = true);
+        await YieldLoadingUiAsync();
         try
         {
-            var heats = await HeatService.GetHeatsByEventIdAsync(eventId);
+            var entryId = _entryId.Value;
+            var swimEvent = SelectedSwimEvent;
+            await YieldToBackgroundAsync();
+
+            var heats = await HeatService.GetHeatsByEventIdAsync(eventId).ConfigureAwait(false);
             var heatsInEvent = heats.Count;
             var heatsForEntry = heats
-                .Where(heat => heat.Positions.Any(hp => hp.EntryId == _entryId.Value))
+                .Where(heat => heat.Positions.Any(hp => hp.EntryId == entryId))
                 .ToList();
-            var heatsTotal = HeatService.GetTotalHeats();
-            var swimEvent = SelectedSwimEvent;
+            var heatsTotal = await HeatService.GetTotalHeatsAsync().ConfigureAwait(false);
             var heatPositionViews = heatsForEntry.SelectMany(h =>
                 h.Positions.Select(p =>
-                    new HeatPositionView(p, swimEvent, h.Number, heatsInEvent, h.Order, heatsTotal, h.Status, EntityDisplayFormatter.FormatHeatDayTime(h))));
-            HeatPositions = new ObservableCollection<HeatPositionView>(heatPositionViews);
-            SelectedHeatPosition = heatPositionViews.FirstOrDefault(p => p.Entry.Id == _entryId.Value);
-            UpdateHeatPaging(heatsForEntry.Count, resetPage: false);
+                    new HeatPositionView(p, swimEvent, h.Number, heatsInEvent, h.Order, heatsTotal, h.Status, EntityDisplayFormatter.FormatHeatDayTime(h))))
+                .ToList();
+
+            await DispatcherUiHelper.InvokeOnUiAsync(() =>
+            {
+                HeatPositions = new ObservableCollection<HeatPositionView>(heatPositionViews);
+                SelectedHeatPosition = heatPositionViews.FirstOrDefault(p => p.Entry.Id == entryId);
+                UpdateHeatPaging(heatsForEntry.Count, resetPage: false);
+            });
         }
         finally
         {
-            IsLoading = false;
+            await DispatcherUiHelper.InvokeOnUiAsync(() => IsLoading = false);
         }
     }
 

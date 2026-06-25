@@ -18,6 +18,7 @@ public static class TemplateStrings
     public static string Entries_Title_B1 => Get(nameof(Entries_Title_B1));
     public static string Entries_Header_FirstName => Get(nameof(Entries_Header_FirstName));
     public static string Entries_Header_LastName => Get(nameof(Entries_Header_LastName));
+    public static string Entries_Header_FullName => Get(nameof(Entries_Header_FullName));
     public static string Entries_Header_BirthYear => Get(nameof(Entries_Header_BirthYear));
     public static string Entries_Header_Gender => Get(nameof(Entries_Header_Gender));
     public static string Entries_Header_Category => Get(nameof(Entries_Header_Category));
@@ -35,6 +36,7 @@ public static class TemplateStrings
     public static string Stroke_Medley => Get(nameof(Stroke_Medley));
     public static string Entries_Example_FirstName => Get(nameof(Entries_Example_FirstName));
     public static string Entries_Example_LastName => Get(nameof(Entries_Example_LastName));
+    public static string Entries_Example_FullName => Get(nameof(Entries_Example_FullName));
     public static string Entries_Example_Category => Get(nameof(Entries_Example_Category));
     public static string Category_IMoS => Get(nameof(Category_IMoS));
     public static string Category_MoS => Get(nameof(Category_MoS));

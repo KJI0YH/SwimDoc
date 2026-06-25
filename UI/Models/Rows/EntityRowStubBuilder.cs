@@ -103,6 +103,7 @@ internal static class EntityRowStubBuilder
             LaneMax = p.LaneMax,
             CustomLaneNames = p.CustomLaneNames,
             Status = p.Status,
+            RoundParticipantsCount = p.RoundParticipantsCount,
             AgeGroupId = p.AgeGroupId,
             AgeGroup = BuildAgeGroup(p.AgeGroupId, p.AgeGroupName, p.AgeGroupGender, p.AgeGroupBirthYearMin,
                 p.AgeGroupBirthYearMax),

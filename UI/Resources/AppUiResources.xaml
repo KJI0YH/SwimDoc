@@ -3,7 +3,8 @@
                     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
                     xmlns:displayHelpers="clr-namespace:UI.Helpers.Display"
              xmlns:converters="clr-namespace:UI.Helpers.Converters"
-             xmlns:uiHelpers="clr-namespace:UI.Helpers.Controls"
+                    xmlns:uiHelpers="clr-namespace:UI.Helpers.Controls"
+                    xmlns:searchableComboBox="clr-namespace:UI.Views.Controls.SearchableComboBox"
                     xmlns:system="clr-namespace:System;assembly=System.Runtime">
 
     <converters:EntryScoringConverter x:Key="EntryScoringConverter" />
@@ -20,18 +21,24 @@
     </Style>
 
     
+    <system:Double x:Key="SwimDocFilterDateWidth">120</system:Double>
     <system:Double x:Key="SwimDocFilterRoundWidth">108</system:Double>
     <system:Double x:Key="SwimDocFilterDistanceWidth">168</system:Double>
     <system:Double x:Key="SwimDocFilterStrokeWidth">168</system:Double>
     <system:Double x:Key="SwimDocFilterGenderWidth">120</system:Double>
     <system:Double x:Key="SwimDocFilterStatusWidth">172</system:Double>
     <system:Double x:Key="SwimDocSwimEventComboBoxWidth">500</system:Double>
-    <system:Double x:Key="SwimDocHeatNumberComboBoxWidth">72</system:Double>
+    <system:Double x:Key="SwimDocHeatNumberComboBoxWidth">96</system:Double>
     <system:Double x:Key="SwimDocAgeGroupComboBoxWidth">500</system:Double>
 
     <Style x:Key="SwimDocSwimEventComboBoxStyle"
            TargetType="ComboBox"
            BasedOn="{StaticResource {x:Type ComboBox}}">
+        <Setter Property="uiHelpers:ComboBoxFixedWidthHelper.Width" Value="{StaticResource SwimDocSwimEventComboBoxWidth}" />
+    </Style>
+
+    <Style x:Key="SwimDocSwimEventSearchableComboBoxStyle"
+           TargetType="searchableComboBox:SearchableComboBox">
         <Setter Property="uiHelpers:ComboBoxFixedWidthHelper.Width" Value="{StaticResource SwimDocSwimEventComboBoxWidth}" />
     </Style>
 

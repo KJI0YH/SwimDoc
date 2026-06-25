@@ -370,4 +370,9 @@ public class HeatService(EfCoreContext dbContext, IAppLog log) : CrudService<Hea
     {
         return dbContext.Heats.Count(heat => heat.SwimEventId == swimEventId);
     }
+
+    public Task<int> GetTotalHeatsAsync() => dbContext.Heats.CountAsync();
+
+    public Task<int> GetTotalHeatsInEventAsync(int swimEventId) =>
+        dbContext.Heats.CountAsync(heat => heat.SwimEventId == swimEventId);
 }
