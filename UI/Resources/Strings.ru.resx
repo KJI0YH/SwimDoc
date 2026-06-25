@@ -202,8 +202,9 @@
   <data name="Dialog_SaveExcelStartListReports_DefaultFileName" xml:space="preserve"><value>Стартовый протокол.xlsx</value></data>
   <data name="Dialog_SaveExcelFinishListReports_DefaultFileName" xml:space="preserve"><value>Итоговый протокол.xlsx</value></data>
 
-  <data name="Dialog_CompetitionDb_Filter" xml:space="preserve"><value>SQLite Database (*.db)|*.db|SQLite Database (*.sqlite)|*.sqlite|All Files (*.*)|*.*</value></data>
-  <data name="Dialog_CompetitionDb_DefaultExt" xml:space="preserve"><value>db</value></data>
+  <data name="Dialog_CompetitionDb_Filter" xml:space="preserve"><value>Файл соревнования SwimDoc (*.swimdb)|*.swimdb|Все файлы (*.*)|*.*</value></data>
+  <data name="Dialog_CompetitionDb_OpenFilter" xml:space="preserve"><value>Файл соревнования SwimDoc (*.swimdb)|*.swimdb|База SQLite (*.db)|*.db|Все файлы (*.*)|*.*</value></data>
+  <data name="Dialog_CompetitionDb_DefaultExt" xml:space="preserve"><value>swimdb</value></data>
 
   <data name="Import_File_Header" xml:space="preserve"><value>Импорт заявок</value></data>
   <data name="Import_File_Preparing_MessageFormat" xml:space="preserve"><value>Подготовка {0} файлов</value></data>
@@ -220,6 +221,10 @@
   <data name="Dialog_CreateCompetition_Title" xml:space="preserve"><value>Создать новое соревнование</value></data>
   <data name="Dialog_OpenCompetition_Title" xml:space="preserve"><value>Выберите файл соревнования</value></data>
   <data name="Dialog_Error_CreateDbFile_Title" xml:space="preserve"><value>Не удалось создать файл базы данных</value></data>
+  <data name="Dialog_Error_OpenCompetition_Title" xml:space="preserve"><value>Не удалось открыть соревнование</value></data>
+  <data name="Dialog_Error_OpenCompetition_MessageFormat" xml:space="preserve"><value>Не удалось открыть файл как базу данных соревнования SwimDoc.\n\n{0}</value></data>
+  <data name="Dialog_Error_OpenCompetition_NoDetails" xml:space="preserve"><value>Не удалось установить соединение с базой данных.</value></data>
+  <data name="Dialog_Error_CompetitionFileNotFoundFormat" xml:space="preserve"><value>Файл соревнования не найден:\n\n{0}</value></data>
 
   <data name="Reports_WindowTitle" xml:space="preserve"><value>Генерация отчётов</value></data>
   <data name="Reports_SaveDialog_Title" xml:space="preserve"><value>Сохранить отчёты</value></data>

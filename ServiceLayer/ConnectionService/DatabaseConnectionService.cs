@@ -4,7 +4,7 @@ namespace ServiceLayer.ConnectionService;
 
 public class DatabaseConnectionService : IDatabaseConnection
 {
-    private string _connection = $"Data Source={Path.Combine(Directory.GetCurrentDirectory(), "Default.db")}";
+    private string _connection = $"Data Source={Path.Combine(Directory.GetCurrentDirectory(), "Default.swimdb")}";
     public string? CurrentConnection()
     {
         return _connection;

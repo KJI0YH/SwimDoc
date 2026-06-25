@@ -20,6 +20,7 @@ using ServiceLayer.ReportGeneratorService;
 using ServiceLayer.SwimStyleService;
 using System.Globalization;
 using System.Net.Http;
+using UI.Helpers;
 using UI.Localization;
 using UI.Services.FontScale;
 using UI.ViewModels.Pages;
@@ -55,6 +56,7 @@ public partial class App : Application
     }
 
     public new static App Current => (App)Application.Current;
+    public string? StartupCompetitionFilePath { get; private set; }
     public IServiceProvider Services
     {
         get
@@ -67,6 +69,7 @@ public partial class App : Application
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+        StartupCompetitionFilePath = CompetitionFile.ResolveStartupPath(e.Args);
         Services.GetRequiredService<IFontScaleService>().ApplyCurrent();
         var mainWindow = new MainWindow();
         mainWindow.Show();
@@ -109,6 +112,7 @@ public partial class App : Application
     private static void ConfigureServices(IServiceCollection services)
     {
         services.AddSingleton<IDatabaseConnection, DatabaseConnectionService>();
+        services.AddTransient<ICompetitionDatabaseService, CompetitionDatabaseService>();
         services.AddSingleton<INavigationService, NavigationService>();
         services.AddSingleton<IAddEditWindowFactory, AddEditWindowFactory>();
         services.AddSingleton<IBaseTimeRepository, CsvBaseTimeRepository>();

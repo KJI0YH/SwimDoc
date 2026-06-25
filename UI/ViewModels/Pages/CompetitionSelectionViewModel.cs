@@ -2,11 +2,12 @@ using System.IO;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
+using ServiceLayer.ConnectionService;
 using UI.Resources;
 
 namespace UI.ViewModels.Pages;
 
-public partial class CompetitionSelectionViewModel : ViewModelBase
+public partial class CompetitionSelectionViewModel(ICompetitionDatabaseService competitionDatabaseService) : ViewModelBase
 {
     public event Action<string>? CompetitionSelected;
 
@@ -24,7 +25,7 @@ public partial class CompetitionSelectionViewModel : ViewModelBase
             try
             {
                 File.Create(saveFileDialog.FileName).Close();
-                InitializeDatabase(saveFileDialog.FileName);
+                await TryOpenCompetitionFileAsync(saveFileDialog.FileName);
             }
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
             {
@@ -37,20 +38,45 @@ public partial class CompetitionSelectionViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void OpenExisting()
+    private async Task OpenExisting()
     {
         var openFileDialog = new OpenFileDialog
         {
-            Filter = Strings.Dialog_CompetitionDb_Filter,
+            Filter = Strings.Dialog_CompetitionDb_OpenFilter,
             Title = Strings.Dialog_OpenCompetition_Title
         };
-        if (openFileDialog.ShowDialog() == true) InitializeDatabase(openFileDialog.FileName);
+        if (openFileDialog.ShowDialog() == true)
+            await TryOpenCompetitionFileAsync(openFileDialog.FileName);
     }
 
-    private void InitializeDatabase(string filePath)
+    public async Task<bool> TryOpenCompetitionFileAsync(string filePath)
     {
-        var connectionString = $"Data Source={filePath}";
-        App.Current.SetConnectionString(connectionString);
-        CompetitionSelected?.Invoke(filePath);
+        var fullPath = Path.GetFullPath(filePath);
+        if (!File.Exists(fullPath))
+        {
+            await ShowOpenErrorAsync(string.Format(Strings.Dialog_Error_CompetitionFileNotFoundFormat, fullPath));
+            return false;
+        }
+
+        var result = await competitionDatabaseService.TryOpenAsync(fullPath);
+        if (!result.Success)
+        {
+            var details = string.IsNullOrWhiteSpace(result.ErrorMessage)
+                ? Strings.Dialog_Error_OpenCompetition_NoDetails
+                : result.ErrorMessage;
+            await ShowOpenErrorAsync(string.Format(Strings.Dialog_Error_OpenCompetition_MessageFormat, details));
+            return false;
+        }
+
+        CompetitionSelected?.Invoke(fullPath);
+        return true;
+    }
+
+    private static async Task ShowOpenErrorAsync(string message)
+    {
+        var dialogs = App.Current.Services.GetRequiredService<IErrorDialogService>();
+        await dialogs.ShowErrorAsync(
+            title: Strings.Dialog_Error_OpenCompetition_Title,
+            message: message);
     }
 }

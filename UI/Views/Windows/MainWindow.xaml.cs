@@ -35,7 +35,7 @@ public partial class MainWindow : FluentWindow
         contentDialogService.SetDialogHost(RootContentDialog);
     }
 
-    private void NavigationView_OnLoaded(object sender, RoutedEventArgs e)
+    private async void NavigationView_OnLoaded(object sender, RoutedEventArgs e)
     {
         NavigationView.SetServiceProvider(App.Current.Services);
         NavigationView.BackRequested += OnNavigationBackRequested;
@@ -43,8 +43,14 @@ public partial class MainWindow : FluentWindow
         NavigationView.PreviewMouseDown += OnNavigationPreviewMouseDown;
         _navigationService = App.Current.Services.GetRequiredService<INavigationService>();
         _navigationService.NavigationStateChanged += OnNavigationStateChanged;
+
+        var startupPath = App.Current.StartupCompetitionFilePath;
+        if (startupPath is not null && _viewModel is not null)
+            await _viewModel.CompetitionSelectionViewModel.TryOpenCompetitionFileAsync(startupPath);
+
         if (_viewModel is not { IsCompetitionSelected: true })
             _navigationService.NavigateToCompetitionSelection();
+
         Dispatcher.BeginInvoke(HookBackButton, System.Windows.Threading.DispatcherPriority.Loaded);
     }
 

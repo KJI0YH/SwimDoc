@@ -188,6 +188,7 @@ public static class Strings
     public static string Dialog_SaveExcelStartListReports_DefaultFileName => Get(nameof(Dialog_SaveExcelStartListReports_DefaultFileName));
     public static string Dialog_SaveExcelFinishListReports_DefaultFileName => Get(nameof(Dialog_SaveExcelFinishListReports_DefaultFileName));
     public static string Dialog_CompetitionDb_Filter => Get(nameof(Dialog_CompetitionDb_Filter));
+    public static string Dialog_CompetitionDb_OpenFilter => Get(nameof(Dialog_CompetitionDb_OpenFilter));
     public static string Dialog_CompetitionDb_DefaultExt => Get(nameof(Dialog_CompetitionDb_DefaultExt));
     public static string Import_File_Header => Get(nameof(Import_File_Header));
     public static string Import_File_Preparing_MessageFormat => Get(nameof(Import_File_Preparing_MessageFormat));
@@ -226,6 +227,10 @@ public static class Strings
     public static string Dialog_CreateCompetition_Title => Get(nameof(Dialog_CreateCompetition_Title));
     public static string Dialog_OpenCompetition_Title => Get(nameof(Dialog_OpenCompetition_Title));
     public static string Dialog_Error_CreateDbFile_Title => Get(nameof(Dialog_Error_CreateDbFile_Title));
+    public static string Dialog_Error_OpenCompetition_Title => Get(nameof(Dialog_Error_OpenCompetition_Title));
+    public static string Dialog_Error_OpenCompetition_MessageFormat => Get(nameof(Dialog_Error_OpenCompetition_MessageFormat));
+    public static string Dialog_Error_OpenCompetition_NoDetails => Get(nameof(Dialog_Error_OpenCompetition_NoDetails));
+    public static string Dialog_Error_CompetitionFileNotFoundFormat => Get(nameof(Dialog_Error_CompetitionFileNotFoundFormat));
     public static string Reports_WindowTitle => Get(nameof(Reports_WindowTitle));
     public static string Reports_SaveDialog_Title => Get(nameof(Reports_SaveDialog_Title));
     public static string Reports_Validation_SelectAtLeastOne => Get(nameof(Reports_Validation_SelectAtLeastOne));
