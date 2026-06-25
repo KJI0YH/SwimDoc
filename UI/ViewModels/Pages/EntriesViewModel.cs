@@ -422,7 +422,7 @@ public partial class EntriesViewModel(
     protected override void ShowAddEditDialog(int? id = default)
     {
         var result = _windowFactory.CreateAndShow<EntryAddEditWindow>(id);
-        if (result == true) _ = LoadDataAsync();
+        if (result == true) ReloadAfterMutation();
     }
 
     protected virtual NavigationContext? GetLoadEntriesFromPreviousEventContext() => null;

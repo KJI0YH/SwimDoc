@@ -1,7 +1,9 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Windows;
 using System.Windows.Data;
+using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DataLayer;
@@ -41,19 +43,35 @@ public partial class HeatsViewModel(
     private bool _searchHandlerAttached;
     private bool _suppressHeatPageLoad;
     private bool _heatPagingSubscribed;
+
+    protected override void OnSearchTextChangedCore(string value)
+    {
+        ScheduleHeatSearchReload();
+    }
+
+    private void ScheduleHeatSearchReload()
+    {
+        var dispatcher = Application.Current?.Dispatcher;
+        if (dispatcher is null)
+        {
+            TriggerHeatSearchReload();
+            return;
+        }
+
+        dispatcher.BeginInvoke(TriggerHeatSearchReload, DispatcherPriority.Background);
+    }
+
+    private void TriggerHeatSearchReload()
+    {
+        ResetHeatPaging();
+        _ = LoadHeatPositionsAsync();
+    }
+
     private void EnsureSearchHandlerAttached()
     {
         if (_searchHandlerAttached)
             return;
         _searchHandlerAttached = true;
-        PropertyChanged += (_, e) =>
-        {
-            if (e.PropertyName == nameof(SearchText))
-            {
-                ResetHeatPaging();
-                _ = LoadHeatPositionsAsync();
-            }
-        };
     }
 
     private void EnsureHeatPagingSubscription()
@@ -237,7 +255,7 @@ public partial class HeatsViewModel(
             UpdateHeatPaging(0);
             return;
         }
-        await DispatcherUiHelper.InvokeOnUiAsync(() => IsLoading = true);
+        await DispatcherUiHelper.InvokeOnUiAsync(() => IsLoading = true, DispatcherPriority.Render);
         await YieldLoadingUiAsync();
         try
         {

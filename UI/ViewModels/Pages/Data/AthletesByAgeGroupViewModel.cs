@@ -68,6 +68,6 @@ public class AthletesByAgeGroupViewModel : AthletesViewModel
     {
         var result = _windowFactory.CreateAndShow<AthleteAddEditWindow>(id);
         if (result == true)
-            _ = LoadDataAsync();
+            ReloadAfterMutation();
     }
 }

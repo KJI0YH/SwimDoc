@@ -56,6 +56,6 @@ public class EntriesByAthleteViewModel : EntriesViewModel
         var context = _athleteId.HasValue ? new NavigationContext { AthleteId = _athleteId.Value } : null;
         var result = _windowFactory.CreateAndShow<EntryAddEditWindow>(id, context);
         if (result == true)
-            _ = LoadDataAsync();
+            ReloadAfterMutation();
     }
 }

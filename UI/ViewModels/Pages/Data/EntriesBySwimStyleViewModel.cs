@@ -48,6 +48,6 @@ public class EntriesBySwimStyleViewModel : EntriesViewModel
         var context = _swimStyleId.HasValue ? new NavigationContext { SwimStyleId = _swimStyleId.Value } : null;
         var result = _windowFactory.CreateAndShow<EntryAddEditWindow>(id, context);
         if (result == true)
-            _ = LoadDataAsync();
+            ReloadAfterMutation();
     }
 }

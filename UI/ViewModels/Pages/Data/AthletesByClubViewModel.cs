@@ -45,6 +45,6 @@ public class AthletesByClubViewModel : AthletesViewModel
         var context = _clubId.HasValue ? new NavigationContext { ClubId = _clubId.Value } : null;
         var result = _windowFactory.CreateAndShow<AthleteAddEditWindow>(id, context);
         if (result == true)
-            _ = LoadDataAsync();
+            ReloadAfterMutation();
     }
 }

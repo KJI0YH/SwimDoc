@@ -96,8 +96,8 @@ public static class RowProjectionQueries
             AthleteCount = c.Athletes.Count,
             EntryScoringCount = c.Athletes.Sum(a => a.Entries.Count(e => e.Scoring)),
             EntryPersonalCount = c.Athletes.Sum(a => a.Entries.Count(e => !e.Scoring)),
-            RelayScoringCount = c.Relays.Count(r => r.Entry.Scoring),
-            RelayPersonalCount = c.Relays.Count(r => !r.Entry.Scoring),
+            RelayScoringCount = c.Relays.Count(r => r.Entry != null && r.Entry.Scoring),
+            RelayPersonalCount = c.Relays.Count(r => r.Entry != null && !r.Entry.Scoring),
             PointCount = c.Athletes.Sum(a => a.Entries.Where(e => e.Scoring).Sum(e => e.Points ?? 0))
         });
 

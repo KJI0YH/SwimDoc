@@ -7,7 +7,7 @@
              xmlns:toolbar="clr-namespace:UI.Views.Controls.Toolbar"
              xmlns:converters="clr-namespace:UI.Helpers.Converters"
              xmlns:loc="clr-namespace:UI.Localization"
-             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:loadingSpinner="clr-namespace:UI.Views.Controls.LoadingSpinner"
              ScrollViewer.VerticalScrollBarVisibility="Disabled"
              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
              mc:Ignorable="d"
@@ -68,11 +68,8 @@
                 <StackPanel VerticalAlignment="Center"
                             HorizontalAlignment="Center"
                             MinWidth="220">
-                    <ui:ProgressRing Width="40"
-                                     Height="40"
-                                     Margin="0,0,0,12"
-                                     HorizontalAlignment="Center"
-                                     IsIndeterminate="{Binding IsLoading}" />
+                    <loadingSpinner:LoadingSpinner Margin="0,0,0,12"
+                                                 IsActive="{Binding IsLoading}" />
                     <TextBlock Text="{loc:Localizastion Common_LoadingData}"
                                HorizontalAlignment="Center"
                                Opacity="0.85" />

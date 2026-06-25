@@ -124,30 +124,39 @@ public partial class DataViewModel<TEntity, TRowView, TKey> : DataViewModelBase,
     protected ICrudService<TEntity, TKey> CreateScopedCrudService(IServiceProvider serviceProvider) =>
         (ICrudService<TEntity, TKey>)serviceProvider.GetRequiredService(_crudServiceType);
 
-    private async Task BeginLoadAsync()
+    private async Task RunGuardedLoadAsync(Func<Task> loadWork, bool includePrepare = false)
     {
         await _loadGate.WaitAsync().ConfigureAwait(false);
-        await DispatcherUiHelper.InvokeOnUiAsync(() => IsLoading = true);
-        await YieldLoadingUiAsync();
-    }
-
-    private async Task EndLoadAsync()
-    {
-        await DispatcherUiHelper.InvokeOnUiAsync(() => IsLoading = false);
-        _loadGate.Release();
-    }
-
-    private async Task LoadDataWithPrepareAsync()
-    {
-        await BeginLoadAsync();
         try
         {
-            await PrepareBeforeLoadAsync().ConfigureAwait(false);
-            await LoadDataCoreAsync().ConfigureAwait(false);
+            await DispatcherUiHelper.InvokeOnUiAsync(() => IsLoading = true, DispatcherPriority.Render);
+            await YieldLoadingUiAsync();
+            if (includePrepare)
+                await PrepareBeforeLoadAsync().ConfigureAwait(false);
+            await loadWork().ConfigureAwait(false);
         }
         finally
         {
-            await EndLoadAsync();
+            await DispatcherUiHelper.InvokeOnUiAsync(() => IsLoading = false);
+            _loadGate.Release();
+        }
+    }
+
+    private Task LoadDataWithPrepareAsync() =>
+        RunGuardedLoadAsync(LoadDataCoreAsync, includePrepare: true);
+
+    protected void ReloadAfterMutation() => _ = ReloadAfterMutationAsync();
+
+    protected async Task ReloadAfterMutationAsync()
+    {
+        try
+        {
+            await LoadDataAsync().ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            App.Current.Services.GetRequiredService<IAppLog>()
+                .Error("Failed to reload data after mutation.", ex);
         }
     }
 
@@ -225,10 +234,32 @@ public partial class DataViewModel<TEntity, TRowView, TKey> : DataViewModelBase,
 
     partial void OnSearchTextChanged(string value)
     {
-        if (CurrentPage == 0)
-            LoadDataCommand.Execute(null);
-        else
+        OnSearchTextChangedCore(value);
+    }
+
+    protected virtual void OnSearchTextChangedCore(string value)
+    {
+        ScheduleSearchReload();
+    }
+
+    private void ScheduleSearchReload()
+    {
+        var dispatcher = Application.Current?.Dispatcher;
+        if (dispatcher is null)
+        {
+            TriggerSearchReload();
+            return;
+        }
+
+        dispatcher.BeginInvoke(TriggerSearchReload, DispatcherPriority.Background);
+    }
+
+    private void TriggerSearchReload()
+    {
+        if (CurrentPage != 0)
             CurrentPage = 0;
+        else
+            _ = LoadDataAsync();
     }
 
     partial void OnCurrentPageChanged(int value)
@@ -253,25 +284,9 @@ public partial class DataViewModel<TEntity, TRowView, TKey> : DataViewModelBase,
             : new ObservableCollection<int>();
     }
 
-    private bool CanLoadData() => !IsLoading;
-    partial void OnIsLoadingChanged(bool value)
-    {
-        LoadDataCommand.NotifyCanExecuteChanged();
-    }
-
-    [RelayCommand(CanExecute = nameof(CanLoadData))]
-    protected virtual async Task LoadDataAsync()
-    {
-        await BeginLoadAsync();
-        try
-        {
-            await LoadDataCoreAsync().ConfigureAwait(false);
-        }
-        finally
-        {
-            await EndLoadAsync();
-        }
-    }
+    [RelayCommand]
+    protected virtual Task LoadDataAsync() =>
+        RunGuardedLoadAsync(LoadDataCoreAsync);
 
     private async Task LoadDataCoreAsync()
     {
@@ -547,7 +562,7 @@ public partial class DataViewModel<TEntity, TRowView, TKey> : DataViewModelBase,
     {
         var factory = App.Current.Services.GetRequiredService<IAddEditWindowFactory>();
         if (factory.ShowGenericAddEdit(id, CrudService) == true)
-            _ = LoadDataAsync();
+            ReloadAfterMutation();
     }
 
     protected virtual TKey GetEntityId(TEntity entity)

@@ -108,7 +108,7 @@ public partial class AgeGroupsViewModel : DataViewModel<AgeGroup, AgeGroupRowVie
     protected override void ShowAddEditDialog(int? id = default)
     {
         var result = _windowFactory.CreateAndShow<AgeGroupAddEditWindow>(id);
-        if (result == true) _ = LoadDataAsync();
+        if (result == true) ReloadAfterMutation();
     }
 
     [RelayCommand(CanExecute = nameof(CanGenerateCombinedResultsReports))]

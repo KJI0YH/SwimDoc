@@ -56,6 +56,6 @@ public class SwimStylesViewModel : DataViewModel<SwimStyle, SwimStyleRowView, in
     protected override void ShowAddEditDialog(int? id = default)
     {
         var result = _windowFactory.CreateAndShow<SwimStyleAddEditWindow>(id);
-        if (result == true) _ = LoadDataAsync();
+        if (result == true) ReloadAfterMutation();
     }
 }

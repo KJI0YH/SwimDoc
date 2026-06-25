@@ -56,6 +56,6 @@ public class EntriesByClubViewModel : EntriesViewModel
         var context = _clubId.HasValue ? new NavigationContext { ClubId = _clubId.Value } : null;
         var result = _windowFactory.CreateAndShow<EntryAddEditWindow>(id, context);
         if (result == true)
-            _ = LoadDataAsync();
+            ReloadAfterMutation();
     }
 }

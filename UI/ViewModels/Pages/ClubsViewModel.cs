@@ -36,8 +36,8 @@ public class ClubsViewModel : DataViewModel<Club, ClubRowView, int?>
                 club => club.Athletes.Sum(athlete => athlete.Entries.Count(e => !e.Scoring)))));
         ColumnConfigurations.Add(new ColumnConfiguration<Club>("RelayCount", Strings.Clubs_Col_Relays, 170,
             ColumnConfiguration<Club>.SortBy(club =>
-                club.Relays.Count(r => r.Entry.Scoring),
-                club => club.Relays.Count(r => !r.Entry.Scoring))));
+                club.Relays.Count(r => r.Entry != null && r.Entry.Scoring),
+                club => club.Relays.Count(r => r.Entry != null && !r.Entry.Scoring))));
         ColumnConfigurations.Add(new ColumnConfiguration<Club>("PointCount", Strings.Clubs_Col_Points, 150,
             ColumnConfiguration<Club>.SortBy(club => club.Athletes.Sum(athlete =>
                 athlete.Entries.Where(entry => entry.Scoring).Sum(entry => entry.Points ?? 0)))));
@@ -63,6 +63,6 @@ public class ClubsViewModel : DataViewModel<Club, ClubRowView, int?>
     protected override void ShowAddEditDialog(int? id = default)
     {
         var result = _windowFactory.CreateAndShow<ClubAddEditWindow>(id);
-        if (result == true) _ = LoadDataAsync();
+        if (result == true) ReloadAfterMutation();
     }
 }

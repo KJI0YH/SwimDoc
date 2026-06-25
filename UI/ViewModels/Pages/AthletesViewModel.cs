@@ -82,6 +82,6 @@ public class AthletesViewModel : DataViewModel<Athlete, AthleteRowView, int?>
     protected override void ShowAddEditDialog(int? id = default)
     {
         var result = _windowFactory.CreateAndShow<AthleteAddEditWindow>(id);
-        if (result == true) _ = LoadDataAsync();
+        if (result == true) ReloadAfterMutation();
     }
 }

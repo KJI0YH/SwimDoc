@@ -370,9 +370,17 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView
 
     protected async Task RefreshAfterAddEditAsync()
     {
-        await RefreshDateFilterOptionsAsync();
-        await RefreshDistanceFilterOptionsAsync();
-        await LoadDataAsync();
+        try
+        {
+            await RefreshDateFilterOptionsAsync().ConfigureAwait(false);
+            await RefreshDistanceFilterOptionsAsync().ConfigureAwait(false);
+            await LoadDataAsync().ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            App.Current.Services.GetRequiredService<IAppLog>()
+                .Error("Failed to reload events after mutation.", ex);
+        }
     }
 
     [RelayCommand(CanExecute = nameof(CanAllocateHeats))]
