@@ -24,7 +24,12 @@ public partial class LoadEntriesFromPreviousEventViewModel : ViewModelBase, IWin
     {
         _eventService = eventService;
         ValidationErrors.CollectionChanged += OnValidationErrorsChanged;
+    }
+
+    public Task InitializeAsync()
+    {
         LoadEvents();
+        return Task.CompletedTask;
     }
 
     public string WindowTitle => Strings.LoadPrev_WindowTitle;
@@ -46,12 +51,12 @@ public partial class LoadEntriesFromPreviousEventViewModel : ViewModelBase, IWin
             .ThenBy(swimEvent => swimEvent.Date)
             .ToList();
         OfficialPreviousEvents.Clear();
-        foreach (var swimEvent in swimEvents.Where(e => e.Status == SwimEventStatus.OFFICIAL))
+        foreach (var swimEvent in swimEvents)
         {
             OfficialPreviousEvents.Add(new SearchableItem
             {
                 Value = swimEvent,
-                DisplayText = EntityDisplayFormatter.FormatSwimEvent(swimEvent)
+                DisplayText = FormatPreviousEventOption(swimEvent)
             });
         }
         TargetEvents.Clear();
@@ -95,6 +100,11 @@ public partial class LoadEntriesFromPreviousEventViewModel : ViewModelBase, IWin
             ValidationErrors.Add(Strings.LoadPrev_Validation_SelectOfficialPreviousEvent);
             return;
         }
+        if (previousEvent.Status != SwimEventStatus.OFFICIAL)
+        {
+            ValidationErrors.Add(Strings.LoadPrev_Validation_SelectOfficialPreviousEvent);
+            return;
+        }
         if (SelectedTargetEvent?.Value is not SwimEvent targetEvent)
         {
             ValidationErrors.Add(Strings.LoadPrev_Validation_SelectCurrentEvent);
@@ -116,6 +126,14 @@ public partial class LoadEntriesFromPreviousEventViewModel : ViewModelBase, IWin
             EntityDisplayFormatter.FormatSwimEvent(previousEvent),
             EntityDisplayFormatter.FormatSwimEvent(targetEvent));
         CloseRequested?.Invoke(this, EventArgs.Empty);
+    }
+
+    private static string FormatPreviousEventOption(SwimEvent swimEvent)
+    {
+        var name = EntityDisplayFormatter.FormatSwimEvent(swimEvent);
+        return swimEvent.Status == SwimEventStatus.OFFICIAL
+            ? name
+            : $"{name} ({EntityDisplayFormatter.FormatSwimEventStatus(swimEvent)})";
     }
 
     [RelayCommand]

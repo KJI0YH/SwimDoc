@@ -19,6 +19,7 @@ using UI.Resources;
 using UI.ViewModels.Pages.Data;
 using UI.Models.Rows;
 using UI.Models.Rows.Projections;
+using UI.Services.Navigation;
 using UI.ViewModels.Dialogs.HeatAllocationParameters;
 using UI.ViewModels.Dialogs.ReportGeneration;
 using UI.ViewModels.Dialogs.StartTimeCalculation;
@@ -29,7 +30,7 @@ using StartTimeCalculationWindow = UI.Views.Dialogs.Markers.StartTimeCalculation
 
 namespace UI.ViewModels.Pages;
 
-public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView, int?>
+public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView, int?>, INavigationAware
 {
     protected override PagingPage PagingSettingsPage => PagingPage.Events;
     private IEventService EventService =>
@@ -508,4 +509,10 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView
     }
 
     private bool CanCalculateStartTimes() => SelectedItems.Count > 0 && !IsOperationRunning;
+
+    public void OnNavigatedTo(object? parameter)
+    {
+    }
+
+    public void OnNavigationRestored() => RequestReload();
 }

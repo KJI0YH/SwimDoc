@@ -40,7 +40,16 @@ public partial class SearchableComboBox : UserControl
     public SearchableComboBox()
     {
         InitializeComponent();
-        Loaded += (_, _) => HookEditableTextBox();
+        Loaded += OnLoaded;
+    }
+
+    private void OnLoaded(object sender, RoutedEventArgs e)
+    {
+        HookEditableTextBox();
+        if (ItemsSource is not null && _itemsView is null)
+            BindItemsView(ItemsSource);
+        else
+            SyncComboBoxSelection();
     }
 
     public ObservableCollection<SearchableItem>? ItemsSource
@@ -90,13 +99,46 @@ public partial class SearchableComboBox : UserControl
         _itemsView.Filter = FilterItem;
         ComboBoxControl.ItemsSource = _itemsView;
         _itemsView.Refresh();
+        SyncComboBoxSelection();
+    }
+
+    private void SyncComboBoxSelection()
+    {
+        if (_itemsView is null)
+            return;
+        _isSyncingSelection = true;
+        try
+        {
+            if (SelectedItem is null)
+            {
+                ComboBoxControl.SelectedItem = null;
+                return;
+            }
+
+            var itemInSource = ItemsSource?.FirstOrDefault(i =>
+                ReferenceEquals(i, SelectedItem) ||
+                AreValuesEqual(i.Value, SelectedItem.Value));
+            if (itemInSource is null)
+            {
+                ComboBoxControl.SelectedItem = null;
+                return;
+            }
+
+            if (!ReferenceEquals(SelectedItem, itemInSource))
+                SelectedItem = itemInSource;
+            ComboBoxControl.SelectedItem = itemInSource;
+        }
+        finally
+        {
+            _isSyncingSelection = false;
+        }
     }
 
     private void OnBoundItemsSourceChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         _itemsView?.Refresh();
         if (!_isSearchActive)
-            SyncSelectedItem();
+            SyncComboBoxSelection();
     }
 
     private void SyncSelectedItem()
@@ -111,6 +153,8 @@ public partial class SearchableComboBox : UserControl
             SelectedItem = itemInSource;
             _isSyncingSelection = false;
         }
+
+        SyncComboBoxSelection();
     }
 
     private static bool AreValuesEqual(object? value1, object? value2)

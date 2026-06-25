@@ -5,7 +5,7 @@ namespace DataLayer.Display;
 public static class EntityDisplay
 {
     public static string FormatAthleteName(Athlete? athlete) =>
-        athlete is null ? string.Empty : $"{athlete.FirstName} {athlete.LastName}";
+        athlete is null ? string.Empty : $"{athlete.LastName} {athlete.FirstName}";
 
     public static string FormatAthleteClubName(Athlete? athlete, IEntityDisplayTexts texts) =>
         athlete?.Club?.Name ?? texts.PersonalParen;
