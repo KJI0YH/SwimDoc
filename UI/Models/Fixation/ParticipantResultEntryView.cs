@@ -4,7 +4,8 @@ namespace UI.Models.Fixation;
 
 public sealed class ParticipantResultEntryView(ResultEntryView result, int? athleteId = null)
 {
-    public int Place => result.Place;
+    public int? RankingPlace => result.RankingPlace;
+    public string PlaceDisplay => result.PlaceDisplay;
     public Entry Entry => result.Entry;
     public string EventName => EntityDisplayFormatter.FormatEntrySwimName(Entry);
     public string ParticipantName => result.ParticipantName;

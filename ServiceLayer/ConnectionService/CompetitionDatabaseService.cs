@@ -1,1 +1,89 @@
-using DataLayer.EfCore;using Microsoft.EntityFrameworkCore;using ServiceLayer.Logging;namespace ServiceLayer.ConnectionService;public interface ICompetitionDatabaseService{    Task<CompetitionOpenResult> TryOpenAsync(string filePath, CancellationToken cancellationToken = default);}public sealed record CompetitionOpenResult(bool Success, string? ErrorMessage);public sealed class CompetitionDatabaseService(    IDatabaseConnection databaseConnection,    IAppLog log) : ICompetitionDatabaseService{    public async Task<CompetitionOpenResult> TryOpenAsync(string filePath, CancellationToken cancellationToken = default)    {        var fullPath = Path.GetFullPath(filePath);        var connectionString = $"Data Source={fullPath}";        try        {            var options = new DbContextOptionsBuilder<EfCoreContext>()                .UseSwimDocSqlite()                .Options;            var validationConnection = new DatabaseConnectionService();            validationConnection.SetConnection(connectionString);            await using var context = new EfCoreContext(options, validationConnection);            if (!await context.Database.CanConnectAsync(cancellationToken))            {                log.Warning($"Database connection check failed: {fullPath}");                return new CompetitionOpenResult(false, null);            }            databaseConnection.SetConnection(connectionString);            log.Info($"Database connection established: {fullPath}");            return new CompetitionOpenResult(true, null);        }        catch (Exception ex)        {            log.Error($"Database open failed: {fullPath}", ex);            return new CompetitionOpenResult(false, ex.Message);        }    }}
+using DataLayer.EfCore;
+
+using Microsoft.EntityFrameworkCore;
+
+using ServiceLayer.Logging;
+
+
+
+namespace ServiceLayer.ConnectionService;
+
+
+
+public interface ICompetitionDatabaseService
+
+{
+
+    Task<CompetitionOpenResult> TryOpenAsync(string filePath, CancellationToken cancellationToken = default);
+
+}
+
+
+
+public sealed record CompetitionOpenResult(bool Success, string? ErrorMessage);
+
+
+
+public sealed class CompetitionDatabaseService(
+
+    IDatabaseConnection databaseConnection,
+
+    IAppLog log) : ICompetitionDatabaseService
+
+{
+    public async Task<CompetitionOpenResult> TryOpenAsync(string filePath, CancellationToken cancellationToken = default)
+    {
+        var fullPath = Path.GetFullPath(filePath);
+        var connectionString = $"Data Source={fullPath}";
+
+        try
+        {
+
+            var options = new DbContextOptionsBuilder<EfCoreContext>()
+
+                .UseSwimDocSqlite()
+
+                .Options;
+
+            var validationConnection = new DatabaseConnectionService();
+
+            validationConnection.SetConnection(connectionString);
+
+
+
+            await using var context = new EfCoreContext(options, validationConnection);
+
+            if (!await context.Database.CanConnectAsync(cancellationToken))
+
+            {
+
+                log.Warning($"Database connection check failed: {fullPath}");
+
+                return new CompetitionOpenResult(false, null);
+
+            }
+
+
+
+            databaseConnection.SetConnection(connectionString);
+
+            log.Info($"Database connection established: {fullPath}");
+
+            return new CompetitionOpenResult(true, null);
+
+        }
+
+        catch (Exception ex)
+
+        {
+
+            log.Error($"Database open failed: {fullPath}", ex);
+
+            return new CompetitionOpenResult(false, ex.Message);
+
+        }
+
+    }
+
+}
+

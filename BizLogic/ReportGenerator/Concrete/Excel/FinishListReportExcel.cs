@@ -74,11 +74,11 @@ public class FinishListReportExcel(EfCoreContext dbContext) : BaseReportExcel(db
             var entries = EntryPlaceAssignment.OrderForResults(swimEvent.Entries);
             foreach (var (entry, entryPlace) in EntryPlaceAssignment.AssignPlaces(entries))
             {
-                worksheet.Cells[row, colNo].Value = entryPlace;
+                worksheet.Cells[row, colNo].Value = EntryTimeDisplay.FormatResultPlace(entry, entryPlace);
                 worksheet.Cells[row, colParticipant].Value = LocalizedEntityDisplayFormatter.FormatEntryParticipantName(entry);
                 worksheet.Cells[row, colBirthYear].Value = LocalizedEntityDisplayFormatter.FormatEntryParticipantBirthYear(entry);
                 worksheet.Cells[row, colTeam].Value = LocalizedEntityDisplayFormatter.FormatEntryParticipantClubName(entry);
-                worksheet.Cells[row, colFinishTime].Value = EntryTimeDisplay.FormatFinishTime(entry);
+                worksheet.Cells[row, colFinishTime].Value = EntryTimeDisplay.FormatResultTime(entry);
                 worksheet.Cells[row, colPoints].Value = entry.Points;
                 worksheet.Cells[row, colComment].Value = entry.Comment;
                 var dataRange = worksheet.Cells[row, colNo, row, tableLastCol];

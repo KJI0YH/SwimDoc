@@ -41,7 +41,7 @@
                       IsReadOnly="True"
                       RowStyle="{StaticResource DataGridRowResultsPlaceStyle}">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="{loc:Localizastion Results_Col_Place}" Binding="{Binding Place}" IsReadOnly="True" Width="80" />
+                    <DataGridTextColumn Header="{loc:Localizastion Results_Col_Place}" Binding="{Binding PlaceDisplay}" IsReadOnly="True" Width="80" />
                     <DataGridTextColumn Header="{loc:Localizastion Results_Col_Participant}" Binding="{Binding ParticipantName}" IsReadOnly="True"
                                         Width="*" />
                     <DataGridTextColumn Header="{loc:Localizastion Fixation_Col_BirthYear}" Binding="{Binding ParticipantYearOfBirth}"

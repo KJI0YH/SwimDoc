@@ -31,6 +31,50 @@ public sealed class EntryResultRulesTest
     }
 
     [Test]
+    public void FormatResultPlace_Dsq_ShowsStatusInsteadOfPlace()
+    {
+        var entry = new DataLayer.EfClasses.Entry { Status = EntryStatus.DSQ };
+
+        Assert.That(EntryTimeDisplay.FormatResultPlace(entry, 3), Is.EqualTo("DSQ"));
+    }
+
+    [Test]
+    public void FormatResultPlace_Finish_ShowsPlaceNumber()
+    {
+        var entry = new DataLayer.EfClasses.Entry { Status = EntryStatus.FINISH };
+
+        Assert.That(EntryTimeDisplay.FormatResultPlace(entry, 2), Is.EqualTo("2"));
+    }
+
+    [Test]
+    public void FormatResultTime_DsqWithTime_ShowsTimeWithoutStatusOrParentheses()
+    {
+        var entry = new DataLayer.EfClasses.Entry
+        {
+            Status = EntryStatus.DSQ,
+            FinishTime = 2525
+        };
+
+        Assert.That(EntryTimeDisplay.FormatResultTime(entry), Is.EqualTo("25.25"));
+    }
+
+    [Test]
+    public void FormatResultTime_DsqWithoutTime_IsEmpty()
+    {
+        var entry = new DataLayer.EfClasses.Entry { Status = EntryStatus.DSQ };
+
+        Assert.That(EntryTimeDisplay.FormatResultTime(entry), Is.Empty);
+    }
+
+    [Test]
+    public void FormatResultTime_DnsWithoutTime_IsEmpty()
+    {
+        var entry = new DataLayer.EfClasses.Entry { Status = EntryStatus.DNS };
+
+        Assert.That(EntryTimeDisplay.FormatResultTime(entry), Is.Empty);
+    }
+
+    [Test]
     public void ApplyNonFinishResultRules_Dsq_KeepsFinishTimeAndClearsPoints()
     {
         var entry = new DataLayer.EfClasses.Entry

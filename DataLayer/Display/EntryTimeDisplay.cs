@@ -1,3 +1,4 @@
+using System.Globalization;
 using DataLayer.EfClasses;
 
 namespace DataLayer.Display;
@@ -7,6 +8,17 @@ public static class EntryTimeDisplay
     public const string NotEnteredText = "N.T.";
     public static string FormatEntryTime(int? entryTime) =>
         entryTime == null ? NotEnteredText : FormatHundredths(entryTime.Value);
+
+    public static bool IsDisqualifiedResult(Entry entry) =>
+        entry.Status is EntryStatus.DSQ or EntryStatus.DNS or EntryStatus.DNF;
+
+    public static string FormatResultPlace(Entry entry, int place) =>
+        IsDisqualifiedResult(entry)
+            ? entry.Status.ToString()
+            : place.ToString(CultureInfo.InvariantCulture);
+
+    public static string FormatResultTime(Entry entry) =>
+        entry.FinishTime.HasValue ? FormatHundredths(entry.FinishTime.Value) : string.Empty;
 
     public static string FormatFinishTime(Entry entry) =>
         entry.Status switch

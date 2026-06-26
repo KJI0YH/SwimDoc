@@ -563,7 +563,7 @@
         <Style.Triggers>
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding Place}" Value="1" />
+                    <Condition Binding="{Binding RankingPlace}" Value="1" />
                     <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}"
                                Value="False" />
                 </MultiDataTrigger.Conditions>
@@ -571,7 +571,7 @@
             </MultiDataTrigger>
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding Place}" Value="2" />
+                    <Condition Binding="{Binding RankingPlace}" Value="2" />
                     <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}"
                                Value="False" />
                 </MultiDataTrigger.Conditions>
@@ -579,7 +579,7 @@
             </MultiDataTrigger>
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding Place}" Value="3" />
+                    <Condition Binding="{Binding RankingPlace}" Value="3" />
                     <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}"
                                Value="False" />
                 </MultiDataTrigger.Conditions>
@@ -587,7 +587,7 @@
             </MultiDataTrigger>
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding Place}" Value="1" />
+                    <Condition Binding="{Binding RankingPlace}" Value="1" />
                     <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}"
                                Value="False" />
                     <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}"
@@ -597,7 +597,7 @@
             </MultiDataTrigger>
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding Place}" Value="2" />
+                    <Condition Binding="{Binding RankingPlace}" Value="2" />
                     <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}"
                                Value="False" />
                     <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}"
@@ -607,7 +607,7 @@
             </MultiDataTrigger>
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding Place}" Value="3" />
+                    <Condition Binding="{Binding RankingPlace}" Value="3" />
                     <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}"
                                Value="False" />
                     <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}"
