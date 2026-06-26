@@ -1,0 +1,70 @@
+using BizLogic.HeatAllocation;
+using DataLayer.EfClasses;
+using DataLayer.EfCore;
+using Microsoft.EntityFrameworkCore;
+using ServiceLayer.ClubService;
+using ServiceLayer.HeatService;
+using ServiceLayer.Logging;
+using Tests.TestInfrastructure;
+
+namespace Tests.Event;
+
+[TestFixture]
+public sealed class EmptyHeatAfterClubDeleteTest : DatabaseTestFixture
+{
+    private ClubService _clubService = null!;
+    private HeatService _heatService = null!;
+    private TestDataSeeder _seeder = null!;
+
+    [SetUp]
+    public void SetUpService()
+    {
+        _clubService = new ClubService(Context, NullAppLog.Instance);
+        _heatService = new HeatService(Context, NullAppLog.Instance);
+        _seeder = new TestDataSeeder(Context);
+    }
+
+    [Test]
+    public async Task DeleteAllClubs_RemovesEmptyHeats_AndSetsStatusEmpty()
+    {
+        var ageGroup = _seeder.SeedAgeGroup();
+        var swimStyle = _seeder.SeedSwimStyle();
+        var swimEvent = _seeder.SeedSwimEvent(ageGroup, swimStyle);
+        var (club, _, _) = _seeder.SeedEntry(
+            swimEvent,
+            swimStyle,
+            "Ivan",
+            "Ivanov",
+            2005,
+            Gender.Male,
+            1000);
+        _seeder.SeedEntry(
+            swimEvent,
+            swimStyle,
+            "Petr",
+            "Petrov",
+            2005,
+            Gender.Male,
+            1100,
+            existingAthlete: null);
+        var secondClub = await Context.Clubs
+            .AsNoTracking()
+            .OrderByDescending(c => c.Id)
+            .FirstAsync();
+        _heatService.AllocateEntriesToHeats(
+            new HeatAllocationParameters(swimEvent.Id, HeatOrder.FromWeakToStrong, minHeatSize: 2));
+
+        Context.ChangeTracker.Clear();
+        await _clubService.DeleteAsync(club.Id);
+        await _clubService.DeleteAsync(secondClub.Id);
+
+        Context.ChangeTracker.Clear();
+        Assert.That(await Context.Heats.CountAsync(heat => heat.SwimEventId == swimEvent.Id), Is.EqualTo(0));
+        Assert.That(
+            await Context.SwimEvents.AsNoTracking()
+                .Where(se => se.Id == swimEvent.Id)
+                .Select(se => se.Status)
+                .SingleAsync(),
+            Is.EqualTo(SwimEventStatus.EMPTY));
+    }
+}

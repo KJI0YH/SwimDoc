@@ -362,19 +362,14 @@ public partial class EventAddViewModel(
             .Include(swimEvent => swimEvent.AgeGroup)
             .Include(swimEvent => swimEvent.SwimStyle)
             .Include(swimEvent => swimEvent.PreviousSwimEvent)
+            .OrderBy(swimEvent => swimEvent.Order)
+            .ThenBy(swimEvent => swimEvent.Date)
             .ToList();
         PreviousSwimEvents.Clear();
         PreviousSwimEvents.Add(new SearchableItem { Value = null, DisplayText = Strings.Common_NoneParen });
-        foreach (var swimEvent in swimEvents)
-        {
-            if (!IsAdd && swimEvent.Id == Entity.Id)
-                continue;
-            PreviousSwimEvents.Add(new SearchableItem
-            {
-                Value = swimEvent,
-                DisplayText = EntityDisplayFormatter.FormatSwimEvent(swimEvent)
-            });
-        }
+        var previousEventCandidates = swimEvents.Where(swimEvent => IsAdd || swimEvent.Id != Entity.Id);
+        foreach (var item in SearchableItem.FromSwimEvents(previousEventCandidates))
+            PreviousSwimEvents.Add(item);
     }
 
     [RelayCommand]

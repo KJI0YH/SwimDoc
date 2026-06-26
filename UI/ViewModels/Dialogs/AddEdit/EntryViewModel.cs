@@ -472,14 +472,8 @@ public partial class EntryViewModel(
     {
         SwimEvents.Clear();
         SwimEvents.Add(new SearchableItem { Value = null, DisplayText = string.Empty });
-        foreach (var swimEvent in swimEvents)
-        {
-            SwimEvents.Add(new SearchableItem
-            {
-                Value = swimEvent,
-                DisplayText = EntityDisplayFormatter.FormatSwimEvent(swimEvent)
-            });
-        }
+        foreach (var item in SearchableItem.FromSwimEvents(swimEvents))
+            SwimEvents.Add(item);
     }
 
     private async Task LoadRelayEventsAsync()
@@ -500,8 +494,8 @@ public partial class EntryViewModel(
         }
         else
         {
-            foreach (var swimEvent in relayEvents)
-                RelaySwimEvents.Add(new SearchableItem { Value = swimEvent, DisplayText = EntityDisplayFormatter.FormatSwimEvent(swimEvent) });
+            foreach (var item in SearchableItem.FromSwimEvents(relayEvents))
+                RelaySwimEvents.Add(item);
         }
         if (IsAdd
             && !_contextAthleteId.HasValue

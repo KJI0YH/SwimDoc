@@ -55,17 +55,13 @@ public class HeatsByAthleteViewModel : HeatsViewModel
             HeatPositions = [];
             return;
         }
-        await DispatcherUiHelper.InvokeOnUiAsync(() => IsLoading = true);
-        await YieldLoadingUiAsync();
-        try
-        {
-            var athleteId = _athleteId.Value;
-            var focusEntryId = _focusEntryId;
-            var focusSwimEventId = _focusSwimEventId;
-            var swimEvent = SelectedSwimEvent;
-            await YieldToBackgroundAsync();
+        var athleteId = _athleteId.Value;
+        var focusEntryId = _focusEntryId;
+        var focusSwimEventId = _focusSwimEventId;
+        var swimEvent = SelectedSwimEvent;
+        await YieldToBackgroundAsync();
 
-            var heats = await HeatService.GetHeatsByEventIdAsync(eventId).ConfigureAwait(false);
+        var heats = await HeatService.GetHeatsByEventIdAsync(eventId).ConfigureAwait(false);
             var heatsInEvent = heats.Count;
             var heatsForAthlete = heats
                 .Where(heat => heat.Positions.Any(hp =>
@@ -78,22 +74,17 @@ public class HeatsByAthleteViewModel : HeatsViewModel
                     new HeatPositionView(p, swimEvent, h.Number, heatsInEvent, h.Order, heatsTotal, h.Status, EntityDisplayFormatter.FormatHeatDayTime(h))))
                 .ToList();
 
-            await DispatcherUiHelper.InvokeOnUiAsync(() =>
-            {
-                HeatPositions = new ObservableCollection<HeatPositionView>(heatPositionViews);
-                UpdateHeatPaging(heatsForAthlete.Count, resetPage: false);
-                if (focusEntryId.HasValue)
-                {
-                    SelectedHeatPosition = heatPositionViews.FirstOrDefault(p => p.EntryId == focusEntryId.Value);
-                    _focusEntryId = null;
-                    _focusSwimEventId = null;
-                }
-            });
-        }
-        finally
+        await DispatcherUiHelper.InvokeOnUiAsync(() =>
         {
-            await DispatcherUiHelper.InvokeOnUiAsync(() => IsLoading = false);
-        }
+            HeatPositions = new ObservableCollection<HeatPositionView>(heatPositionViews);
+            UpdateHeatPaging(heatsForAthlete.Count, resetPage: false);
+            if (focusEntryId.HasValue)
+            {
+                SelectedHeatPosition = heatPositionViews.FirstOrDefault(p => p.EntryId == focusEntryId.Value);
+                _focusEntryId = null;
+                _focusSwimEventId = null;
+            }
+        });
     }
 
     protected override IQueryable<SwimEvent> ApplyQuery(IQueryable<SwimEvent> query)

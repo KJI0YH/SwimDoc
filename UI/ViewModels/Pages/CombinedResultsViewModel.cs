@@ -18,7 +18,6 @@ public partial class CombinedResultsViewModel : ViewModelBase
         App.Current.Services.GetRequiredService<IAgeGroupService>();
     private IEntryService EntryService =>
         App.Current.Services.GetRequiredService<IEntryService>();
-    [ObservableProperty] private bool _isLoading;
     [ObservableProperty] private AgeGroup? _selectedAgeGroup;
     [ObservableProperty] private ObservableCollection<SearchableItem> _ageGroupOptions = new();
     [ObservableProperty] private ObservableCollection<CombinedResultsEventColumnView> _eventColumns = new();
@@ -85,27 +84,18 @@ public partial class CombinedResultsViewModel : ViewModelBase
             SelectedRow = null;
             return;
         }
-        await DispatcherUiHelper.InvokeOnUiAsync(() => IsLoading = true);
-        await YieldLoadingUiAsync();
-        try
+        await YieldToBackgroundAsync();
+        var data = await EntryService.GetCombinedResultsByAgeGroupAsync(ageGroupId).ConfigureAwait(false);
+        var columns = data.EventColumns
+            .Select(column => new CombinedResultsEventColumnView(column.SwimStyleId, column.Header))
+            .ToList();
+        var rows = BuildRows(data.Athletes);
+        await DispatcherUiHelper.InvokeOnUiAsync(() =>
         {
-            await YieldToBackgroundAsync();
-            var data = await EntryService.GetCombinedResultsByAgeGroupAsync(ageGroupId).ConfigureAwait(false);
-            var columns = data.EventColumns
-                .Select(column => new CombinedResultsEventColumnView(column.SwimStyleId, column.Header))
-                .ToList();
-            var rows = BuildRows(data.Athletes);
-            await DispatcherUiHelper.InvokeOnUiAsync(() =>
-            {
-                EventColumns = new ObservableCollection<CombinedResultsEventColumnView>(columns);
-                Rows = new ObservableCollection<CombinedResultRow>(rows);
-                SelectedRow = null;
-            });
-        }
-        finally
-        {
-            await DispatcherUiHelper.InvokeOnUiAsync(() => IsLoading = false);
-        }
+            EventColumns = new ObservableCollection<CombinedResultsEventColumnView>(columns);
+            Rows = new ObservableCollection<CombinedResultRow>(rows);
+            SelectedRow = null;
+        });
     }
 
     partial void OnSelectedRowChanged(CombinedResultRow? value) =>

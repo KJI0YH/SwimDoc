@@ -6,8 +6,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:toolbar="clr-namespace:UI.Views.Controls.Toolbar"
              xmlns:converters="clr-namespace:UI.Helpers.Converters"
-             xmlns:loc="clr-namespace:UI.Localization"
-             xmlns:loadingSpinner="clr-namespace:UI.Views.Controls.LoadingSpinner"
              ScrollViewer.VerticalScrollBarVisibility="Disabled"
              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
              mc:Ignorable="d"
@@ -49,32 +47,6 @@
             </toolbar:DefaultToolbar.Style>
         </toolbar:DefaultToolbar>
 
-        <Grid Grid.Row="1">
-            <ContentPresenter Content="{Binding ElementName=Root, Path=MainContent}" />
-
-            <Border Background="#CCFFFFFF"
-                    Panel.ZIndex="1"
-                    IsHitTestVisible="{Binding IsLoading}">
-                <Border.Style>
-                    <Style TargetType="Border">
-                        <Setter Property="Opacity" Value="0" />
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding IsLoading}" Value="True">
-                                <Setter Property="Opacity" Value="1" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Border.Style>
-                <StackPanel VerticalAlignment="Center"
-                            HorizontalAlignment="Center"
-                            MinWidth="220">
-                    <loadingSpinner:LoadingSpinner Margin="0,0,0,12"
-                                                 IsActive="{Binding IsLoading}" />
-                    <TextBlock Text="{loc:Localizastion Common_LoadingData}"
-                               HorizontalAlignment="Center"
-                               Opacity="0.85" />
-                </StackPanel>
-            </Border>
-        </Grid>
-    </Grid>
+        <ContentPresenter Grid.Row="1"
+                          Content="{Binding ElementName=Root, Path=MainContent}" />    </Grid>
 </UserControl>

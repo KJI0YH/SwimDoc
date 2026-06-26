@@ -14,6 +14,7 @@ using DataLayer.QueryObjects;
 using Microsoft.EntityFrameworkCore;
 using ServiceLayer.BizRunners;
 using ServiceLayer.Crud;
+using ServiceLayer.EventService;
 using ServiceLayer.HeatService.Exceptions;
 using ServiceLayer.Logging;
 using ServiceLayer.Resources;
@@ -40,6 +41,8 @@ public class HeatService(EfCoreContext dbContext, IAppLog log) : CrudService<Hea
                 throw new HeatAllocationException(_runner.Errors);
             if (saveChanges)
             {
+                HeatNumberOrderAdjuster.RecalculateGlobalOrdersAsync(dbContext).GetAwaiter().GetResult();
+                dbContext.SaveChanges();
                 log.Info(
                     $"Allocate heats SwimEventId={parameters.SwimEventId}, heatOrder={parameters.HeatOrder}, minWeakHeatSize={parameters.MinHeatSize}, created={result.Heats.Count}");
                 foreach (var heat in result.Heats)
@@ -77,13 +80,16 @@ public class HeatService(EfCoreContext dbContext, IAppLog log) : CrudService<Hea
     {
         var position = await dbContext.HeatPositions
             .Include(heatPosition => heatPosition.Entry)
+            .Include(heatPosition => heatPosition.Heat)
             .FirstOrDefaultAsync(heatPosition => heatPosition.HeatId == heatId && heatPosition.EntryId == entryId);
         if (position is null)
             return;
+        var swimEventId = position.Heat.SwimEventId;
         log.Info(EntityLogFormatter.FormatOperation("Delete", position));
         position.Entry.ClearHeatResultData();
         dbContext.HeatPositions.Remove(position);
         await dbContext.SaveChangesAsync();
+        await EmptyHeatRemover.RemoveEmptyHeatsAndRefreshStatusAsync(dbContext, swimEventId);
     }
 
     public async Task DeleteHeatAsync(int heatId)
@@ -100,6 +106,8 @@ public class HeatService(EfCoreContext dbContext, IAppLog log) : CrudService<Hea
         foreach (var position in heat.Positions)
             position.Entry.Status = EntryStatus.EVENT;
         dbContext.Heats.Remove(heat);
+        await dbContext.SaveChangesAsync();
+        await HeatNumberOrderAdjuster.RecalculateGlobalOrdersAsync(dbContext);
         await dbContext.SaveChangesAsync();
     }
 
@@ -131,16 +139,28 @@ public class HeatService(EfCoreContext dbContext, IAppLog log) : CrudService<Hea
         await RemoveEntriesFromOtherHeatsAsync(entryIds, isAdd ? null : heat.Id);
         if (isAdd)
         {
-            heat.Status = HeatStatus.NOT_STARTED;
-            heat.Positions ??= [];
-            foreach (var position in heat.Positions)
-                position.Heat = heat;
-            dbContext.Heats.Add(heat);
-            await dbContext.SaveChangesAsync();
-            await RecalculateHeatOrdersAsync();
-            await dbContext.Entry(heat).ReloadAsync();
-            log.Info(EntityLogFormatter.FormatOperation("Create", heat));
-            return (heat, ImmutableList<ValidationResult>.Empty);
+            await using var transaction = await dbContext.Database.BeginTransactionAsync();
+            try
+            {
+                await HeatNumberOrderAdjuster.ShiftNumbersFromAsync(dbContext, heat.SwimEventId, heat.Number);
+                heat.Status = HeatStatus.NOT_STARTED;
+                heat.Positions ??= [];
+                foreach (var position in heat.Positions)
+                    position.Heat = heat;
+                dbContext.Heats.Add(heat);
+                await dbContext.SaveChangesAsync();
+                await HeatNumberOrderAdjuster.RecalculateGlobalOrdersAsync(dbContext);
+                await dbContext.SaveChangesAsync();
+                await transaction.CommitAsync();
+                await dbContext.Entry(heat).ReloadAsync();
+                log.Info(EntityLogFormatter.FormatOperation("Create", heat));
+                return (heat, ImmutableList<ValidationResult>.Empty);
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
         DetachHeatGraphIfTracked(heat);
         var trackedHeat = await dbContext.Heats
@@ -150,47 +170,48 @@ public class HeatService(EfCoreContext dbContext, IAppLog log) : CrudService<Hea
                 CultureInfo.CurrentUICulture,
                 ServiceErrorStrings.Heat_Save_HeatNotFound_Format,
                 heat.Id))]);
-        trackedHeat.Number = heat.Number;
-        trackedHeat.DayTime = heat.DayTime;
-        trackedHeat.Status = heat.Status;
-        var existingPositions = await dbContext.HeatPositions
-            .Where(position => position.HeatId == heat.Id)
-            .ToListAsync();
-        if (existingPositions.Count > 0)
-            dbContext.HeatPositions.RemoveRange(existingPositions);
-        foreach (var position in heat.Positions ?? [])
+        await using (var transaction = await dbContext.Database.BeginTransactionAsync())
         {
-            dbContext.HeatPositions.Add(new HeatPosition
+            try
             {
-                HeatId = trackedHeat.Id,
-                Lane = position.Lane,
-                EntryId = position.EntryId
-            });
+                var oldNumber = trackedHeat.Number;
+                await HeatNumberOrderAdjuster.ApplyNumberChangeAsync(
+                    dbContext,
+                    trackedHeat.SwimEventId,
+                    trackedHeat.Id,
+                    oldNumber,
+                    heat.Number);
+                trackedHeat.Number = heat.Number;
+                trackedHeat.DayTime = heat.DayTime;
+                trackedHeat.Status = heat.Status;
+                var existingPositions = await dbContext.HeatPositions
+                    .Where(position => position.HeatId == heat.Id)
+                    .ToListAsync();
+                if (existingPositions.Count > 0)
+                    dbContext.HeatPositions.RemoveRange(existingPositions);
+                foreach (var position in heat.Positions ?? [])
+                {
+                    dbContext.HeatPositions.Add(new HeatPosition
+                    {
+                        HeatId = trackedHeat.Id,
+                        Lane = position.Lane,
+                        EntryId = position.EntryId
+                    });
+                }
+                await dbContext.SaveChangesAsync();
+                await HeatNumberOrderAdjuster.RecalculateGlobalOrdersAsync(dbContext);
+                await dbContext.SaveChangesAsync();
+                await transaction.CommitAsync();
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
-        await dbContext.SaveChangesAsync();
-        await RecalculateHeatOrdersAsync();
         await dbContext.Entry(trackedHeat).ReloadAsync();
         log.Info(EntityLogFormatter.FormatOperation("Update", heat));
         return (trackedHeat, ImmutableList<ValidationResult>.Empty);
-    }
-
-    private async Task RecalculateHeatOrdersAsync()
-    {
-        var heats = await dbContext.Heats
-            .Join(
-                dbContext.SwimEvents,
-                heat => heat.SwimEventId,
-                swimEvent => swimEvent.Id,
-                (heat, swimEvent) => new { heat, swimEvent.Order })
-            .OrderBy(x => x.Order)
-            .ThenBy(x => x.heat.Number)
-            .ThenBy(x => x.heat.Id)
-            .Select(x => x.heat)
-            .ToListAsync();
-        for (var order = 1; order <= heats.Count; order++)
-            heats[order - 1].Order = order;
-        if (heats.Count > 0)
-            await dbContext.SaveChangesAsync();
     }
 
     private void DetachHeatGraphIfTracked(Heat heat)

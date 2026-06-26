@@ -96,12 +96,7 @@ public partial class FixationViewModel(
             return;
         }
         SelectedSwimEvent ??= items.OrderBy(e => e.Order).FirstOrDefault();
-        SwimEventOptions = new ObservableCollection<SearchableItem>(
-            items.Select(e => new SearchableItem
-            {
-                Value = e,
-                DisplayText = EntityDisplayFormatter.FormatSwimEvent(e)
-            }));
+        SwimEventOptions = SearchableItem.ToSwimEventOptions(items);
         if (SelectedSwimEvent is not null && items.Any(e => e.Id == SelectedSwimEvent.Id))
         {
             SyncSelectedSwimEventOption();
@@ -157,32 +152,23 @@ public partial class FixationViewModel(
             FixationHeatPositionViews = [];
             return;
         }
-        await DispatcherUiHelper.InvokeOnUiAsync(() => IsLoading = true);
-        await YieldLoadingUiAsync();
-        try
+        await YieldToBackgroundAsync();
+        var keepHeatId = SelectedHeat?.Id;
+        var eventIdCopy = eventId;
+        _fixationSwimEvent = await CrudService.Query()
+            .Include(se => se.SwimStyle)
+            .Include(se => se.AgeGroup)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(se => se.Id == eventIdCopy)
+            .ConfigureAwait(false);
+        var heats = await HeatService.GetHeatsByEventIdAsync(eventIdCopy).ConfigureAwait(false);
+        await DispatcherUiHelper.InvokeOnUiAsync(() =>
         {
-            await YieldToBackgroundAsync();
-            var keepHeatId = SelectedHeat?.Id;
-            var eventIdCopy = eventId;
-            _fixationSwimEvent = await CrudService.Query()
-                .Include(se => se.SwimStyle)
-                .Include(se => se.AgeGroup)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(se => se.Id == eventIdCopy)
-                .ConfigureAwait(false);
-            var heats = await HeatService.GetHeatsByEventIdAsync(eventIdCopy).ConfigureAwait(false);
-            await DispatcherUiHelper.InvokeOnUiAsync(() =>
-            {
-                EventHeats = new ObservableCollection<HeatListItemView>(heats.Select(h => new HeatListItemView(h)));
-                SelectedHeatItem = keepHeatId is int id
-                    ? EventHeats.FirstOrDefault(h => h.Entity.Id == id) ?? EventHeats.FirstOrDefault()
-                    : EventHeats.FirstOrDefault();
-            });
-        }
-        finally
-        {
-            await DispatcherUiHelper.InvokeOnUiAsync(() => IsLoading = false);
-        }
+            EventHeats = new ObservableCollection<HeatListItemView>(heats.Select(h => new HeatListItemView(h)));
+            SelectedHeatItem = keepHeatId is int id
+                ? EventHeats.FirstOrDefault(h => h.Entity.Id == id) ?? EventHeats.FirstOrDefault()
+                : EventHeats.FirstOrDefault();
+        });
     }
 
     private void LoadHeatPositions()

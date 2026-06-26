@@ -42,15 +42,11 @@ public class HeatByEntryIdViewModel : HeatsViewModel
             UpdateHeatPaging(0);
             return;
         }
-        await DispatcherUiHelper.InvokeOnUiAsync(() => IsLoading = true);
-        await YieldLoadingUiAsync();
-        try
-        {
-            var entryId = _entryId.Value;
-            var swimEvent = SelectedSwimEvent;
-            await YieldToBackgroundAsync();
+        var entryId = _entryId.Value;
+        var swimEvent = SelectedSwimEvent;
+        await YieldToBackgroundAsync();
 
-            var heats = await HeatService.GetHeatsByEventIdAsync(eventId).ConfigureAwait(false);
+        var heats = await HeatService.GetHeatsByEventIdAsync(eventId).ConfigureAwait(false);
             var heatsInEvent = heats.Count;
             var heatsForEntry = heats
                 .Where(heat => heat.Positions.Any(hp => hp.EntryId == entryId))
@@ -61,17 +57,12 @@ public class HeatByEntryIdViewModel : HeatsViewModel
                     new HeatPositionView(p, swimEvent, h.Number, heatsInEvent, h.Order, heatsTotal, h.Status, EntityDisplayFormatter.FormatHeatDayTime(h))))
                 .ToList();
 
-            await DispatcherUiHelper.InvokeOnUiAsync(() =>
-            {
-                HeatPositions = new ObservableCollection<HeatPositionView>(heatPositionViews);
-                SelectedHeatPosition = heatPositionViews.FirstOrDefault(p => p.Entry.Id == entryId);
-                UpdateHeatPaging(heatsForEntry.Count, resetPage: false);
-            });
-        }
-        finally
+        await DispatcherUiHelper.InvokeOnUiAsync(() =>
         {
-            await DispatcherUiHelper.InvokeOnUiAsync(() => IsLoading = false);
-        }
+            HeatPositions = new ObservableCollection<HeatPositionView>(heatPositionViews);
+            SelectedHeatPosition = heatPositionViews.FirstOrDefault(p => p.Entry.Id == entryId);
+            UpdateHeatPaging(heatsForEntry.Count, resetPage: false);
+        });
     }
 
     protected override IQueryable<SwimEvent> ApplyQuery(IQueryable<SwimEvent> query)

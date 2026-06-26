@@ -1,8 +1,11 @@
+using System.Collections.Immutable;
+using System.ComponentModel.DataAnnotations;
 using DataLayer.EfClasses;
 using DataLayer.EfCore;
 using Microsoft.EntityFrameworkCore;
 using ServiceLayer.BaseTimeRepository;
 using ServiceLayer.Crud;
+using ServiceLayer.HeatService;
 using ServiceLayer.Logging;
 using DataLayer;
 
@@ -11,6 +14,102 @@ namespace ServiceLayer.EventService;
 public class EventService(EfCoreContext dbContext, IBaseTimeRepository baseTimeRepository, IAppLog log)
     : CrudService<SwimEvent, int?>(dbContext, log), IEventService
 {
+    public override async Task<(SwimEvent? entity, ImmutableList<ValidationResult> errors)> CreateAsync(
+        SwimEvent entity,
+        CancellationToken cancellationToken = default)
+    {
+        await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
+        try
+        {
+            await SwimEventOrderAdjuster.ShiftOrdersFromAsync(dbContext, entity.Order, cancellationToken);
+            await dbContext.SwimEvents.AddAsync(entity, cancellationToken);
+            var errors = await dbContext.SaveChangesWithValidationAsync();
+            if (errors.Count > 0)
+            {
+                dbContext.Entry(entity).State = EntityState.Detached;
+                await transaction.RollbackAsync(cancellationToken);
+                return (entity, errors);
+            }
+            await HeatNumberOrderAdjuster.RecalculateGlobalOrdersAsync(dbContext, cancellationToken);
+            await dbContext.SaveChangesAsync(cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
+            log.Info(EntityLogFormatter.FormatOperation("Create", entity));
+            return (entity, errors);
+        }
+        catch
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            throw;
+        }
+    }
+
+    public override async Task<(SwimEvent? entity, ImmutableList<ValidationResult> errors)> UpdateAsync(
+        SwimEvent entity,
+        CancellationToken cancellationToken = default)
+    {
+        if (entity.Id == 0)
+            throw new InvalidOperationException("Cannot update entity with null Id.");
+        var id = entity.Id;
+        var trackedEntity = await dbContext.SwimEvents.FindAsync([id], cancellationToken);
+        if (trackedEntity is null)
+            throw new InvalidOperationException($"Entity with Id {id} was not found in the database.");
+        await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
+        try
+        {
+            var oldOrder = trackedEntity.Order;
+            var newOrder = entity.Order;
+            if (oldOrder != newOrder)
+                await SwimEventOrderAdjuster.ApplyOrderChangeAsync(dbContext, id, oldOrder, newOrder, cancellationToken);
+            dbContext.Entry(trackedEntity).CurrentValues.SetValues(entity);
+            trackedEntity.Order = newOrder;
+            dbContext.Entry(trackedEntity).State = EntityState.Modified;
+            var errors = await dbContext.SaveChangesWithValidationAsync();
+            if (errors.Count > 0)
+            {
+                await dbContext.Entry(trackedEntity).ReloadAsync(cancellationToken).ConfigureAwait(false);
+                await transaction.RollbackAsync(cancellationToken);
+                return (trackedEntity, errors);
+            }
+            if (oldOrder != newOrder)
+            {
+                await HeatNumberOrderAdjuster.RecalculateGlobalOrdersAsync(dbContext, cancellationToken);
+                await dbContext.SaveChangesAsync(cancellationToken);
+            }
+            await transaction.CommitAsync(cancellationToken);
+            log.Info(EntityLogFormatter.FormatOperation("Update", trackedEntity));
+            return (trackedEntity, errors);
+        }
+        catch
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            throw;
+        }
+    }
+
+    public override async Task DeleteAsync(int? id, CancellationToken cancellationToken = default)
+    {
+        if (id is not int swimEventId)
+            return;
+        var entity = await dbContext.SwimEvents.FindAsync([swimEventId], cancellationToken);
+        if (entity is null)
+            return;
+        log.Info(EntityLogFormatter.FormatOperation("Delete", entity));
+        await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
+        try
+        {
+            dbContext.SwimEvents.Remove(entity);
+            await dbContext.SaveChangesAsync(cancellationToken);
+            await HeatNumberOrderAdjuster.RecalculateGlobalOrdersAsync(dbContext, cancellationToken);
+            await dbContext.SaveChangesAsync(cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
+        }
+        catch
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            throw;
+        }
+    }
+
     public int GetNextOrderNumber()
     {
         var total = dbContext.SwimEvents.Count();
@@ -61,6 +160,8 @@ public class EventService(EfCoreContext dbContext, IBaseTimeRepository baseTimeR
             .Include(se => se.AgeGroup)
             .Include(se => se.SwimStyle)
             .Where(se => se.SwimStyle.RelayCount == 0)
+            .OrderBy(se => se.Order)
+            .ThenBy(se => se.Date)
             .ToListAsync();
     }
 
@@ -71,6 +172,8 @@ public class EventService(EfCoreContext dbContext, IBaseTimeRepository baseTimeR
             .Include(se => se.AgeGroup)
             .Include(se => se.SwimStyle)
             .Where(se => se.SwimStyle.RelayCount > 0)
+            .OrderBy(se => se.Order)
+            .ThenBy(se => se.Date)
             .ToListAsync();
     }
 

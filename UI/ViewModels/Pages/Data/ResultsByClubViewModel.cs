@@ -17,7 +17,6 @@ public partial class ResultsByClubViewModel(IEntryService entryService) : ViewMo
         App.Current.Services.GetRequiredService<INavigationService>();
 
     private int? _clubId;
-    [ObservableProperty] private bool _isLoading;
     [ObservableProperty] private ObservableCollection<ParticipantResultEntryView> _results = new();
     [ObservableProperty] private ParticipantResultEntryView? _selectedResult;
 
@@ -36,14 +35,10 @@ public partial class ResultsByClubViewModel(IEntryService entryService) : ViewMo
             return;
         }
 
-        await DispatcherUiHelper.InvokeOnUiAsync(() => IsLoading = true);
-        await YieldLoadingUiAsync();
-        try
-        {
-            var clubId = _clubId.Value;
-            await YieldToBackgroundAsync();
+        var clubId = _clubId.Value;
+        await YieldToBackgroundAsync();
 
-            await using var scope = App.Current.Services.CreateAsyncScope();
+        await using var scope = App.Current.Services.CreateAsyncScope();
             var scopedEntryService = scope.ServiceProvider.GetRequiredService<IEntryService>();
             var eventIds = await scopedEntryService.Query()
                 .Where(e => e.SwimEventId != null)
@@ -69,13 +64,8 @@ public partial class ResultsByClubViewModel(IEntryService entryService) : ViewMo
                     rows.Add(new ParticipantResultEntryView(clubResult));
             }
 
-            await DispatcherUiHelper.InvokeOnUiAsync(() =>
-                Results = new ObservableCollection<ParticipantResultEntryView>(rows));
-        }
-        finally
-        {
-            await DispatcherUiHelper.InvokeOnUiAsync(() => IsLoading = false);
-        }
+        await DispatcherUiHelper.InvokeOnUiAsync(() =>
+            Results = new ObservableCollection<ParticipantResultEntryView>(rows));
     }
 
     partial void OnSelectedResultChanged(ParticipantResultEntryView? value) =>

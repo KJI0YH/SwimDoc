@@ -17,6 +17,7 @@ using ServiceLayer.Logging;
 using UI.Helpers.Threading;
 using UI.Resources;
 using UI.Models.Rows;
+using UI.Services.Dialogs;
 using UI.Services.Navigation;
 namespace UI.ViewModels.Pages.Data;
 
@@ -35,7 +36,6 @@ public partial class DataViewModel<TEntity, TRowView, TKey> : DataViewModelBase,
     private bool _needsLoad = true;
     [ObservableProperty] private bool _autoGenerateColumns = true;
     [ObservableProperty] private ObservableCollection<ColumnConfiguration> _columnConfigurations = new();
-    [ObservableProperty] private bool _isLoading;
     [ObservableProperty] private ObservableCollection<TRowView> _items = new();
     [ObservableProperty] private string _searchText = string.Empty;
     [ObservableProperty] private TRowView? _selectedItem;
@@ -129,8 +129,6 @@ public partial class DataViewModel<TEntity, TRowView, TKey> : DataViewModelBase,
         await _loadGate.WaitAsync().ConfigureAwait(false);
         try
         {
-            await DispatcherUiHelper.InvokeOnUiAsync(() => IsLoading = true, DispatcherPriority.Render);
-            await YieldLoadingUiAsync();
             if (includePrepare)
                 await PrepareBeforeLoadAsync().ConfigureAwait(false);
             await loadWork().ConfigureAwait(false);
@@ -144,7 +142,6 @@ public partial class DataViewModel<TEntity, TRowView, TKey> : DataViewModelBase,
         }
         finally
         {
-            await DispatcherUiHelper.InvokeOnUiAsync(() => IsLoading = false);
             _loadGate.Release();
         }
     }

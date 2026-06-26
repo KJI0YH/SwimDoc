@@ -36,6 +36,6 @@ public class HeatAllocationDbAccess(EfCoreContext context) : IHeatAllocationDbAc
 
     public void AddHeats(IEnumerable<Heat> heats)
     {
-        context.Heats.AddRange(heats);
+        context.Heats.AddRange(heats.OrderBy(heat => heat.Number));
     }
 }

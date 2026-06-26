@@ -7,7 +7,5 @@ public class ViewModelBase : ObservableObject
 {
     public virtual double ContentWidth => 520;
 
-    protected static Task YieldLoadingUiAsync() => DispatcherUiHelper.YieldForRenderAsync();
-
     protected static Task YieldToBackgroundAsync() => DispatcherUiHelper.YieldToBackgroundAsync();
 }

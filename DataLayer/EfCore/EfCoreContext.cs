@@ -42,6 +42,7 @@ public sealed class EfCoreContext : DbContext
 
     private void ConfigureSqliteConcurrency()
     {
+        Database.ExecuteSqlRaw("PRAGMA foreign_keys=ON;");
         Database.ExecuteSqlRaw("PRAGMA journal_mode=WAL;");
         Database.ExecuteSqlRaw("PRAGMA busy_timeout=10000;");
     }
@@ -123,11 +124,20 @@ public sealed class EfCoreContext : DbContext
                 WHERE Id IN (NEW.SwimEventId, OLD.SwimEventId);
             END;
             """);
+        Database.ExecuteSqlRaw("DROP TRIGGER IF EXISTS trg_entries_after_delete_update_swim_event_status;");
         Database.ExecuteSqlRaw("""
-            CREATE TRIGGER IF NOT EXISTS trg_entries_after_delete_update_swim_event_status
+            CREATE TRIGGER trg_entries_after_delete_update_swim_event_status
             AFTER DELETE ON Entries
             WHEN OLD.SwimEventId IS NOT NULL
             BEGIN
+                DELETE FROM HeatPositions
+                WHERE HeatId IN (SELECT Id FROM Heats WHERE SwimEventId = OLD.SwimEventId)
+                  AND NOT EXISTS (SELECT 1 FROM Entries e WHERE e.Id = HeatPositions.EntryId);
+
+                DELETE FROM Heats
+                WHERE SwimEventId = OLD.SwimEventId
+                  AND NOT EXISTS (SELECT 1 FROM HeatPositions hp WHERE hp.HeatId = Heats.Id);
+
                 UPDATE SwimEvents
                 SET Status =
                     CASE
@@ -269,9 +279,10 @@ public sealed class EfCoreContext : DbContext
                   );
             END;
             """);
+        Database.ExecuteSqlRaw("DROP TRIGGER IF EXISTS trg_swim_events_after_update;");
         Database.ExecuteSqlRaw("""
-            CREATE TRIGGER IF NOT EXISTS trg_swim_events_after_update
-            AFTER UPDATE ON SwimEvents
+            CREATE TRIGGER trg_swim_events_after_update
+            AFTER UPDATE OF SwimStyleId, AgeGroupId ON SwimEvents
             BEGIN
                 UPDATE Entries
                 SET SwimEventId = NULL,

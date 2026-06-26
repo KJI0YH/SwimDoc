@@ -51,23 +51,11 @@ public partial class LoadEntriesFromPreviousEventViewModel : ViewModelBase, IWin
             .ThenBy(swimEvent => swimEvent.Date)
             .ToList();
         OfficialPreviousEvents.Clear();
-        foreach (var swimEvent in swimEvents)
-        {
-            OfficialPreviousEvents.Add(new SearchableItem
-            {
-                Value = swimEvent,
-                DisplayText = FormatPreviousEventOption(swimEvent)
-            });
-        }
+        foreach (var item in SearchableItem.FromSwimEvents(swimEvents, FormatPreviousEventOption))
+            OfficialPreviousEvents.Add(item);
         TargetEvents.Clear();
-        foreach (var swimEvent in swimEvents)
-        {
-            TargetEvents.Add(new SearchableItem
-            {
-                Value = swimEvent,
-                DisplayText = EntityDisplayFormatter.FormatSwimEvent(swimEvent)
-            });
-        }
+        foreach (var item in SearchableItem.FromSwimEvents(swimEvents))
+            TargetEvents.Add(item);
         ApplyDefaultSelections();
     }
 

@@ -190,14 +190,8 @@ public partial class ResultsViewModel(
         var options = pageItems.Count > 0 ? pageItems.ToList() : [swimEvent];
         if (options.All(e => e.Id != eventId))
             options.Add(swimEvent);
-        options = options.OrderBy(e => e.Order).ToList();
-        SwimEventOptions = new ObservableCollection<SearchableItem>(
-            options.Select(e => new SearchableItem
-            {
-                Value = e,
-                DisplayText = EntityDisplayFormatter.FormatSwimEvent(e)
-            }));
-        SelectedSwimEvent = options.First(e => e.Id == eventId);
+        SwimEventOptions = SearchableItem.ToSwimEventOptions(options);
+        SelectedSwimEvent = swimEvent;
         SelectedSwimEventOption = SwimEventOptions.FirstOrDefault(o =>
             o.Value is SwimEvent swim && swim.Id == eventId);
     }
@@ -337,20 +331,11 @@ public partial class ResultsViewModel(
 
     private async Task LoadEntriesCoreAsync(int eventId)
     {
-        await DispatcherUiHelper.InvokeOnUiAsync(() => IsLoading = true);
-        await YieldLoadingUiAsync();
-        try
-        {
-            await YieldToBackgroundAsync();
-            var entries = await EntryService.GetEntriesByEventIdOrderByFinishTimeAsync(eventId).ConfigureAwait(false);
-            var views = BuildResultEntryViews(entries);
-            await DispatcherUiHelper.InvokeOnUiAsync(() =>
-                Entries = new ObservableCollection<ResultEntryView>(views));
-        }
-        finally
-        {
-            await DispatcherUiHelper.InvokeOnUiAsync(() => IsLoading = false);
-        }
+        await YieldToBackgroundAsync();
+        var entries = await EntryService.GetEntriesByEventIdOrderByFinishTimeAsync(eventId).ConfigureAwait(false);
+        var views = BuildResultEntryViews(entries);
+        await DispatcherUiHelper.InvokeOnUiAsync(() =>
+            Entries = new ObservableCollection<ResultEntryView>(views));
     }
 
     internal static List<ResultEntryView> BuildResultEntryViews(IReadOnlyList<Entry> entries)

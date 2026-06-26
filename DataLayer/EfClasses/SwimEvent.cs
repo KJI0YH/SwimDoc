@@ -37,10 +37,17 @@ public class SwimEvent : IValidatableObject
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
         var currContext = validationContext.GetService(typeof(DbContext)) as EfCoreContext;
+        var trackedEvents = currContext.SwimEvents.Local;
         var existedOrderDate =
-            currContext.SwimEvents.FirstOrDefault(swimEvent => swimEvent.Order == Order && swimEvent.Date == Date);
-        var existedEvent = currContext.SwimEvents.FirstOrDefault(swimEvent =>
-            swimEvent.SwimStyleId == SwimStyleId && swimEvent.AgeGroupId == AgeGroupId && swimEvent.Round == Round);
+            trackedEvents.FirstOrDefault(swimEvent =>
+                swimEvent.Id != Id &&
+                swimEvent.Order == Order &&
+                swimEvent.Date == Date);
+        var existedEvent = trackedEvents.FirstOrDefault(swimEvent =>
+            swimEvent.Id != Id &&
+            swimEvent.SwimStyleId == SwimStyleId &&
+            swimEvent.AgeGroupId == AgeGroupId &&
+            swimEvent.Round == Round);
         if (existedOrderDate is not null && currContext.Entry(this).State == EntityState.Added)
             yield return new ValidationResult(string.Format(
                 CultureInfo.CurrentUICulture,

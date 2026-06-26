@@ -7,6 +7,7 @@ using DataLayer.EfClasses;
 using DataLayer.EfCore;
 using Microsoft.EntityFrameworkCore;
 using ServiceLayer.Crud;
+using ServiceLayer.HeatService;
 using ServiceLayer.Logging;
 using ServiceLayer.Resources;
 
@@ -68,7 +69,11 @@ public class EntryService(EfCoreContext dbContext, IAppLog log) : CrudService<En
         if (errors.Count > 0)
             await dbContext.Entry(tracked).ReloadAsync(cancellationToken).ConfigureAwait(false);
         else
+        {
             log.Info(EntityLogFormatter.FormatOperation("Update", entity));
+            if (swimEventIdBeforeUpdate is int oldEventId && oldEventId != tracked.SwimEventId)
+                await EmptyHeatRemover.RemoveEmptyHeatsAndRefreshStatusAsync(dbContext, oldEventId, cancellationToken);
+        }
         return (tracked, errors);
     }
 
@@ -90,7 +95,11 @@ public class EntryService(EfCoreContext dbContext, IAppLog log) : CrudService<En
         if (errors.Count > 0)
             await dbContext.Entry(tracked).ReloadAsync(cancellationToken).ConfigureAwait(false);
         else
+        {
             log.Info(EntityLogFormatter.FormatOperation("Update", entity));
+            if (swimEventIdBeforeUpdate is int oldEventId && oldEventId != tracked.SwimEventId)
+                await EmptyHeatRemover.RemoveEmptyHeatsAndRefreshStatusAsync(dbContext, oldEventId, cancellationToken);
+        }
         return (tracked, errors);
     }
 
@@ -307,12 +316,14 @@ public class EntryService(EfCoreContext dbContext, IAppLog log) : CrudService<En
 
     public override async Task DeleteAsync(int? id, CancellationToken cancellationToken = default)
     {
-        if (id == null) return;
+        if (id == null)
+            return;
         var entry = await dbContext.Entries
             .Include(e => e.Relay)
             .ThenInclude(r => r!.Positions)
-            .FirstOrDefaultAsync(e => e.Id == id.Value, cancellationToken);
-        if (entry == null) return;
+            .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+        if (entry == null)
+            return;
         log.Info(EntityLogFormatter.FormatOperation("Delete", entry));
         var relay = entry.Relay;
         dbContext.Entries.Remove(entry);
