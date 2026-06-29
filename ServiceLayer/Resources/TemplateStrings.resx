@@ -43,7 +43,7 @@
 
   <data name="Entries_Example_FirstName" xml:space="preserve"><value>First name</value></data>
   <data name="Entries_Example_LastName" xml:space="preserve"><value>Last name</value></data>
-  <data name="Entries_Example_FullName" xml:space="preserve"><value>John Smith</value></data>
+  <data name="Entries_Example_FullName" xml:space="preserve"><value> Aliaksei Kryzhanouski</value></data>
   <data name="Entries_Example_Category" xml:space="preserve"><value>MoS</value></data>
 
   <data name="Category_IMoS" xml:space="preserve"><value>IMoS</value></data>
