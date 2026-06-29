@@ -396,6 +396,7 @@ FodyWeavers.xsd
 # Windows Installer files from build outputs
 Artifacts/
 Installer/SwimDocSetup*.exe
+Installer/Version.iss
 *.cab
 *.msi
 *.msix
