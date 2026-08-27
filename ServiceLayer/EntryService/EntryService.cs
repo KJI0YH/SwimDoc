@@ -165,7 +165,7 @@ public class EntryService(EfCoreContext dbContext, IAppLog log) : CrudService<En
                     group.Key,
                     LocalizedEntityDisplayFormatter.FormatSwimStyle(swimStyle),
                     entries.Any(entry =>
-                        entry.Scoring &&
+                        (entry.Points ?? 0) > 0 &&
                         group.Any(swimEvent => swimEvent.Id == entry.SwimEventId)));
             })
             .ToList();

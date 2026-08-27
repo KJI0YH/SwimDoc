@@ -176,6 +176,7 @@ public partial class DataGridView : UserControl
                     : new DataGridLength(config.Width.Value);
             DgTableView.Columns.Add(column);
         }
+        DataGridHeaderFitHelper.FitHeaders(DgTableView);
         SyncDataGridSortGlyphs(viewModel);
         viewModel.ConfigureDataGrid(DgTableView);
         ApplyDataGridRowStyle(DgTableView, viewModel);

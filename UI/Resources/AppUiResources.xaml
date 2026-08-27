@@ -508,6 +508,7 @@
         <Setter Property="RowHeaderWidth" Value="0" />
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
         <Setter Property="uiHelpers:DataGridHorizontalScrollHelper.IsEnabled" Value="True" />
+        <Setter Property="uiHelpers:DataGridHeaderFitHelper.IsEnabled" Value="True" />
         <Setter Property="TextColumnElementStyle" Value="{StaticResource SwimDocDataGridTextColumnElementStyle}" />
         <Setter Property="TextColumnEditingElementStyle" Value="{StaticResource SwimDocDataGridTextColumnEditingElementStyle}" />
     </Style>

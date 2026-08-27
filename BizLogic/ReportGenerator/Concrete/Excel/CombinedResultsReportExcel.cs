@@ -15,24 +15,27 @@ public static class CombinedResultsReportExcel
         const int colParticipant = 2;
         const int colBirthYear = 3;
         const int colTeam = 4;
+        const int colTotal = 5;
         worksheet.Cells.Style.Font.Name = "Calibri";
         worksheet.Cells.Style.Font.Size = 11;
         worksheet.Column(colPlace).Width = 5;
         worksheet.Column(colParticipant).Width = 30;
         worksheet.Column(colBirthYear).Width = 10;
         worksheet.Column(colTeam).Width = 30;
+        worksheet.Column(colTotal).Width = 10;
         worksheet.Column(colPlace).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
         worksheet.Column(colBirthYear).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+        worksheet.Column(colTotal).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
         var row = 1;
         foreach (var (ageGroupTitle, data) in sections)
         {
             if (row > 1)
                 row += 1;
             var eventColumnCount = data.EventColumns.Count;
-            var tableLastCol = colTeam + eventColumnCount + 1;
-            for (var columnIndex = colTeam + 1; columnIndex <= tableLastCol; columnIndex++)
+            var tableLastCol = colTotal + eventColumnCount;
+            for (var columnIndex = colTotal + 1; columnIndex <= tableLastCol; columnIndex++)
             {
-                worksheet.Column(columnIndex).Width = columnIndex == tableLastCol ? 10 : 12;
+                worksheet.Column(columnIndex).Width = 12;
                 worksheet.Column(columnIndex).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             }
             var titleRange = worksheet.Cells[row, colPlace, row, tableLastCol];
@@ -45,10 +48,10 @@ public static class CombinedResultsReportExcel
             worksheet.Cells[row, colParticipant].Value = ReportExcelStrings.Col_Participant;
             worksheet.Cells[row, colBirthYear].Value = ReportExcelStrings.Col_BirthYear;
             worksheet.Cells[row, colTeam].Value = ReportExcelStrings.Col_Team;
-            var eventColumnOffset = colTeam;
+            worksheet.Cells[row, colTotal].Value = ReportExcelStrings.Col_Total;
+            var eventColumnOffset = colTotal;
             foreach (var eventColumn in data.EventColumns)
                 worksheet.Cells[row, ++eventColumnOffset].Value = eventColumn.Header;
-            worksheet.Cells[row, tableLastCol].Value = ReportExcelStrings.Col_Total;
             var headerRange = worksheet.Cells[row, colPlace, row, tableLastCol];
             headerRange.Style.Font.Bold = true;
             headerRange.Style.Border.Top.Style = ExcelBorderStyle.Thin;
@@ -58,14 +61,6 @@ public static class CombinedResultsReportExcel
             headerRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             headerRange.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
             headerRange.Style.WrapText = true;
-            eventColumnOffset = colTeam;
-            foreach (var eventColumn in data.EventColumns)
-            {
-                if (!eventColumn.HasScoringEntries)
-                    ReportExcelScoringHelper.ApplyNonScoringFill(worksheet.Cells[row, ++eventColumnOffset]);
-                else
-                    eventColumnOffset++;
-            }
             row += 1;
             foreach (var athleteRow in data.Athletes)
             {
@@ -74,7 +69,8 @@ public static class CombinedResultsReportExcel
                 worksheet.Cells[row, colParticipant].Value = athleteRow.ParticipantName;
                 worksheet.Cells[row, colBirthYear].Value = athleteRow.YearOfBirth;
                 worksheet.Cells[row, colTeam].Value = athleteRow.ClubName;
-                eventColumnOffset = colTeam;
+                worksheet.Cells[row, colTotal].Value = athleteRow.TotalPoints;
+                eventColumnOffset = colTotal;
                 foreach (var eventColumn in data.EventColumns)
                 {
                     var cell = worksheet.Cells[row, ++eventColumnOffset];
@@ -82,7 +78,6 @@ public static class CombinedResultsReportExcel
                     if (IsNonScoringSwimStyle(athleteRow, eventColumn.SwimStyleId))
                         ReportExcelScoringHelper.ApplyNonScoringFill(cell);
                 }
-                worksheet.Cells[row, tableLastCol].Value = athleteRow.TotalPoints;
                 var dataRange = worksheet.Cells[row, colPlace, row, tableLastCol];
                 dataRange.Style.Border.Top.Style = ExcelBorderStyle.Thin;
                 dataRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;

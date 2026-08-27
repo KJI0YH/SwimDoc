@@ -67,6 +67,7 @@ public sealed class ReportExportService(EfCoreContext dbContext, IEntryService e
             .ToList();
         return new CombinedResultsReportData(
             data.EventColumns
+                .Where(column => column.HasScoringEntries)
                 .Select(column => new CombinedResultsReportEventColumn(
                     column.SwimStyleId,
                     column.Header,

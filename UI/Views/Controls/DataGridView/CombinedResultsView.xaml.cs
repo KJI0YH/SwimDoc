@@ -68,6 +68,7 @@ public partial class CombinedResultsView : UserControl
         _grid.Columns.Add(CreateTextColumn(Strings.Fixation_Col_BirthYear, nameof(CombinedResultRow.YearOfBirth), 120));
         _grid.Columns.Add(CreateTextColumn(Strings.Athletes_Col_Category, nameof(CombinedResultRow.Category), 100));
         _grid.Columns.Add(CreateTextColumn(Strings.Results_Col_Team, nameof(CombinedResultRow.ClubName), 180));
+        _grid.Columns.Add(CreateTextColumn(Strings.Results_Col_Total, nameof(CombinedResultRow.TotalPoints), 90));
         foreach (var column in viewModel.EventColumns)
         {
             _grid.Columns.Add(new DataGridTextColumn
@@ -81,7 +82,7 @@ public partial class CombinedResultsView : UserControl
                 CellStyle = CreateNonScoringCellStyle(column.SwimStyleId)
             });
         }
-        _grid.Columns.Add(CreateTextColumn(Strings.Results_Col_Total, nameof(CombinedResultRow.TotalPoints), 90));
+        DataGridHeaderFitHelper.FitHeaders(_grid);
     }
 
     private static Style CreateNonScoringCellStyle(int eventId)

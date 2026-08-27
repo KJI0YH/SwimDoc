@@ -87,6 +87,7 @@ public partial class CombinedResultsViewModel : ViewModelBase
         await YieldToBackgroundAsync();
         var data = await EntryService.GetCombinedResultsByAgeGroupAsync(ageGroupId).ConfigureAwait(false);
         var columns = data.EventColumns
+            .Where(column => column.HasScoringEntries)
             .Select(column => new CombinedResultsEventColumnView(column.SwimStyleId, column.Header))
             .ToList();
         var rows = BuildRows(data.Athletes);
@@ -130,6 +131,7 @@ public partial class CombinedResultsViewModel : ViewModelBase
             EntityDisplayFormatter.FormatAthleteCategory(athlete),
             EntityDisplayFormatter.FormatAthleteClubName(athlete),
             athleteRow.TotalPoints,
+            athleteRow.IsInOfficialStandings,
             athleteRow.PointsBySwimStyleId,
             athleteRow.ScoringBySwimStyleId);
     }

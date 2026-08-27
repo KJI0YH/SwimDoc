@@ -10,6 +10,7 @@ public sealed class CombinedResultRow
         string category,
         string clubName,
         int totalPoints,
+        bool isInOfficialStandings,
         IReadOnlyDictionary<int, string> pointsBySwimStyleId,
         IReadOnlyDictionary<int, bool> scoringBySwimStyleId)
     {
@@ -20,11 +21,13 @@ public sealed class CombinedResultRow
         Category = category;
         ClubName = clubName;
         TotalPoints = totalPoints;
+        IsInOfficialStandings = isInOfficialStandings;
         _pointsBySwimStyleId = new Dictionary<int, string>(pointsBySwimStyleId);
         _scoringBySwimStyleId = new Dictionary<int, bool>(scoringBySwimStyleId);
     }
 
     public int? Place { get; }
+    public int? RankingPlace => IsInOfficialStandings ? Place : null;
     public string PlaceDisplay => Place?.ToString() ?? string.Empty;
     public int AthleteId { get; }
     public string ParticipantName { get; }
@@ -32,6 +35,7 @@ public sealed class CombinedResultRow
     public string Category { get; }
     public string ClubName { get; }
     public int TotalPoints { get; }
+    public bool IsInOfficialStandings { get; }
     private readonly Dictionary<int, string> _pointsBySwimStyleId;
     private readonly Dictionary<int, bool> _scoringBySwimStyleId;
     public string this[int swimStyleId] =>
