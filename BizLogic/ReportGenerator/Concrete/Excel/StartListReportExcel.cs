@@ -3,7 +3,6 @@ using DataLayer.Display;
 using DataLayer.EfCore;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
-using System.Drawing;
 using System.Globalization;
 using BizLogic.Helpers;
 using BizLogic.Resources;
@@ -25,18 +24,21 @@ public class StartListReportExcel(EfCoreContext dbContext) : BaseReportExcel(dbC
         const int colLane = 1;
         const int colParticipant = 2;
         const int colBirthYear = 3;
-        const int colTeam = 4;
-        const int colEntryTime = 5;
+        const int colCategory = 4;
+        const int colTeam = 5;
+        const int colEntryTime = 6;
         const int tableLastCol = colEntryTime;
         worksheet.Cells.Style.Font.Name = "Calibri";
         worksheet.Cells.Style.Font.Size = 11;
         worksheet.Column(colLane).Width = 10;
         worksheet.Column(colParticipant).Width = 30;
         worksheet.Column(colBirthYear).Width = 10;
+        worksheet.Column(colCategory).Width = 12;
         worksheet.Column(colTeam).Width = 30;
         worksheet.Column(colEntryTime).Width = 10;
         worksheet.Column(colLane).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
         worksheet.Column(colBirthYear).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+        worksheet.Column(colCategory).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
         worksheet.Column(colEntryTime).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
         var row = 1;
         foreach (var swimEvent in swimEvents)
@@ -53,6 +55,7 @@ public class StartListReportExcel(EfCoreContext dbContext) : BaseReportExcel(dbC
             worksheet.Cells[row, colLane].Value = ReportExcelStrings.Col_Lane;
             worksheet.Cells[row, colParticipant].Value = ReportExcelStrings.Col_Participant;
             worksheet.Cells[row, colBirthYear].Value = ReportExcelStrings.Col_BirthYear;
+            worksheet.Cells[row, colCategory].Value = ReportExcelStrings.Col_Category;
             worksheet.Cells[row, colTeam].Value = ReportExcelStrings.Col_Team;
             worksheet.Cells[row, colEntryTime].Value = ReportExcelStrings.Col_Time;
             var headerRange = worksheet.Cells[row, colLane, row, tableLastCol];
@@ -74,13 +77,22 @@ public class StartListReportExcel(EfCoreContext dbContext) : BaseReportExcel(dbC
                     continue;
                 var heatTitleRange = worksheet.Cells[row, colLane, row, tableLastCol];
                 heatTitleRange.Merge = true;
-                heatTitleRange.Value = string.Format(
-                    CultureInfo.CurrentUICulture,
-                    ReportExcelStrings.HeatTitle_Format,
-                    heat.Number,
-                    swimEvent.Heats.Count,
-                    heat.Order,
-                    heatsCount);
+                heatTitleRange.Value = StartTimeDisplay.IsSet(heat.DayTime)
+                    ? string.Format(
+                        CultureInfo.CurrentUICulture,
+                        ReportExcelStrings.HeatTitle_WithStart_Format,
+                        heat.Number,
+                        swimEvent.Heats.Count,
+                        heat.Order,
+                        heatsCount,
+                        StartTimeDisplay.Format(heat.DayTime))
+                    : string.Format(
+                        CultureInfo.CurrentUICulture,
+                        ReportExcelStrings.HeatTitle_Format,
+                        heat.Number,
+                        swimEvent.Heats.Count,
+                        heat.Order,
+                        heatsCount);
                 heatTitleRange.Style.Font.Bold = true;
                 heatTitleRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 row += 1;
@@ -92,6 +104,7 @@ public class StartListReportExcel(EfCoreContext dbContext) : BaseReportExcel(dbC
                         SwimEventLaneNames.GetLaneDisplay(swimEvent, position.Lane);
                     worksheet.Cells[row, colParticipant].Value = LocalizedEntityDisplayFormatter.FormatEntryParticipantName(entry);
                     worksheet.Cells[row, colBirthYear].Value = LocalizedEntityDisplayFormatter.FormatEntryParticipantBirthYear(entry);
+                    worksheet.Cells[row, colCategory].Value = LocalizedEntityDisplayFormatter.FormatEntryParticipantCategory(entry);
                     worksheet.Cells[row, colTeam].Value = LocalizedEntityDisplayFormatter.FormatEntryParticipantClubName(entry);
                     worksheet.Cells[row, colEntryTime].Value = EntryTimeDisplay.FormatEntryTime(entry.EntryTime);
                     var dataRange = worksheet.Cells[row, colLane, row, tableLastCol];

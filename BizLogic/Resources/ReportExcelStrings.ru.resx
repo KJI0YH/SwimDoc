@@ -22,6 +22,7 @@
   <data name="Col_Lane" xml:space="preserve"><value>Дорожка</value></data>
   <data name="Col_Participant" xml:space="preserve"><value>Участник</value></data>
   <data name="Col_BirthYear" xml:space="preserve"><value>Год рождения</value></data>
+  <data name="Col_Category" xml:space="preserve"><value>Разряд</value></data>
   <data name="Col_Team" xml:space="preserve"><value>Команда</value></data>
   <data name="Col_Time" xml:space="preserve"><value>Время</value></data>
   <data name="Col_Points" xml:space="preserve"><value>Очки</value></data>
@@ -31,6 +32,7 @@
   <data name="Value_PersonalParen" xml:space="preserve"><value>(Лично)</value></data>
 
   <data name="HeatTitle_Format" xml:space="preserve"><value>Заплыв {0} из {1} ({2} из {3})</value></data>
+  <data name="HeatTitle_WithStart_Format" xml:space="preserve"><value>Заплыв {0} из {1} ({2} из {3}), старт {4}</value></data>
   <data name="Col_Comment" xml:space="preserve">
     <value>Примечание</value>
   </data>

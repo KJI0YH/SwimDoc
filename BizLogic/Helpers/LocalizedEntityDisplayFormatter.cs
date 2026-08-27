@@ -28,6 +28,9 @@ public static class LocalizedEntityDisplayFormatter
     public static string FormatEntryParticipantBirthYear(Entry entry) =>
         EntityDisplay.FormatEntryParticipantBirthYear(entry, Texts);
 
+    public static string FormatEntryParticipantCategory(Entry entry) =>
+        EntityDisplay.FormatEntryParticipantCategory(entry, Texts);
+
     public static string FormatEntryParticipantClubName(Entry entry) =>
         EntityDisplay.FormatEntryParticipantClubName(entry, Texts);
 }

@@ -22,6 +22,7 @@
   <data name="Col_Lane" xml:space="preserve"><value>Lane</value></data>
   <data name="Col_Participant" xml:space="preserve"><value>Participant</value></data>
   <data name="Col_BirthYear" xml:space="preserve"><value>Birth year</value></data>
+  <data name="Col_Category" xml:space="preserve"><value>Category</value></data>
   <data name="Col_Team" xml:space="preserve"><value>Club</value></data>
   <data name="Col_Time" xml:space="preserve"><value>Time</value></data>
   <data name="Col_Points" xml:space="preserve"><value>Points</value></data>
@@ -31,6 +32,7 @@
   <data name="Value_PersonalParen" xml:space="preserve"><value>(Personal)</value></data>
 
   <data name="HeatTitle_Format" xml:space="preserve"><value>Heat {0} of {1} ({2} of {3})</value></data>
+  <data name="HeatTitle_WithStart_Format" xml:space="preserve"><value>Heat {0} of {1} ({2} of {3}), start {4}</value></data>
   <data name="Col_Comment" xml:space="preserve">
     <value>Comment</value>
   </data>

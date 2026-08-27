@@ -20,6 +20,7 @@ public static class ReportExcelStrings
     public static string Col_Lane => Get(nameof(Col_Lane));
     public static string Col_Participant => Get(nameof(Col_Participant));
     public static string Col_BirthYear => Get(nameof(Col_BirthYear));
+    public static string Col_Category => Get(nameof(Col_Category));
     public static string Col_Team => Get(nameof(Col_Team));
     public static string Col_Time => Get(nameof(Col_Time));
     public static string Col_Points => Get(nameof(Col_Points));
@@ -28,4 +29,5 @@ public static class ReportExcelStrings
     public static string Value_NoneParen => Get(nameof(Value_NoneParen));
     public static string Value_PersonalParen => Get(nameof(Value_PersonalParen));
     public static string HeatTitle_Format => Get(nameof(HeatTitle_Format));
+    public static string HeatTitle_WithStart_Format => Get(nameof(HeatTitle_WithStart_Format));
 }

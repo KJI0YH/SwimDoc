@@ -88,6 +88,17 @@ public static class EntityDisplay
         return string.Empty;
     }
 
+    public static string FormatEntryParticipantCategory(Entry? entry, IEntityDisplayTexts texts)
+    {
+        if (entry is null)
+            return string.Empty;
+        if (entry.Athlete is not null)
+            return texts.GetEnumDisplay(entry.Athlete.Category);
+        if (entry.Relay is not null)
+            return FormatRelayCategories(entry.Relay, texts);
+        return string.Empty;
+    }
+
     public static string FormatEntryTime(Entry? entry) =>
         entry is null ? string.Empty : EntryTimeDisplay.FormatEntryTime(entry.EntryTime);
 
@@ -172,6 +183,17 @@ public static class EntityDisplay
             .Select(year => year!.Value.ToString(texts.Culture))
             .ToList() ?? [];
         return years.Count == 0 ? string.Empty : string.Join(", ", years);
+    }
+
+    private static string FormatRelayCategories(Relay relay, IEntityDisplayTexts texts)
+    {
+        var categories = relay.Positions?
+            .OrderBy(p => p.Order)
+            .Select(p => p.Athlete)
+            .Where(athlete => athlete is not null)
+            .Select(athlete => texts.GetEnumDisplay(athlete!.Category))
+            .ToList() ?? [];
+        return categories.Count == 0 ? string.Empty : string.Join(", ", categories);
     }
 
     private static string FormatAgeGroupYearRange(AgeGroup ageGroup, IEntityDisplayTexts texts)
