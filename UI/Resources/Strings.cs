@@ -159,7 +159,14 @@ public static class Strings
     public static string Filters_Distance => Get(nameof(Filters_Distance));
     public static string Filters_Stroke => Get(nameof(Filters_Stroke));
     public static string Filters_Gender => Get(nameof(Filters_Gender));
+    public static string Filters_AgeGroup => Get(nameof(Filters_AgeGroup));
     public static string Filters_Status => Get(nameof(Filters_Status));
+    public static string Filters_Scoring => Get(nameof(Filters_Scoring));
+    public static string Filters_Personal => Get(nameof(Filters_Personal));
+    public static string Filters_Category => Get(nameof(Filters_Category));
+    public static string Filters_Club => Get(nameof(Filters_Club));
+    public static string Filters_BirthYearFrom => Get(nameof(Filters_BirthYearFrom));
+    public static string Filters_BirthYearTo => Get(nameof(Filters_BirthYearTo));
     public static string Entries_ImportFromFile => Get(nameof(Entries_ImportFromFile));
     public static string Entries_ImportFromPrevEvent => Get(nameof(Entries_ImportFromPrevEvent));
     public static string Entries_Col_Distance => Get(nameof(Entries_Col_Distance));

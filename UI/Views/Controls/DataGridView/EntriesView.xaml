@@ -54,10 +54,24 @@
                             Margin="5,0,5,5" />
 
                         <eventFilterComboBox:EventFilterComboBox
+                            ItemsSource="{Binding AgeGroupFilterOptions}"
+                            DisplayText="{Binding AgeGroupFilterText}"
+                            ItemTemplate="{StaticResource EventFilterOptionTemplate}"
+                            FilterWidth="{StaticResource SwimDocFilterAgeGroupWidth}"
+                            Margin="5,0,5,5" />
+
+                        <eventFilterComboBox:EventFilterComboBox
                             ItemsSource="{Binding StatusFilterOptions}"
                             DisplayText="{Binding StatusFilterText}"
                             ItemTemplate="{StaticResource EventFilterOptionTemplate}"
                             FilterWidth="{StaticResource SwimDocFilterStatusWidth}"
+                            Margin="5,0,5,5" />
+
+                        <eventFilterComboBox:EventFilterComboBox
+                            ItemsSource="{Binding ScoringFilterOptions}"
+                            DisplayText="{Binding ScoringFilterText}"
+                            ItemTemplate="{StaticResource EventFilterOptionTemplate}"
+                            FilterWidth="{StaticResource SwimDocFilterScoringWidth}"
                             Margin="5,0,5,5" />
 
                         <Button

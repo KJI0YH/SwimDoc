@@ -161,7 +161,14 @@
   <data name="Filters_Distance" xml:space="preserve"><value>Дистанция</value></data>
   <data name="Filters_Stroke" xml:space="preserve"><value>Стиль</value></data>
   <data name="Filters_Gender" xml:space="preserve"><value>Пол</value></data>
+  <data name="Filters_AgeGroup" xml:space="preserve"><value>Возрастная группа</value></data>
   <data name="Filters_Status" xml:space="preserve"><value>Статус</value></data>
+  <data name="Filters_Scoring" xml:space="preserve"><value>Зачёт</value></data>
+  <data name="Filters_Personal" xml:space="preserve"><value>Лично</value></data>
+  <data name="Filters_Category" xml:space="preserve"><value>Разряд</value></data>
+  <data name="Filters_Club" xml:space="preserve"><value>Команда</value></data>
+  <data name="Filters_BirthYearFrom" xml:space="preserve"><value>Год рождения от</value></data>
+  <data name="Filters_BirthYearTo" xml:space="preserve"><value>Год рождения до</value></data>
   <data name="Entries_ImportFromFile" xml:space="preserve"><value>Загрузить заявки из файла</value></data>
   <data name="Entries_ImportFromPrevEvent" xml:space="preserve"><value>Загрузить заявки из предыдущего события</value></data>
 

@@ -161,7 +161,14 @@
   <data name="Filters_Distance" xml:space="preserve"><value>Distance</value></data>
   <data name="Filters_Stroke" xml:space="preserve"><value>Stroke</value></data>
   <data name="Filters_Gender" xml:space="preserve"><value>Gender</value></data>
+  <data name="Filters_AgeGroup" xml:space="preserve"><value>Age group</value></data>
   <data name="Filters_Status" xml:space="preserve"><value>Status</value></data>
+  <data name="Filters_Scoring" xml:space="preserve"><value>Scoring</value></data>
+  <data name="Filters_Personal" xml:space="preserve"><value>Personal</value></data>
+  <data name="Filters_Category" xml:space="preserve"><value>Category</value></data>
+  <data name="Filters_Club" xml:space="preserve"><value>Club</value></data>
+  <data name="Filters_BirthYearFrom" xml:space="preserve"><value>Birth year from</value></data>
+  <data name="Filters_BirthYearTo" xml:space="preserve"><value>Birth year to</value></data>
   <data name="Entries_ImportFromFile" xml:space="preserve"><value>Import entries from file</value></data>
   <data name="Entries_ImportFromPrevEvent" xml:space="preserve"><value>Import entries from previous event</value></data>
 

@@ -26,7 +26,12 @@
     <system:Double x:Key="SwimDocFilterDistanceWidth">168</system:Double>
     <system:Double x:Key="SwimDocFilterStrokeWidth">168</system:Double>
     <system:Double x:Key="SwimDocFilterGenderWidth">120</system:Double>
+    <system:Double x:Key="SwimDocFilterAgeGroupWidth">240</system:Double>
     <system:Double x:Key="SwimDocFilterStatusWidth">172</system:Double>
+    <system:Double x:Key="SwimDocFilterScoringWidth">140</system:Double>
+    <system:Double x:Key="SwimDocFilterCategoryWidth">160</system:Double>
+    <system:Double x:Key="SwimDocFilterClubWidth">220</system:Double>
+    <system:Double x:Key="SwimDocFilterBirthYearWidth">210</system:Double>
     <system:Double x:Key="SwimDocSwimEventComboBoxWidth">500</system:Double>
     <system:Double x:Key="SwimDocHeatNumberComboBoxWidth">96</system:Double>
     <system:Double x:Key="SwimDocAgeGroupComboBoxWidth">500</system:Double>

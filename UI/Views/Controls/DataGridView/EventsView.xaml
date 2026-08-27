@@ -59,6 +59,12 @@
                         FilterWidth="{StaticResource SwimDocFilterGenderWidth}"
                         Margin="5,0,5,5" />
 
+                    <eventFilterComboBox:EventFilterComboBox
+                        ItemsSource="{Binding AgeGroupFilterOptions}"
+                        DisplayText="{Binding AgeGroupFilterText}"
+                        ItemTemplate="{StaticResource EventFilterOptionTemplate}"
+                        FilterWidth="{StaticResource SwimDocFilterAgeGroupWidth}"
+                        Margin="5,0,5,5" />
 
                     <eventFilterComboBox:EventFilterComboBox
                         ItemsSource="{Binding StatusFilterOptions}"

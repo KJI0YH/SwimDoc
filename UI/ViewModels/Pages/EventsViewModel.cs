@@ -9,6 +9,7 @@ using DataLayer;
 using DataLayer.EfClasses;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using ServiceLayer.AgeGroupService;
 using ServiceLayer.EventService;
 using ServiceLayer.HeatService;
 using ServiceLayer.Logging;
@@ -40,6 +41,7 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView
     [ObservableProperty] private ObservableCollection<EventFilterOption<int>> _distanceFilterOptions = new();
     [ObservableProperty] private ObservableCollection<EventFilterOption<Stroke>> _strokeFilterOptions = new();
     [ObservableProperty] private ObservableCollection<EventFilterOption<Gender>> _genderFilterOptions = new();
+    [ObservableProperty] private ObservableCollection<EventFilterOption<int>> _ageGroupFilterOptions = new();
     [ObservableProperty] private ObservableCollection<EventFilterOption<SwimEventStatus>> _statusFilterOptions = new();
     [ObservableProperty] private ObservableCollection<EventFilterOption<EventRound>> _roundFilterOptions = new();
     [ObservableProperty] private bool _isFiltersPanelVisible;
@@ -47,6 +49,7 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView
     public string DistanceFilterText => GetFilterText(DistanceFilterOptions, Strings.Filters_Distance);
     public string StrokeFilterText => GetFilterText(StrokeFilterOptions, Strings.Filters_Stroke);
     public string GenderFilterText => GetFilterText(GenderFilterOptions, Strings.Filters_Gender);
+    public string AgeGroupFilterText => GetFilterText(AgeGroupFilterOptions, Strings.Filters_AgeGroup);
     public string StatusFilterText => GetFilterText(StatusFilterOptions, Strings.Filters_Status);
     public string RoundFilterText => GetFilterText(RoundFilterOptions, Strings.Filters_Round);
     private bool _filterOptionsInitialized;
@@ -90,8 +93,32 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView
         OnPropertyChanged(nameof(DateFilterText));
         OnPropertyChanged(nameof(StrokeFilterText));
         OnPropertyChanged(nameof(GenderFilterText));
+        OnPropertyChanged(nameof(AgeGroupFilterText));
         OnPropertyChanged(nameof(StatusFilterText));
         OnPropertyChanged(nameof(RoundFilterText));
+        _ = RefreshAgeGroupFilterDisplayTextsAsync();
+    }
+
+    private async Task RefreshAgeGroupFilterDisplayTextsAsync()
+    {
+        if (AgeGroupFilterOptions.Count == 0)
+            return;
+        var ageGroupService = App.Current.Services.GetRequiredService<IAgeGroupService>();
+        var ageGroups = await ageGroupService.Query()
+            .ToListAsync()
+            .ConfigureAwait(false);
+        var displayById = ageGroups.ToDictionary(
+            ageGroup => ageGroup.Id,
+            EntityDisplayFormatter.FormatAgeGroup);
+        await DispatcherUiHelper.InvokeOnUiAsync(() =>
+        {
+            foreach (var option in AgeGroupFilterOptions)
+            {
+                if (displayById.TryGetValue(option.Value, out var displayText))
+                    option.DisplayText = displayText;
+            }
+            OnPropertyChanged(nameof(AgeGroupFilterText));
+        });
     }
 
     private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -173,6 +200,10 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView
         var genders = GenderFilterOptions.Where(option => option.IsSelected).Select(option => option.Value).ToArray();
         if (genders.Length > 0)
             query = query.Where(e => genders.Contains(e.AgeGroup.Gender));
+        var ageGroupIds = AgeGroupFilterOptions.Where(option => option.IsSelected).Select(option => option.Value)
+            .ToArray();
+        if (ageGroupIds.Length > 0)
+            query = query.Where(e => ageGroupIds.Contains(e.AgeGroupId));
         var statuses = StatusFilterOptions.Where(option => option.IsSelected).Select(option => option.Value).ToArray();
         if (statuses.Length > 0)
             query = query.Where(e => statuses.Contains(e.Status));
@@ -205,6 +236,13 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView
             .OrderBy(distance => distance)
             .ToListAsync()
             .ConfigureAwait(false);
+        var ageGroupService = App.Current.Services.GetRequiredService<IAgeGroupService>();
+        var ageGroups = await ageGroupService.Query()
+            .OrderBy(ageGroup => ageGroup.Name)
+            .ThenBy(ageGroup => ageGroup.Gender)
+            .ThenBy(ageGroup => ageGroup.BirthYearMin)
+            .ToListAsync()
+            .ConfigureAwait(false);
 
         await DispatcherUiHelper.InvokeOnUiAsync(() =>
         {
@@ -222,6 +260,10 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView
             GenderFilterOptions = new ObservableCollection<EventFilterOption<Gender>>(
                 Enum.GetValues<Gender>().Select(gender =>
                     new EventFilterOption<Gender>(gender, Strings.GetEnumDisplay(gender))));
+            AgeGroupFilterOptions = new ObservableCollection<EventFilterOption<int>>(
+                ageGroups.Select(ageGroup => new EventFilterOption<int>(
+                    ageGroup.Id,
+                    EntityDisplayFormatter.FormatAgeGroup(ageGroup))));
             StatusFilterOptions = new ObservableCollection<EventFilterOption<SwimEventStatus>>(
                 Enum.GetValues<SwimEventStatus>().Select(status =>
                     new EventFilterOption<SwimEventStatus>(status, Strings.GetEnumDisplay(status))));
@@ -238,6 +280,7 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView
         SubscribeFilterOptions(DistanceFilterOptions);
         SubscribeFilterOptions(StrokeFilterOptions);
         SubscribeFilterOptions(GenderFilterOptions);
+        SubscribeFilterOptions(AgeGroupFilterOptions);
         SubscribeFilterOptions(StatusFilterOptions);
         SubscribeFilterOptions(RoundFilterOptions);
     }
@@ -315,6 +358,7 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView
         OnPropertyChanged(nameof(DistanceFilterText));
         OnPropertyChanged(nameof(StrokeFilterText));
         OnPropertyChanged(nameof(GenderFilterText));
+        OnPropertyChanged(nameof(AgeGroupFilterText));
         OnPropertyChanged(nameof(StatusFilterText));
         OnPropertyChanged(nameof(RoundFilterText));
         ClearFiltersCommand.NotifyCanExecuteChanged();
@@ -331,6 +375,7 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView
         ClearFilterOptions(DistanceFilterOptions);
         ClearFilterOptions(StrokeFilterOptions);
         ClearFilterOptions(GenderFilterOptions);
+        ClearFilterOptions(AgeGroupFilterOptions);
         ClearFilterOptions(StatusFilterOptions);
         ClearFilterOptions(RoundFilterOptions);
     }
@@ -340,6 +385,7 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView
         DistanceFilterOptions.Any(option => option.IsSelected) ||
         StrokeFilterOptions.Any(option => option.IsSelected) ||
         GenderFilterOptions.Any(option => option.IsSelected) ||
+        AgeGroupFilterOptions.Any(option => option.IsSelected) ||
         StatusFilterOptions.Any(option => option.IsSelected) ||
         RoundFilterOptions.Any(option => option.IsSelected);
 

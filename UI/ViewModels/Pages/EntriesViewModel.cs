@@ -14,6 +14,7 @@ using DataLayer.EfCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
+using ServiceLayer.AgeGroupService;
 using ServiceLayer.EntryDocumentReaderService;
 using ServiceLayer.EntryService;
 using ServiceLayer.Logging;
@@ -41,13 +42,17 @@ public partial class EntriesViewModel(
     [ObservableProperty] private ObservableCollection<EventFilterOption<int>> _distanceFilterOptions = new();
     [ObservableProperty] private ObservableCollection<EventFilterOption<Stroke>> _strokeFilterOptions = new();
     [ObservableProperty] private ObservableCollection<EventFilterOption<Gender>> _genderFilterOptions = new();
+    [ObservableProperty] private ObservableCollection<EventFilterOption<int>> _ageGroupFilterOptions = new();
     [ObservableProperty] private ObservableCollection<EventFilterOption<EntryStatus>> _statusFilterOptions = new();
+    [ObservableProperty] private ObservableCollection<EventFilterOption<bool>> _scoringFilterOptions = new();
     [ObservableProperty] private bool _isFiltersPanelVisible;
     public string RoundFilterText => GetFilterText(RoundFilterOptions, Strings.Filters_Round);
     public string DistanceFilterText => GetFilterText(DistanceFilterOptions, Strings.Filters_Distance);
     public string StrokeFilterText => GetFilterText(StrokeFilterOptions, Strings.Filters_Stroke);
     public string GenderFilterText => GetFilterText(GenderFilterOptions, Strings.Filters_Gender);
+    public string AgeGroupFilterText => GetFilterText(AgeGroupFilterOptions, Strings.Filters_AgeGroup);
     public string StatusFilterText => GetFilterText(StatusFilterOptions, Strings.Filters_Status);
+    public string ScoringFilterText => GetFilterText(ScoringFilterOptions, Strings.Filters_Scoring);
     private readonly IAddEditWindowFactory _windowFactory =
         App.Current.Services.GetRequiredService<IAddEditWindowFactory>();
 
@@ -244,9 +249,16 @@ public partial class EntriesViewModel(
             query = query.Where(e =>
                 (e.SwimEvent != null && genders.Contains(e.SwimEvent.AgeGroup.Gender)) ||
                 (e.Athlete != null && genders.Contains(e.Athlete.Gender)));
+        var ageGroupIds = AgeGroupFilterOptions.Where(option => option.IsSelected).Select(option => option.Value)
+            .ToArray();
+        if (ageGroupIds.Length > 0)
+            query = query.Where(e => e.SwimEvent != null && ageGroupIds.Contains(e.SwimEvent.AgeGroupId));
         var statuses = StatusFilterOptions.Where(option => option.IsSelected).Select(option => option.Value).ToArray();
         if (statuses.Length > 0)
             query = query.Where(e => statuses.Contains(e.Status));
+        var scorings = ScoringFilterOptions.Where(option => option.IsSelected).Select(option => option.Value).ToArray();
+        if (scorings.Length > 0)
+            query = query.Where(e => scorings.Contains(e.Scoring));
         return query;
     }
 
@@ -285,10 +297,37 @@ public partial class EntriesViewModel(
             option.DisplayText = Strings.GetEnumDisplay(option.Value);
         foreach (var option in StatusFilterOptions)
             option.DisplayText = Strings.GetEnumDisplay(option.Value);
+        foreach (var option in ScoringFilterOptions)
+            option.DisplayText = option.Value ? Strings.Entry_Field_Scoring : Strings.Filters_Personal;
         OnPropertyChanged(nameof(RoundFilterText));
         OnPropertyChanged(nameof(StrokeFilterText));
         OnPropertyChanged(nameof(GenderFilterText));
+        OnPropertyChanged(nameof(AgeGroupFilterText));
         OnPropertyChanged(nameof(StatusFilterText));
+        OnPropertyChanged(nameof(ScoringFilterText));
+        _ = RefreshAgeGroupFilterDisplayTextsAsync();
+    }
+
+    private async Task RefreshAgeGroupFilterDisplayTextsAsync()
+    {
+        if (AgeGroupFilterOptions.Count == 0)
+            return;
+        var ageGroupService = App.Current.Services.GetRequiredService<IAgeGroupService>();
+        var ageGroups = await ageGroupService.Query()
+            .ToListAsync()
+            .ConfigureAwait(false);
+        var displayById = ageGroups.ToDictionary(
+            ageGroup => ageGroup.Id,
+            EntityDisplayFormatter.FormatAgeGroup);
+        await DispatcherUiHelper.InvokeOnUiAsync(() =>
+        {
+            foreach (var option in AgeGroupFilterOptions)
+            {
+                if (displayById.TryGetValue(option.Value, out var displayText))
+                    option.DisplayText = displayText;
+            }
+            OnPropertyChanged(nameof(AgeGroupFilterText));
+        });
     }
 
     protected override void ResetForNewCompetition()
@@ -309,7 +348,9 @@ public partial class EntriesViewModel(
         UnsubscribeFilterOptions(DistanceFilterOptions);
         UnsubscribeFilterOptions(StrokeFilterOptions);
         UnsubscribeFilterOptions(GenderFilterOptions);
+        UnsubscribeFilterOptions(AgeGroupFilterOptions);
         UnsubscribeFilterOptions(StatusFilterOptions);
+        UnsubscribeFilterOptions(ScoringFilterOptions);
         _filterOptionsInitialized = false;
     }
 
@@ -320,6 +361,13 @@ public partial class EntriesViewModel(
             .Select(swimStyle => swimStyle.Distance)
             .Distinct()
             .OrderBy(distance => distance)
+            .ToListAsync()
+            .ConfigureAwait(false);
+        var ageGroupService = App.Current.Services.GetRequiredService<IAgeGroupService>();
+        var ageGroups = await ageGroupService.Query()
+            .OrderBy(ageGroup => ageGroup.Name)
+            .ThenBy(ageGroup => ageGroup.Gender)
+            .ThenBy(ageGroup => ageGroup.BirthYearMin)
             .ToListAsync()
             .ConfigureAwait(false);
 
@@ -338,9 +386,18 @@ public partial class EntriesViewModel(
             GenderFilterOptions = new ObservableCollection<EventFilterOption<Gender>>(
                 Enum.GetValues<Gender>().Select(gender =>
                     new EventFilterOption<Gender>(gender, Strings.GetEnumDisplay(gender))));
+            AgeGroupFilterOptions = new ObservableCollection<EventFilterOption<int>>(
+                ageGroups.Select(ageGroup => new EventFilterOption<int>(
+                    ageGroup.Id,
+                    EntityDisplayFormatter.FormatAgeGroup(ageGroup))));
             StatusFilterOptions = new ObservableCollection<EventFilterOption<EntryStatus>>(
                 Enum.GetValues<EntryStatus>().Select(status =>
                     new EventFilterOption<EntryStatus>(status, Strings.GetEnumDisplay(status))));
+            ScoringFilterOptions = new ObservableCollection<EventFilterOption<bool>>(
+            [
+                new EventFilterOption<bool>(true, Strings.Entry_Field_Scoring),
+                new EventFilterOption<bool>(false, Strings.Filters_Personal)
+            ]);
             SubscribeFilterOptions();
         });
     }
@@ -351,7 +408,9 @@ public partial class EntriesViewModel(
         SubscribeFilterOptions(DistanceFilterOptions);
         SubscribeFilterOptions(StrokeFilterOptions);
         SubscribeFilterOptions(GenderFilterOptions);
+        SubscribeFilterOptions(AgeGroupFilterOptions);
         SubscribeFilterOptions(StatusFilterOptions);
+        SubscribeFilterOptions(ScoringFilterOptions);
     }
 
     private void SubscribeFilterOptions<T>(IEnumerable<EventFilterOption<T>> options)
@@ -374,7 +433,9 @@ public partial class EntriesViewModel(
         OnPropertyChanged(nameof(DistanceFilterText));
         OnPropertyChanged(nameof(StrokeFilterText));
         OnPropertyChanged(nameof(GenderFilterText));
+        OnPropertyChanged(nameof(AgeGroupFilterText));
         OnPropertyChanged(nameof(StatusFilterText));
+        OnPropertyChanged(nameof(ScoringFilterText));
         ClearFiltersCommand.NotifyCanExecuteChanged();
         ReloadFromFirstPage();
     }
@@ -389,7 +450,9 @@ public partial class EntriesViewModel(
         ClearFilterOptions(DistanceFilterOptions);
         ClearFilterOptions(StrokeFilterOptions);
         ClearFilterOptions(GenderFilterOptions);
+        ClearFilterOptions(AgeGroupFilterOptions);
         ClearFilterOptions(StatusFilterOptions);
+        ClearFilterOptions(ScoringFilterOptions);
     }
 
     private bool HasActiveFilters() =>
@@ -397,7 +460,9 @@ public partial class EntriesViewModel(
         DistanceFilterOptions.Any(option => option.IsSelected) ||
         StrokeFilterOptions.Any(option => option.IsSelected) ||
         GenderFilterOptions.Any(option => option.IsSelected) ||
-        StatusFilterOptions.Any(option => option.IsSelected);
+        AgeGroupFilterOptions.Any(option => option.IsSelected) ||
+        StatusFilterOptions.Any(option => option.IsSelected) ||
+        ScoringFilterOptions.Any(option => option.IsSelected);
 
     private static void ClearFilterOptions<T>(IEnumerable<EventFilterOption<T>> options)
     {
