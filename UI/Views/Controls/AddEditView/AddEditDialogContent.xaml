@@ -39,16 +39,17 @@
                                Symbol="ErrorCircle24"
                                Foreground="{DynamicResource SystemFillColorCriticalBrush}"
                                Margin="0,0,10,0"
-                               VerticalAlignment="Top" />
+                               VerticalAlignment="Center" />
                 <ItemsControl Grid.Column="1"
                               HorizontalAlignment="Stretch"
+                              VerticalAlignment="Center"
                               ItemsSource="{Binding ValidationErrors}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Foreground="{DynamicResource SystemFillColorCriticalBrush}"
                                        Text="{Binding}"
                                        TextWrapping="Wrap"
-                                       Margin="0,1" />
+                                       VerticalAlignment="Center" />
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>

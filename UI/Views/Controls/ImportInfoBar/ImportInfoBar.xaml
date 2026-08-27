@@ -203,8 +203,11 @@
                                                     <StackPanel Orientation="Horizontal">
                                                         <ContentControl Content="{ui:SymbolIcon Warning24}"
                                                                         Foreground="#D97706"
-                                                                        Margin="0,0,6,0" />
+                                                                        Margin="0,0,6,0"
+                                                                        VerticalAlignment="Center"
+                                                                        VerticalContentAlignment="Center" />
                                                         <TextBlock Foreground="#D97706"
+                                                                   VerticalAlignment="Center"
                                                                    Text="{Binding WarningsCount, Converter={StaticResource LocFormat}, ConverterParameter=Import_WarningsFormat}" />
                                                     </StackPanel>
                                                 </GroupBox.Header>
@@ -234,8 +237,11 @@
                                                     <StackPanel Orientation="Horizontal">
                                                         <ContentControl Content="{ui:SymbolIcon ErrorCircle24}"
                                                                         Foreground="#B91C1C"
-                                                                        Margin="0,0,6,0" />
+                                                                        Margin="0,0,6,0"
+                                                                        VerticalAlignment="Center"
+                                                                        VerticalContentAlignment="Center" />
                                                         <TextBlock Foreground="#B91C1C"
+                                                                   VerticalAlignment="Center"
                                                                    Text="{Binding ErrorsCount, Converter={StaticResource LocFormat}, ConverterParameter=Import_ErrorsFormat}" />
                                                     </StackPanel>
                                                 </GroupBox.Header>
@@ -346,8 +352,11 @@
                             <StackPanel Orientation="Horizontal">
                                 <ContentControl Content="{ui:SymbolIcon ErrorCircle24}"
                                                 Foreground="#B91C1C"
-                                                Margin="0,0,6,0" />
+                                                Margin="0,0,6,0"
+                                                VerticalAlignment="Center"
+                                                VerticalContentAlignment="Center" />
                                 <TextBlock Foreground="#B91C1C"
+                                           VerticalAlignment="Center"
                                            Text="{Binding EventImportErrors.Count, Converter={StaticResource LocFormat}, ConverterParameter=Import_ErrorsFormat}" />
                             </StackPanel>
                         </GroupBox.Header>
