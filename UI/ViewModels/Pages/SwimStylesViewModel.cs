@@ -28,9 +28,9 @@ public class SwimStylesViewModel : DataViewModel<SwimStyle, SwimStyleRowView, in
         ColumnConfigurations.Add(new ColumnConfiguration<SwimStyle>("DisplayName", Strings.SwimStyles_Col_Name, 300,
             ColumnConfiguration<SwimStyle>.SortBy(e => e.Distance, e => e.Stroke, e => e.RelayCount)));
         ColumnConfigurations.Add(new ColumnConfiguration<SwimStyle>("Distance", Strings.SwimStyles_Col_Distance, 150,
-            ColumnConfiguration<SwimStyle>.SortBy(e => e.Distance)));
+            ColumnConfiguration<SwimStyle>.SortBy(e => e.Distance, e => e.Stroke, e => e.RelayCount)));
         ColumnConfigurations.Add(new ColumnConfiguration<SwimStyle>("Stroke", Strings.SwimStyles_Col_Stroke, 200,
-            ColumnConfiguration<SwimStyle>.SortBy(e => e.Stroke)));
+            ColumnConfiguration<SwimStyle>.SortBy(e => e.Stroke, e => e.Distance, e => e.RelayCount)));
     }
 
     protected override async Task<List<SwimStyleRowView>> LoadPageRowsAsync(
