@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -14,6 +15,9 @@ namespace UI.Views.Controls.SearchableComboBox;
 
 public partial class SearchableComboBox : UserControl
 {
+    private static readonly ConcurrentDictionary<Type, PropertyInfo?> IdPropertyCache = new();
+    private static readonly TimeSpan SearchDebounceInterval = TimeSpan.FromMilliseconds(200);
+
     public static readonly DependencyProperty ItemsSourceProperty =
         DependencyProperty.Register(nameof(ItemsSource), typeof(ObservableCollection<SearchableItem>),
             typeof(SearchableComboBox), new PropertyMetadata(null, OnItemsSourceChanged));
@@ -32,6 +36,7 @@ public partial class SearchableComboBox : UserControl
         DependencyProperty.Register(nameof(Watermark), typeof(string),
             typeof(SearchableComboBox), new PropertyMetadata(Strings.Common_SearchPlaceholder));
 
+    private readonly DispatcherTimer _searchRefreshTimer;
     private bool _isSearchActive;
     private bool _isSyncingSelection;
     private bool _isUpdatingText;
@@ -39,10 +44,14 @@ public partial class SearchableComboBox : UserControl
     private ICollectionView? _itemsView;
     private ObservableCollection<SearchableItem>? _boundItemsSource;
     private string _searchText = string.Empty;
+
     public SearchableComboBox()
     {
         InitializeComponent();
+        _searchRefreshTimer = new DispatcherTimer { Interval = SearchDebounceInterval };
+        _searchRefreshTimer.Tick += OnSearchRefreshTimerTick;
         Loaded += OnLoaded;
+        Unloaded += OnUnloaded;
     }
 
     private void OnLoaded(object sender, RoutedEventArgs e)
@@ -52,6 +61,11 @@ public partial class SearchableComboBox : UserControl
             BindItemsView(ItemsSource);
         else
             SyncComboBoxSelection();
+    }
+
+    private void OnUnloaded(object sender, RoutedEventArgs e)
+    {
+        _searchRefreshTimer.Stop();
     }
 
     public ObservableCollection<SearchableItem>? ItemsSource
@@ -100,7 +114,7 @@ public partial class SearchableComboBox : UserControl
         _itemsView = new ListCollectionView(itemsSource);
         _itemsView.Filter = FilterItem;
         ComboBoxControl.ItemsSource = _itemsView;
-        _itemsView.Refresh();
+        RefreshFilterNow();
         SyncComboBoxSelection();
     }
 
@@ -138,8 +152,11 @@ public partial class SearchableComboBox : UserControl
 
     private void OnBoundItemsSourceChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        _itemsView?.Refresh();
-        if (!_isSearchActive)
+        // ListCollectionView already applies incremental CollectionChanged updates.
+        // A full Refresh here on every Add during bulk rebuilds is O(n²) and freezes the UI.
+        if (_isSearchActive)
+            return;
+        if (e.Action is NotifyCollectionChangedAction.Reset or NotifyCollectionChangedAction.Replace)
             SyncComboBoxSelection();
     }
 
@@ -165,8 +182,8 @@ public partial class SearchableComboBox : UserControl
         if (value1 == null || value2 == null) return false;
         if (ReferenceEquals(value1, value2)) return true;
         if (value1.Equals(value2)) return true;
-        var idProperty1 = value1.GetType().GetProperty("Id", BindingFlags.Public | BindingFlags.Instance);
-        var idProperty2 = value2.GetType().GetProperty("Id", BindingFlags.Public | BindingFlags.Instance);
+        var idProperty1 = GetIdProperty(value1.GetType());
+        var idProperty2 = GetIdProperty(value2.GetType());
         if (idProperty1 != null && idProperty2 != null &&
             idProperty1.PropertyType == idProperty2.PropertyType)
         {
@@ -176,6 +193,10 @@ public partial class SearchableComboBox : UserControl
         }
         return false;
     }
+
+    private static PropertyInfo? GetIdProperty(Type type) =>
+        IdPropertyCache.GetOrAdd(type,
+            static t => t.GetProperty("Id", BindingFlags.Public | BindingFlags.Instance));
 
     private static void OnSelectedItemChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
@@ -258,12 +279,33 @@ public partial class SearchableComboBox : UserControl
         ClearComboBoxSelectionDuringSearch();
         typedText = ComboBoxControl.Text ?? _searchText;
         _searchText = typedText;
-        _itemsView.Refresh();
+        if (string.IsNullOrWhiteSpace(_searchText))
+            RefreshFilterNow();
+        else
+            ScheduleSearchRefresh();
         if (!ComboBoxControl.IsKeyboardFocusWithin)
             return;
         _isOpeningDropDownForSearch = true;
         ComboBoxControl.IsDropDownOpen = true;
         ScheduleCaretToEnd(typedText);
+    }
+
+    private void ScheduleSearchRefresh()
+    {
+        _searchRefreshTimer.Stop();
+        _searchRefreshTimer.Start();
+    }
+
+    private void OnSearchRefreshTimerTick(object? sender, EventArgs e)
+    {
+        _searchRefreshTimer.Stop();
+        _itemsView?.Refresh();
+    }
+
+    private void RefreshFilterNow()
+    {
+        _searchRefreshTimer.Stop();
+        _itemsView?.Refresh();
     }
 
     private void ClearComboBoxSelectionDuringSearch()
@@ -288,7 +330,7 @@ public partial class SearchableComboBox : UserControl
     {
         _isSearchActive = false;
         _searchText = string.Empty;
-        _itemsView?.Refresh();
+        RefreshFilterNow();
     }
 
     private void HookEditableTextBox()

@@ -11,6 +11,10 @@
                   IsEditable="True"
                   IsTextSearchEnabled="False"
                   StaysOpenOnEdit="True"
+                  MaxDropDownHeight="320"
+                  VirtualizingPanel.IsVirtualizing="True"
+                  VirtualizingPanel.VirtualizationMode="Recycling"
+                  ScrollViewer.CanContentScroll="True"
                   PreviewKeyDown="ComboBoxControl_OnPreviewKeyDown"
                   PreviewTextInput="ComboBoxControl_OnPreviewTextInput"
                   DropDownOpened="ComboBoxControl_OnDropDownOpened"
@@ -18,6 +22,12 @@
                   TextBoxBase.TextChanged="ComboBoxControl_OnTextChanged"
                   SelectionChanged="ComboBoxControl_OnSelectionChanged"
                   SelectedItem="{Binding SelectedItem, ElementName=Root, Mode=OneWay}"
-                  DisplayMemberPath="{Binding DisplayMemberPath, ElementName=Root}" />
+                  DisplayMemberPath="{Binding DisplayMemberPath, ElementName=Root}">
+            <ComboBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel />
+                </ItemsPanelTemplate>
+            </ComboBox.ItemsPanel>
+        </ComboBox>
     </Grid>
 </UserControl>

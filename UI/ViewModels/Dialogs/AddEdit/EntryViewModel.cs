@@ -8,6 +8,7 @@ using ServiceLayer.AthleteService;
 using ServiceLayer.ClubService;
 using ServiceLayer.EntryService;
 using ServiceLayer.EventService;
+using UI.Helpers.Collections;
 using UI.Resources;
 using UI.Models;
 using UI.Views.Dialogs.Markers.AddEdit;
@@ -32,7 +33,7 @@ public partial class EntryViewModel(
     private bool _relayNumberManuallySet;
     private string _relayNumberText = string.Empty;
     public bool IsInitialized => _initialized;
-    [ObservableProperty] private ObservableCollection<SearchableItem> _athletes = new();
+    [ObservableProperty] private ObservableCollection<SearchableItem> _athletes = new ResettableObservableCollection<SearchableItem>();
     private int? _contextAthleteId;
     private int? _contextClubId;
     private int? _contextEventId;
@@ -40,15 +41,15 @@ public partial class EntryViewModel(
     private string _entryTimeText = string.Empty;
     [ObservableProperty] private SearchableItem? _selectedAthlete;
     [ObservableProperty] private SearchableItem? _selectedSwimEvent;
-    [ObservableProperty] private ObservableCollection<SearchableItem> _swimEvents = new();
+    [ObservableProperty] private ObservableCollection<SearchableItem> _swimEvents = new ResettableObservableCollection<SearchableItem>();
     [ObservableProperty] private int _selectedTabIndex;
     [ObservableProperty] private bool _isIndividualTabEnabled = true;
     [ObservableProperty] private bool _isRelayTabEnabled = true;
-    [ObservableProperty] private ObservableCollection<SearchableItem> _relaySwimEvents = new();
+    [ObservableProperty] private ObservableCollection<SearchableItem> _relaySwimEvents = new ResettableObservableCollection<SearchableItem>();
     [ObservableProperty] private SearchableItem? _selectedRelaySwimEvent;
-    [ObservableProperty] private ObservableCollection<SearchableItem> _clubs = new();
+    [ObservableProperty] private ObservableCollection<SearchableItem> _clubs = new ResettableObservableCollection<SearchableItem>();
     [ObservableProperty] private SearchableItem? _selectedClub;
-    [ObservableProperty] private ObservableCollection<SearchableItem> _relayAthletes = new();
+    [ObservableProperty] private ObservableCollection<SearchableItem> _relayAthletes = new ResettableObservableCollection<SearchableItem>();
     [ObservableProperty] private ObservableCollection<RelayRowViewModel> _relayLegs = new();
     public int? RelayNumber
     {
@@ -214,8 +215,8 @@ public partial class EntryViewModel(
         IsRelayTabEnabled = true;
         await LoadAllIndividualEventsAsync();
         await LoadRelayEventsAsync();
-        LoadClubs();
-        LoadAllAthletes();
+        await LoadClubsAsync();
+        await LoadAllAthletesAsync();
         await LoadExistingIndividualEntryKeysAsync();
         _entryTimeText = SwimTimeInput.Format(Entity.EntryTime);
         OnPropertyChanged(nameof(EntryTimeText));
@@ -352,17 +353,17 @@ public partial class EntryViewModel(
         _ = TryAssignDefaultRelayNumberAsync();
     }
 
-    private void LoadAllAthletes()
+    private async Task LoadAllAthletesAsync()
     {
         var query = athleteService.Query();
         if (_contextAthleteId.HasValue)
             query = query.Where(a => a.Id == _contextAthleteId.Value);
         else if (_contextClubId.HasValue)
             query = query.Where(a => a.ClubId == _contextClubId.Value);
-        _allAthletes = query
+        _allAthletes = await query
             .OrderBy(a => a.LastName)
             .ThenBy(a => a.FirstName)
-            .ToList();
+            .ToListAsync();
     }
 
     private async Task LoadAllIndividualEventsAsync()
@@ -457,46 +458,46 @@ public partial class EntryViewModel(
 
     private void SyncAthleteItems(IEnumerable<Athlete> athletes)
     {
-        Athletes.Clear();
-        foreach (var athlete in athletes)
+        Athletes.ReplaceAll(athletes.Select(athlete => new SearchableItem
         {
-            Athletes.Add(new SearchableItem
-            {
-                Value = athlete,
-                DisplayText = EntityDisplayFormatter.FormatAthleteName(athlete)
-            });
-        }
+            Value = athlete,
+            DisplayText = EntityDisplayFormatter.FormatAthleteName(athlete)
+        }));
     }
 
     private void SyncSwimEventItems(IEnumerable<SwimEvent> swimEvents)
     {
-        SwimEvents.Clear();
-        SwimEvents.Add(new SearchableItem { Value = null, DisplayText = string.Empty });
-        foreach (var item in SearchableItem.FromSwimEvents(swimEvents))
-            SwimEvents.Add(item);
+        var items = new List<SearchableItem>
+        {
+            new() { Value = null, DisplayText = string.Empty }
+        };
+        items.AddRange(SearchableItem.FromSwimEvents(swimEvents));
+        SwimEvents.ReplaceAll(items);
     }
 
     private async Task LoadRelayEventsAsync()
     {
-        RelaySwimEvents.Clear();
         var relayEvents = await eventService.GetRelayEventsAsync();
+        IEnumerable<SearchableItem> items;
         if (_contextEventId.HasValue && relayEvents.Count != 0)
         {
             var relayEvent = relayEvents.FirstOrDefault(se => se.Id == _contextEventId.Value);
-            if (relayEvent != null)
-                RelaySwimEvents.Add(new SearchableItem { Value = relayEvent, DisplayText = EntityDisplayFormatter.FormatSwimEvent(relayEvent) });
+            items = relayEvent != null
+                ? [new SearchableItem { Value = relayEvent, DisplayText = EntityDisplayFormatter.FormatSwimEvent(relayEvent) }]
+                : [];
         }
         else if (_contextSwimStyleId.HasValue && relayEvents.Count != 0)
         {
             var relayEvent = relayEvents.FirstOrDefault(se => se.SwimStyleId == _contextSwimStyleId.Value);
-            if (relayEvent != null)
-                RelaySwimEvents.Add(new SearchableItem { Value = relayEvent, DisplayText = EntityDisplayFormatter.FormatSwimEvent(relayEvent) });
+            items = relayEvent != null
+                ? [new SearchableItem { Value = relayEvent, DisplayText = EntityDisplayFormatter.FormatSwimEvent(relayEvent) }]
+                : [];
         }
         else
         {
-            foreach (var item in SearchableItem.FromSwimEvents(relayEvents))
-                RelaySwimEvents.Add(item);
+            items = SearchableItem.FromSwimEvents(relayEvents);
         }
+        RelaySwimEvents.ReplaceAll(items);
         if (IsAdd
             && !_contextAthleteId.HasValue
             && Entity.SwimEventId == null
@@ -512,21 +513,23 @@ public partial class EntryViewModel(
         }
     }
 
-    private void LoadClubs()
+    private async Task LoadClubsAsync()
     {
-        var clubs = clubService.Query().ToList();
-        Clubs.Clear();
-        foreach (var club in clubs)
-            Clubs.Add(new SearchableItem { Value = club, DisplayText = club.Name });
+        var clubs = await clubService.Query().ToListAsync();
+        Clubs.ReplaceAll(clubs.Select(club =>
+            new SearchableItem { Value = club, DisplayText = club.Name }));
     }
 
     private async Task LoadRelayAthletesAsync()
     {
-        RelayAthletes.Clear();
-        if (SelectedClub?.Value is not Club club) return;
+        if (SelectedClub?.Value is not Club club)
+        {
+            RelayAthletes.ReplaceAll([]);
+            return;
+        }
         var athletes = await athleteService.GetAthletesByClubIdAsync(club.Id);
-        foreach (var athlete in athletes)
-            RelayAthletes.Add(new SearchableItem { Value = athlete, DisplayText = EntityDisplayFormatter.FormatAthleteName(athlete) });
+        RelayAthletes.ReplaceAll(athletes.Select(athlete =>
+            new SearchableItem { Value = athlete, DisplayText = EntityDisplayFormatter.FormatAthleteName(athlete) }));
     }
 
     private async Task LoadRelayPositionsByRelayIdAsync(int relayId)
@@ -947,13 +950,13 @@ public partial class EntryViewModel(
     }
 
     [RelayCommand]
-    private void CreateAthlete()
+    private async Task CreateAthlete()
     {
         var factory = App.Current.Services.GetRequiredService<IAddEditWindowFactory>();
         var dialog = factory.CreateAndShowAndReturn<AthleteAddEditWindow>();
         if (dialog is { DialogResult: true, DataContext: IWindowResult { Result: Athlete newAthlete } })
         {
-            LoadAllAthletes();
+            await LoadAllAthletesAsync();
             RefreshIndividualEntryOptions();
             SelectedAthlete = Athletes.FirstOrDefault(item => item.Value is Athlete a && a.Id == newAthlete.Id);
         }
@@ -1012,13 +1015,13 @@ public partial class EntryViewModel(
     }
 
     [RelayCommand]
-    private void CreateClub()
+    private async Task CreateClub()
     {
         var factory = App.Current.Services.GetRequiredService<IAddEditWindowFactory>();
         var dialog = factory.CreateAndShowAndReturn<ClubAddEditWindow>();
         if (dialog is { DialogResult: true, DataContext: IWindowResult { Result: Club newClub } })
         {
-            LoadClubs();
+            await LoadClubsAsync();
             SelectedClub = Clubs.FirstOrDefault(item => item.Value is Club c && c.Id == newClub.Id);
         }
     }

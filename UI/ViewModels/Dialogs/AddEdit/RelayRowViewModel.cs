@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using DataLayer.EfClasses;
+using UI.Helpers.Collections;
 using UI.Models;
 
 namespace UI.ViewModels.Dialogs.AddEdit;
@@ -10,7 +11,7 @@ public partial class RelayRowViewModel : ObservableObject
     private Action _onChanged;
     private string _entryTimeText = string.Empty;
     private int? _entryTime;
-    public ObservableCollection<SearchableItem> AvailableAthletes { get; } = new();
+    public ObservableCollection<SearchableItem> AvailableAthletes { get; } = new ResettableObservableCollection<SearchableItem>();
 
     public RelayRowViewModel(int order, Action onChanged)
     {
@@ -20,12 +21,8 @@ public partial class RelayRowViewModel : ObservableObject
 
     public int Order { get; }
 
-    public void SetAvailableAthletes(IEnumerable<SearchableItem> items)
-    {
-        AvailableAthletes.Clear();
-        foreach (var item in items)
-            AvailableAthletes.Add(item);
-    }
+    public void SetAvailableAthletes(IEnumerable<SearchableItem> items) =>
+        AvailableAthletes.ReplaceAll(items);
 
     public void SetSelectedAthleteSilently(SearchableItem? athlete)
     {
