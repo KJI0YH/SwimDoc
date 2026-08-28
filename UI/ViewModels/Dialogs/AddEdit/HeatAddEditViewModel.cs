@@ -182,7 +182,7 @@ public partial class HeatAddEditViewModel(
             return;
         }
         var filledRows = PositionRows
-            .Where(row => row.SelectedEntry?.Value is Entry)
+            .Where(row => row.EntryId > 0)
             .ToList();
         if (filledRows.Count > MaxPositionCount)
         {
@@ -198,7 +198,7 @@ public partial class HeatAddEditViewModel(
             {
                 HeatId = _entity.Id,
                 Lane = row.Lane,
-                EntryId = ((Entry)row.SelectedEntry!.Value!).Id
+                EntryId = row.EntryId
             })
             .ToList();
         var (savedHeat, errors) = await heatService.SaveHeatWithPositionsAsync(_entity, _isAdd);
@@ -355,14 +355,11 @@ public partial class HeatAddEditViewModel(
                     .Where(other => other != row && other.EntryId > 0)
                     .Select(other => other.EntryId)
                     .ToHashSet();
-                row.AvailableEntries.Clear();
-                foreach (var item in _allEntryItems)
-                {
-                    if (item.Value is not Entry entry)
-                        continue;
-                    if (!usedInOtherRows.Contains(entry.Id) || entryId == entry.Id)
-                        row.AvailableEntries.Add(item);
-                }
+                var desiredItems = _allEntryItems
+                    .Where(item => item.Value is Entry entry &&
+                                   (!usedInOtherRows.Contains(entry.Id) || entryId == entry.Id))
+                    .ToList();
+                SyncAvailableEntries(row.AvailableEntries, desiredItems);
                 if (entryId <= 0)
                 {
                     row.SelectedEntry = null;
@@ -382,17 +379,43 @@ public partial class HeatAddEditViewModel(
         }
     }
 
+    private static void SyncAvailableEntries(
+        ObservableCollection<SearchableItem> current,
+        IReadOnlyList<SearchableItem> desired)
+    {
+        for (var index = current.Count - 1; index >= 0; index--)
+        {
+            if (!ContainsEntryItem(desired, current[index]))
+                current.RemoveAt(index);
+        }
+        foreach (var item in desired)
+        {
+            if (!ContainsEntryItem(current, item))
+                current.Add(item);
+        }
+    }
+
+    private static bool ContainsEntryItem(IEnumerable<SearchableItem> items, SearchableItem item) =>
+        items.Any(candidate =>
+            ReferenceEquals(candidate, item) ||
+            candidate.Value is Entry candidateEntry &&
+            item.Value is Entry itemEntry &&
+            candidateEntry.Id == itemEntry.Id);
+
     private HeatPositionEditorRow CreateRowFromPosition(HeatPosition position)
     {
+        var selectedEntry = _allEntryItems.FirstOrDefault(item =>
+            item.Value is Entry entry && entry.Id == position.EntryId);
+        selectedEntry ??= new SearchableItem
+        {
+            Value = position.Entry,
+            DisplayText = FormatEntryDisplay(position.Entry, GetEntryHeatPlacement(position.EntryId))
+        };
         var row = new HeatPositionEditorRow
         {
             Lane = position.Lane,
             EntryId = position.EntryId,
-            SelectedEntry = new SearchableItem
-            {
-                Value = position.Entry,
-                DisplayText = FormatEntryDisplay(position.Entry, GetEntryHeatPlacement(position.EntryId))
-            },
+            SelectedEntry = selectedEntry,
             RemoveCommand = new RelayCommand<HeatPositionEditorRow>(RemovePositionRow)
         };
         return row;

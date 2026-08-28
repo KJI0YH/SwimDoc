@@ -39,6 +39,7 @@ public partial class SearchableComboBox : UserControl
     private readonly DispatcherTimer _searchRefreshTimer;
     private bool _isSearchActive;
     private bool _isSyncingSelection;
+    private bool _preserveNullSelection = true;
     private bool _isUpdatingText;
     private bool _isOpeningDropDownForSearch;
     private ICollectionView? _itemsView;
@@ -116,6 +117,34 @@ public partial class SearchableComboBox : UserControl
         ComboBoxControl.ItemsSource = _itemsView;
         RefreshFilterNow();
         SyncComboBoxSelection();
+        ScheduleNullSelectionEnforcement();
+    }
+
+    private void ScheduleNullSelectionEnforcement()
+    {
+        if (!_preserveNullSelection || SelectedItem is not null)
+            return;
+        Dispatcher.BeginInvoke(EnforceNullSelection, DispatcherPriority.Loaded);
+    }
+
+    private void EnforceNullSelection()
+    {
+        if (!_preserveNullSelection || SelectedItem is not null || _isSearchActive)
+            return;
+        if (ComboBoxControl.SelectedItem is null &&
+            string.IsNullOrEmpty(ComboBoxControl.Text))
+            return;
+        _isSyncingSelection = true;
+        try
+        {
+            ComboBoxControl.SelectedItem = null;
+            if (!string.IsNullOrEmpty(ComboBoxControl.Text))
+                RestoreEditableText(string.Empty);
+        }
+        finally
+        {
+            _isSyncingSelection = false;
+        }
     }
 
     private void SyncComboBoxSelection()
@@ -128,6 +157,8 @@ public partial class SearchableComboBox : UserControl
             if (SelectedItem is null)
             {
                 ComboBoxControl.SelectedItem = null;
+                if (!string.IsNullOrEmpty(ComboBoxControl.Text))
+                    RestoreEditableText(string.Empty);
                 return;
             }
 
@@ -158,6 +189,7 @@ public partial class SearchableComboBox : UserControl
             return;
         if (e.Action is NotifyCollectionChangedAction.Reset or NotifyCollectionChangedAction.Replace)
             SyncComboBoxSelection();
+        ScheduleNullSelectionEnforcement();
     }
 
     private void SyncSelectedItem()
@@ -202,6 +234,7 @@ public partial class SearchableComboBox : UserControl
     {
         if (d is not SearchableComboBox control) return;
         if (control._isSyncingSelection) return;
+        control._preserveNullSelection = e.NewValue is null;
         if (e.NewValue is SearchableItem)
         {
             control.ResetSearchState();
@@ -215,7 +248,10 @@ public partial class SearchableComboBox : UserControl
     private void ComboBoxControl_OnPreviewKeyDown(object sender, KeyEventArgs e)
     {
         if (e.Key is Key.Back or Key.Delete)
+        {
+            _preserveNullSelection = false;
             _isSearchActive = true;
+        }
         if (e.Key == Key.Enter)
         {
             ComboBoxControl.IsDropDownOpen = false;
@@ -225,6 +261,7 @@ public partial class SearchableComboBox : UserControl
 
     private void ComboBoxControl_OnPreviewTextInput(object sender, TextCompositionEventArgs e)
     {
+        _preserveNullSelection = false;
         _isSearchActive = true;
     }
 
@@ -235,6 +272,7 @@ public partial class SearchableComboBox : UserControl
             _isOpeningDropDownForSearch = false;
             return;
         }
+        _preserveNullSelection = false;
         ResetSearchState();
     }
 
@@ -250,8 +288,14 @@ public partial class SearchableComboBox : UserControl
     {
         if (_isSyncingSelection)
             return;
+        if (_preserveNullSelection && ComboBoxControl.SelectedItem is SearchableItem)
+        {
+            EnforceNullSelection();
+            return;
+        }
         if (ComboBoxControl.SelectedItem is SearchableItem selected)
         {
+            _preserveNullSelection = false;
             ResetSearchState();
             var itemInSource = ItemsSource?.FirstOrDefault(i =>
                                     ReferenceEquals(i, selected) ||
@@ -261,8 +305,14 @@ public partial class SearchableComboBox : UserControl
                 SelectedItem = itemInSource;
             return;
         }
-        if (ComboBoxControl.SelectedItem is null && SelectedItem is not null && !_isSearchActive)
-            SelectedItem = null;
+        if (ComboBoxControl.SelectedItem is null && SelectedItem is not null && !_isSearchActive && !_isSyncingSelection)
+        {
+            var selectedStillAvailable = ItemsSource?.Any(item =>
+                ReferenceEquals(item, SelectedItem) ||
+                AreValuesEqual(item.Value, SelectedItem.Value)) == true;
+            if (!selectedStillAvailable)
+                SelectedItem = null;
+        }
     }
 
     private void ComboBoxControl_OnTextChanged(object sender, TextChangedEventArgs e)
