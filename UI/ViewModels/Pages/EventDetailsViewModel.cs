@@ -5,6 +5,8 @@ using ServiceLayer.EntryService;
 using ServiceLayer.EventService;
 using ServiceLayer.HeatService;
 using ServiceLayer.PointScoreProvider;
+using UI.Helpers.Display;
+using UI.Helpers.Threading;
 using UI.Services.Navigation;
 using UI.ViewModels.Pages.Data;
 
@@ -12,10 +14,12 @@ namespace UI.ViewModels.Pages;
 
 public partial class EventDetailsViewModel : ViewModelBase, INavigationAware, INavigationTabState
 {
+    private readonly IEventService _eventService;
     private readonly EntriesByEventViewModel _entriesTable;
     private readonly HeatsByEventViewModel _heatsTable;
     private readonly FixationByEventViewModel _fixationTable;
     private readonly ResultsByEventViewModel _resultsTable;
+    private int _titleEntityId;
     [ObservableProperty] private string? _title = string.Empty;
     [ObservableProperty] private int _selectedTabIndex;
     public int NavigationTabIndex
@@ -32,6 +36,7 @@ public partial class EventDetailsViewModel : ViewModelBase, INavigationAware, IN
         IAgeGroupService ageGroupService,
         INavigationService navigationService)
     {
+        _eventService = eventService;
         _entriesTable = new EntriesByEventViewModel(entryService, entryDocumentReaderService);
         _heatsTable = new HeatsByEventViewModel(eventService, heatService, navigationService);
         _fixationTable = new FixationByEventViewModel(eventService, heatService, pointScoreProvider, navigationService);
@@ -55,5 +60,23 @@ public partial class EventDetailsViewModel : ViewModelBase, INavigationAware, IN
         _heatsTable.SetEventId(idValue);
         _fixationTable.SetEventId(idValue);
         _resultsTable.SetEventId(idValue);
+        LoadTitle(idValue);
+    }
+
+    private void LoadTitle(int id)
+    {
+        _titleEntityId = id;
+        Title = string.Empty;
+        _ = LoadTitleAsync(id);
+    }
+
+    private async Task LoadTitleAsync(int id)
+    {
+        var title = await DetailPageTitleLoader.LoadEventAsync(_eventService, id).ConfigureAwait(false);
+        await DispatcherUiHelper.InvokeOnUiAsync(() =>
+        {
+            if (_titleEntityId == id)
+                Title = title;
+        }).ConfigureAwait(false);
     }
 }

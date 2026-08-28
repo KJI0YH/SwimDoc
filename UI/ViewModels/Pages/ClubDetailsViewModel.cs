@@ -3,6 +3,9 @@ using ServiceLayer.AthleteService;
 using ServiceLayer.ClubService;
 using ServiceLayer.EntryDocumentReaderService;
 using ServiceLayer.EntryService;
+using UI.Helpers.Display;
+using UI.Helpers.Threading;
+using UI.Services.Navigation;
 using UI.ViewModels.Pages.Data;
 
 namespace UI.ViewModels.Pages;
@@ -13,7 +16,9 @@ public partial class ClubDetailsViewModel : ViewModelBase, INavigationAware
     private readonly IClubService _clubService;
     private readonly EntriesByClubViewModel _entriesTable;
     private readonly ResultsByClubViewModel _resultsTable;
+    private int _titleEntityId;
     [ObservableProperty] private string? _title = string.Empty;
+
     public ClubDetailsViewModel(
         IClubService clubService,
         IAthleteService athleteService,
@@ -36,5 +41,23 @@ public partial class ClubDetailsViewModel : ViewModelBase, INavigationAware
         _athletesTable.SetClubId(idValue);
         _entriesTable.SetClubId(idValue);
         _resultsTable.SetClubId(idValue);
+        LoadTitle(idValue);
+    }
+
+    private void LoadTitle(int id)
+    {
+        _titleEntityId = id;
+        Title = string.Empty;
+        _ = LoadTitleAsync(id);
+    }
+
+    private async Task LoadTitleAsync(int id)
+    {
+        var title = await DetailPageTitleLoader.LoadClubAsync(_clubService, id).ConfigureAwait(false);
+        await DispatcherUiHelper.InvokeOnUiAsync(() =>
+        {
+            if (_titleEntityId == id)
+                Title = title;
+        }).ConfigureAwait(false);
     }
 }

@@ -3,23 +3,24 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       ScrollViewer.CanContentScroll="False"
       xmlns:loc="clr-namespace:UI.Localization"
-      xmlns:dataGridView="clr-namespace:UI.Views.Controls.DataGridView">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-        <TabControl Grid.Row="1" Margin="5" SelectedIndex="{Binding SelectedTabIndex}">
-            <TabItem Header="{loc:Localizastion Tabs_Entries}">
-                <dataGridView:EntriesView DataContext="{Binding EntriesTable}"
-                                          ShowImportActions="False" />
-            </TabItem>
-            <TabItem Header="{loc:Localizastion Tabs_Heats}">
-                <dataGridView:HeatsView DataContext="{Binding HeatsTable}" />
-            </TabItem>
-            <TabItem Header="{loc:Localizastion Tabs_Results}">
-                <dataGridView:ParticipantResultsView DataContext="{Binding ResultsTable}" />
-            </TabItem>
-        </TabControl>
-    </Grid>
+      xmlns:dataGridView="clr-namespace:UI.Views.Controls.DataGridView"
+      xmlns:controls="clr-namespace:UI.Helpers.Controls"
+      xmlns:detailPageHeader="clr-namespace:UI.Views.Controls.DetailPageHeader">
+    <TabControl Margin="5"
+                Style="{StaticResource DetailTabControlStyle}"
+                SelectedIndex="{Binding SelectedTabIndex}">
+        <controls:TabControlHeaderExtensions.RightHeaderContent>
+            <detailPageHeader:DetailPageHeader />
+        </controls:TabControlHeaderExtensions.RightHeaderContent>
+        <TabItem Header="{loc:Localizastion Tabs_Entries}">
+            <dataGridView:EntriesView DataContext="{Binding EntriesTable}"
+                                      ShowImportActions="False" />
+        </TabItem>
+        <TabItem Header="{loc:Localizastion Tabs_Heats}">
+            <dataGridView:HeatsView DataContext="{Binding HeatsTable}" />
+        </TabItem>
+        <TabItem Header="{loc:Localizastion Tabs_Results}">
+            <dataGridView:ParticipantResultsView DataContext="{Binding ResultsTable}" />
+        </TabItem>
+    </TabControl>
 </Page>

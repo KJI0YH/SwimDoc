@@ -1,5 +1,6 @@
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
+using UI.Services.Navigation;
 using UI.ViewModels.Pages;
 
 namespace UI.ViewModels.Windows;
