@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.AgeGroupService;
 using ServiceLayer.EventService;
 using ServiceLayer.SwimStyleService;
+using UI.Helpers.Collections;
 using UI.Resources;
 using UI.Models;
 using UI.Views.Dialogs.Markers.AddEdit;
@@ -33,6 +34,7 @@ public partial class EventAddViewModel(
     [ObservableProperty] private int _laneTabIndex;
     private string? _savedCustomLaneNames;
     private bool _isSyncingLaneTab;
+    private bool _suppressSelectionSync;
     public IReadOnlyList<string> HourOptions { get; } = CreateTimePartOptions(24);
     public IReadOnlyList<string> MinuteOptions { get; } = CreateTimePartOptions(60);
     public override string WindowTitle => IsAdd ? Strings.WindowTitle_CreateEvent : Strings.WindowTitle_EditEvent;
@@ -232,31 +234,36 @@ public partial class EventAddViewModel(
         LoadAgeGroups();
         LoadSwimStyles();
         LoadPreviousSwimEvents();
-        if (IsEdit)
+        _suppressSelectionSync = true;
+        try
         {
-            SelectedAgeGroup =
-                Enumerable.FirstOrDefault<SearchableItem>(AgeGroups, item => item.Value is AgeGroup ag && ag.Id == Entity.AgeGroupId);
-            SelectedSwimStyle =
-                Enumerable.FirstOrDefault<SearchableItem>(SwimStyles, item => item.Value is SwimStyle ss && ss.Id == Entity.SwimStyleId);
-            SelectedPreviousSwimEvent = Enumerable.FirstOrDefault<SearchableItem>(PreviousSwimEvents, item =>
-                item.Value is SwimEvent se && se.Id == Entity.PreviousSwimEventId);
+            if (IsEdit)
+            {
+                SelectedAgeGroup = SearchableItemCollectionHelper.FindAgeGroup(AgeGroups, Entity.AgeGroupId);
+                SelectedSwimStyle = SearchableItemCollectionHelper.FindSwimStyle(SwimStyles, Entity.SwimStyleId);
+                SelectedPreviousSwimEvent = Entity.PreviousSwimEventId is int previousEventId
+                    ? SearchableItemCollectionHelper.FindSwimEvent(PreviousSwimEvents, previousEventId)
+                    : SearchableItemCollectionHelper.FindSwimEvent(PreviousSwimEvents, null);
+            }
+            else
+            {
+                Order = eventService.GetNextOrderNumber();
+                Date = eventService.GetPreviousDate();
+                Time = eventService.GetPreviousTime();
+                Course = eventService.GetPreviousCourse();
+                var previousLanes = eventService.GetPreviousLaneSettings();
+                (LaneMin, LaneMax) = (previousLanes.min, previousLanes.max);
+                CustomLaneNames = previousLanes.customLaneNames;
+                SelectedPreviousSwimEvent = SearchableItemCollectionHelper.FindSwimEvent(PreviousSwimEvents, null);
+                if (_contextAgeGroupId.HasValue)
+                    SelectedAgeGroup = SearchableItemCollectionHelper.FindAgeGroup(AgeGroups, _contextAgeGroupId.Value);
+                if (_contextSwimStyleId.HasValue)
+                    SelectedSwimStyle = SearchableItemCollectionHelper.FindSwimStyle(SwimStyles, _contextSwimStyleId.Value);
+            }
         }
-        else
+        finally
         {
-            Order = eventService.GetNextOrderNumber();
-            Date = eventService.GetPreviousDate();
-            Time = eventService.GetPreviousTime();
-            Course = eventService.GetPreviousCourse();
-            var previousLanes = eventService.GetPreviousLaneSettings();
-            (LaneMin, LaneMax) = (previousLanes.min, previousLanes.max);
-            CustomLaneNames = previousLanes.customLaneNames;
-            SelectedPreviousSwimEvent = Enumerable.FirstOrDefault<SearchableItem>(PreviousSwimEvents, item => item.Value == null);
-            if (_contextAgeGroupId.HasValue)
-                SelectedAgeGroup =
-                    Enumerable.FirstOrDefault<SearchableItem>(AgeGroups, item => item.Value is AgeGroup ag && ag.Id == _contextAgeGroupId.Value);
-            if (_contextSwimStyleId.HasValue)
-                SelectedSwimStyle = Enumerable.FirstOrDefault<SearchableItem>(SwimStyles, item =>
-                    item.Value is SwimStyle ss && ss.Id == _contextSwimStyleId.Value);
+            _suppressSelectionSync = false;
         }
         InitializeLaneTab();
     }
@@ -310,20 +317,26 @@ public partial class EventAddViewModel(
 
     partial void OnSelectedAgeGroupChanged(SearchableItem? value)
     {
-        if (value?.Value is not AgeGroup ageGroup) return;
+        if (_suppressSelectionSync || value?.Value is not AgeGroup ageGroup)
+            return;
         Entity.AgeGroupId = ageGroup.Id;
     }
 
     partial void OnSelectedSwimStyleChanged(SearchableItem? value)
     {
-        if (value?.Value is not SwimStyle swimStyle) return;
+        if (_suppressSelectionSync || value?.Value is not SwimStyle swimStyle)
+            return;
         Entity.SwimStyleId = swimStyle.Id;
     }
 
     partial void OnSelectedPreviousSwimEventChanged(SearchableItem? value)
     {
-        if (value?.Value is not SwimEvent swimEvent) return;
-        Entity.PreviousSwimEventId = swimEvent.Id;
+        if (_suppressSelectionSync)
+            return;
+        if (value?.Value is SwimEvent swimEvent)
+            Entity.PreviousSwimEventId = swimEvent.Id;
+        else
+            Entity.PreviousSwimEventId = null;
     }
 
     private void LoadAgeGroups()
@@ -339,6 +352,8 @@ public partial class EventAddViewModel(
                 Value = ageGroup,
                 DisplayText = EntityDisplayFormatter.FormatAgeGroup(ageGroup)
             });
+        if (IsEdit)
+            SearchableItemCollectionHelper.EnsureAgeGroup(AgeGroups, Entity.AgeGroup);
     }
 
     private void LoadSwimStyles()
@@ -354,6 +369,8 @@ public partial class EventAddViewModel(
                 Value = swimStyle,
                 DisplayText = EntityDisplayFormatter.FormatSwimStyle(swimStyle)
             });
+        if (IsEdit)
+            SearchableItemCollectionHelper.EnsureSwimStyle(SwimStyles, Entity.SwimStyle);
     }
 
     private void LoadPreviousSwimEvents()
@@ -370,6 +387,8 @@ public partial class EventAddViewModel(
         var previousEventCandidates = swimEvents.Where(swimEvent => IsAdd || swimEvent.Id != Entity.Id);
         foreach (var item in SearchableItem.FromSwimEvents(previousEventCandidates))
             PreviousSwimEvents.Add(item);
+        if (IsEdit)
+            SearchableItemCollectionHelper.EnsureSwimEvent(PreviousSwimEvents, Entity.PreviousSwimEvent);
     }
 
     [RelayCommand]

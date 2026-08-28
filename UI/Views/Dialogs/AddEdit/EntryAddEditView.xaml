@@ -13,9 +13,18 @@
              mc:Ignorable="d">
     <UserControl.Resources>
         <converters:NullableIntConverter x:Key="NullableIntConverter" />
+        <ControlTemplate x:Key="EntryAddEditTabControlContentOnlyTemplate" TargetType="TabControl">
+            <Border Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    Padding="{TemplateBinding Padding}">
+                <ContentPresenter ContentSource="SelectedContent" />
+            </Border>
+        </ControlTemplate>
     </UserControl.Resources>
-    <TabControl SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                        Margin="0,0,0,15">
+    <TabControl x:Name="EntryTabControl"
+                SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                Margin="0,0,0,15">
                 <TabItem Header="{loc:Localizastion Entry_Tab_Individual}"
                          IsEnabled="{Binding IsIndividualTabEnabled}">
                     <ScrollViewer VerticalScrollBarVisibility="Auto">

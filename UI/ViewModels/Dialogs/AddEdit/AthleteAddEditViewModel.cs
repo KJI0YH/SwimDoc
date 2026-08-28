@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.AthleteService;
 using ServiceLayer.ClubService;
+using UI.Helpers.Collections;
 using UI.Resources;
 using UI.Models;
 using UI.Views.Dialogs.Markers.AddEdit;
@@ -17,6 +18,7 @@ public partial class AthleteAddViewModel(int? id, IAthleteService athleteService
 {
     [ObservableProperty] private ObservableCollection<SearchableItem> _clubs = new();
     private int? _contextClubId;
+    private bool _suppressClubSync;
     [ObservableProperty] private SearchableItem? _selectedClub;
     public override string WindowTitle => IsAdd ? Strings.WindowTitle_CreateAthlete : Strings.WindowTitle_EditAthlete;
     public string FirstName
@@ -90,22 +92,29 @@ public partial class AthleteAddViewModel(int? id, IAthleteService athleteService
     {
         await base.InitializeAsync();
         LoadClubs();
-        if (IsEdit)
+        _suppressClubSync = true;
+        try
         {
-            SelectedClub = Enumerable.FirstOrDefault<SearchableItem>(Clubs, item => item.Value is Club club && club.Id == Entity.ClubId.Value);
-        }
-        else
-        {
-            YearOfBirth = DateTime.Now.Year;
-            if (_contextClubId.HasValue)
-                SelectedClub = Enumerable.FirstOrDefault<SearchableItem>(Clubs, item => item.Value is Club c && c.Id == _contextClubId.Value);
+            if (IsEdit)
+                SelectedClub = SearchableItemCollectionHelper.FindClub(Clubs, Entity.ClubId);
             else
-                SelectedClub = Enumerable.FirstOrDefault<SearchableItem>(Clubs, item => item.Value == null);
+            {
+                YearOfBirth = DateTime.Now.Year;
+                SelectedClub = _contextClubId.HasValue
+                    ? SearchableItemCollectionHelper.FindClub(Clubs, _contextClubId.Value)
+                    : SearchableItemCollectionHelper.FindClub(Clubs, null);
+            }
+        }
+        finally
+        {
+            _suppressClubSync = false;
         }
     }
 
     partial void OnSelectedClubChanged(SearchableItem? item)
     {
+        if (_suppressClubSync)
+            return;
         if (item?.Value is null)
         {
             Entity.ClubId = null;
@@ -121,8 +130,16 @@ public partial class AthleteAddViewModel(int? id, IAthleteService athleteService
         if (_contextClubId.HasValue)
             clubsQuery = clubsQuery.Where(c => c.Id == _contextClubId.Value);
         var clubs = clubsQuery.ToList();
+        if (IsEdit && Entity.ClubId is int entityClubId && clubs.All(c => c.Id != entityClubId))
+        {
+            var entityClub = Entity.Club ?? clubService.Query().FirstOrDefault(c => c.Id == entityClubId);
+            if (entityClub is not null)
+                clubs.Add(entityClub);
+        }
+
         Clubs.Clear();
-        if (!_contextClubId.HasValue)
+        var includePersonalOption = !_contextClubId.HasValue || (IsEdit && Entity.ClubId is null);
+        if (includePersonalOption)
             Clubs.Add(new SearchableItem { Value = null, DisplayText = Strings.Common_PersonalParen });
         foreach (var club in clubs)
             Clubs.Add(new SearchableItem

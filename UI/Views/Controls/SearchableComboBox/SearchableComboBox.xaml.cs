@@ -62,6 +62,8 @@ public partial class SearchableComboBox : UserControl
             BindItemsView(ItemsSource);
         else
             SyncComboBoxSelection();
+        // WPF may auto-select the first item after ItemsSource is applied; re-sync once layout is done.
+        Dispatcher.BeginInvoke(SyncComboBoxSelection, DispatcherPriority.Loaded);
     }
 
     private void OnUnloaded(object sender, RoutedEventArgs e)
@@ -108,14 +110,32 @@ public partial class SearchableComboBox : UserControl
         if (itemsSource == null)
         {
             _itemsView = null;
-            ComboBoxControl.ItemsSource = null;
+            _isSyncingSelection = true;
+            try
+            {
+                ComboBoxControl.ItemsSource = null;
+                ComboBoxControl.SelectedItem = null;
+                ComboBoxControl.SelectedIndex = -1;
+            }
+            finally
+            {
+                _isSyncingSelection = false;
+            }
             return;
         }
         itemsSource.CollectionChanged += OnBoundItemsSourceChanged;
         _itemsView = new ListCollectionView(itemsSource);
         _itemsView.Filter = FilterItem;
-        ComboBoxControl.ItemsSource = _itemsView;
-        RefreshFilterNow();
+        _isSyncingSelection = true;
+        try
+        {
+            ComboBoxControl.ItemsSource = _itemsView;
+            RefreshFilterNow();
+        }
+        finally
+        {
+            _isSyncingSelection = false;
+        }
         SyncComboBoxSelection();
         ScheduleNullSelectionEnforcement();
     }
@@ -157,6 +177,7 @@ public partial class SearchableComboBox : UserControl
             if (SelectedItem is null)
             {
                 ComboBoxControl.SelectedItem = null;
+                ComboBoxControl.SelectedIndex = -1;
                 if (!string.IsNullOrEmpty(ComboBoxControl.Text))
                     RestoreEditableText(string.Empty);
                 return;
@@ -168,17 +189,28 @@ public partial class SearchableComboBox : UserControl
             if (itemInSource is null)
             {
                 ComboBoxControl.SelectedItem = null;
+                ComboBoxControl.SelectedIndex = -1;
                 return;
             }
 
             if (!ReferenceEquals(SelectedItem, itemInSource))
                 SelectedItem = itemInSource;
             ComboBoxControl.SelectedItem = itemInSource;
+            UpdateDisplayTextFromSelection(itemInSource);
         }
         finally
         {
             _isSyncingSelection = false;
         }
+    }
+
+    private void UpdateDisplayTextFromSelection(SearchableItem? item)
+    {
+        if (_isSearchActive || item is null)
+            return;
+        var text = item.DisplayText ?? string.Empty;
+        if (ComboBoxControl.Text != text)
+            RestoreEditableText(text);
     }
 
     private void OnBoundItemsSourceChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -235,10 +267,11 @@ public partial class SearchableComboBox : UserControl
         if (d is not SearchableComboBox control) return;
         if (control._isSyncingSelection) return;
         control._preserveNullSelection = e.NewValue is null;
-        if (e.NewValue is SearchableItem)
+        if (e.NewValue is SearchableItem item)
         {
             control.ResetSearchState();
             control.SyncSelectedItem();
+            control.UpdateDisplayTextFromSelection(item);
             return;
         }
         if (!control._isSearchActive)
@@ -295,6 +328,16 @@ public partial class SearchableComboBox : UserControl
         }
         if (ComboBoxControl.SelectedItem is SearchableItem selected)
         {
+            if (SelectedItem is SearchableItem bound &&
+                !ReferenceEquals(selected, bound) &&
+                !AreValuesEqual(selected.Value, bound.Value) &&
+                !ComboBoxControl.IsDropDownOpen &&
+                !_isSearchActive)
+            {
+                SyncComboBoxSelection();
+                return;
+            }
+
             _preserveNullSelection = false;
             ResetSearchState();
             var itemInSource = ItemsSource?.FirstOrDefault(i =>
@@ -303,6 +346,7 @@ public partial class SearchableComboBox : UserControl
                                 ?? selected;
             if (!ReferenceEquals(SelectedItem, itemInSource))
                 SelectedItem = itemInSource;
+            UpdateDisplayTextFromSelection(itemInSource);
             return;
         }
         if (ComboBoxControl.SelectedItem is null && SelectedItem is not null && !_isSearchActive && !_isSyncingSelection)
