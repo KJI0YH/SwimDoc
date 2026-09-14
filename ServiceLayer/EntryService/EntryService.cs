@@ -138,6 +138,26 @@ public class EntryService(EfCoreContext dbContext, IAppLog log) : CrudService<En
         return EntryPlaceAssignment.OrderForResults(entries).ToList();
     }
 
+    public async Task<List<Entry>> GetEntriesForEventScoringAsync(int eventId)
+    {
+        var rows = await dbContext.Entries
+            .AsNoTracking()
+            .Where(e => e.SwimEventId == eventId)
+            .Select(e => new { e.Id, e.Status, e.FinishTime, e.Points, e.SwimEventId, e.SwimStyleId })
+            .ToListAsync();
+        return rows
+            .Select(e => new Entry
+            {
+                Id = e.Id,
+                Status = e.Status,
+                FinishTime = e.FinishTime,
+                Points = e.Points,
+                SwimEventId = e.SwimEventId,
+                SwimStyleId = e.SwimStyleId
+            })
+            .ToList();
+    }
+
     public async Task<CombinedResultsData> GetCombinedResultsByAgeGroupAsync(int ageGroupId)
     {
         var events = await dbContext.SwimEvents

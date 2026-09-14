@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
 using ServiceLayer.EntryService;
 using ServiceLayer.HeatService;
+using Tests.Helpers;
 using ServiceLayer.Logging;
 using ServiceLayer.ReportGeneratorService;
 using Tests.TestInfrastructure;
@@ -24,7 +25,7 @@ public class ReportExportTest : DatabaseTestFixture
     public void SetUpServices()
     {
         _reportService = new ReportExportService(Context, new EntryService(Context, NullAppLog.Instance), NullAppLog.Instance);
-        _heatService = new HeatService(Context, NullAppLog.Instance);
+        _heatService = new HeatService(Context, NullAppLog.Instance, new NoOpPointScoreProvider());
         _seeder = new TestDataSeeder(Context);
     }
 

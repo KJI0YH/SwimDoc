@@ -8,6 +8,8 @@ using CommunityToolkit.Mvvm.Input;
 using DataLayer.EfClasses;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.BaseTimeRepository;
+using ServiceLayer.Logging;
+using ServiceLayer.Scoring;
 using UI.Resources;
 using static UI.Models.BaseTimes.BaseTimesSwimStyleCatalog;
 
@@ -132,6 +134,7 @@ public sealed partial class BaseTimesSettingsViewModel : ObservableObject
         try
         {
             _baseTimeRepository.Save();
+            await RecalculatePointsAfterBaseTimesSaveAsync();
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
@@ -139,6 +142,20 @@ public sealed partial class BaseTimesSettingsViewModel : ObservableObject
             await dialogs.ShowErrorAsync(
                 title: Strings.Dialog_Error_SaveBaseTimes_Title,
                 message: Strings.Dialog_Error_BaseTimesFileBusyOrUnavailable);
+        }
+    }
+
+    private static async Task RecalculatePointsAfterBaseTimesSaveAsync()
+    {
+        try
+        {
+            var recalc = App.Current.Services.GetRequiredService<IPointsRecalculationService>();
+            await Task.Run(async () => await recalc.RecalculateAllAsync().ConfigureAwait(false));
+        }
+        catch (Exception ex)
+        {
+            App.Current.Services.GetRequiredService<IAppLog>().Warning(
+                $"Points recalculation after base times save failed: {ex.Message}");
         }
     }
 }

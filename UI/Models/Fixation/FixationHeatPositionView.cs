@@ -2,7 +2,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using DataLayer;
 using DataLayer.Display;
 using DataLayer.EfClasses;
-using ServiceLayer.PointScoreProvider;
 
 namespace UI.Models.Fixation;
 
@@ -10,23 +9,20 @@ public sealed partial class FixationHeatPositionView : ObservableObject
 {
     private readonly HeatPosition _position;
     private readonly SwimEvent _swimEvent;
-    private readonly IPointScoreProvider _pointScoreProvider;
     private readonly Action _onChanged;
     private string _finishTimeText;
+
     public FixationHeatPositionView(
         HeatPosition position,
         SwimEvent swimEvent,
-        Action onChanged,
-        IPointScoreProvider pointScoreProvider)
+        Action onChanged)
     {
         _position = position;
         _swimEvent = swimEvent;
         _onChanged = onChanged;
-        _pointScoreProvider = pointScoreProvider;
         if (Entry.Status < EntryStatus.FINISH)
             Entry.Status = EntryStatus.FINISH;
         _finishTimeText = SwimTimeInput.Format(Entry.FinishTime);
-        CalculatePoints();
     }
 
     public Entry Entry => _position.Entry;
@@ -46,6 +42,7 @@ public sealed partial class FixationHeatPositionView : ObservableObject
         EntryStatus.DNS,
         EntryStatus.DNF
     ];
+
     public EntryStatus SelectedStatus
     {
         get => Entry.Status;
@@ -62,7 +59,6 @@ public sealed partial class FixationHeatPositionView : ObservableObject
             }
             OnPropertyChanged();
             OnPropertyChanged(nameof(FinishTimeDisplay));
-            CalculatePoints();
             _onChanged();
         }
     }
@@ -82,7 +78,6 @@ public sealed partial class FixationHeatPositionView : ObservableObject
             {
                 Entry.FinishTime = update.Hundredths;
                 OnPropertyChanged(nameof(FinishTimeDisplay));
-                CalculatePoints();
                 _onChanged();
             }
         }
@@ -110,21 +105,5 @@ public sealed partial class FixationHeatPositionView : ObservableObject
             _ => false
         };
 
-    private void CalculatePoints()
-    {
-        var points = 0;
-        if (Entry.Status == EntryStatus.FINISH)
-        {
-            var swimStyle = Entry.SwimStyle ?? _swimEvent.SwimStyle;
-            points = _pointScoreProvider.CalculatePoints(
-                _swimEvent.Course,
-                swimStyle.Distance,
-                swimStyle.Stroke,
-                swimStyle.RelayCount,
-                _swimEvent.AgeGroup.Gender,
-                Entry.FinishTime);
-        }
-        Entry.Points = points;
-        OnPropertyChanged(nameof(Points));
-    }
+    public void NotifyPointsChanged() => OnPropertyChanged(nameof(Points));
 }

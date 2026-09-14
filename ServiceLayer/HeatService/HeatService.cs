@@ -16,13 +16,16 @@ using ServiceLayer.BizRunners;
 using ServiceLayer.Crud;
 using ServiceLayer.EventService;
 using ServiceLayer.HeatService.Exceptions;
-using ServiceLayer.Logging;
+using ServiceLayer.PointScoreProvider;
 using ServiceLayer.Resources;
 using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
 
 namespace ServiceLayer.HeatService;
 
-public class HeatService(EfCoreContext dbContext, IAppLog log) : CrudService<Heat, int?>(dbContext, log), IHeatService
+public class HeatService(
+    EfCoreContext dbContext,
+    IAppLog log,
+    IPointScoreProvider pointScoreProvider) : CrudService<Heat, int?>(dbContext, log), IHeatService
 {
     private readonly RunnerWriteDb<HeatAllocationInDto, HeatAllocationOutDto> _runner = new(
         new HeatAllocationAction(new HeatAllocationDbAccess(dbContext), new AppBizLog(log)),
@@ -298,14 +301,29 @@ public class HeatService(EfCoreContext dbContext, IAppLog log) : CrudService<Hea
     public Task<List<Heat>> GetHeatsByEventIdAsync(int eventId) =>
         HeatsByEventQuery(eventId).ToListAsync();
 
-    public Task<List<Heat>> GetHeatsByEventIdPagedAsync(int eventId, int page, int pageSize) =>
-        HeatsByEventQuery(eventId).Page(page, pageSize).ToListAsync();
-
-    private IQueryable<Heat> HeatsByEventQuery(int eventId) =>
+    public Task<List<Heat>> GetHeatsByEventIdSummaryAsync(int eventId) =>
         dbContext.Heats
             .AsNoTracking()
             .Where(heat => heat.SwimEventId == eventId)
             .OrderBy(heat => heat.Number)
+            .ToListAsync();
+
+    public Task<Heat?> GetHeatForFixationAsync(int heatId) =>
+        ApplyHeatForFixationIncludes(dbContext.Heats.AsNoTracking().Where(heat => heat.Id == heatId))
+            .FirstOrDefaultAsync();
+
+    public Task<List<Heat>> GetHeatsByEventIdPagedAsync(int eventId, int page, int pageSize) =>
+        HeatsByEventQuery(eventId).Page(page, pageSize).ToListAsync();
+
+    private IQueryable<Heat> HeatsByEventQuery(int eventId) =>
+        ApplyHeatForFixationIncludes(
+            dbContext.Heats
+                .AsNoTracking()
+                .Where(heat => heat.SwimEventId == eventId)
+                .OrderBy(heat => heat.Number));
+
+    private static IQueryable<Heat> ApplyHeatForFixationIncludes(IQueryable<Heat> query) =>
+        query
             .Include(heat => heat.Positions.OrderBy(hp => hp.Lane))
             .ThenInclude(hp => hp.Entry)
             .ThenInclude(entry => entry.Athlete!)
@@ -351,7 +369,6 @@ public class HeatService(EfCoreContext dbContext, IAppLog log) : CrudService<Hea
             trackedPosition.Entry.Status = incomingEntry.Status;
             trackedPosition.Entry.FinishTime = incomingEntry.FinishTime;
             trackedPosition.Entry.Comment = incomingEntry.Comment;
-            trackedPosition.Entry.Points = incomingEntry.Points;
             trackedPosition.Entry.ApplyNonFinishResultRules();
             dbContext.NormalizeEntry(trackedPosition.Entry);
         }
@@ -368,8 +385,22 @@ public class HeatService(EfCoreContext dbContext, IAppLog log) : CrudService<Hea
                 throw new ValidationException(ServiceErrorStrings.Heat_Approve_NotAllLaneResultsProvided);
         }
         trackedHeat.Status = HeatStatus.OFFICIAL;
+        await RecalculateSwimEventPointsAsync(trackedHeat.SwimEventId);
         await dbContext.SaveChangesAsync();
         log.Info(EntityLogFormatter.FormatOperation("Approve", trackedHeat));
+    }
+
+    private async Task RecalculateSwimEventPointsAsync(int swimEventId)
+    {
+        var swimEvent = await dbContext.SwimEvents
+            .Include(e => e.SwimStyle)
+            .Include(e => e.AgeGroup)
+            .Include(e => e.Entries)
+            .ThenInclude(entry => entry.SwimStyle)
+            .FirstOrDefaultAsync(e => e.Id == swimEventId);
+        if (swimEvent is null)
+            return;
+        pointScoreProvider.ApplyEventPoints(swimEvent, swimEvent.Entries.ToList());
     }
 
     public async Task UnapproveHeatAsync(int heatId)

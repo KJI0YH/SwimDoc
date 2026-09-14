@@ -69,6 +69,23 @@
   <data name="Settings_Paging_PageSize" xml:space="preserve"><value>Page size</value></data>
   <data name="Settings_EntryImport_HighlightScoring_Title" xml:space="preserve"><value>Highlighted entries</value></data>
   <data name="Settings_EntryImport_HighlightScoring_Description" xml:space="preserve"><value>How yellow-highlighted cells in entry documents are interpreted during import. Applied to the next import.</value></data>
+  <data name="Settings_Scoring_Title" xml:space="preserve"><value>Scoring</value></data>
+  <data name="Settings_Scoring_Description" xml:space="preserve"><value>World Aquatics points or team scoring by place.</value></data>
+  <data name="Settings_Scoring_Recalculating" xml:space="preserve"><value>Recalculating points...</value></data>
+  <data name="Settings_Scoring_Mode" xml:space="preserve"><value>Scoring mode</value></data>
+  <data name="Settings_Scoring_Mode_Description" xml:space="preserve"><value>World Aquatics points or team scoring by place. Changing the mode recalculates points in the open competition.</value></data>
+  <data name="Settings_Scoring_PlaceTable" xml:space="preserve"><value>Points by place</value></data>
+  <data name="Settings_Scoring_PlaceTable_Description" xml:space="preserve"><value>Press Apply to save the table and recalculate scores in the open competition.</value></data>
+  <data name="Settings_Scoring_PlaceColumn" xml:space="preserve"><value>Place</value></data>
+  <data name="Settings_Scoring_PlaceRow" xml:space="preserve"><value>Place {0}</value></data>
+  <data name="Settings_Scoring_PointsColumn" xml:space="preserve"><value>Points</value></data>
+  <data name="Settings_Scoring_RemoveLastPlace" xml:space="preserve"><value>Remove last</value></data>
+  <data name="Settings_Scoring_ResetDefaults" xml:space="preserve"><value>Reset to defaults</value></data>
+  <data name="Settings_Scoring_Apply" xml:space="preserve"><value>Apply</value></data>
+  <data name="Settings_Scoring_RecalcError_Title" xml:space="preserve"><value>Could not recalculate points</value></data>
+  <data name="Settings_Scoring_RecalcError_Message" xml:space="preserve"><value>Settings were saved, but recalculating points in the open competition failed.</value></data>
+  <data name="Enum_ScoringMode_WorldAquatics" xml:space="preserve"><value>World Aquatics</value></data>
+  <data name="Enum_ScoringMode_PlaceTable" xml:space="preserve"><value>Team scoring</value></data>
   <data name="Enum_EntryImportHighlightScoringMode_HighlightedInCompetition" xml:space="preserve"><value>Scoring</value></data>
   <data name="Enum_EntryImportHighlightScoringMode_HighlightedOutOfCompetition" xml:space="preserve"><value>Non-scoring</value></data>
   <data name="Common_Back" xml:space="preserve"><value>Back</value></data>

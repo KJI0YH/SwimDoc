@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using ServiceLayer.BaseTimeRepository;
 using ServiceLayer.EventService;
 using ServiceLayer.HeatService;
+using Tests.Helpers;
 using ServiceLayer.Logging;
 using Tests.TestInfrastructure;
 
@@ -18,7 +19,7 @@ public sealed class HeatNumberOrderTest : DatabaseTestFixture
     [SetUp]
     public void SetUpServices()
     {
-        _heatService = new HeatService(Context, NullAppLog.Instance);
+        _heatService = new HeatService(Context, NullAppLog.Instance, new NoOpPointScoreProvider());
         _eventService = new EventService(Context, new StubBaseTimeRepository(), NullAppLog.Instance);
         _seeder = new TestDataSeeder(Context);
     }

@@ -1,0 +1,254 @@
+<UserControl x:Class="UI.Views.Controls.ScoringSettingsView.ScoringSettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:loc="clr-namespace:UI.Localization"
+             xmlns:displayHelpers="clr-namespace:UI.Helpers.Display"
+             xmlns:converters="clr-namespace:UI.Helpers.Converters"
+             xmlns:baseTimesView="clr-namespace:UI.Views.Controls.BaseTimesSettingsView"
+             HorizontalAlignment="Stretch"
+             VerticalAlignment="Stretch">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <displayHelpers:EnumDescriptionConverter x:Key="EnumDescriptionConverter" />
+        <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+
+        <Style x:Key="PlacePointsCellStyle" TargetType="DataGridCell">
+            <Setter Property="Padding" Value="4,0" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
+
+        <Style x:Key="PlacePointsRowStyle" TargetType="DataGridRow" BasedOn="{StaticResource {x:Type DataGridRow}}">
+            <Setter Property="MinHeight" Value="28" />
+            <Setter Property="Height" Value="28" />
+            <Setter Property="Margin" Value="0" />
+        </Style>
+    </UserControl.Resources>
+
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0"
+                    Command="{Binding CloseScoringCommand}"
+                    Padding="8,6"
+                    ToolTip="{loc:Localizastion Common_Back}"
+                    IsEnabled="{Binding IsRecalculating, Converter={StaticResource InverseBoolConverter}}">
+                <StackPanel Orientation="Horizontal">
+                    <ContentControl Content="{ui:SymbolIcon ChevronLeft24}"
+                                    Margin="0,0,6,0"
+                                    VerticalAlignment="Center" />
+                    <TextBlock Text="{loc:Localizastion Common_Back}" VerticalAlignment="Center" />
+                </StackPanel>
+            </Button>
+
+            <StackPanel Grid.Column="1" Margin="16,0" VerticalAlignment="Center">
+                <TextBlock Style="{StaticResource TitleTextBlockStyle}"
+                           Text="{loc:Localizastion Settings_Scoring_Title}" />
+                <TextBlock Margin="0,4,0,0"
+                           Height="18"
+                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                           Text="{loc:Localizastion Settings_Scoring_Recalculating}">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Opacity" Value="0" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsRecalculating}" Value="True">
+                                    <Setter Property="Opacity" Value="1" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+            </StackPanel>
+
+            <StackPanel Grid.Column="2"
+                        Orientation="Horizontal"
+                        VerticalAlignment="Center"
+                        Visibility="{Binding IsWorldAquaticsMode, Converter={StaticResource BoolToVis}}">
+                <Button Command="{Binding BaseTimes.OpenWorldAquaticsPointsCommand}"
+                        Padding="16,8"
+                        Margin="0,0,8,0"
+                        ToolTip="{loc:Localizastion BaseTimes_WorldAquaticsPoints_Tooltip}">
+                    <StackPanel Orientation="Horizontal">
+                        <ContentControl Content="{ui:SymbolIcon Globe24}"
+                                        Margin="0,0,8,0"
+                                        VerticalAlignment="Center" />
+                        <TextBlock Text="{loc:Localizastion BaseTimes_WorldAquaticsPoints}"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+                <Button Command="{Binding BaseTimes.SaveCommand}"
+                        Padding="16,8"
+                        ToolTip="{loc:Localizastion Common_Save}">
+                    <StackPanel Orientation="Horizontal">
+                        <ContentControl Content="{ui:SymbolIcon Save24}"
+                                        Margin="0,0,8,0"
+                                        VerticalAlignment="Center" />
+                        <TextBlock Text="{loc:Localizastion Common_Save}"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <Border Style="{StaticResource SettingsCardBorderStyle}" Margin="0,0,0,12">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel VerticalAlignment="Center" Margin="0,0,16,0">
+                        <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}"
+                                   Text="{loc:Localizastion Settings_Scoring_Mode}" />
+                        <TextBlock Margin="0,4,0,0"
+                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                   TextWrapping="Wrap"
+                                   Text="{loc:Localizastion Settings_Scoring_Mode_Description}" />
+                    </StackPanel>
+                    <ComboBox Grid.Column="1"
+                              Width="260"
+                              VerticalAlignment="Center"
+                              ItemsSource="{Binding ScoringModes}"
+                              SelectedItem="{Binding SelectedScoringMode}"
+                              IsEnabled="{Binding IsRecalculating, Converter={StaticResource InverseBoolConverter}}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </Grid>
+            </Border>
+
+            <Grid Grid.Row="1"
+                  Visibility="{Binding IsPlaceTableMode, Converter={StaticResource BoolToVis}}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <Border Style="{StaticResource SettingsCardBorderStyle}" Margin="0,0,0,12">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel VerticalAlignment="Center" Margin="0,0,16,0">
+                            <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}"
+                                       Text="{loc:Localizastion Settings_Scoring_PlaceTable}" />
+                            <TextBlock Margin="0,4,0,0"
+                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                       TextWrapping="Wrap"
+                                       Text="{loc:Localizastion Settings_Scoring_PlaceTable_Description}" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1"
+                                    Orientation="Horizontal"
+                                    VerticalAlignment="Center">
+                            <Button Command="{Binding AddPlacePointRowCommand}"
+                                    Content="{loc:Localizastion Common_Add}"
+                                    Margin="0,0,8,0"
+                                    Padding="12,6"
+                                    IsEnabled="{Binding IsRecalculating, Converter={StaticResource InverseBoolConverter}}" />
+                            <Button Command="{Binding RemoveLastPlacePointRowCommand}"
+                                    Content="{loc:Localizastion Settings_Scoring_RemoveLastPlace}"
+                                    Margin="0,0,8,0"
+                                    Padding="12,6"
+                                    IsEnabled="{Binding IsRecalculating, Converter={StaticResource InverseBoolConverter}}" />
+                            <Button Command="{Binding ResetPlacePointsToDefaultCommand}"
+                                    Content="{loc:Localizastion Settings_Scoring_ResetDefaults}"
+                                    Margin="0,0,8,0"
+                                    Padding="12,6"
+                                    IsEnabled="{Binding IsRecalculating, Converter={StaticResource InverseBoolConverter}}" />
+                            <Button Command="{Binding ApplyPlaceTableCommand}"
+                                    Content="{loc:Localizastion Settings_Scoring_Apply}"
+                                    Padding="12,6"
+                                    IsEnabled="{Binding IsRecalculating, Converter={StaticResource InverseBoolConverter}}" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <Border Grid.Row="1"
+                        Style="{StaticResource SettingsCardBorderStyle}"
+                        Margin="0"
+                        Padding="8">
+                    <ui:DataGrid ItemsSource="{Binding PlacePointRows}"
+                                 AutoGenerateColumns="False"
+                                 CanUserAddRows="False"
+                                 CanUserDeleteRows="False"
+                                 CanUserSortColumns="False"
+                                 CanUserResizeRows="False"
+                                 IsReadOnly="False"
+                                 HeadersVisibility="Column"
+                                 GridLinesVisibility="Horizontal"
+                                 SelectionUnit="FullRow"
+                                 SelectionMode="Single"
+                                 RowHeight="28"
+                                 ColumnHeaderHeight="28"
+                                 RowStyle="{StaticResource PlacePointsRowStyle}"
+                                 CellStyle="{StaticResource PlacePointsCellStyle}"
+                                 HorizontalAlignment="Stretch"
+                                 VerticalAlignment="Stretch"
+                                 VerticalScrollBarVisibility="Auto"
+                                 HorizontalScrollBarVisibility="Disabled">
+                        <ui:DataGrid.ColumnHeaderStyle>
+                            <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+                                <Setter Property="Padding" Value="4,0" />
+                                <Setter Property="Height" Value="28" />
+                            </Style>
+                        </ui:DataGrid.ColumnHeaderStyle>
+                        <ui:DataGrid.Columns>
+                            <DataGridTextColumn Header="{loc:Localizastion Settings_Scoring_PlaceColumn}"
+                                                Binding="{Binding Place}"
+                                                IsReadOnly="True"
+                                                Width="72"
+                                                ElementStyle="{StaticResource SwimDocDataGridTextColumnElementStyle}" />
+                            <DataGridTextColumn Header="{loc:Localizastion Settings_Scoring_PointsColumn}"
+                                                Binding="{Binding PointsText, UpdateSourceTrigger=LostFocus}"
+                                                Width="*"
+                                                ElementStyle="{StaticResource SwimDocDataGridTextColumnElementStyle}"
+                                                EditingElementStyle="{StaticResource SwimDocDataGridTextColumnEditingElementStyle}" />
+                        </ui:DataGrid.Columns>
+                    </ui:DataGrid>
+                </Border>
+            </Grid>
+
+            <Grid Grid.Row="1"
+                  Visibility="{Binding IsWorldAquaticsMode, Converter={StaticResource BoolToVis}}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <StackPanel Margin="0,0,0,12">
+                    <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
+                               Text="{loc:Localizastion Settings_Tab_BaseTime}"
+                               Margin="0,0,0,8" />
+                    <TextBlock Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                               TextWrapping="Wrap"
+                               Text="{loc:Localizastion Settings_BaseTimes_Description}" />
+                </StackPanel>
+                <baseTimesView:BaseTimesSettingsView Grid.Row="1"
+                                                     DataContext="{Binding BaseTimes}"
+                                                     ShowHeader="False"
+                                                     HorizontalAlignment="Stretch"
+                                                     VerticalAlignment="Stretch" />
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

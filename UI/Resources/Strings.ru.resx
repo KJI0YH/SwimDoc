@@ -69,6 +69,23 @@
   <data name="Settings_Paging_PageSize" xml:space="preserve"><value>Размер страницы</value></data>
   <data name="Settings_EntryImport_HighlightScoring_Title" xml:space="preserve"><value>Выделенные заявки</value></data>
   <data name="Settings_EntryImport_HighlightScoring_Description" xml:space="preserve"><value>Как интерпретировать ячейки, выделенные жёлтым цветом в файле заявки при импорте. Применяется к следующему импорту.</value></data>
+  <data name="Settings_Scoring_Title" xml:space="preserve"><value>Подсчёт очков</value></data>
+  <data name="Settings_Scoring_Description" xml:space="preserve"><value>Очки World Aquatics или командный зачёт по местам.</value></data>
+  <data name="Settings_Scoring_Recalculating" xml:space="preserve"><value>Пересчёт очков...</value></data>
+  <data name="Settings_Scoring_Mode" xml:space="preserve"><value>Режим подсчёта</value></data>
+  <data name="Settings_Scoring_Mode_Description" xml:space="preserve"><value>Очки World Aquatics или командный зачёт по местам. Смена режима пересчитывает очки в открытом соревновании.</value></data>
+  <data name="Settings_Scoring_PlaceTable" xml:space="preserve"><value>Очки за места</value></data>
+  <data name="Settings_Scoring_PlaceTable_Description" xml:space="preserve"><value>Нажмите «Применить», чтобы сохранить таблицу и пересчитать очки в открытом соревновании.</value></data>
+  <data name="Settings_Scoring_PlaceColumn" xml:space="preserve"><value>Место</value></data>
+  <data name="Settings_Scoring_PlaceRow" xml:space="preserve"><value>Место {0}</value></data>
+  <data name="Settings_Scoring_PointsColumn" xml:space="preserve"><value>Очки</value></data>
+  <data name="Settings_Scoring_RemoveLastPlace" xml:space="preserve"><value>Удалить последнее</value></data>
+  <data name="Settings_Scoring_ResetDefaults" xml:space="preserve"><value>Сбросить по умолчанию</value></data>
+  <data name="Settings_Scoring_Apply" xml:space="preserve"><value>Применить</value></data>
+  <data name="Settings_Scoring_RecalcError_Title" xml:space="preserve"><value>Не удалось пересчитать очки</value></data>
+  <data name="Settings_Scoring_RecalcError_Message" xml:space="preserve"><value>Настройки сохранены, но пересчёт очков в открытом соревновании не выполнен.</value></data>
+  <data name="Enum_ScoringMode_WorldAquatics" xml:space="preserve"><value>World Aquatics</value></data>
+  <data name="Enum_ScoringMode_PlaceTable" xml:space="preserve"><value>Командный зачёт</value></data>
   <data name="Enum_EntryImportHighlightScoringMode_HighlightedInCompetition" xml:space="preserve"><value>В зачёт</value></data>
   <data name="Enum_EntryImportHighlightScoringMode_HighlightedOutOfCompetition" xml:space="preserve"><value>Вне зачёта</value></data>
   <data name="Common_Back" xml:space="preserve"><value>Назад</value></data>

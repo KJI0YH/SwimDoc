@@ -6,4 +6,7 @@ public sealed class AppSettings
     public int? FontSize { get; set; }
     public Dictionary<string, int>? PageSizes { get; set; }
     public string? EntryImportHighlightScoringMode { get; set; }
+    public string? ScoringMode { get; set; }
+    public List<int>? PlacePoints { get; set; }
+    public string? ActiveScoringPresetId { get; set; }
 }

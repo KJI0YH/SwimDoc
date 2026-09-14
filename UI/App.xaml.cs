@@ -19,6 +19,7 @@ using ServiceLayer.EventService;
 using ServiceLayer.HeatService;
 using ServiceLayer.PointScoreProvider;
 using ServiceLayer.ReportGeneratorService;
+using ServiceLayer.Scoring;
 using ServiceLayer.SwimStyleService;
 using System.Globalization;
 using System.Net.Http;
@@ -171,7 +172,10 @@ public partial class App : Application
         services.AddSingleton<INavigationService, NavigationService>();
         services.AddSingleton<IAddEditWindowFactory, AddEditWindowFactory>();
         services.AddSingleton<IBaseTimeRepository>(sp => new CsvBaseTimeRepository(sp.GetRequiredService<IAppLog>()));
+        services.AddSingleton<IScoringSettingsService>(sp =>
+            new ScoringSettingsService(sp.GetRequiredService<IAppSettingsStore>(), sp.GetRequiredService<IAppLog>()));
         services.AddSingleton<IPointScoreProvider, PointScoreProvider>();
+        services.AddTransient<IPointsRecalculationService, PointsRecalculationService>();
         services.AddSingleton<Wpf.Ui.IContentDialogService, Wpf.Ui.ContentDialogService>();
         services.AddTransient<IConfirmDialogService, ConfirmDialogService>();
         services.AddTransient<IErrorDialogService, ErrorDialogService>();

@@ -4,6 +4,7 @@ using DataLayer.EfCore;
 using Microsoft.EntityFrameworkCore;
 using ServiceLayer.AthleteService;
 using ServiceLayer.HeatService;
+using Tests.Helpers;
 using ServiceLayer.Logging;
 using Tests.TestInfrastructure;
 
@@ -20,7 +21,7 @@ public sealed class EmptyHeatAfterAthleteDeleteTest : DatabaseTestFixture
     public void SetUpService()
     {
         _athleteService = new AthleteService(Context, NullAppLog.Instance);
-        _heatService = new HeatService(Context, NullAppLog.Instance);
+        _heatService = new HeatService(Context, NullAppLog.Instance, new NoOpPointScoreProvider());
         _seeder = new TestDataSeeder(Context);
     }
 

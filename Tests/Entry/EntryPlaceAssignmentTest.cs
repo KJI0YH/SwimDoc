@@ -7,14 +7,14 @@ namespace Tests.EntryResults;
 public sealed class EntryPlaceAssignmentTest
 {
     [Test]
-    public void OrderForResults_SortsByPointsDescThenTime_WithUnrankedAtEnd()
+    public void OrderForResults_SortsByFinishTimeAsc_WithUnrankedAtEnd()
     {
         var entries = new List<DataLayer.EfClasses.Entry>
         {
-            CreateEntry(1, EntryStatus.FINISH, 2100, 450),
-            CreateEntry(2, EntryStatus.FINISH, 2000, 500),
-            CreateEntry(3, EntryStatus.DSQ, 2525, 0),
-            CreateEntry(4, EntryStatus.DNS, null, 0),
+            CreateEntry(1, EntryStatus.FINISH, 2100),
+            CreateEntry(2, EntryStatus.FINISH, 2000),
+            CreateEntry(3, EntryStatus.DSQ, 2525),
+            CreateEntry(4, EntryStatus.DNS, null),
         };
 
         var ordered = EntryPlaceAssignment.OrderForResults(entries);
@@ -23,13 +23,13 @@ public sealed class EntryPlaceAssignmentTest
     }
 
     [Test]
-    public void AssignPlaces_TiedPoints_KeepSharedPlace()
+    public void AssignPlaces_TiedFinishTimes_KeepSharedPlace()
     {
         var entries = new List<DataLayer.EfClasses.Entry>
         {
-            CreateEntry(1, EntryStatus.FINISH, 2000, 500),
-            CreateEntry(2, EntryStatus.FINISH, 2100, 500),
-            CreateEntry(3, EntryStatus.FINISH, 2200, 400),
+            CreateEntry(1, EntryStatus.FINISH, 2000),
+            CreateEntry(2, EntryStatus.FINISH, 2000),
+            CreateEntry(3, EntryStatus.FINISH, 2200),
         };
 
         var places = EntryPlaceAssignment.AssignPlaces(EntryPlaceAssignment.OrderForResults(entries));
@@ -38,20 +38,27 @@ public sealed class EntryPlaceAssignmentTest
     }
 
     [Test]
-    public void AssignPlaces_DsqAndZeroPointEntries_ShareFinalPlace()
+    public void AssignPlaces_DsqAndDns_ShareFinalPlaceAfterFinishers()
     {
         var entries = new List<DataLayer.EfClasses.Entry>
         {
-            CreateEntry(1, EntryStatus.FINISH, 2000, 500),
-            CreateEntry(2, EntryStatus.FINISH, 2100, 450),
-            CreateEntry(3, EntryStatus.DSQ, 2525, 0),
-            CreateEntry(4, EntryStatus.DNS, null, 0),
-            CreateEntry(5, EntryStatus.FINISH, 3000, 0),
+            CreateEntry(1, EntryStatus.FINISH, 2000),
+            CreateEntry(2, EntryStatus.FINISH, 2100),
+            CreateEntry(3, EntryStatus.DSQ, 2525),
+            CreateEntry(4, EntryStatus.DNS, null),
+            CreateEntry(5, EntryStatus.FINISH, 3000),
         };
 
         var places = EntryPlaceAssignment.AssignPlaces(EntryPlaceAssignment.OrderForResults(entries));
 
-        Assert.That(places.Select(p => p.Place), Is.EqualTo(new[] { 1, 2, 3, 3, 3 }));
+        Assert.That(places.Select(p => (p.Entry.Id, p.Place)), Is.EqualTo(new[]
+        {
+            (1, 1),
+            (2, 2),
+            (5, 3),
+            (3, 4),
+            (4, 4),
+        }));
     }
 
     [Test]
@@ -59,11 +66,11 @@ public sealed class EntryPlaceAssignmentTest
     {
         var entries = new List<DataLayer.EfClasses.Entry>
         {
-            CreateEntry(1, EntryStatus.FINISH, 2000, 500),
-            CreateEntry(2, EntryStatus.FINISH, 2000, 500),
-            CreateEntry(3, EntryStatus.FINISH, 2200, 400),
-            CreateEntry(4, EntryStatus.DNF, null, 0),
-            CreateEntry(5, EntryStatus.DSQ, 2400, 0),
+            CreateEntry(1, EntryStatus.FINISH, 2000),
+            CreateEntry(2, EntryStatus.FINISH, 2000),
+            CreateEntry(3, EntryStatus.FINISH, 2200),
+            CreateEntry(4, EntryStatus.DNF, null),
+            CreateEntry(5, EntryStatus.DSQ, 2400),
         };
 
         var places = EntryPlaceAssignment.AssignPlaces(EntryPlaceAssignment.OrderForResults(entries));
@@ -76,9 +83,9 @@ public sealed class EntryPlaceAssignmentTest
     {
         var entries = new List<DataLayer.EfClasses.Entry>
         {
-            CreateEntry(1, EntryStatus.DSQ, 2525, 0),
-            CreateEntry(2, EntryStatus.DNS, null, 0),
-            CreateEntry(3, EntryStatus.DNF, null, 0),
+            CreateEntry(1, EntryStatus.DSQ, 2525),
+            CreateEntry(2, EntryStatus.DNS, null),
+            CreateEntry(3, EntryStatus.DNF, null),
         };
 
         var places = EntryPlaceAssignment.AssignPlaces(EntryPlaceAssignment.OrderForResults(entries));
@@ -89,14 +96,12 @@ public sealed class EntryPlaceAssignmentTest
     private static DataLayer.EfClasses.Entry CreateEntry(
         int id,
         EntryStatus status,
-        int? finishTime,
-        int points) =>
+        int? finishTime) =>
         new()
         {
             Id = id,
             Status = status,
             FinishTime = finishTime,
-            Points = points,
             SwimStyleId = 1
         };
 }

@@ -66,7 +66,10 @@ public sealed class AppSettingsStore : IAppSettingsStore
             PageSizes = settings.PageSizes is null
                 ? null
                 : new Dictionary<string, int>(settings.PageSizes),
-            EntryImportHighlightScoringMode = settings.EntryImportHighlightScoringMode
+            EntryImportHighlightScoringMode = settings.EntryImportHighlightScoringMode,
+            ScoringMode = settings.ScoringMode,
+            PlacePoints = settings.PlacePoints is null ? null : [..settings.PlacePoints],
+            ActiveScoringPresetId = settings.ActiveScoringPresetId
         };
 
     private static string GetSettingsPath() =>

@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.HeatService;
 using ServiceLayer.HeatService.Exceptions;
 using ServiceLayer.Logging;
+using ServiceLayer.PointScoreProvider;
 using UI.ViewModels.Pages;
 
 namespace UI.Services.Sessions;
@@ -28,7 +29,8 @@ public sealed class HeatAllocationBatchSession : IAsyncDisposable
         _minHeatSize = minHeatSize;
         _dbContext = _scope.ServiceProvider.GetRequiredService<EfCoreContext>();
         _log = _scope.ServiceProvider.GetRequiredService<IAppLog>();
-        _heatService = new HeatService(_dbContext, _log);
+        var pointScoreProvider = _scope.ServiceProvider.GetRequiredService<IPointScoreProvider>();
+        _heatService = new HeatService(_dbContext, _log, pointScoreProvider);
     }
 
     public OperationItemOutcome AllocateEvent(int swimEventId)
