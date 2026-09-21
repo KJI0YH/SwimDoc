@@ -14,6 +14,7 @@ public sealed class ParticipantResultEntryView(ResultEntryView result, int? athl
         : result.ParticipantYearOfBirth;
     public string ClubName => result.ClubName;
     public string ResultText => result.ResultText;
+    public string RankDisplay => result.RankDisplay;
     public int? Points => result.Points;
     private static string GetAthleteBirthYear(Entry entry, int athleteId)
     {

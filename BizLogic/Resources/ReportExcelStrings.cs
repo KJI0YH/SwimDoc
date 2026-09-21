@@ -23,6 +23,7 @@ public static class ReportExcelStrings
     public static string Col_Category => Get(nameof(Col_Category));
     public static string Col_Team => Get(nameof(Col_Team));
     public static string Col_Time => Get(nameof(Col_Time));
+    public static string Col_Rank => Get(nameof(Col_Rank));
     public static string Col_Points => Get(nameof(Col_Points));
     public static string Col_Total => Get(nameof(Col_Total));
     public static string Col_Comment => Get(nameof(Col_Comment));

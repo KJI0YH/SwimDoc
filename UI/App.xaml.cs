@@ -18,6 +18,8 @@ using ServiceLayer.EntryService;
 using ServiceLayer.EventService;
 using ServiceLayer.HeatService;
 using ServiceLayer.PointScoreProvider;
+using ServiceLayer.RankTimeProvider;
+using ServiceLayer.RankTimeRepository;
 using ServiceLayer.ReportGeneratorService;
 using ServiceLayer.Scoring;
 using ServiceLayer.SwimStyleService;
@@ -172,6 +174,10 @@ public partial class App : Application
         services.AddSingleton<INavigationService, NavigationService>();
         services.AddSingleton<IAddEditWindowFactory, AddEditWindowFactory>();
         services.AddSingleton<IBaseTimeRepository>(sp => new CsvBaseTimeRepository(sp.GetRequiredService<IAppLog>()));
+        services.AddSingleton<IRankTimeRepository>(sp => new CsvRankTimeRepository(sp.GetRequiredService<IAppLog>()));
+        services.AddSingleton<IAchievedRankProvider, AchievedRankProvider>();
+        services.AddSingleton<BizLogic.ReportGenerator.IAchievedRankFormatter>(sp =>
+            sp.GetRequiredService<IAchievedRankProvider>());
         services.AddSingleton<IScoringSettingsService>(sp =>
             new ScoringSettingsService(sp.GetRequiredService<IAppSettingsStore>(), sp.GetRequiredService<IAppLog>()));
         services.AddSingleton<IPointScoreProvider, PointScoreProvider>();
@@ -211,6 +217,7 @@ public partial class App : Application
         services.AddTransient<AboutViewModel>();
         services.AddTransient<SettingsViewModel>();
         services.AddTransient<BaseTimesSettingsViewModel>();
+        services.AddTransient<RankTimesSettingsViewModel>();
         services.AddTransient<EventsViewModel>();
         services.AddTransient<HeatsViewModel>();
         services.AddTransient<FixationViewModel>();

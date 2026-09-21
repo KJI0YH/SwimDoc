@@ -53,6 +53,7 @@
   <data name="Menu_Open" xml:space="preserve"><value>Открыть</value></data>
 
   <data name="Settings_Tab_BaseTime" xml:space="preserve"><value>Базовое время</value></data>
+  <data name="Settings_Tab_Ranks" xml:space="preserve"><value>Разряды</value></data>
   <data name="Settings_Tab_Templates" xml:space="preserve"><value>Шаблоны</value></data>
   <data name="Settings_Page_Subtitle" xml:space="preserve"><value>Настройки приложения, шаблоны и параметры соревнований.</value></data>
   <data name="Settings_Section_General" xml:space="preserve"><value>Общие</value></data>
@@ -64,6 +65,7 @@
   <data name="Settings_FontSize_Increase" xml:space="preserve"><value>Увеличить шрифт</value></data>
   <data name="Settings_FontSize_Decrease" xml:space="preserve"><value>Уменьшить шрифт</value></data>
   <data name="Settings_BaseTimes_Description" xml:space="preserve"><value>Эталонное время World Aquatics для рассчёта очков</value></data>
+  <data name="Settings_Ranks_Description" xml:space="preserve"><value>Нормативы времени для спортивных разрядов (МСМК, МС, КМС, I–III, юношеские).</value></data>
   <data name="Settings_Section_Paging" xml:space="preserve"><value>Пагинация</value></data>
   <data name="Settings_Paging_Description" xml:space="preserve"><value>Количество элементов на странице для каждого списка. Применяется сразу.</value></data>
   <data name="Settings_Paging_PageSize" xml:space="preserve"><value>Размер страницы</value></data>
@@ -98,6 +100,10 @@
   <data name="BaseTimes_Col_Stroke" xml:space="preserve"><value>Стиль</value></data>
   <data name="BaseTimes_Header_BaseTime" xml:space="preserve"><value>Базовое время</value></data>
   <data name="BaseTimes_Header_BaseTimeSeconds" xml:space="preserve"><value>Базовое время, секунды</value></data>
+  <data name="Ranks_Group_ScmMen" xml:space="preserve"><value>SCM (25m) — Мужчины</value></data>
+  <data name="Ranks_Group_ScmWomen" xml:space="preserve"><value>SCM (25m) — Женщины</value></data>
+  <data name="Ranks_Group_LcmMen" xml:space="preserve"><value>LCM (50m) — Мужчины</value></data>
+  <data name="Ranks_Group_LcmWomen" xml:space="preserve"><value>LCM (50m) — Женщины</value></data>
   <data name="Templates_Title" xml:space="preserve"><value>Шаблоны</value></data>
   <data name="Templates_Description" xml:space="preserve"><value>Здесь можно скачать готовые шаблоны файлов для импорта данных в SwimDoc.</value></data>
   <data name="Templates_EntryDoc_GroupHeader" xml:space="preserve"><value>Заявки</value></data>
@@ -241,6 +247,8 @@
   <data name="Dialog_Error_FileBusyOrUnavailableWithDetailsFormat" xml:space="preserve"><value>Файл занят другим процессом или недоступен.\n\n{0}</value></data>
   <data name="Dialog_Error_SaveBaseTimes_Title" xml:space="preserve"><value>Не удалось сохранить базовое время</value></data>
   <data name="Dialog_Error_BaseTimesFileBusyOrUnavailable" xml:space="preserve"><value>Файл базовых времен занят другим процессом или недоступен</value></data>
+  <data name="Dialog_Error_SaveRankTimes_Title" xml:space="preserve"><value>Не удалось сохранить нормативы разрядов</value></data>
+  <data name="Dialog_Error_RankTimesFileBusyOrUnavailable" xml:space="preserve"><value>Файл нормативов разрядов занят другим процессом или недоступен</value></data>
   <data name="Dialog_Error_SaveFile_Title" xml:space="preserve"><value>Не удалось сохранить файл</value></data>
 
   <data name="Dialog_CreateCompetition_Title" xml:space="preserve"><value>Создать новое соревнование</value></data>
@@ -480,6 +488,7 @@
   <data name="Results_Col_Team" xml:space="preserve"><value>Команда</value></data>
   <data name="Results_Col_Place" xml:space="preserve"><value>Место</value></data>
   <data name="Results_Col_Result" xml:space="preserve"><value>Результат</value></data>
+  <data name="Results_Col_Rank" xml:space="preserve"><value>Разряд</value></data>
   <data name="Results_Col_Points" xml:space="preserve"><value>Очки</value></data>
   <data name="Results_Col_Total" xml:space="preserve"><value>Итого</value></data>
 
@@ -491,6 +500,7 @@
   <data name="Fixation_Col_EntryTime" xml:space="preserve"><value>Заявочное</value></data>
   <data name="Fixation_Col_Status" xml:space="preserve"><value>Статус</value></data>
   <data name="Fixation_Col_Result" xml:space="preserve"><value>Результат</value></data>
+  <data name="Fixation_Col_Rank" xml:space="preserve"><value>Разряд</value></data>
   <data name="Fixation_Col_Points" xml:space="preserve"><value>Очки</value></data>
   <data name="Fixation_Col_Comment" xml:space="preserve"><value>Примечание</value></data>
   <data name="Fixation_Comment_Tooltip" xml:space="preserve"><value>Сохраняется в примечание</value></data>

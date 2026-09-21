@@ -19,6 +19,7 @@ public sealed partial class BaseTimesSettingsViewModel : ObservableObject
 {
     private const string WorldAquaticsPointsUrl = "https://www.worldaquatics.com/swimming/points";
     private readonly IBaseTimeRepository _baseTimeRepository;
+    private bool _rowsLoaded;
     [ObservableProperty] private ObservableCollection<BaseTimeTableRowViewModel> _scmRows = new();
     [ObservableProperty] private ObservableCollection<BaseTimeTableRowViewModel> _lcmRows = new();
     [ObservableProperty] private ObservableCollection<MixedRelayRowViewModel> _scmMixedRelayRows = new();
@@ -29,6 +30,12 @@ public sealed partial class BaseTimesSettingsViewModel : ObservableObject
     {
         _baseTimeRepository = baseTimeRepository;
         localizationService.CultureChanged += OnCultureChanged;
+    }
+
+    public void EnsureLoaded()
+    {
+        if (_rowsLoaded)
+            return;
         LoadRows();
     }
 
@@ -38,6 +45,7 @@ public sealed partial class BaseTimesSettingsViewModel : ObservableObject
         LcmRows = CreateMenWomenRows(Course.LCM, LcmMenWomen);
         ScmMixedRelayRows = CreateMixedRelayRows(Course.SCM, ScmMixedRelay);
         LcmMixedRelayRows = CreateMixedRelayRows(Course.LCM, LcmMixedRelay);
+        _rowsLoaded = true;
     }
 
     private ObservableCollection<BaseTimeTableRowViewModel> CreateMenWomenRows(
@@ -92,6 +100,8 @@ public sealed partial class BaseTimesSettingsViewModel : ObservableObject
 
     public void RefreshDisplayNames()
     {
+        if (!_rowsLoaded)
+            return;
         foreach (var row in ScmRows)
             row.RefreshDisplayName();
         foreach (var row in LcmRows)
@@ -100,10 +110,6 @@ public sealed partial class BaseTimesSettingsViewModel : ObservableObject
             row.RefreshDisplayName();
         foreach (var row in LcmMixedRelayRows)
             row.RefreshDisplayName();
-        ScmRows = new ObservableCollection<BaseTimeTableRowViewModel>(ScmRows);
-        LcmRows = new ObservableCollection<BaseTimeTableRowViewModel>(LcmRows);
-        ScmMixedRelayRows = new ObservableCollection<MixedRelayRowViewModel>(ScmMixedRelayRows);
-        LcmMixedRelayRows = new ObservableCollection<MixedRelayRowViewModel>(LcmMixedRelayRows);
     }
 
     public void ReloadFromRepository() => LoadRows();

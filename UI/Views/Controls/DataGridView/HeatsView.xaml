@@ -73,6 +73,8 @@
                                         Width="*" MinWidth="220" />
                     <DataGridTextColumn Header="{loc:Localizastion Heats_Col_BirthYear}" Binding="{Binding YearOfBirth}" IsReadOnly="True"
                                         Width="140" MinWidth="120" />
+                    <DataGridTextColumn Header="{loc:Localizastion Athletes_Col_Category}" Binding="{Binding Category}" IsReadOnly="True"
+                                        Width="100" MinWidth="80" />
                     <DataGridTextColumn Header="{loc:Localizastion Heats_Col_Team}" Binding="{Binding Club}" IsReadOnly="True" Width="*"
                                         MinWidth="220" />
                     <DataGridTextColumn Header="{loc:Localizastion Heats_Col_EntryTime}" Binding="{Binding EntryTime}" IsReadOnly="True"

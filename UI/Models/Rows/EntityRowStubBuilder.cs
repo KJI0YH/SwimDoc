@@ -31,7 +31,7 @@ internal static class EntityRowStubBuilder
                 Id = athleteId,
                 FirstName = p.AthleteFirstName ?? string.Empty,
                 LastName = p.AthleteLastName ?? string.Empty,
-                Gender = Gender.Mixed,
+                Gender = p.AthleteGender ?? Gender.Mixed,
                 YearOfBirth = p.AthleteYearOfBirth ?? 0,
                 Category = p.AthleteCategory ?? Category.NoCategory,
                 Club = p.AthleteClubName is not null ? new Club { Name = p.AthleteClubName } : null
@@ -69,6 +69,7 @@ internal static class EntityRowStubBuilder
             {
                 Id = p.SwimEventId ?? 0,
                 Order = p.SwimEventOrder.Value,
+                Course = p.SwimEventCourse ?? Course.LCM,
                 Date = default,
                 Round = p.SwimEventRound ?? EventRound.FIN,
                 LaneMin = 0,

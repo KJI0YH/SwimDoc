@@ -7,15 +7,28 @@
              VerticalAlignment="Stretch"
              HorizontalContentAlignment="Stretch">
     <UserControl.Resources>
-        <Style TargetType="GroupBox">
+        <Style x:Key="BaseTimesDataGridStyle" TargetType="ui:DataGrid" BasedOn="{StaticResource {x:Type ui:DataGrid}}">
             <Setter Property="HorizontalAlignment" Value="Stretch" />
-            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="VerticalAlignment" Value="Stretch" />
+            <Setter Property="AutoGenerateColumns" Value="False" />
+            <Setter Property="IsReadOnly" Value="False" />
+            <Setter Property="CanUserAddRows" Value="False" />
+            <Setter Property="CanUserDeleteRows" Value="False" />
+            <Setter Property="CanUserSortColumns" Value="False" />
+            <Setter Property="HeadersVisibility" Value="Column" />
+            <Setter Property="EnableRowVirtualization" Value="True" />
+            <Setter Property="EnableColumnVirtualization" Value="True" />
+            <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True" />
+            <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Recycling" />
+            <Setter Property="VirtualizingPanel.ScrollUnit" Value="Pixel" />
+            <Setter Property="ScrollViewer.CanContentScroll" Value="True" />
+            <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
+            <Setter Property="HorizontalScrollBarVisibility" Value="Disabled" />
         </Style>
     </UserControl.Resources>
     <Grid x:Name="LayoutRoot"
           HorizontalAlignment="Stretch"
-          VerticalAlignment="Stretch"
-          SizeChanged="LayoutRoot_OnSizeChanged">
+          VerticalAlignment="Stretch">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
@@ -85,280 +98,244 @@
             </StackPanel>
         </Grid>
 
-        <ScrollViewer x:Name="BaseTimesScroll"
-                      Grid.Row="1"
-                      HorizontalAlignment="Stretch"
-                      HorizontalContentAlignment="Stretch"
-                      VerticalScrollBarVisibility="Auto"
-                      HorizontalScrollBarVisibility="Disabled">
-            <Grid x:Name="ContentGrid"
-                  HorizontalAlignment="Stretch">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
+        <TabControl Grid.Row="1"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch">
+            <TabItem Header="{loc:Localizastion BaseTimes_Group_Scm}">
+                <ui:DataGrid Style="{StaticResource BaseTimesDataGridStyle}"
+                             ItemsSource="{Binding ScmRows}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="{loc:Localizastion BaseTimes_Col_Stroke}" Binding="{Binding Name}" IsReadOnly="True"
+                                            Width="*" />
+                        <DataGridTemplateColumn Width="*">
+                            <DataGridTemplateColumn.Header>
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                    <TextBlock Text="{loc:Localizastion Common_Men}" HorizontalAlignment="Center"
+                                               TextAlignment="Center" FontWeight="SemiBold" />
+                                    <TextBlock Text="{loc:Localizastion BaseTimes_Header_BaseTime}" HorizontalAlignment="Center"
+                                               TextAlignment="Center" />
+                                </StackPanel>
+                            </DataGridTemplateColumn.Header>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
+                                                Text="{Binding MenBaseTimeText, UpdateSourceTrigger=PropertyChanged}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Width="*">
+                            <DataGridTemplateColumn.Header>
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                    <TextBlock Text="{loc:Localizastion Common_Men}" HorizontalAlignment="Center"
+                                               TextAlignment="Center" FontWeight="SemiBold" />
+                                    <TextBlock Text="{loc:Localizastion BaseTimes_Header_BaseTimeSeconds}" HorizontalAlignment="Center"
+                                               TextAlignment="Center" />
+                                </StackPanel>
+                            </DataGridTemplateColumn.Header>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
+                                                Text="{Binding MenSecondsText, UpdateSourceTrigger=PropertyChanged}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Width="*">
+                            <DataGridTemplateColumn.Header>
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                    <TextBlock Text="{loc:Localizastion Common_Women}" HorizontalAlignment="Center"
+                                               TextAlignment="Center" FontWeight="SemiBold" />
+                                    <TextBlock Text="{loc:Localizastion BaseTimes_Header_BaseTime}" HorizontalAlignment="Center"
+                                               TextAlignment="Center" />
+                                </StackPanel>
+                            </DataGridTemplateColumn.Header>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
+                                                Text="{Binding WomenBaseTimeText, UpdateSourceTrigger=PropertyChanged}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Width="*">
+                            <DataGridTemplateColumn.Header>
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                    <TextBlock Text="{loc:Localizastion Common_Women}" HorizontalAlignment="Center"
+                                               TextAlignment="Center" FontWeight="SemiBold" />
+                                    <TextBlock Text="{loc:Localizastion BaseTimes_Header_BaseTimeSeconds}" HorizontalAlignment="Center"
+                                               TextAlignment="Center" />
+                                </StackPanel>
+                            </DataGridTemplateColumn.Header>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
+                                                Text="{Binding WomenSecondsText, UpdateSourceTrigger=PropertyChanged}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </ui:DataGrid>
+            </TabItem>
 
-                <GroupBox Grid.Row="0"
-                          Header="{loc:Localizastion BaseTimes_Group_Scm}"
-                          Margin="0,0,0,12">
-                    <Grid>
-                    <ui:DataGrid ItemsSource="{Binding ScmRows}"
-                                 HorizontalAlignment="Stretch"
-                                 AutoGenerateColumns="False"
-                                 IsReadOnly="False">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="{loc:Localizastion BaseTimes_Col_Stroke}" Binding="{Binding Name}" IsReadOnly="True"
-                                                Width="*" />
-                            <DataGridTemplateColumn Width="*">
-                                <DataGridTemplateColumn.Header>
-                                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                        <TextBlock Text="{loc:Localizastion Common_Men}" HorizontalAlignment="Center"
-                                                   TextAlignment="Center" FontWeight="SemiBold" />
-                                        <TextBlock Text="{loc:Localizastion BaseTimes_Header_BaseTime}" HorizontalAlignment="Center"
-                                                   TextAlignment="Center" />
-                                    </StackPanel>
-                                </DataGridTemplateColumn.Header>
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
-                                                    Text="{Binding MenBaseTimeText, UpdateSourceTrigger=PropertyChanged}" />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                            <DataGridTemplateColumn Width="*">
-                                <DataGridTemplateColumn.Header>
-                                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                        <TextBlock Text="{loc:Localizastion Common_Men}" HorizontalAlignment="Center"
-                                                   TextAlignment="Center" FontWeight="SemiBold" />
-                                        <TextBlock Text="{loc:Localizastion BaseTimes_Header_BaseTimeSeconds}" HorizontalAlignment="Center"
-                                                   TextAlignment="Center" />
-                                    </StackPanel>
-                                </DataGridTemplateColumn.Header>
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
-                                                    Text="{Binding MenSecondsText, UpdateSourceTrigger=PropertyChanged}" />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                            <DataGridTemplateColumn Width="*">
-                                <DataGridTemplateColumn.Header>
-                                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                        <TextBlock Text="{loc:Localizastion Common_Women}" HorizontalAlignment="Center"
-                                                   TextAlignment="Center" FontWeight="SemiBold" />
-                                        <TextBlock Text="{loc:Localizastion BaseTimes_Header_BaseTime}" HorizontalAlignment="Center"
-                                                   TextAlignment="Center" />
-                                    </StackPanel>
-                                </DataGridTemplateColumn.Header>
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
-                                                    Text="{Binding WomenBaseTimeText, UpdateSourceTrigger=PropertyChanged}" />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                            <DataGridTemplateColumn Width="*">
-                                <DataGridTemplateColumn.Header>
-                                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                        <TextBlock Text="{loc:Localizastion Common_Women}" HorizontalAlignment="Center"
-                                                   TextAlignment="Center" FontWeight="SemiBold" />
-                                        <TextBlock Text="{loc:Localizastion BaseTimes_Header_BaseTimeSeconds}" HorizontalAlignment="Center"
-                                                   TextAlignment="Center" />
-                                    </StackPanel>
-                                </DataGridTemplateColumn.Header>
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
-                                                    Text="{Binding WomenSecondsText, UpdateSourceTrigger=PropertyChanged}" />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                        </DataGrid.Columns>
-                    </ui:DataGrid>
-                    </Grid>
-                </GroupBox>
+            <TabItem Header="{loc:Localizastion BaseTimes_Group_ScmMixedRelay}">
+                <ui:DataGrid Style="{StaticResource BaseTimesDataGridStyle}"
+                             ItemsSource="{Binding ScmMixedRelayRows}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="{loc:Localizastion BaseTimes_Col_Stroke}" Binding="{Binding Name}" IsReadOnly="True"
+                                            Width="*" />
+                        <DataGridTemplateColumn Width="*">
+                            <DataGridTemplateColumn.Header>
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                    <TextBlock Text="{loc:Localizastion Common_Mixed}" HorizontalAlignment="Center"
+                                               TextAlignment="Center" FontWeight="SemiBold" />
+                                    <TextBlock Text="{loc:Localizastion BaseTimes_Header_BaseTime}" HorizontalAlignment="Center"
+                                               TextAlignment="Center" />
+                                </StackPanel>
+                            </DataGridTemplateColumn.Header>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
+                                                Text="{Binding MixedBaseTimeText, UpdateSourceTrigger=PropertyChanged}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Width="*">
+                            <DataGridTemplateColumn.Header>
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                    <TextBlock Text="{loc:Localizastion Common_Mixed}" HorizontalAlignment="Center"
+                                               TextAlignment="Center" FontWeight="SemiBold" />
+                                    <TextBlock Text="{loc:Localizastion BaseTimes_Header_BaseTimeSeconds}" HorizontalAlignment="Center"
+                                               TextAlignment="Center" />
+                                </StackPanel>
+                            </DataGridTemplateColumn.Header>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
+                                                Text="{Binding MixedSecondsText, UpdateSourceTrigger=PropertyChanged}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Width="*" />
+                        <DataGridTemplateColumn Width="*" />
+                    </DataGrid.Columns>
+                </ui:DataGrid>
+            </TabItem>
 
-                <GroupBox Grid.Row="1"
-                          Header="{loc:Localizastion BaseTimes_Group_ScmMixedRelay}"
-                          Margin="0,0,0,12">
-                    <Grid>
-                    <ui:DataGrid ItemsSource="{Binding ScmMixedRelayRows}"
-                                 HorizontalAlignment="Stretch"
-                                 AutoGenerateColumns="False"
-                                 IsReadOnly="False">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="{loc:Localizastion BaseTimes_Col_Stroke}" Binding="{Binding Name}" IsReadOnly="True"
-                                                Width="*" />
-                            <DataGridTemplateColumn Width="*">
-                                <DataGridTemplateColumn.Header>
-                                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                        <TextBlock Text="{loc:Localizastion Common_Mixed}" HorizontalAlignment="Center"
-                                                   TextAlignment="Center" FontWeight="SemiBold" />
-                                        <TextBlock Text="{loc:Localizastion BaseTimes_Header_BaseTime}" HorizontalAlignment="Center"
-                                                   TextAlignment="Center" />
-                                    </StackPanel>
-                                </DataGridTemplateColumn.Header>
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
-                                                    Text="{Binding MixedBaseTimeText, UpdateSourceTrigger=PropertyChanged}" />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                            <DataGridTemplateColumn Width="*">
-                                <DataGridTemplateColumn.Header>
-                                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                        <TextBlock Text="{loc:Localizastion Common_Mixed}" HorizontalAlignment="Center"
-                                                   TextAlignment="Center" FontWeight="SemiBold" />
-                                        <TextBlock Text="{loc:Localizastion BaseTimes_Header_BaseTimeSeconds}" HorizontalAlignment="Center"
-                                                   TextAlignment="Center" />
-                                    </StackPanel>
-                                </DataGridTemplateColumn.Header>
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
-                                                    Text="{Binding MixedSecondsText, UpdateSourceTrigger=PropertyChanged}" />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                            <DataGridTemplateColumn Width="*" />
-                            <DataGridTemplateColumn Width="*" />
-                        </DataGrid.Columns>
-                    </ui:DataGrid>
-                    </Grid>
-                </GroupBox>
+            <TabItem Header="{loc:Localizastion BaseTimes_Group_Lcm}">
+                <ui:DataGrid Style="{StaticResource BaseTimesDataGridStyle}"
+                             ItemsSource="{Binding LcmRows}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="{loc:Localizastion BaseTimes_Col_Stroke}" Binding="{Binding Name}" IsReadOnly="True"
+                                            Width="*" />
+                        <DataGridTemplateColumn Width="*">
+                            <DataGridTemplateColumn.Header>
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                    <TextBlock Text="{loc:Localizastion Common_Men}" HorizontalAlignment="Center"
+                                               TextAlignment="Center" FontWeight="SemiBold" />
+                                    <TextBlock Text="{loc:Localizastion BaseTimes_Header_BaseTime}" HorizontalAlignment="Center"
+                                               TextAlignment="Center" />
+                                </StackPanel>
+                            </DataGridTemplateColumn.Header>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
+                                                Text="{Binding MenBaseTimeText, UpdateSourceTrigger=PropertyChanged}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Width="*">
+                            <DataGridTemplateColumn.Header>
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                    <TextBlock Text="{loc:Localizastion Common_Men}" HorizontalAlignment="Center"
+                                               TextAlignment="Center" FontWeight="SemiBold" />
+                                    <TextBlock Text="{loc:Localizastion BaseTimes_Header_BaseTimeSeconds}" HorizontalAlignment="Center"
+                                               TextAlignment="Center" />
+                                </StackPanel>
+                            </DataGridTemplateColumn.Header>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
+                                                Text="{Binding MenSecondsText, UpdateSourceTrigger=PropertyChanged}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Width="*">
+                            <DataGridTemplateColumn.Header>
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                    <TextBlock Text="{loc:Localizastion Common_Women}" HorizontalAlignment="Center"
+                                               TextAlignment="Center" FontWeight="SemiBold" />
+                                    <TextBlock Text="{loc:Localizastion BaseTimes_Header_BaseTime}" HorizontalAlignment="Center"
+                                               TextAlignment="Center" />
+                                </StackPanel>
+                            </DataGridTemplateColumn.Header>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
+                                                Text="{Binding WomenBaseTimeText, UpdateSourceTrigger=PropertyChanged}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Width="*">
+                            <DataGridTemplateColumn.Header>
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                    <TextBlock Text="{loc:Localizastion Common_Women}" HorizontalAlignment="Center"
+                                               TextAlignment="Center" FontWeight="SemiBold" />
+                                    <TextBlock Text="{loc:Localizastion BaseTimes_Header_BaseTimeSeconds}" HorizontalAlignment="Center"
+                                               TextAlignment="Center" />
+                                </StackPanel>
+                            </DataGridTemplateColumn.Header>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
+                                                Text="{Binding WomenSecondsText, UpdateSourceTrigger=PropertyChanged}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </ui:DataGrid>
+            </TabItem>
 
-                <GroupBox Grid.Row="2"
-                          Header="{loc:Localizastion BaseTimes_Group_Lcm}"
-                          Margin="0,0,0,12">
-                    <Grid>
-                    <ui:DataGrid ItemsSource="{Binding LcmRows}"
-                                 HorizontalAlignment="Stretch"
-                                 AutoGenerateColumns="False"
-                                 IsReadOnly="False">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="{loc:Localizastion BaseTimes_Col_Stroke}" Binding="{Binding Name}" IsReadOnly="True"
-                                                Width="*" />
-                            <DataGridTemplateColumn Width="*">
-                                <DataGridTemplateColumn.Header>
-                                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                        <TextBlock Text="{loc:Localizastion Common_Men}" HorizontalAlignment="Center"
-                                                   TextAlignment="Center" FontWeight="SemiBold" />
-                                        <TextBlock Text="{loc:Localizastion BaseTimes_Header_BaseTime}" HorizontalAlignment="Center"
-                                                   TextAlignment="Center" />
-                                    </StackPanel>
-                                </DataGridTemplateColumn.Header>
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
-                                                    Text="{Binding MenBaseTimeText, UpdateSourceTrigger=PropertyChanged}" />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                            <DataGridTemplateColumn Width="*">
-                                <DataGridTemplateColumn.Header>
-                                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                        <TextBlock Text="{loc:Localizastion Common_Men}" HorizontalAlignment="Center"
-                                                   TextAlignment="Center" FontWeight="SemiBold" />
-                                        <TextBlock Text="{loc:Localizastion BaseTimes_Header_BaseTimeSeconds}" HorizontalAlignment="Center"
-                                                   TextAlignment="Center" />
-                                    </StackPanel>
-                                </DataGridTemplateColumn.Header>
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
-                                                    Text="{Binding MenSecondsText, UpdateSourceTrigger=PropertyChanged}" />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                            <DataGridTemplateColumn Width="*">
-                                <DataGridTemplateColumn.Header>
-                                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                        <TextBlock Text="{loc:Localizastion Common_Women}" HorizontalAlignment="Center"
-                                                   TextAlignment="Center" FontWeight="SemiBold" />
-                                        <TextBlock Text="{loc:Localizastion BaseTimes_Header_BaseTime}" HorizontalAlignment="Center"
-                                                   TextAlignment="Center" />
-                                    </StackPanel>
-                                </DataGridTemplateColumn.Header>
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
-                                                    Text="{Binding WomenBaseTimeText, UpdateSourceTrigger=PropertyChanged}" />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                            <DataGridTemplateColumn Width="*">
-                                <DataGridTemplateColumn.Header>
-                                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                        <TextBlock Text="{loc:Localizastion Common_Women}" HorizontalAlignment="Center"
-                                                   TextAlignment="Center" FontWeight="SemiBold" />
-                                        <TextBlock Text="{loc:Localizastion BaseTimes_Header_BaseTimeSeconds}" HorizontalAlignment="Center"
-                                                   TextAlignment="Center" />
-                                    </StackPanel>
-                                </DataGridTemplateColumn.Header>
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
-                                                    Text="{Binding WomenSecondsText, UpdateSourceTrigger=PropertyChanged}" />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                        </DataGrid.Columns>
-                    </ui:DataGrid>
-                    </Grid>
-                </GroupBox>
-
-                <GroupBox Grid.Row="3"
-                          Header="{loc:Localizastion BaseTimes_Group_LcmMixedRelay}">
-                    <Grid>
-                    <ui:DataGrid ItemsSource="{Binding LcmMixedRelayRows}"
-                                 HorizontalAlignment="Stretch"
-                                 AutoGenerateColumns="False"
-                                 IsReadOnly="False">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="{loc:Localizastion BaseTimes_Col_Stroke}" Binding="{Binding Name}" IsReadOnly="True"
-                                                Width="*" />
-                            <DataGridTemplateColumn Width="*">
-                                <DataGridTemplateColumn.Header>
-                                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                        <TextBlock Text="{loc:Localizastion Common_Mixed}" HorizontalAlignment="Center"
-                                                   TextAlignment="Center" FontWeight="SemiBold" />
-                                        <TextBlock Text="{loc:Localizastion BaseTimes_Header_BaseTime}" HorizontalAlignment="Center"
-                                                   TextAlignment="Center" />
-                                    </StackPanel>
-                                </DataGridTemplateColumn.Header>
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
-                                                    Text="{Binding MixedBaseTimeText, UpdateSourceTrigger=PropertyChanged}" />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                            <DataGridTemplateColumn Width="*">
-                                <DataGridTemplateColumn.Header>
-                                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                        <TextBlock Text="{loc:Localizastion Common_Mixed}" HorizontalAlignment="Center"
-                                                   TextAlignment="Center" FontWeight="SemiBold" />
-                                        <TextBlock Text="{loc:Localizastion BaseTimes_Header_BaseTimeSeconds}" HorizontalAlignment="Center"
-                                                   TextAlignment="Center" />
-                                    </StackPanel>
-                                </DataGridTemplateColumn.Header>
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
-                                                    Text="{Binding MixedSecondsText, UpdateSourceTrigger=PropertyChanged}" />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                            <DataGridTemplateColumn Width="*" />
-                            <DataGridTemplateColumn Width="*" />
-                        </DataGrid.Columns>
-                    </ui:DataGrid>
-                    </Grid>
-                </GroupBox>
-            </Grid>
-        </ScrollViewer>
+            <TabItem Header="{loc:Localizastion BaseTimes_Group_LcmMixedRelay}">
+                <ui:DataGrid Style="{StaticResource BaseTimesDataGridStyle}"
+                             ItemsSource="{Binding LcmMixedRelayRows}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="{loc:Localizastion BaseTimes_Col_Stroke}" Binding="{Binding Name}" IsReadOnly="True"
+                                            Width="*" />
+                        <DataGridTemplateColumn Width="*">
+                            <DataGridTemplateColumn.Header>
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                    <TextBlock Text="{loc:Localizastion Common_Mixed}" HorizontalAlignment="Center"
+                                               TextAlignment="Center" FontWeight="SemiBold" />
+                                    <TextBlock Text="{loc:Localizastion BaseTimes_Header_BaseTime}" HorizontalAlignment="Center"
+                                               TextAlignment="Center" />
+                                </StackPanel>
+                            </DataGridTemplateColumn.Header>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
+                                                Text="{Binding MixedBaseTimeText, UpdateSourceTrigger=PropertyChanged}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Width="*">
+                            <DataGridTemplateColumn.Header>
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                    <TextBlock Text="{loc:Localizastion Common_Mixed}" HorizontalAlignment="Center"
+                                               TextAlignment="Center" FontWeight="SemiBold" />
+                                    <TextBlock Text="{loc:Localizastion BaseTimes_Header_BaseTimeSeconds}" HorizontalAlignment="Center"
+                                               TextAlignment="Center" />
+                                </StackPanel>
+                            </DataGridTemplateColumn.Header>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ui:TextBox Style="{StaticResource SwimDocDataGridInlineTextBoxStyle}"
+                                                Text="{Binding MixedSecondsText, UpdateSourceTrigger=PropertyChanged}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Width="*" />
+                        <DataGridTemplateColumn Width="*" />
+                    </DataGrid.Columns>
+                </ui:DataGrid>
+            </TabItem>
+        </TabControl>
     </Grid>
 </UserControl>

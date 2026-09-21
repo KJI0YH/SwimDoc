@@ -25,6 +25,7 @@
   <data name="Col_Category" xml:space="preserve"><value>Разряд</value></data>
   <data name="Col_Team" xml:space="preserve"><value>Команда</value></data>
   <data name="Col_Time" xml:space="preserve"><value>Время</value></data>
+  <data name="Col_Rank" xml:space="preserve"><value>Разряд</value></data>
   <data name="Col_Points" xml:space="preserve"><value>Очки</value></data>
   <data name="Col_Total" xml:space="preserve"><value>Итого</value></data>
 

@@ -31,10 +31,12 @@ public sealed partial class SettingsViewModel : ViewModelBase
 
     public ObservableCollection<PagingSettingItemViewModel> PagingSettings { get; }
     public BaseTimesSettingsViewModel BaseTimes { get; }
+    public RankTimesSettingsViewModel RankTimes { get; }
     public ObservableCollection<PlacePointRowViewModel> PlacePointRows { get; } = new();
 
     [ObservableProperty] private AppLanguage _selectedLanguage;
     [ObservableProperty] private bool _isBaseTimesOpen;
+    [ObservableProperty] private bool _isRankTimesOpen;
     [ObservableProperty] private bool _isScoringOpen;
     [ObservableProperty] private bool _isPagingOpen;
     [ObservableProperty] private EntryImportHighlightScoringMode _highlightScoringMode;
@@ -46,7 +48,7 @@ public sealed partial class SettingsViewModel : ViewModelBase
     public Array ScoringModes => Enum.GetValues<ScoringMode>();
     public bool IsPlaceTableMode => SelectedScoringMode == ScoringMode.PlaceTable;
     public bool IsWorldAquaticsMode => SelectedScoringMode == ScoringMode.WorldAquatics;
-    public bool IsSettingsHubVisible => !IsScoringOpen && !IsBaseTimesOpen && !IsPagingOpen;
+    public bool IsSettingsHubVisible => !IsScoringOpen && !IsBaseTimesOpen && !IsRankTimesOpen && !IsPagingOpen;
 
     public SettingsViewModel(
         IEntryDocumentTemplateService entryDocumentTemplateService,
@@ -55,6 +57,7 @@ public sealed partial class SettingsViewModel : ViewModelBase
         IFontScaleService fontScaleService,
         IPagingSettingsService pagingSettingsService,
         BaseTimesSettingsViewModel baseTimesSettingsViewModel,
+        RankTimesSettingsViewModel rankTimesSettingsViewModel,
         IScoringSettingsService scoringSettingsService)
     {
         _entryDocumentTemplateService = entryDocumentTemplateService;
@@ -63,6 +66,7 @@ public sealed partial class SettingsViewModel : ViewModelBase
         _fontScaleService = fontScaleService;
         _scoringSettingsService = scoringSettingsService;
         BaseTimes = baseTimesSettingsViewModel;
+        RankTimes = rankTimesSettingsViewModel;
         _selectedLanguage = localizationService.CurrentLanguage;
         _highlightScoringMode = entryImportSettingsService.HighlightScoringMode;
         _fontSize = fontScaleService.CurrentFontSize;
@@ -126,6 +130,8 @@ public sealed partial class SettingsViewModel : ViewModelBase
     {
         OnPropertyChanged(nameof(IsPlaceTableMode));
         OnPropertyChanged(nameof(IsWorldAquaticsMode));
+        if (value == ScoringMode.WorldAquatics)
+            BaseTimes.EnsureLoaded();
         if (_suppressScoringHandlers)
             return;
         _ = PersistActiveSettingsAndRecalculateAsync();
@@ -138,6 +144,7 @@ public sealed partial class SettingsViewModel : ViewModelBase
         foreach (var row in PlacePointRows)
             row.RefreshDisplayText();
         BaseTimes.RefreshDisplayNames();
+        RankTimes.RefreshDisplayNames();
         OnPropertyChanged(nameof(HighlightScoringModes));
         OnPropertyChanged(nameof(ScoringModes));
     }
@@ -146,8 +153,10 @@ public sealed partial class SettingsViewModel : ViewModelBase
     private void OpenScoring()
     {
         LoadScoringFromServices();
-        BaseTimes.ReloadFromRepository();
+        if (IsWorldAquaticsMode)
+            BaseTimes.EnsureLoaded();
         IsBaseTimesOpen = false;
+        IsRankTimesOpen = false;
         IsPagingOpen = false;
         IsScoringOpen = true;
     }
@@ -157,15 +166,28 @@ public sealed partial class SettingsViewModel : ViewModelBase
     {
         PersistActiveSettings();
         IsScoringOpen = false;
+        if (IsWorldAquaticsMode)
+            BaseTimes.ReloadFromRepository();
     }
 
     [RelayCommand]
     private void OpenBaseTimes()
     {
-        BaseTimes.ReloadFromRepository();
+        BaseTimes.EnsureLoaded();
         IsScoringOpen = false;
+        IsRankTimesOpen = false;
         IsPagingOpen = false;
         IsBaseTimesOpen = true;
+    }
+
+    [RelayCommand]
+    private void OpenRankTimes()
+    {
+        RankTimes.EnsureLoaded();
+        IsScoringOpen = false;
+        IsBaseTimesOpen = false;
+        IsPagingOpen = false;
+        IsRankTimesOpen = true;
     }
 
     [RelayCommand]
@@ -173,6 +195,7 @@ public sealed partial class SettingsViewModel : ViewModelBase
     {
         IsScoringOpen = false;
         IsBaseTimesOpen = false;
+        IsRankTimesOpen = false;
         IsPagingOpen = true;
     }
 
@@ -185,12 +208,20 @@ public sealed partial class SettingsViewModel : ViewModelBase
     [RelayCommand]
     private void CloseBaseTimes()
     {
-        BaseTimes.ReloadFromRepository();
         IsBaseTimesOpen = false;
+        BaseTimes.ReloadFromRepository();
+    }
+
+    [RelayCommand]
+    private void CloseRankTimes()
+    {
+        IsRankTimesOpen = false;
+        RankTimes.ReloadFromRepository();
     }
 
     partial void OnIsScoringOpenChanged(bool value) => OnPropertyChanged(nameof(IsSettingsHubVisible));
     partial void OnIsBaseTimesOpenChanged(bool value) => OnPropertyChanged(nameof(IsSettingsHubVisible));
+    partial void OnIsRankTimesOpenChanged(bool value) => OnPropertyChanged(nameof(IsSettingsHubVisible));
     partial void OnIsPagingOpenChanged(bool value) => OnPropertyChanged(nameof(IsSettingsHubVisible));
 
     [RelayCommand]

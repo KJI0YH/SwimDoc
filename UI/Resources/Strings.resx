@@ -53,6 +53,7 @@
   <data name="Menu_Open" xml:space="preserve"><value>Open</value></data>
 
   <data name="Settings_Tab_BaseTime" xml:space="preserve"><value>Base times</value></data>
+  <data name="Settings_Tab_Ranks" xml:space="preserve"><value>Ranks</value></data>
   <data name="Settings_Tab_Templates" xml:space="preserve"><value>Templates</value></data>
   <data name="Settings_Page_Subtitle" xml:space="preserve"><value>Application preferences, templates, and competition defaults.</value></data>
   <data name="Settings_Section_General" xml:space="preserve"><value>General</value></data>
@@ -64,6 +65,7 @@
   <data name="Settings_FontSize_Increase" xml:space="preserve"><value>Increase font size</value></data>
   <data name="Settings_FontSize_Decrease" xml:space="preserve"><value>Decrease font size</value></data>
   <data name="Settings_BaseTimes_Description" xml:space="preserve"><value>World Aquatics Points Base Times.</value></data>
+  <data name="Settings_Ranks_Description" xml:space="preserve"><value>Qualification times for swimming ranks (MSMK, MS, CMS, I–III, junior).</value></data>
   <data name="Settings_Section_Paging" xml:space="preserve"><value>Pagination</value></data>
   <data name="Settings_Paging_Description" xml:space="preserve"><value>Number of items loaded per page for each list. Applied immediately.</value></data>
   <data name="Settings_Paging_PageSize" xml:space="preserve"><value>Page size</value></data>
@@ -98,6 +100,10 @@
   <data name="BaseTimes_Col_Stroke" xml:space="preserve"><value>Stroke</value></data>
   <data name="BaseTimes_Header_BaseTime" xml:space="preserve"><value>Base time</value></data>
   <data name="BaseTimes_Header_BaseTimeSeconds" xml:space="preserve"><value>Base time (seconds)</value></data>
+  <data name="Ranks_Group_ScmMen" xml:space="preserve"><value>SCM (25m) — Men</value></data>
+  <data name="Ranks_Group_ScmWomen" xml:space="preserve"><value>SCM (25m) — Women</value></data>
+  <data name="Ranks_Group_LcmMen" xml:space="preserve"><value>LCM (50m) — Men</value></data>
+  <data name="Ranks_Group_LcmWomen" xml:space="preserve"><value>LCM (50m) — Women</value></data>
   <data name="Templates_Title" xml:space="preserve"><value>Templates</value></data>
   <data name="Templates_Description" xml:space="preserve"><value>Download ready-to-use templates for importing data into SwimDoc.</value></data>
   <data name="Templates_EntryDoc_GroupHeader" xml:space="preserve"><value>Entry Document</value></data>
@@ -241,6 +247,8 @@
   <data name="Dialog_Error_FileBusyOrUnavailableWithDetailsFormat" xml:space="preserve"><value>The file is used by another process or is unavailable.\n\n{0}</value></data>
   <data name="Dialog_Error_SaveBaseTimes_Title" xml:space="preserve"><value>Could not save base times</value></data>
   <data name="Dialog_Error_BaseTimesFileBusyOrUnavailable" xml:space="preserve"><value>The base times file is used by another process or is unavailable.</value></data>
+  <data name="Dialog_Error_SaveRankTimes_Title" xml:space="preserve"><value>Could not save rank times</value></data>
+  <data name="Dialog_Error_RankTimesFileBusyOrUnavailable" xml:space="preserve"><value>The rank times file is used by another process or is unavailable.</value></data>
   <data name="Dialog_Error_SaveFile_Title" xml:space="preserve"><value>Could not save file</value></data>
 
   <data name="Dialog_CreateCompetition_Title" xml:space="preserve"><value>Create new competition</value></data>
@@ -483,6 +491,7 @@
   <data name="Results_Col_Team" xml:space="preserve"><value>Club</value></data>
   <data name="Results_Col_Place" xml:space="preserve"><value>Place</value></data>
   <data name="Results_Col_Result" xml:space="preserve"><value>Result</value></data>
+  <data name="Results_Col_Rank" xml:space="preserve"><value>Rank</value></data>
   <data name="Results_Col_Points" xml:space="preserve"><value>Points</value></data>
   <data name="Results_Col_Total" xml:space="preserve"><value>Total</value></data>
 
@@ -494,6 +503,7 @@
   <data name="Fixation_Col_EntryTime" xml:space="preserve"><value>Entry time</value></data>
   <data name="Fixation_Col_Status" xml:space="preserve"><value>Status</value></data>
   <data name="Fixation_Col_Result" xml:space="preserve"><value>Result</value></data>
+  <data name="Fixation_Col_Rank" xml:space="preserve"><value>Rank</value></data>
   <data name="Fixation_Col_Points" xml:space="preserve"><value>Points</value></data>
   <data name="Fixation_Col_Comment" xml:space="preserve"><value>Comment</value></data>
   <data name="Fixation_Comment_Tooltip" xml:space="preserve"><value>Saved to Comment</value></data>

@@ -85,6 +85,7 @@ public static class Strings
     public static string Menu_Create => Get(nameof(Menu_Create));
     public static string Menu_Open => Get(nameof(Menu_Open));
     public static string Settings_Tab_BaseTime => Get(nameof(Settings_Tab_BaseTime));
+    public static string Settings_Tab_Ranks => Get(nameof(Settings_Tab_Ranks));
     public static string Settings_Tab_Templates => Get(nameof(Settings_Tab_Templates));
     public static string Settings_Page_Subtitle => Get(nameof(Settings_Page_Subtitle));
     public static string Settings_Section_General => Get(nameof(Settings_Section_General));
@@ -96,6 +97,7 @@ public static class Strings
     public static string Settings_FontSize_Increase => Get(nameof(Settings_FontSize_Increase));
     public static string Settings_FontSize_Decrease => Get(nameof(Settings_FontSize_Decrease));
     public static string Settings_BaseTimes_Description => Get(nameof(Settings_BaseTimes_Description));
+    public static string Settings_Ranks_Description => Get(nameof(Settings_Ranks_Description));
     public static string Settings_Section_Paging => Get(nameof(Settings_Section_Paging));
     public static string Settings_Paging_Description => Get(nameof(Settings_Paging_Description));
     public static string Settings_Paging_PageSize => Get(nameof(Settings_Paging_PageSize));
@@ -127,6 +129,10 @@ public static class Strings
     public static string BaseTimes_Col_Stroke => Get(nameof(BaseTimes_Col_Stroke));
     public static string BaseTimes_Header_BaseTime => Get(nameof(BaseTimes_Header_BaseTime));
     public static string BaseTimes_Header_BaseTimeSeconds => Get(nameof(BaseTimes_Header_BaseTimeSeconds));
+    public static string Ranks_Group_ScmMen => Get(nameof(Ranks_Group_ScmMen));
+    public static string Ranks_Group_ScmWomen => Get(nameof(Ranks_Group_ScmWomen));
+    public static string Ranks_Group_LcmMen => Get(nameof(Ranks_Group_LcmMen));
+    public static string Ranks_Group_LcmWomen => Get(nameof(Ranks_Group_LcmWomen));
     public static string Templates_EntryDoc_GroupHeader => Get(nameof(Templates_EntryDoc_GroupHeader));
     public static string Templates_EntryDoc_Title => Get(nameof(Templates_EntryDoc_Title));
     public static string Templates_EntryDoc_Subtitle => Get(nameof(Templates_EntryDoc_Subtitle));
@@ -246,6 +252,8 @@ public static class Strings
     public static string Dialog_Error_FileBusyOrUnavailableWithDetailsFormat => Get(nameof(Dialog_Error_FileBusyOrUnavailableWithDetailsFormat));
     public static string Dialog_Error_SaveBaseTimes_Title => Get(nameof(Dialog_Error_SaveBaseTimes_Title));
     public static string Dialog_Error_BaseTimesFileBusyOrUnavailable => Get(nameof(Dialog_Error_BaseTimesFileBusyOrUnavailable));
+    public static string Dialog_Error_SaveRankTimes_Title => Get(nameof(Dialog_Error_SaveRankTimes_Title));
+    public static string Dialog_Error_RankTimesFileBusyOrUnavailable => Get(nameof(Dialog_Error_RankTimesFileBusyOrUnavailable));
     public static string Dialog_Error_SaveFile_Title => Get(nameof(Dialog_Error_SaveFile_Title));
     public static string Dialog_CreateCompetition_Title => Get(nameof(Dialog_CreateCompetition_Title));
     public static string Dialog_OpenCompetition_Title => Get(nameof(Dialog_OpenCompetition_Title));
@@ -460,6 +468,7 @@ public static class Strings
     public static string Results_Col_Team => Get(nameof(Results_Col_Team));
     public static string Results_Col_Place => Get(nameof(Results_Col_Place));
     public static string Results_Col_Result => Get(nameof(Results_Col_Result));
+    public static string Results_Col_Rank => Get(nameof(Results_Col_Rank));
     public static string Results_Col_Points => Get(nameof(Results_Col_Points));
     public static string Results_Col_Total => Get(nameof(Results_Col_Total));
     public static string Fixation_Refresh => Get(nameof(Fixation_Refresh));
@@ -470,6 +479,7 @@ public static class Strings
     public static string Fixation_Col_EntryTime => Get(nameof(Fixation_Col_EntryTime));
     public static string Fixation_Col_Status => Get(nameof(Fixation_Col_Status));
     public static string Fixation_Col_Result => Get(nameof(Fixation_Col_Result));
+    public static string Fixation_Col_Rank => Get(nameof(Fixation_Col_Rank));
     public static string Fixation_Col_Points => Get(nameof(Fixation_Col_Points));
     public static string Fixation_Col_Comment => Get(nameof(Fixation_Col_Comment));
     public static string Fixation_Comment_Tooltip => Get(nameof(Fixation_Comment_Tooltip));

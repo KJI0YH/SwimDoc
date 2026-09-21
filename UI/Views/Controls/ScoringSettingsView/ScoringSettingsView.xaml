@@ -5,7 +5,6 @@
              xmlns:loc="clr-namespace:UI.Localization"
              xmlns:displayHelpers="clr-namespace:UI.Helpers.Display"
              xmlns:converters="clr-namespace:UI.Helpers.Converters"
-             xmlns:baseTimesView="clr-namespace:UI.Views.Controls.BaseTimesSettingsView"
              HorizontalAlignment="Stretch"
              VerticalAlignment="Stretch">
     <UserControl.Resources>
@@ -56,20 +55,14 @@
                 <TextBlock Style="{StaticResource TitleTextBlockStyle}"
                            Text="{loc:Localizastion Settings_Scoring_Title}" />
                 <TextBlock Margin="0,4,0,0"
-                           Height="18"
                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                           Text="{loc:Localizastion Settings_Scoring_Recalculating}">
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="Opacity" Value="0" />
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsRecalculating}" Value="True">
-                                    <Setter Property="Opacity" Value="1" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBlock.Style>
-                </TextBlock>
+                           TextWrapping="Wrap"
+                           VerticalAlignment="Center"
+                           Text="{loc:Localizastion Settings_Scoring_Description}" />
+                <TextBlock Margin="0,4,0,0"
+                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                           Text="{loc:Localizastion Settings_Scoring_Recalculating}"
+                           Visibility="{Binding IsRecalculating, Converter={StaticResource BoolToVis}}" />
             </StackPanel>
 
             <StackPanel Grid.Column="2"
@@ -122,18 +115,27 @@
                                    TextWrapping="Wrap"
                                    Text="{loc:Localizastion Settings_Scoring_Mode_Description}" />
                     </StackPanel>
-                    <ComboBox Grid.Column="1"
-                              Width="260"
-                              VerticalAlignment="Center"
-                              ItemsSource="{Binding ScoringModes}"
-                              SelectedItem="{Binding SelectedScoringMode}"
-                              IsEnabled="{Binding IsRecalculating, Converter={StaticResource InverseBoolConverter}}">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}}" />
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
+                    <StackPanel Grid.Column="1"
+                                Orientation="Horizontal"
+                                VerticalAlignment="Center">
+                        <ComboBox Width="260"
+                                  VerticalAlignment="Center"
+                                  Margin="0,0,8,0"
+                                  ItemsSource="{Binding ScoringModes}"
+                                  SelectedItem="{Binding SelectedScoringMode}"
+                                  IsEnabled="{Binding IsRecalculating, Converter={StaticResource InverseBoolConverter}}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                        <Button Command="{Binding ApplyPlaceTableCommand}"
+                                Content="{loc:Localizastion Settings_Scoring_Apply}"
+                                Padding="12,6"
+                                VerticalAlignment="Center"
+                                IsEnabled="{Binding IsRecalculating, Converter={StaticResource InverseBoolConverter}}" />
+                    </StackPanel>
                 </Grid>
             </Border>
 
@@ -173,11 +175,6 @@
                                     IsEnabled="{Binding IsRecalculating, Converter={StaticResource InverseBoolConverter}}" />
                             <Button Command="{Binding ResetPlacePointsToDefaultCommand}"
                                     Content="{loc:Localizastion Settings_Scoring_ResetDefaults}"
-                                    Margin="0,0,8,0"
-                                    Padding="12,6"
-                                    IsEnabled="{Binding IsRecalculating, Converter={StaticResource InverseBoolConverter}}" />
-                            <Button Command="{Binding ApplyPlaceTableCommand}"
-                                    Content="{loc:Localizastion Settings_Scoring_Apply}"
                                     Padding="12,6"
                                     IsEnabled="{Binding IsRecalculating, Converter={StaticResource InverseBoolConverter}}" />
                         </StackPanel>
@@ -243,11 +240,12 @@
                                TextWrapping="Wrap"
                                Text="{loc:Localizastion Settings_BaseTimes_Description}" />
                 </StackPanel>
-                <baseTimesView:BaseTimesSettingsView Grid.Row="1"
-                                                     DataContext="{Binding BaseTimes}"
-                                                     ShowHeader="False"
-                                                     HorizontalAlignment="Stretch"
-                                                     VerticalAlignment="Stretch" />
+                <ContentControl x:Name="BaseTimesHost"
+                                Grid.Row="1"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch"
+                                HorizontalContentAlignment="Stretch"
+                                VerticalContentAlignment="Stretch" />
             </Grid>
         </Grid>
     </Grid>

@@ -10,6 +10,7 @@ public partial class RelayRowViewModel : ObservableObject
 {
     private Action _onChanged;
     private string _entryTimeText = string.Empty;
+    private string _entryTimeDigits = string.Empty;
     private int? _entryTime;
     public ObservableCollection<SearchableItem> AvailableAthletes { get; } = new ResettableObservableCollection<SearchableItem>();
 
@@ -52,7 +53,10 @@ public partial class RelayRowViewModel : ObservableObject
                 return;
             var formatted = SwimTimeInput.Format(value);
             if (_entryTimeText != formatted)
+            {
                 SetProperty(ref _entryTimeText, formatted, nameof(EntryTimeText));
+                _entryTimeDigits = SwimTimeInput.ToDigitBuffer(value);
+            }
             _onChanged();
         }
     }
@@ -62,7 +66,8 @@ public partial class RelayRowViewModel : ObservableObject
         get => _entryTimeText;
         set
         {
-            var update = SwimTimeInput.ApplyText(value);
+            var update = SwimTimeInput.ApplyText(value, _entryTimeDigits, _entryTimeText);
+            _entryTimeDigits = update.Digits;
             if (_entryTimeText != update.Text)
                 SetProperty(ref _entryTimeText, update.Text);
             if (_entryTime != update.Hundredths)

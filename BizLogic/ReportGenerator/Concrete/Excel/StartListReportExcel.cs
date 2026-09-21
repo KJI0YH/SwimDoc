@@ -9,8 +9,12 @@ using BizLogic.Resources;
 
 namespace BizLogic.ReportGenerator.Concrete.Excel;
 
-public class StartListReportExcel(EfCoreContext dbContext) : BaseReportExcel(dbContext)
+public class StartListReportExcel(EfCoreContext dbContext, IAchievedRankFormatter? achievedRankFormatter = null)
+    : BaseReportExcel(dbContext)
 {
+    private readonly IAchievedRankFormatter _achievedRankFormatter =
+        achievedRankFormatter ?? NullAchievedRankFormatter.Instance;
+
     public override void AddWorksheet(ExcelPackage package, List<int> swimEventIds)
     {
         var swimEvents = DbAccess.GetSwimEventsWithHeats(swimEventIds);
@@ -18,7 +22,7 @@ public class StartListReportExcel(EfCoreContext dbContext) : BaseReportExcel(dbC
         RenderToWorksheet(worksheet, swimEvents);
     }
 
-    private static void RenderToWorksheet(ExcelWorksheet worksheet,
+    private void RenderToWorksheet(ExcelWorksheet worksheet,
         IEnumerable<DataLayer.EfClasses.SwimEvent> swimEvents)
     {
         const int colLane = 1;
@@ -49,9 +53,12 @@ public class StartListReportExcel(EfCoreContext dbContext) : BaseReportExcel(dbC
             titleRange.Value = LocalizedEntityDisplayFormatter.FormatSwimEvent(swimEvent);
             titleRange.Style.Font.Bold = true;
             titleRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            ReportExcelRankRequirementsHelper.ApplyThinBorder(titleRange);
             if (ReportExcelScoringHelper.IsNonScoringSwimEvent(swimEvent))
                 ReportExcelScoringHelper.ApplyNonScoringFill(titleRange);
             row += 1;
+            row = ReportExcelRankRequirementsHelper.TryWriteAfterTitle(
+                worksheet, row, colLane, tableLastCol, swimEvent, _achievedRankFormatter);
             worksheet.Cells[row, colLane].Value = ReportExcelStrings.Col_Lane;
             worksheet.Cells[row, colParticipant].Value = ReportExcelStrings.Col_Participant;
             worksheet.Cells[row, colBirthYear].Value = ReportExcelStrings.Col_BirthYear;
@@ -60,10 +67,7 @@ public class StartListReportExcel(EfCoreContext dbContext) : BaseReportExcel(dbC
             worksheet.Cells[row, colEntryTime].Value = ReportExcelStrings.Col_Time;
             var headerRange = worksheet.Cells[row, colLane, row, tableLastCol];
             headerRange.Style.Font.Bold = true;
-            headerRange.Style.Border.Top.Style = ExcelBorderStyle.Thin;
-            headerRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-            headerRange.Style.Border.Left.Style = ExcelBorderStyle.Thin;
-            headerRange.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            ReportExcelRankRequirementsHelper.ApplyThinBorder(headerRange);
             headerRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             headerRange.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
             headerRange.Style.WrapText = true;
@@ -108,10 +112,7 @@ public class StartListReportExcel(EfCoreContext dbContext) : BaseReportExcel(dbC
                     worksheet.Cells[row, colTeam].Value = LocalizedEntityDisplayFormatter.FormatEntryParticipantClubName(entry);
                     worksheet.Cells[row, colEntryTime].Value = EntryTimeDisplay.FormatEntryTime(entry.EntryTime);
                     var dataRange = worksheet.Cells[row, colLane, row, tableLastCol];
-                    dataRange.Style.Border.Top.Style = ExcelBorderStyle.Thin;
-                    dataRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-                    dataRange.Style.Border.Left.Style = ExcelBorderStyle.Thin;
-                    dataRange.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                    ReportExcelRankRequirementsHelper.ApplyThinBorder(dataRange);
                     if (ReportExcelScoringHelper.IsNonScoringEntry(entry))
                         ReportExcelScoringHelper.ApplyNonScoringFill(dataRange);
                     row += 1;

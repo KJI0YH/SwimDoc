@@ -7,6 +7,9 @@ namespace UI.ViewModels.Pages;
 public sealed partial class MixedRelayRowViewModel : ObservableObject
 {
     private bool _suppressSync;
+    private string _mixedClockDigits = string.Empty;
+    private string _mixedClockDisplay = string.Empty;
+
     public Course Course { get; }
     public int Distance { get; }
     public Stroke Stroke { get; }
@@ -39,12 +42,16 @@ public sealed partial class MixedRelayRowViewModel : ObservableObject
         MixedBaseTimeHundredths = mixedHundredthsFromStore;
         _mixedBaseTimeText = SwimTimeInput.Format(MixedBaseTimeHundredths);
         _mixedSecondsText = SwimTimeInput.FormatSecondsField(MixedBaseTimeHundredths);
+        _mixedClockDisplay = _mixedBaseTimeText;
+        _mixedClockDigits = SwimTimeInput.ToDigitBuffer(MixedBaseTimeHundredths);
     }
 
     partial void OnMixedBaseTimeTextChanged(string value)
     {
         if (_suppressSync) return;
-        var update = SwimTimeInput.FromClockText(value);
+        var update = SwimTimeInput.FromClockText(value, _mixedClockDigits, _mixedClockDisplay);
+        _mixedClockDigits = update.Digits;
+        _mixedClockDisplay = update.ClockText;
         MixedBaseTimeHundredths = update.Hundredths;
         _suppressSync = true;
         try { MixedSecondsText = update.SecondsText; }
@@ -55,6 +62,8 @@ public sealed partial class MixedRelayRowViewModel : ObservableObject
     {
         if (_suppressSync) return;
         var update = SwimTimeInput.FromSecondsText(value);
+        _mixedClockDigits = update.Digits;
+        _mixedClockDisplay = update.ClockText;
         MixedBaseTimeHundredths = update.Hundredths;
         _suppressSync = true;
         try
@@ -68,6 +77,7 @@ public sealed partial class MixedRelayRowViewModel : ObservableObject
     partial void OnMixedBaseTimeHundredthsChanged(int? value)
     {
         var formatted = SwimTimeInput.Format(value);
+        _mixedClockDisplay = formatted;
         if (!string.Equals(_mixedBaseTimeText, formatted, StringComparison.Ordinal))
         {
             _mixedBaseTimeText = formatted;

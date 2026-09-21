@@ -11,8 +11,15 @@ using ServiceLayer.Resources;
 
 namespace ServiceLayer.ReportGeneratorService;
 
-public sealed class ReportExportService(EfCoreContext dbContext, IEntryService entryService, IAppLog log) : IReportExportService
+public sealed class ReportExportService(
+    EfCoreContext dbContext,
+    IEntryService entryService,
+    IAppLog log,
+    IAchievedRankFormatter? achievedRankFormatter = null) : IReportExportService
 {
+    private readonly IAchievedRankFormatter _achievedRankFormatter =
+        achievedRankFormatter ?? NullAchievedRankFormatter.Instance;
+
     public void ExportToExcel(ReportExportOptions options)
     {
         if (options.SwimEventIds.Count == 0)
@@ -24,11 +31,11 @@ public sealed class ReportExportService(EfCoreContext dbContext, IEntryService e
             throw new ArgumentException(ServiceErrorStrings.ReportExport_NoReportsSelected, nameof(options));
         using var package = new ExcelPackage();
         if (options.IncludeEntryList)
-            new EntryListReportExcel(dbContext).AddWorksheet(package, options.SwimEventIds.ToList());
+            new EntryListReportExcel(dbContext, _achievedRankFormatter).AddWorksheet(package, options.SwimEventIds.ToList());
         if (options.IncludeStartList)
-            new StartListReportExcel(dbContext).AddWorksheet(package, options.SwimEventIds.ToList());
+            new StartListReportExcel(dbContext, _achievedRankFormatter).AddWorksheet(package, options.SwimEventIds.ToList());
         if (options.IncludeFinishList)
-            new FinishListReportExcel(dbContext).AddWorksheet(package, options.SwimEventIds.ToList());
+            new FinishListReportExcel(dbContext, _achievedRankFormatter).AddWorksheet(package, options.SwimEventIds.ToList());
         package.SaveAs(new FileInfo(options.OutputFilePath));
         log.Info(
             $"Export reports to Excel: file=\"{options.OutputFilePath}\", swimEventIds=[{EntityLogFormatter.FormatIdList(options.SwimEventIds)}], entryList={options.IncludeEntryList}, startList={options.IncludeStartList}, finishList={options.IncludeFinishList}");

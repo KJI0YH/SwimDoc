@@ -7,6 +7,11 @@ namespace UI.ViewModels.Pages;
 public sealed partial class BaseTimeTableRowViewModel : ObservableObject
 {
     private bool _suppressSync;
+    private string _menClockDigits = string.Empty;
+    private string _womenClockDigits = string.Empty;
+    private string _menClockDisplay = string.Empty;
+    private string _womenClockDisplay = string.Empty;
+
     public Course Course { get; }
     public int Distance { get; }
     public Stroke Stroke { get; }
@@ -46,12 +51,18 @@ public sealed partial class BaseTimeTableRowViewModel : ObservableObject
         _womenBaseTimeText = SwimTimeInput.Format(WomenBaseTimeHundredths);
         _menSecondsText = SwimTimeInput.FormatSecondsField(MenBaseTimeHundredths);
         _womenSecondsText = SwimTimeInput.FormatSecondsField(WomenBaseTimeHundredths);
+        _menClockDisplay = _menBaseTimeText;
+        _womenClockDisplay = _womenBaseTimeText;
+        _menClockDigits = SwimTimeInput.ToDigitBuffer(MenBaseTimeHundredths);
+        _womenClockDigits = SwimTimeInput.ToDigitBuffer(WomenBaseTimeHundredths);
     }
 
     partial void OnMenBaseTimeTextChanged(string value)
     {
         if (_suppressSync) return;
-        var update = SwimTimeInput.FromClockText(value);
+        var update = SwimTimeInput.FromClockText(value, _menClockDigits, _menClockDisplay);
+        _menClockDigits = update.Digits;
+        _menClockDisplay = update.ClockText;
         MenBaseTimeHundredths = update.Hundredths;
         _suppressSync = true;
         try { MenSecondsText = update.SecondsText; }
@@ -61,7 +72,9 @@ public sealed partial class BaseTimeTableRowViewModel : ObservableObject
     partial void OnWomenBaseTimeTextChanged(string value)
     {
         if (_suppressSync) return;
-        var update = SwimTimeInput.FromClockText(value);
+        var update = SwimTimeInput.FromClockText(value, _womenClockDigits, _womenClockDisplay);
+        _womenClockDigits = update.Digits;
+        _womenClockDisplay = update.ClockText;
         WomenBaseTimeHundredths = update.Hundredths;
         _suppressSync = true;
         try { WomenSecondsText = update.SecondsText; }
@@ -72,6 +85,8 @@ public sealed partial class BaseTimeTableRowViewModel : ObservableObject
     {
         if (_suppressSync) return;
         var update = SwimTimeInput.FromSecondsText(value);
+        _menClockDigits = update.Digits;
+        _menClockDisplay = update.ClockText;
         MenBaseTimeHundredths = update.Hundredths;
         _suppressSync = true;
         try
@@ -86,6 +101,8 @@ public sealed partial class BaseTimeTableRowViewModel : ObservableObject
     {
         if (_suppressSync) return;
         var update = SwimTimeInput.FromSecondsText(value);
+        _womenClockDigits = update.Digits;
+        _womenClockDisplay = update.ClockText;
         WomenBaseTimeHundredths = update.Hundredths;
         _suppressSync = true;
         try
@@ -99,6 +116,7 @@ public sealed partial class BaseTimeTableRowViewModel : ObservableObject
     partial void OnMenBaseTimeHundredthsChanged(int? value)
     {
         var formatted = SwimTimeInput.Format(value);
+        _menClockDisplay = formatted;
         if (!string.Equals(_menBaseTimeText, formatted, StringComparison.Ordinal))
         {
             _menBaseTimeText = formatted;
@@ -109,6 +127,7 @@ public sealed partial class BaseTimeTableRowViewModel : ObservableObject
     partial void OnWomenBaseTimeHundredthsChanged(int? value)
     {
         var formatted = SwimTimeInput.Format(value);
+        _womenClockDisplay = formatted;
         if (!string.Equals(_womenBaseTimeText, formatted, StringComparison.Ordinal))
         {
             _womenBaseTimeText = formatted;

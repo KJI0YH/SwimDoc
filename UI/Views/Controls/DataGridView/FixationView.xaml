@@ -83,6 +83,7 @@
                         <DataGridTextColumn Header="{loc:Localizastion Fixation_Col_Participant}" Binding="{Binding ParticipantName}" IsReadOnly="True"
                                             Width="*" />
                         <DataGridTextColumn Header="{loc:Localizastion Fixation_Col_BirthYear}" Binding="{Binding YearOfBirth}" IsReadOnly="True" Width="120"/>
+                        <DataGridTextColumn Header="{loc:Localizastion Athletes_Col_Category}" Binding="{Binding Category}" IsReadOnly="True" Width="100"/>
                         <DataGridTextColumn Header="{loc:Localizastion Fixation_Col_Club}" Binding="{Binding Club}" IsReadOnly="True" Width="*" />
                         <DataGridTextColumn Header="{loc:Localizastion Fixation_Col_EntryTime}" Binding="{Binding EntryTimeDisplay}" IsReadOnly="True"
                                             Width="100" />
@@ -120,6 +121,8 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
+
+                        <DataGridTextColumn Header="{loc:Localizastion Fixation_Col_Rank}" Binding="{Binding RankDisplay}" IsReadOnly="True" Width="90"/>
                         
                         <DataGridTextColumn Header="{loc:Localizastion Fixation_Col_Points}" Binding="{Binding Points}" IsReadOnly="True" Width="100"/>
 

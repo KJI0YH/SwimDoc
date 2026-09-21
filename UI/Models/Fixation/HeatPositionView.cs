@@ -34,6 +34,7 @@ public sealed class HeatPositionView(
         : HeatPosition.Lane.ToString();
     public string Participant => EntityDisplayFormatter.FormatEntryParticipantName(HeatPosition.Entry);
     public int? YearOfBirth => HeatPosition.Entry.Athlete?.YearOfBirth;
+    public string Category => EntityDisplayFormatter.FormatAthleteCategory(HeatPosition.Entry.Athlete);
     public string Club => EntityDisplayFormatter.FormatEntryParticipantClubName(HeatPosition.Entry);
     public string EntryTime => EntityDisplayFormatter.FormatEntryTime(HeatPosition.Entry);
     public string FinishTime => EntityDisplayFormatter.FormatFinishTime(HeatPosition.Entry);

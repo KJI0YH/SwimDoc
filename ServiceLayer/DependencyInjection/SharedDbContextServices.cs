@@ -1,3 +1,4 @@
+using BizLogic.ReportGenerator;
 using DataLayer.EfCore;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.EntryService;
@@ -16,6 +17,11 @@ public static class SharedDbContextServices
     {
         var dbContext = provider.GetRequiredService<EfCoreContext>();
         var log = provider.GetRequiredService<IAppLog>();
-        return new ReportExportService(dbContext, new EntryService.EntryService(dbContext, log), log);
+        var achievedRankFormatter = provider.GetService<IAchievedRankFormatter>();
+        return new ReportExportService(
+            dbContext,
+            new EntryService.EntryService(dbContext, log),
+            log,
+            achievedRankFormatter);
     }
 }

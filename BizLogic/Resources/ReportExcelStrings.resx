@@ -25,6 +25,7 @@
   <data name="Col_Category" xml:space="preserve"><value>Category</value></data>
   <data name="Col_Team" xml:space="preserve"><value>Club</value></data>
   <data name="Col_Time" xml:space="preserve"><value>Time</value></data>
+  <data name="Col_Rank" xml:space="preserve"><value>Rank</value></data>
   <data name="Col_Points" xml:space="preserve"><value>Points</value></data>
   <data name="Col_Total" xml:space="preserve"><value>Total</value></data>
 

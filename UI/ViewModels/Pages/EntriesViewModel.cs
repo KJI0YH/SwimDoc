@@ -185,6 +185,12 @@ public partial class EntriesViewModel(
                     : SlowestTimeRank,
                 e => e.Id),
             nameof(Entry.FinishTime)));
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("RankDisplay", Strings.Results_Col_Rank, 70,
+            ColumnConfiguration<Entry>.SortBy(
+                e => e.Status == EntryStatus.FINISH && e.FinishTime.HasValue
+                    ? e.FinishTime!.Value
+                    : SlowestTimeRank,
+                e => e.Id)));
         ColumnConfigurations.Add(new ColumnConfiguration<Entry>("Points", Strings.Entries_Col_Points, 50,
             ColumnConfiguration<Entry>.SortBy(e => e.Points ?? 0)));
         ColumnConfigurations.Add(new ColumnConfiguration<Entry>("Comment", Strings.Entries_Col_Comment, 250,

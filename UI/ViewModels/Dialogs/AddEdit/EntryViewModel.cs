@@ -39,6 +39,7 @@ public partial class EntryViewModel(
     private int? _contextEventId;
     private int? _contextSwimStyleId;
     private string _entryTimeText = string.Empty;
+    private string _entryTimeDigits = string.Empty;
     [ObservableProperty] private SearchableItem? _selectedAthlete;
     [ObservableProperty] private SearchableItem? _selectedSwimEvent;
     [ObservableProperty] private ObservableCollection<SearchableItem> _swimEvents = new ResettableObservableCollection<SearchableItem>();
@@ -106,6 +107,7 @@ public partial class EntryViewModel(
             if (_entryTimeText != formatted)
             {
                 _entryTimeText = formatted;
+                _entryTimeDigits = SwimTimeInput.ToDigitBuffer(value);
                 OnPropertyChanged(nameof(EntryTimeText));
             }
         }
@@ -116,7 +118,8 @@ public partial class EntryViewModel(
         get => _entryTimeText;
         set
         {
-            var update = SwimTimeInput.ApplyText(value);
+            var update = SwimTimeInput.ApplyText(value, _entryTimeDigits, _entryTimeText);
+            _entryTimeDigits = update.Digits;
             if (_entryTimeText != update.Text)
             {
                 _entryTimeText = update.Text;
@@ -220,6 +223,7 @@ public partial class EntryViewModel(
         await LoadAllAthletesAsync();
         await LoadExistingIndividualEntryKeysAsync();
         _entryTimeText = SwimTimeInput.Format(Entity.EntryTime);
+        _entryTimeDigits = SwimTimeInput.ToDigitBuffer(Entity.EntryTime);
         OnPropertyChanged(nameof(EntryTimeText));
         OnPropertyChanged(nameof(Scoring));
         if (IsAdd)

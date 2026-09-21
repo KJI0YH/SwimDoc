@@ -5,8 +5,6 @@
       xmlns:loc="clr-namespace:UI.Localization"
       xmlns:displayHelpers="clr-namespace:UI.Helpers.Display"
       xmlns:converters="clr-namespace:UI.Helpers.Converters"
-      xmlns:baseTimesView="clr-namespace:UI.Views.Controls.BaseTimesSettingsView"
-      xmlns:scoringView="clr-namespace:UI.Views.Controls.ScoringSettingsView"
       xmlns:pagingView="clr-namespace:UI.Views.Controls.PagingSettingsView"
       ScrollViewer.CanContentScroll="False">
     <Page.Resources>
@@ -76,6 +74,29 @@
                         <StackPanel Grid.Column="1" Margin="16,0,16,0" VerticalAlignment="Center">
                             <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}"
                                        Text="{loc:Localizastion Settings_Scoring_Title}" />
+                        </StackPanel>
+                        <ui:SymbolIcon Grid.Column="2"
+                                       Symbol="ChevronRight24"
+                                       VerticalAlignment="Center" />
+                    </Grid>
+                </Button>
+                <Button Style="{StaticResource SettingsNavCardButtonStyle}"
+                        Margin="0,12,0,0"
+                        Command="{Binding OpenRankTimesCommand}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Border Grid.Column="0" Style="{StaticResource SettingsIconBadgeStyle}">
+                            <ui:SymbolIcon Symbol="RibbonStar24"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel Grid.Column="1" Margin="16,0,16,0" VerticalAlignment="Center">
+                            <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}"
+                                       Text="{loc:Localizastion Settings_Tab_Ranks}" />
                         </StackPanel>
                         <ui:SymbolIcon Grid.Column="2"
                                        Symbol="ChevronRight24"
@@ -207,8 +228,11 @@
               HorizontalAlignment="Stretch"
               VerticalAlignment="Stretch"
               Visibility="{Binding IsScoringOpen, Converter={StaticResource BoolToVis}}">
-            <scoringView:ScoringSettingsView HorizontalAlignment="Stretch"
-                                             VerticalAlignment="Stretch" />
+            <ContentControl x:Name="ScoringHost"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
+                            HorizontalContentAlignment="Stretch"
+                            VerticalContentAlignment="Stretch" />
         </Grid>
         <Grid Margin="24,24,24,24"
               HorizontalAlignment="Stretch"
@@ -221,9 +245,21 @@
               HorizontalAlignment="Stretch"
               VerticalAlignment="Stretch"
               Visibility="{Binding IsBaseTimesOpen, Converter={StaticResource BoolToVis}}">
-            <baseTimesView:BaseTimesSettingsView DataContext="{Binding BaseTimes}"
-                                                 HorizontalAlignment="Stretch"
-                                                 VerticalAlignment="Stretch" />
+            <ContentControl x:Name="BaseTimesHost"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
+                            HorizontalContentAlignment="Stretch"
+                            VerticalContentAlignment="Stretch" />
+        </Grid>
+        <Grid Margin="24,24,24,24"
+              HorizontalAlignment="Stretch"
+              VerticalAlignment="Stretch"
+              Visibility="{Binding IsRankTimesOpen, Converter={StaticResource BoolToVis}}">
+            <ContentControl x:Name="RankTimesHost"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
+                            HorizontalContentAlignment="Stretch"
+                            VerticalContentAlignment="Stretch" />
         </Grid>
     </Grid>
 </Page>

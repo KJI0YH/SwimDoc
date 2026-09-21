@@ -18,6 +18,7 @@ public sealed class EntryRowProjection
     public string? AthleteFirstName { get; init; }
     public string? AthleteLastName { get; init; }
     public int? AthleteYearOfBirth { get; init; }
+    public Gender? AthleteGender { get; init; }
     public Category? AthleteCategory { get; init; }
     public string? AthleteClubName { get; init; }
     public string? RelayClubName { get; init; }
@@ -27,6 +28,7 @@ public sealed class EntryRowProjection
     public Stroke SwimStyleStroke { get; init; }
     public int SwimStyleRelayCount { get; init; }
     public bool SwimStyleIsRelay { get; init; }
+    public Course? SwimEventCourse { get; init; }
     public int? SwimEventOrder { get; init; }
     public EventRound? SwimEventRound { get; init; }
     public int? SwimEventAgeGroupId { get; init; }

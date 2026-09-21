@@ -51,6 +51,8 @@
                     <DataGridTextColumn Header="{loc:Localizastion Results_Col_Team}" Binding="{Binding ClubName}" IsReadOnly="True" Width="*" />
                     <DataGridTextColumn Header="{loc:Localizastion Results_Col_Result}" Binding="{Binding ResultText}" IsReadOnly="True"
                                         Width="150" />
+                    <DataGridTextColumn Header="{loc:Localizastion Results_Col_Rank}" Binding="{Binding RankDisplay}" IsReadOnly="True"
+                                        Width="90" />
                     <DataGridTextColumn Header="{loc:Localizastion Results_Col_Points}" Binding="{Binding Points}" IsReadOnly="True" Width="150" />
                 </DataGrid.Columns>
             </ui:DataGrid>
