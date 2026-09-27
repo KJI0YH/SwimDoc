@@ -99,6 +99,15 @@ public static class EntityDisplay
         return string.Empty;
     }
 
+    public static string FormatEntryPoints(Entry? entry, IEntityDisplayTexts texts)
+    {
+        if (entry is null)
+            return string.Empty;
+        if (!entry.Scoring)
+            return texts.PersonalPointsParen;
+        return entry.Points?.ToString(texts.Culture) ?? string.Empty;
+    }
+
     public static string FormatEntryTime(Entry? entry) =>
         entry is null ? string.Empty : EntryTimeDisplay.FormatEntryTime(entry.EntryTime);
 

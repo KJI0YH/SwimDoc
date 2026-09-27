@@ -15,5 +15,6 @@ public interface IEntityDisplayTexts
     string AgeGroupYearRangeOlderThan { get; }
     string AgeGroupYearRangeYoungerThan { get; }
     string PersonalParen { get; }
+    string PersonalPointsParen { get; }
     string MissingParticipantParen { get; }
 }

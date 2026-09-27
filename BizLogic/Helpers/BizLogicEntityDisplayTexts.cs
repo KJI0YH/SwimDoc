@@ -24,5 +24,6 @@ internal sealed class BizLogicEntityDisplayTexts : IEntityDisplayTexts
     public string AgeGroupYearRangeOlderThan => EntityDisplayStrings.AgeGroup_YearRange_OlderThan;
     public string AgeGroupYearRangeYoungerThan => EntityDisplayStrings.AgeGroup_YearRange_YoungerThan;
     public string PersonalParen => ReportExcelStrings.Value_PersonalParen;
+    public string PersonalPointsParen => ReportExcelStrings.Value_PersonalPointsParen;
     public string MissingParticipantParen => ReportExcelStrings.Value_NoneParen;
 }

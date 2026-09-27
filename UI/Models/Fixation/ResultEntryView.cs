@@ -23,5 +23,5 @@ public sealed class ResultEntryView(int place, Entry entry)
     public string RankDisplay => Entry.SwimEvent is null
         ? string.Empty
         : _achievedRankProvider.Format(Entry.SwimEvent, Entry);
-    public int? Points => Entry.Points;
+    public string Points => EntityDisplayFormatter.FormatEntryPoints(Entry);
 }

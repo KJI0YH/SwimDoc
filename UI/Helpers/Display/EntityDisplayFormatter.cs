@@ -62,6 +62,9 @@ public static class EntityDisplayFormatter
     public static string FormatEntryParticipantBirthYear(Entry? entry) =>
         EntityDisplay.FormatEntryParticipantBirthYear(entry, Texts);
 
+    public static string FormatEntryPoints(Entry? entry) =>
+        EntityDisplay.FormatEntryPoints(entry, Texts);
+
     public static string FormatEntryTime(Entry? entry) =>
         EntityDisplay.FormatEntryTime(entry);
 

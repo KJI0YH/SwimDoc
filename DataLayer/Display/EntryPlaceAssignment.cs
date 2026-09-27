@@ -12,7 +12,7 @@ public static class EntryPlaceAssignment
 
     public static IReadOnlyList<Entry> OrderForResults(IEnumerable<Entry> entries) =>
         entries
-            .OrderBy(e => IsUnranked(e) ? 1 : 0)
+            .OrderBy(e => EntryTimeDisplay.IsDisqualifiedResult(e) ? 2 : IsUnranked(e) ? 1 : 0)
             .ThenBy(e => e.FinishTime ?? int.MaxValue)
             .ThenBy(e => e.Id)
             .ToList();

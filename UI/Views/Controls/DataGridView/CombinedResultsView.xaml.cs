@@ -1,3 +1,4 @@
+using System.Collections;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
@@ -14,6 +15,7 @@ public partial class CombinedResultsView : UserControl
 {
     private static readonly CombinedResultsEventScoringConverter EventScoringConverter = new();
     private static readonly SolidColorBrush NonScoringCellBrush = new(Color.FromRgb(0xD3, 0xD3, 0xD3));
+    private readonly Dictionary<DataGridColumn, int> _eventColumnSwimStyleIds = new();
     private CombinedResultsViewModel? _subscribedViewModel;
     private DataGrid? _grid;
     public CombinedResultsView()
@@ -40,6 +42,27 @@ public partial class CombinedResultsView : UserControl
         e.Handled = true;
     }
 
+    private void CombinedResultsGrid_Sorting(object sender, DataGridSortingEventArgs e)
+    {
+        if (sender is not DataGrid dataGrid ||
+            CollectionViewSource.GetDefaultView(dataGrid.ItemsSource) is not ListCollectionView view)
+            return;
+        if (!_eventColumnSwimStyleIds.TryGetValue(e.Column, out var swimStyleId))
+        {
+            view.CustomSort = null;
+            return;
+        }
+
+        e.Handled = true;
+        var direction = e.Column.SortDirection == ListSortDirection.Ascending
+            ? ListSortDirection.Descending
+            : ListSortDirection.Ascending;
+        foreach (var column in dataGrid.Columns)
+            column.SortDirection = null;
+        e.Column.SortDirection = direction;
+        view.CustomSort = new EventPointsComparer(swimStyleId, direction);
+    }
+
     private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
     {
         if (_subscribedViewModel is not null)
@@ -61,9 +84,12 @@ public partial class CombinedResultsView : UserControl
         if (_grid is null)
             return;
         _grid.Columns.Clear();
+        _eventColumnSwimStyleIds.Clear();
         if (DataContext is not CombinedResultsViewModel viewModel)
             return;
-        _grid.Columns.Add(CreateTextColumn(Strings.Results_Col_Place, nameof(CombinedResultRow.PlaceDisplay), 80));
+        var placeColumn = CreateTextColumn(Strings.Results_Col_Place, nameof(CombinedResultRow.PlaceDisplay), 80);
+        placeColumn.SortMemberPath = nameof(CombinedResultRow.Place);
+        _grid.Columns.Add(placeColumn);
         _grid.Columns.Add(CreateTextColumn(Strings.Results_Col_Participant, nameof(CombinedResultRow.ParticipantName), 220));
         _grid.Columns.Add(CreateTextColumn(Strings.Fixation_Col_BirthYear, nameof(CombinedResultRow.YearOfBirth), 120));
         _grid.Columns.Add(CreateTextColumn(Strings.Athletes_Col_Category, nameof(CombinedResultRow.Category), 100));
@@ -71,7 +97,7 @@ public partial class CombinedResultsView : UserControl
         _grid.Columns.Add(CreateTextColumn(Strings.Results_Col_Total, nameof(CombinedResultRow.TotalPoints), 90));
         foreach (var column in viewModel.EventColumns)
         {
-            _grid.Columns.Add(new DataGridTextColumn
+            var eventColumn = new DataGridTextColumn
             {
                 Header = column.Header,
                 Width = 110,
@@ -80,7 +106,9 @@ public partial class CombinedResultsView : UserControl
                     TargetNullValue = string.Empty
                 },
                 CellStyle = CreateNonScoringCellStyle(column.SwimStyleId)
-            });
+            };
+            _eventColumnSwimStyleIds[eventColumn] = column.SwimStyleId;
+            _grid.Columns.Add(eventColumn);
         }
         DataGridHeaderFitHelper.FitHeaders(_grid);
     }
@@ -119,4 +147,21 @@ public partial class CombinedResultsView : UserControl
             IsReadOnly = true,
             Binding = new Binding(bindingPath)
         };
+
+    private sealed class EventPointsComparer(int swimStyleId, ListSortDirection direction) : IComparer
+    {
+        public int Compare(object? x, object? y)
+        {
+            if (x is not CombinedResultRow left || y is not CombinedResultRow right)
+                return 0;
+            var leftPoints = left.GetPoints(swimStyleId);
+            var rightPoints = right.GetPoints(swimStyleId);
+            if (leftPoints is null || rightPoints is null)
+                return (leftPoints is null ? 1 : 0) - (rightPoints is null ? 1 : 0);
+            var result = leftPoints.Value.CompareTo(rightPoints.Value);
+            if (result == 0)
+                return Nullable.Compare(left.Place, right.Place);
+            return direction == ListSortDirection.Ascending ? result : -result;
+        }
+    }
 }

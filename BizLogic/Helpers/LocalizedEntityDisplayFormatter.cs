@@ -33,4 +33,7 @@ public static class LocalizedEntityDisplayFormatter
 
     public static string FormatEntryParticipantClubName(Entry entry) =>
         EntityDisplay.FormatEntryParticipantClubName(entry, Texts);
+
+    public static string FormatEntryPoints(Entry entry) =>
+        EntityDisplay.FormatEntryPoints(entry, Texts);
 }

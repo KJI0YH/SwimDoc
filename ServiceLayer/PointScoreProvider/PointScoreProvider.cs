@@ -50,7 +50,7 @@ public sealed class PointScoreProvider(
 
         foreach (var entry in entries)
         {
-            if (entry.Status != EntryStatus.FINISH || entry.FinishTime is null or <= 0)
+            if (!entry.Scoring || entry.Status != EntryStatus.FINISH || entry.FinishTime is null or <= 0)
             {
                 entry.Points = 0;
                 continue;
@@ -86,17 +86,14 @@ public sealed class PointScoreProvider(
 
     private static void ApplyPlaceTablePoints(IReadOnlyList<Entry> entries, IReadOnlyList<int> placePoints)
     {
-        var ordered = EntryPlaceAssignment.OrderForResults(entries);
-        var places = EntryPlaceAssignment.AssignPlaces(ordered);
-        foreach (var (entry, place) in places)
+        foreach (var entry in entries.Where(e => !e.Scoring))
+            entry.Points = 0;
+        var scoringOrdered = EntryPlaceAssignment.OrderForResults(entries.Where(e => e.Scoring));
+        foreach (var (entry, place) in EntryPlaceAssignment.AssignPlaces(scoringOrdered))
         {
-            if (EntryPlaceAssignment.IsUnranked(entry))
-            {
-                entry.Points = 0;
-                continue;
-            }
-
-            entry.Points = GetPointsForPlace(placePoints, place);
+            entry.Points = EntryPlaceAssignment.IsUnranked(entry)
+                ? 0
+                : GetPointsForPlace(placePoints, place);
         }
     }
 

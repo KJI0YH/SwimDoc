@@ -76,7 +76,10 @@ public static class CombinedResultsReportExcel
                     var cell = worksheet.Cells[row, ++eventColumnOffset];
                     cell.Value = athleteRow.PointsBySwimStyleId.GetValueOrDefault(eventColumn.SwimStyleId);
                     if (IsNonScoringSwimStyle(athleteRow, eventColumn.SwimStyleId))
+                    {
+                        cell.Value = ReportExcelStrings.Value_PersonalPointsParen;
                         ReportExcelScoringHelper.ApplyNonScoringFill(cell);
+                    }
                 }
                 var dataRange = worksheet.Cells[row, colPlace, row, tableLastCol];
                 dataRange.Style.Border.Top.Style = ExcelBorderStyle.Thin;

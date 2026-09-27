@@ -308,6 +308,7 @@ public static class Strings
     public static string WindowTitle_EditAgeGroup => Get(nameof(WindowTitle_EditAgeGroup));
     public static string Common_NoneParen => Get(nameof(Common_NoneParen));
     public static string Common_PersonalParen => Get(nameof(Common_PersonalParen));
+    public static string Common_PersonalPointsParen => Get(nameof(Common_PersonalPointsParen));
     public static string Common_ScoringPersonalCount_Format => Get(nameof(Common_ScoringPersonalCount_Format));
     public static string HeatAlloc_WindowTitle => Get(nameof(HeatAlloc_WindowTitle));
     public static string HeatAlloc_Validation_MinHeatSize => Get(nameof(HeatAlloc_Validation_MinHeatSize));

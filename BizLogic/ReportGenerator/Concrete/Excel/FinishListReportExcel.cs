@@ -92,7 +92,9 @@ public class FinishListReportExcel(EfCoreContext dbContext, IAchievedRankFormatt
                 worksheet.Cells[row, colTeam].Value = LocalizedEntityDisplayFormatter.FormatEntryParticipantClubName(entry);
                 worksheet.Cells[row, colFinishTime].Value = EntryTimeDisplay.FormatResultTime(entry);
                 worksheet.Cells[row, colRank].Value = _achievedRankFormatter.Format(swimEvent, entry);
-                worksheet.Cells[row, colPoints].Value = entry.Points;
+                worksheet.Cells[row, colPoints].Value = entry.Scoring
+                    ? entry.Points
+                    : LocalizedEntityDisplayFormatter.FormatEntryPoints(entry);
                 worksheet.Cells[row, colComment].Value = entry.Comment;
                 var dataRange = worksheet.Cells[row, colNo, row, tableLastCol];
                 ReportExcelRankRequirementsHelper.ApplyThinBorder(dataRange);

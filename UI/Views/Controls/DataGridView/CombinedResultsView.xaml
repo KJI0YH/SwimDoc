@@ -44,6 +44,7 @@
                          AutoGenerateColumns="False"
                          IsReadOnly="True"
                          Loaded="CombinedResultsGrid_Loaded"
+                         Sorting="CombinedResultsGrid_Sorting"
                          RowStyle="{StaticResource CombinedResultsRowStyle}" />
         </dataView:DefaultDataView.MainContent>
     </dataView:DefaultDataView>

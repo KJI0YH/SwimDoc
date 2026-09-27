@@ -81,6 +81,53 @@ public sealed class PointScoreProviderTest
         Assert.That(alreadyFinished.Single(e => e.Id == 2).Points, Is.EqualTo(36));
     }
 
+    [Test]
+    public void ApplyEventPoints_PlaceTable_PersonalEntriesDoNotTakeScoringPlaces()
+    {
+        var settings = new FakeScoringSettings(new ActiveScoringSettings
+        {
+            Mode = ScoringMode.PlaceTable,
+            PlacePoints = [50, 45, 40, 36]
+        });
+        var provider = new PointScoreProvider(new FakeBaseTimeRepository(1000), settings);
+        var swimEvent = CreateSwimEvent();
+        var personalFirst = CreateEntry(1, EntryStatus.FINISH, 1900);
+        personalFirst.Scoring = false;
+        var personalThird = CreateEntry(4, EntryStatus.FINISH, 2050);
+        personalThird.Scoring = false;
+        var entries = new List<Entry>
+        {
+            personalFirst,
+            CreateEntry(2, EntryStatus.FINISH, 2000),
+            CreateEntry(3, EntryStatus.FINISH, 2020),
+            personalThird,
+            CreateEntry(5, EntryStatus.FINISH, 2100),
+        };
+
+        provider.ApplyEventPoints(swimEvent, entries);
+
+        Assert.That(entries.Single(e => e.Id == 1).Points, Is.EqualTo(0));
+        Assert.That(entries.Single(e => e.Id == 2).Points, Is.EqualTo(50));
+        Assert.That(entries.Single(e => e.Id == 3).Points, Is.EqualTo(45));
+        Assert.That(entries.Single(e => e.Id == 4).Points, Is.EqualTo(0));
+        Assert.That(entries.Single(e => e.Id == 5).Points, Is.EqualTo(40));
+    }
+
+    [Test]
+    public void ApplyEventPoints_WorldAquatics_PersonalEntriesGetNoPoints()
+    {
+        var settings = new FakeScoringSettings(new ActiveScoringSettings { Mode = ScoringMode.WorldAquatics });
+        var provider = new PointScoreProvider(new FakeBaseTimeRepository(1000), settings);
+        var personal = CreateEntry(1, EntryStatus.FINISH, 1000);
+        personal.Scoring = false;
+        var scoring = CreateEntry(2, EntryStatus.FINISH, 1000);
+
+        provider.ApplyEventPoints(CreateSwimEvent(), [personal, scoring]);
+
+        Assert.That(personal.Points, Is.EqualTo(0));
+        Assert.That(scoring.Points, Is.EqualTo(1000));
+    }
+
     private static SwimEvent CreateSwimEvent() =>
         new()
         {

@@ -31,6 +31,7 @@
 
   <data name="Value_NoneParen" xml:space="preserve"><value>(нет данных)</value></data>
   <data name="Value_PersonalParen" xml:space="preserve"><value>(Лично)</value></data>
+  <data name="Value_PersonalPointsParen" xml:space="preserve"><value>(лично)</value></data>
 
   <data name="HeatTitle_Format" xml:space="preserve"><value>Заплыв {0} из {1} ({2} из {3})</value></data>
   <data name="HeatTitle_WithStart_Format" xml:space="preserve"><value>Заплыв {0} из {1} ({2} из {3}), старт {4}</value></data>

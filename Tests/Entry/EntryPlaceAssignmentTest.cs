@@ -23,6 +23,23 @@ public sealed class EntryPlaceAssignmentTest
     }
 
     [Test]
+    public void OrderForResults_DisqualifiedAfterEntriesWithoutResult()
+    {
+        var entries = new List<DataLayer.EfClasses.Entry>
+        {
+            CreateEntry(1, EntryStatus.DNS, null),
+            CreateEntry(2, EntryStatus.DSQ, 1900),
+            CreateEntry(3, EntryStatus.ENTRY, null),
+            CreateEntry(4, EntryStatus.FINISH, 2000),
+            CreateEntry(5, EntryStatus.FINISH, null),
+        };
+
+        var ordered = EntryPlaceAssignment.OrderForResults(entries);
+
+        Assert.That(ordered.Select(e => e.Id), Is.EqualTo(new[] { 4, 3, 5, 2, 1 }));
+    }
+
+    [Test]
     public void AssignPlaces_TiedFinishTimes_KeepSharedPlace()
     {
         var entries = new List<DataLayer.EfClasses.Entry>

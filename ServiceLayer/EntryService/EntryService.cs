@@ -143,13 +143,14 @@ public class EntryService(EfCoreContext dbContext, IAppLog log) : CrudService<En
         var rows = await dbContext.Entries
             .AsNoTracking()
             .Where(e => e.SwimEventId == eventId)
-            .Select(e => new { e.Id, e.Status, e.FinishTime, e.Points, e.SwimEventId, e.SwimStyleId })
+            .Select(e => new { e.Id, e.Status, e.Scoring, e.FinishTime, e.Points, e.SwimEventId, e.SwimStyleId })
             .ToListAsync();
         return rows
             .Select(e => new Entry
             {
                 Id = e.Id,
                 Status = e.Status,
+                Scoring = e.Scoring,
                 FinishTime = e.FinishTime,
                 Points = e.Points,
                 SwimEventId = e.SwimEventId,

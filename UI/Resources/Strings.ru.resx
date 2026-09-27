@@ -326,6 +326,7 @@
 
   <data name="Common_NoneParen" xml:space="preserve"><value>(Нет)</value></data>
   <data name="Common_PersonalParen" xml:space="preserve"><value>(Лично)</value></data>
+  <data name="Common_PersonalPointsParen" xml:space="preserve"><value>(лично)</value></data>
   <data name="Common_ScoringPersonalCount_Format" xml:space="preserve"><value>{0} / {1}</value></data>
 
   <data name="HeatAlloc_WindowTitle" xml:space="preserve"><value>Параметры формирования заплывов</value></data>

@@ -29,6 +29,7 @@ public static class ReportExcelStrings
     public static string Col_Comment => Get(nameof(Col_Comment));
     public static string Value_NoneParen => Get(nameof(Value_NoneParen));
     public static string Value_PersonalParen => Get(nameof(Value_PersonalParen));
+    public static string Value_PersonalPointsParen => Get(nameof(Value_PersonalPointsParen));
     public static string HeatTitle_Format => Get(nameof(HeatTitle_Format));
     public static string HeatTitle_WithStart_Format => Get(nameof(HeatTitle_WithStart_Format));
 }

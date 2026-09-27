@@ -1,3 +1,5 @@
+using UI.Resources;
+
 namespace UI.Models.CombinedResults;
 
 public sealed class CombinedResultRow
@@ -38,8 +40,22 @@ public sealed class CombinedResultRow
     public bool IsInOfficialStandings { get; }
     private readonly Dictionary<int, string> _pointsBySwimStyleId;
     private readonly Dictionary<int, bool> _scoringBySwimStyleId;
-    public string this[int swimStyleId] =>
-        _pointsBySwimStyleId.TryGetValue(swimStyleId, out var points) ? points : string.Empty;
+    public string this[int swimStyleId]
+    {
+        get
+        {
+            if (IsNonScoringSwimStyle(swimStyleId))
+                return Strings.Common_PersonalPointsParen;
+            return _pointsBySwimStyleId.TryGetValue(swimStyleId, out var points) ? points : string.Empty;
+        }
+    }
+
+    public int? GetPoints(int swimStyleId) =>
+        !IsNonScoringSwimStyle(swimStyleId) &&
+        _pointsBySwimStyleId.TryGetValue(swimStyleId, out var points) &&
+        int.TryParse(points, out var value)
+            ? value
+            : null;
 
     public bool IsNonScoringSwimStyle(int swimStyleId) =>
         _scoringBySwimStyleId.TryGetValue(swimStyleId, out var scoring) && !scoring;

@@ -18,5 +18,6 @@ internal sealed class UiEntityDisplayTexts : IEntityDisplayTexts
     public string AgeGroupYearRangeOlderThan => Strings.Get("AgeGroup_YearRange_OlderThan");
     public string AgeGroupYearRangeYoungerThan => Strings.Get("AgeGroup_YearRange_YoungerThan");
     public string PersonalParen => Strings.Common_PersonalParen;
+    public string PersonalPointsParen => Strings.Common_PersonalPointsParen;
     public string MissingParticipantParen => string.Empty;
 }
