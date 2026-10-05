@@ -8,6 +8,8 @@ namespace ServiceLayer.RankTimeProvider;
 public interface IAchievedRankProvider : IAchievedRankFormatter
 {
     Category? Resolve(SwimEvent swimEvent, Entry entry);
+
+    bool MeetsCategory(SwimEvent swimEvent, Entry entry, Category minimum);
 }
 
 public sealed class AchievedRankProvider(IRankTimeRepository rankTimeRepository) : IAchievedRankProvider
@@ -39,18 +41,43 @@ public sealed class AchievedRankProvider(IRankTimeRepository rankTimeRepository)
         ArgumentNullException.ThrowIfNull(entry);
         if (entry.Status != EntryStatus.FINISH || entry.FinishTime is null or <= 0)
             return null;
+        var norms = GetNorms(swimEvent, entry);
+        return norms.Count == 0 ? null : CategoryClassifier.Classify(entry.FinishTime.Value, norms);
+    }
+
+    public bool MeetsCategory(SwimEvent swimEvent, Entry entry, Category minimum)
+    {
+        ArgumentNullException.ThrowIfNull(swimEvent);
+        ArgumentNullException.ThrowIfNull(entry);
+        if (minimum == Category.NoCategory)
+            return true;
+        if (entry.Status != EntryStatus.FINISH || entry.FinishTime is null or <= 0)
+            return false;
+        var norms = GetNorms(swimEvent, entry);
+        if (norms.Count == 0)
+            return true;
+        var achieved = CategoryClassifier.Classify(entry.FinishTime.Value, norms);
+        if (achieved is null)
+            return false;
+        return Array.IndexOf(CategoryDisplay.FromHighest, achieved.Value) <=
+               Array.IndexOf(CategoryDisplay.FromHighest, minimum);
+    }
+
+    private IReadOnlyDictionary<Category, int> GetNorms(SwimEvent swimEvent, Entry entry)
+    {
         var swimStyle = entry.SwimStyle ?? swimEvent.SwimStyle;
         if (swimStyle is null || swimStyle.IsRelay)
-            return null;
+            return EmptyNorms;
         var gender = ResolveGender(swimEvent, entry);
-        var norms = rankTimeRepository.GetRankTimes(
+        return rankTimeRepository.GetRankTimes(
             swimEvent.Course,
             swimStyle.Distance,
             swimStyle.Stroke,
             swimStyle.RelayCount,
             gender);
-        return CategoryClassifier.Classify(entry.FinishTime.Value, norms);
     }
+
+    private static readonly IReadOnlyDictionary<Category, int> EmptyNorms = new Dictionary<Category, int>();
 
     private static Gender ResolveGender(SwimEvent swimEvent, Entry entry)
     {

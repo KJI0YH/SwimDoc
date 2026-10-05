@@ -69,6 +69,7 @@ public sealed class AppSettingsStore : IAppSettingsStore
             EntryImportHighlightScoringMode = settings.EntryImportHighlightScoringMode,
             ScoringMode = settings.ScoringMode,
             PlacePoints = settings.PlacePoints is null ? null : [..settings.PlacePoints],
+            ScoringMinimumCategory = settings.ScoringMinimumCategory,
             ActiveScoringPresetId = settings.ActiveScoringPresetId
         };
 

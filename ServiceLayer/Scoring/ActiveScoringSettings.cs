@@ -1,3 +1,5 @@
+using DataLayer.EfClasses;
+
 namespace ServiceLayer.Scoring;
 
 public sealed class ActiveScoringSettings
@@ -7,6 +9,7 @@ public sealed class ActiveScoringSettings
 
     public ScoringMode Mode { get; init; } = ScoringMode.WorldAquatics;
     public IReadOnlyList<int> PlacePoints { get; init; } = DefaultPlacePoints;
+    public Category? MinimumCategory { get; init; }
 
     public static ActiveScoringSettings Defaults { get; } = new()
     {

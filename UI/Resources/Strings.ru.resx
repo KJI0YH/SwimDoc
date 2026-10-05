@@ -76,6 +76,9 @@
   <data name="Settings_Scoring_Recalculating" xml:space="preserve"><value>Пересчёт очков...</value></data>
   <data name="Settings_Scoring_Mode" xml:space="preserve"><value>Режим подсчёта</value></data>
   <data name="Settings_Scoring_Mode_Description" xml:space="preserve"><value>Очки World Aquatics или командный зачёт по местам. Смена режима пересчитывает очки в открытом соревновании.</value></data>
+  <data name="Settings_Scoring_MinimumCategory" xml:space="preserve"><value>Разряд для начисления очков</value></data>
+  <data name="Settings_Scoring_MinimumCategory_Description" xml:space="preserve"><value>Очки получают только заявки, проплывшие на выбранный разряд или быстрее. Остальные получают 0 очков. Эстафеты и дистанции без разрядных нормативов не ограничиваются.</value></data>
+  <data name="Settings_Scoring_MinimumCategory_All" xml:space="preserve"><value>Все разряды</value></data>
   <data name="Settings_Scoring_PlaceTable" xml:space="preserve"><value>Очки за места</value></data>
   <data name="Settings_Scoring_PlaceTable_Description" xml:space="preserve"><value>Нажмите «Применить», чтобы сохранить таблицу и пересчитать очки в открытом соревновании.</value></data>
   <data name="Settings_Scoring_PlaceColumn" xml:space="preserve"><value>Место</value></data>

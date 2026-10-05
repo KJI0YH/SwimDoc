@@ -1,13 +1,15 @@
 using DataLayer.Display;
 using DataLayer.EfClasses;
 using ServiceLayer.BaseTimeRepository;
+using ServiceLayer.RankTimeProvider;
 using ServiceLayer.Scoring;
 
 namespace ServiceLayer.PointScoreProvider;
 
 public sealed class PointScoreProvider(
     IBaseTimeRepository baseTimeRepository,
-    IScoringSettingsService scoringSettings) : IPointScoreProvider
+    IScoringSettingsService scoringSettings,
+    IAchievedRankProvider achievedRankProvider) : IPointScoreProvider
 {
     public int CalculatePoints(
         Course course,
@@ -45,6 +47,7 @@ public sealed class PointScoreProvider(
                 ? MergeHeatEntriesForRanking(rankingEntries, entries)
                 : entries;
             ApplyPlaceTablePoints(forRanking, settings.PlacePoints);
+            ApplyMinimumCategory(swimEvent, forRanking, settings.MinimumCategory);
             return;
         }
 
@@ -65,6 +68,19 @@ public sealed class PointScoreProvider(
                 swimStyle.RelayCount,
                 gender,
                 entry.FinishTime);
+        }
+
+        ApplyMinimumCategory(swimEvent, entries, settings.MinimumCategory);
+    }
+
+    private void ApplyMinimumCategory(SwimEvent swimEvent, IReadOnlyList<Entry> entries, Category? minimum)
+    {
+        if (minimum is null or Category.NoCategory)
+            return;
+        foreach (var entry in entries)
+        {
+            if (entry.Points is > 0 && !achievedRankProvider.MeetsCategory(swimEvent, entry, minimum.Value))
+                entry.Points = 0;
         }
     }
 

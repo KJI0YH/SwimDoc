@@ -1,3 +1,4 @@
+using DataLayer.EfClasses;
 using ServiceLayer.AppSettings;
 using ServiceLayer.Logging;
 
@@ -27,7 +28,7 @@ public sealed class ScoringSettingsService : IScoringSettingsService
         ArgumentNullException.ThrowIfNull(settings);
         _current = Normalize(settings);
         SaveToStore(_current);
-        _log.Info($"Scoring settings updated: mode={_current.Mode}");
+        _log.Info($"Scoring settings updated: mode={_current.Mode}, minimumCategory={_current.MinimumCategory?.ToString() ?? "none"}");
         if (raiseChanged)
             Changed?.Invoke();
     }
@@ -46,8 +47,18 @@ public sealed class ScoringSettingsService : IScoringSettingsService
         return Normalize(new ActiveScoringSettings
         {
             Mode = mode,
-            PlacePoints = ResolvePlacePoints(stored.PlacePoints)
+            PlacePoints = ResolvePlacePoints(stored.PlacePoints),
+            MinimumCategory = ResolveMinimumCategory(stored.ScoringMinimumCategory)
         });
+    }
+
+    private static Category? ResolveMinimumCategory(string? stored)
+    {
+        if (string.IsNullOrWhiteSpace(stored))
+            return null;
+        return Enum.TryParse(stored, ignoreCase: true, out Category parsed) && Enum.IsDefined(parsed)
+            ? parsed
+            : null;
     }
 
     private static List<int> ResolvePlacePoints(List<int>? stored)
@@ -67,6 +78,7 @@ public sealed class ScoringSettingsService : IScoringSettingsService
         {
             s.ScoringMode = settings.Mode.ToString();
             s.PlacePoints = settings.PlacePoints.ToList();
+            s.ScoringMinimumCategory = settings.MinimumCategory?.ToString();
             s.ActiveScoringPresetId = null;
         });
     }
@@ -77,6 +89,7 @@ public sealed class ScoringSettingsService : IScoringSettingsService
             Mode = settings.Mode,
             PlacePoints = settings.PlacePoints.Count > 0
                 ? settings.PlacePoints.ToList()
-                : ActiveScoringSettings.DefaultPlacePoints.ToList()
+                : ActiveScoringSettings.DefaultPlacePoints.ToList(),
+            MinimumCategory = settings.MinimumCategory is Category.NoCategory ? null : settings.MinimumCategory
         };
 }

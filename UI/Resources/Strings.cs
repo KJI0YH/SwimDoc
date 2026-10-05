@@ -108,6 +108,9 @@ public static class Strings
     public static string Settings_Scoring_Recalculating => Get(nameof(Settings_Scoring_Recalculating));
     public static string Settings_Scoring_Mode => Get(nameof(Settings_Scoring_Mode));
     public static string Settings_Scoring_Mode_Description => Get(nameof(Settings_Scoring_Mode_Description));
+    public static string Settings_Scoring_MinimumCategory => Get(nameof(Settings_Scoring_MinimumCategory));
+    public static string Settings_Scoring_MinimumCategory_Description => Get(nameof(Settings_Scoring_MinimumCategory_Description));
+    public static string Settings_Scoring_MinimumCategory_All => Get(nameof(Settings_Scoring_MinimumCategory_All));
     public static string Settings_Scoring_PlaceTable => Get(nameof(Settings_Scoring_PlaceTable));
     public static string Settings_Scoring_PlaceTable_Description => Get(nameof(Settings_Scoring_PlaceTable_Description));
     public static string Settings_Scoring_PlaceColumn => Get(nameof(Settings_Scoring_PlaceColumn));

@@ -8,5 +8,6 @@ public sealed class AppSettings
     public string? EntryImportHighlightScoringMode { get; set; }
     public string? ScoringMode { get; set; }
     public List<int>? PlacePoints { get; set; }
+    public string? ScoringMinimumCategory { get; set; }
     public string? ActiveScoringPresetId { get; set; }
 }

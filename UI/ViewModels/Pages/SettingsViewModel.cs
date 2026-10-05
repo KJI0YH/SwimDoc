@@ -7,6 +7,7 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
 using BizLogic.EntryDocumentReader;
+using DataLayer.Display;
 using ServiceLayer.EntryDocumentTemplateService;
 using ServiceLayer.EntryImportSettings;
 using ServiceLayer.Logging;
@@ -34,6 +35,9 @@ public sealed partial class SettingsViewModel : ViewModelBase
     public RankTimesSettingsViewModel RankTimes { get; }
     public ObservableCollection<PlacePointRowViewModel> PlacePointRows { get; } = new();
 
+    public IReadOnlyList<ScoringCategoryOption> ScoringCategoryOptions { get; } =
+        [new ScoringCategoryOption(null), ..CategoryDisplay.FromHighest.Select(c => new ScoringCategoryOption(c))];
+
     [ObservableProperty] private AppLanguage _selectedLanguage;
     [ObservableProperty] private bool _isBaseTimesOpen;
     [ObservableProperty] private bool _isRankTimesOpen;
@@ -42,6 +46,7 @@ public sealed partial class SettingsViewModel : ViewModelBase
     [ObservableProperty] private EntryImportHighlightScoringMode _highlightScoringMode;
     [ObservableProperty] private int _fontSize;
     [ObservableProperty] private ScoringMode _selectedScoringMode;
+    [ObservableProperty] private ScoringCategoryOption? _selectedScoringCategory;
     [ObservableProperty] private bool _isRecalculating;
 
     public Array HighlightScoringModes => Enum.GetValues<EntryImportHighlightScoringMode>();
@@ -94,6 +99,8 @@ public sealed partial class SettingsViewModel : ViewModelBase
     private void ApplyActiveSettingsToUi(ActiveScoringSettings settings)
     {
         SelectedScoringMode = settings.Mode;
+        SelectedScoringCategory = ScoringCategoryOptions.FirstOrDefault(o => o.Category == settings.MinimumCategory)
+                                  ?? ScoringCategoryOptions[0];
         ReplacePlacePointRows(settings.PlacePoints);
         OnPropertyChanged(nameof(IsPlaceTableMode));
         OnPropertyChanged(nameof(IsWorldAquaticsMode));
@@ -137,12 +144,21 @@ public sealed partial class SettingsViewModel : ViewModelBase
         _ = PersistActiveSettingsAndRecalculateAsync();
     }
 
+    partial void OnSelectedScoringCategoryChanged(ScoringCategoryOption? value)
+    {
+        if (_suppressScoringHandlers || value is null)
+            return;
+        _ = PersistActiveSettingsAndRecalculateAsync();
+    }
+
     private void OnCultureChanged(CultureInfo _)
     {
         foreach (var item in PagingSettings)
             item.RefreshDisplayText();
         foreach (var row in PlacePointRows)
             row.RefreshDisplayText();
+        foreach (var option in ScoringCategoryOptions)
+            option.RefreshDisplayText();
         BaseTimes.RefreshDisplayNames();
         RankTimes.RefreshDisplayNames();
         OnPropertyChanged(nameof(HighlightScoringModes));
@@ -284,7 +300,8 @@ public sealed partial class SettingsViewModel : ViewModelBase
         _scoringSettingsService.SetActive(new ActiveScoringSettings
         {
             Mode = SelectedScoringMode,
-            PlacePoints = PlacePointRows.Select(r => r.Points).ToList()
+            PlacePoints = PlacePointRows.Select(r => r.Points).ToList(),
+            MinimumCategory = SelectedScoringCategory?.Category
         });
     }
 

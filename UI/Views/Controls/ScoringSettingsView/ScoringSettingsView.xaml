@@ -98,6 +98,7 @@
         <Grid Grid.Row="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
@@ -139,7 +140,36 @@
                 </Grid>
             </Border>
 
-            <Grid Grid.Row="1"
+            <Border Grid.Row="1" Style="{StaticResource SettingsCardBorderStyle}" Margin="0,0,0,12">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel VerticalAlignment="Center" Margin="0,0,16,0">
+                        <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}"
+                                   Text="{loc:Localizastion Settings_Scoring_MinimumCategory}" />
+                        <TextBlock Margin="0,4,0,0"
+                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                   TextWrapping="Wrap"
+                                   Text="{loc:Localizastion Settings_Scoring_MinimumCategory_Description}" />
+                    </StackPanel>
+                    <ComboBox Grid.Column="1"
+                              Width="260"
+                              VerticalAlignment="Center"
+                              ItemsSource="{Binding ScoringCategoryOptions}"
+                              SelectedItem="{Binding SelectedScoringCategory}"
+                              IsEnabled="{Binding IsRecalculating, Converter={StaticResource InverseBoolConverter}}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DisplayText}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </Grid>
+            </Border>
+
+            <Grid Grid.Row="2"
                   Visibility="{Binding IsPlaceTableMode, Converter={StaticResource BoolToVis}}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -226,7 +256,7 @@
                 </Border>
             </Grid>
 
-            <Grid Grid.Row="1"
+            <Grid Grid.Row="2"
                   Visibility="{Binding IsWorldAquaticsMode, Converter={StaticResource BoolToVis}}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />

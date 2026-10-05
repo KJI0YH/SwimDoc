@@ -24,6 +24,8 @@ public sealed class PointsRecalculationService(
             .Include(e => e.AgeGroup)
             .Include(e => e.Entries)
             .ThenInclude(entry => entry.SwimStyle)
+            .Include(e => e.Entries)
+            .ThenInclude(entry => entry.Athlete)
             .Where(e => e.Entries.Any(entry => entry.Status >= EntryStatus.FINISH))
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
@@ -42,6 +44,8 @@ public sealed class PointsRecalculationService(
             .Include(e => e.AgeGroup)
             .Include(e => e.Entries)
             .ThenInclude(entry => entry.SwimStyle)
+            .Include(e => e.Entries)
+            .ThenInclude(entry => entry.Athlete)
             .FirstOrDefaultAsync(e => e.Id == swimEventId, cancellationToken)
             .ConfigureAwait(false);
         if (swimEvent is null)
