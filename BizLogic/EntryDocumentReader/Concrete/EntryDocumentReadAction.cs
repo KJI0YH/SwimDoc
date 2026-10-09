@@ -132,7 +132,7 @@ public partial class EntryDocumentReadAction(
             foreach (var canonical in canonicalHeaders)
             {
                 var aliases = HeaderAliases.TryGetValue(canonical, out var list) ? list : [canonical];
-                if (aliases.Contains(cell.Text, StringComparer.OrdinalIgnoreCase))
+                if (aliases.Contains(cell.Text.Trim(), StringComparer.OrdinalIgnoreCase))
                 {
                     headersCols[canonical] = cell.Start;
                     break;
@@ -148,7 +148,7 @@ public partial class EntryDocumentReadAction(
         var usedCells = workSheet.Cells.Where(cell => !string.IsNullOrEmpty(cell.Text));
         foreach (var cell in usedCells)
         {
-            if (headers.Contains(cell.Text, StringComparer.OrdinalIgnoreCase))
+            if (headers.Contains(cell.Text.Trim(), StringComparer.OrdinalIgnoreCase))
                 return cell.Start;
         }
 
@@ -175,7 +175,7 @@ public partial class EntryDocumentReadAction(
             if (string.IsNullOrWhiteSpace(currentStrokeText))
                 continue;
 
-            var distanceText = workSheet.Cells[distanceRow, col].Text;
+            var distanceText = workSheet.Cells[distanceRow, col].Text.Trim();
             if (string.IsNullOrWhiteSpace(distanceText))
                 continue;
             if (!int.TryParse(distanceText, out var distance))
@@ -219,7 +219,7 @@ public partial class EntryDocumentReadAction(
             return false;
         for (var col = startCol; col <= endCol; col++)
         {
-            if (int.TryParse(workSheet.Cells[row, col].Text, out _))
+            if (int.TryParse(workSheet.Cells[row, col].Text.Trim(), out _))
                 return true;
         }
 
@@ -338,7 +338,7 @@ public partial class EntryDocumentReadAction(
                 hasErrors = true;
             }
 
-            if (!int.TryParse(workSheet.Cells[row, athleteHeaders[BIRTH_YEAR_HEADER]!.Column].Text,
+            if (!int.TryParse(workSheet.Cells[row, athleteHeaders[BIRTH_YEAR_HEADER]!.Column].Text.Trim(),
                     out var yearOfBirth))
             {
                 _warnings.Add(
@@ -349,7 +349,7 @@ public partial class EntryDocumentReadAction(
                 hasErrors = true;
             }
 
-            if (!EntryDocumentEnumParser.TryParseGender(workSheet.Cells[row, athleteHeaders[GENDER_HEADER]!.Column].Text,
+            if (!EntryDocumentEnumParser.TryParseGender(workSheet.Cells[row, athleteHeaders[GENDER_HEADER]!.Column].Text.Trim(),
                     out var gender))
             {
                 _warnings.Add(
@@ -463,16 +463,16 @@ public partial class EntryDocumentReadAction(
 
     private Club? ReadClub(ExcelWorksheet workSheet, Dictionary<string, ExcelCellAddress?> clubHeaders)
     {
-        if (!clubHeaders.TryGetValue(CLUB_NAME_HEADER, out var colClub)) return null;
+        if (!clubHeaders.TryGetValue(CLUB_NAME_HEADER, out var colClub) || colClub is null) return null;
         var row = clubHeaders.First(pair => pair.Key == CLUB_NAME_HEADER).Value!.Row;
         var col = colClub!.Column;
-        var clubName = workSheet.Cells[row, col].Text;
+        var clubName = workSheet.Cells[row, col].Text.Trim();
         if (string.Equals(clubName?.Trim(), HeaderAliases[CLUB_NAME_HEADER].First(),
                 StringComparison.OrdinalIgnoreCase) ||
             HeaderAliases[CLUB_NAME_HEADER].Contains(clubName ?? string.Empty, StringComparer.OrdinalIgnoreCase))
         {
             while (workSheet.Cells[row, col + 1].IsEmpty()) row++;
-            clubName = workSheet.Cells[row, col + 1].Text;
+            clubName = workSheet.Cells[row, col + 1].Text.Trim();
         }
 
         if (string.IsNullOrWhiteSpace(clubName))
@@ -545,7 +545,7 @@ public partial class EntryDocumentReadAction(
         if (!athleteHeaders.TryGetValue(CATEGORY_HEADER, out var categoryHeader) || categoryHeader is null)
             return Category.NoCategory;
 
-        var categoryText = workSheet.Cells[row, categoryHeader.Column].Text;
+        var categoryText = workSheet.Cells[row, categoryHeader.Column].Text.Trim();
         if (string.IsNullOrWhiteSpace(categoryText))
             return Category.NoCategory;
 
