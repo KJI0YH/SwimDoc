@@ -1,13 +1,16 @@
 using System.Collections.ObjectModel;
+using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DataLayer;
 using DataLayer.Display;
 using DataLayer.EfClasses;
+using DataLayer.Resources;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceLayer.AgeGroupService;
 using ServiceLayer.EventService;
+using ServiceLayer.Scoring;
 using ServiceLayer.SwimStyleService;
 using UI.Helpers.Collections;
 using UI.Resources;
@@ -33,6 +36,8 @@ public partial class EventAddViewModel(
     [ObservableProperty] private ObservableCollection<SearchableItem> _swimStyles = new();
     [ObservableProperty] private int _laneTabIndex;
     private string? _savedCustomLaneNames;
+    private string? _pointsMultiplierText;
+    private double _initialPointsMultiplier = 1;
     private bool _isSyncingLaneTab;
     private bool _suppressSelectionSync;
     public IReadOnlyList<string> HourOptions { get; } = CreateTimePartOptions(24);
@@ -177,6 +182,31 @@ public partial class EventAddViewModel(
         }
     }
 
+    public IReadOnlyList<string> PointsMultiplierOptions { get; } = ["1", "2"];
+
+    public string PointsMultiplierText
+    {
+        get => _pointsMultiplierText ?? FormatPointsMultiplier(Entity.PointsMultiplier);
+        set
+        {
+            _pointsMultiplierText = value;
+            if (TryParsePointsMultiplier(value, out var multiplier))
+                Entity.PointsMultiplier = multiplier;
+            OnPropertyChanged();
+        }
+    }
+
+    private static string FormatPointsMultiplier(double value) =>
+        value.ToString(CultureInfo.CurrentCulture);
+
+    private static bool TryParsePointsMultiplier(string? text, out double value) =>
+        double.TryParse(
+            (text ?? string.Empty).Trim().Replace(',', '.'),
+            NumberStyles.Float,
+            CultureInfo.InvariantCulture,
+            out value)
+        && value > 0;
+
     public int LaneMin
     {
         get => Entity.LaneMin;
@@ -229,8 +259,10 @@ public partial class EventAddViewModel(
     public override async Task InitializeAsync()
     {
         await base.InitializeAsync();
+        _initialPointsMultiplier = Entity.PointsMultiplier;
         OnPropertyChanged(nameof(HourText));
         OnPropertyChanged(nameof(MinuteText));
+        OnPropertyChanged(nameof(PointsMultiplierText));
         LoadAgeGroups();
         LoadSwimStyles();
         LoadPreviousSwimEvents();
@@ -270,6 +302,11 @@ public partial class EventAddViewModel(
 
     protected override bool ValidateBeforeSave()
     {
+        if (!TryParsePointsMultiplier(PointsMultiplierText, out _))
+        {
+            ValidationErrors.Add(ValidationStrings.SwimEvent_PointsMultiplierMustBeGreaterThanZero);
+            return false;
+        }
         if (LaneTabIndex == 1)
         {
             if (string.IsNullOrWhiteSpace(Entity.CustomLaneNames))
@@ -281,6 +318,14 @@ public partial class EventAddViewModel(
         else
             Entity.CustomLaneNames = null;
         return true;
+    }
+
+    protected override async Task OnSavedAsync()
+    {
+        if (!IsEdit || Entity.PointsMultiplier == _initialPointsMultiplier)
+            return;
+        var recalculation = App.Current.Services.GetRequiredService<IPointsRecalculationService>();
+        await recalculation.RecalculateSwimEventAsync(Entity.Id);
     }
 
     partial void OnLaneTabIndexChanged(int value) => ApplyLaneTabIndex(value);

@@ -10,6 +10,7 @@ public class ColumnConfiguration
     public string? Header { get; set; }
     public double? Width { get; set; }
     public DataGridLengthUnitType? WidthUnitType { get; set; }
+    public double? MinWidth { get; set; }
     public bool IsReadOnly { get; set; } = true;
     public object? Converter { get; set; }
     public string? ConverterParameter { get; set; }

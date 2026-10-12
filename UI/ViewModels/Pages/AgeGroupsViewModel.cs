@@ -41,23 +41,26 @@ public partial class AgeGroupsViewModel : DataViewModel<AgeGroup, AgeGroupRowVie
     {
         AutoGenerateColumns = false;
         ColumnConfigurations.Clear();
-        ColumnConfigurations.Add(new ColumnConfiguration<AgeGroup>("DisplayName", Strings.AgeGroups_Col_Name, 400,
-            ColumnConfiguration<AgeGroup>.SortBy(ag => ag.Name)));
-        ColumnConfigurations.Add(new ColumnConfiguration<AgeGroup>("Gender", Strings.AgeGroups_Col_Gender, 100,
+        ColumnConfigurations.Add(new ColumnConfiguration<AgeGroup>("DisplayName", Strings.AgeGroups_Col_Name, ColumnWidth.Auto,
+            ColumnConfiguration<AgeGroup>.SortBy(ag => ag.Name))
+        {
+            MinWidth = 250
+        });
+        ColumnConfigurations.Add(new ColumnConfiguration<AgeGroup>("Gender", Strings.AgeGroups_Col_Gender, ColumnWidth.Auto,
             ColumnConfiguration<AgeGroup>.SortBy(ag => ag.Gender)));
-        ColumnConfigurations.Add(new ColumnConfiguration<AgeGroup>("BirthYearMin", Strings.AgeGroups_Col_BirthYearFrom, 150,
+        ColumnConfigurations.Add(new ColumnConfiguration<AgeGroup>("BirthYearMin", Strings.AgeGroups_Col_BirthYearFrom, ColumnWidth.Auto,
             ColumnConfiguration<AgeGroup>.SortBy(ag => ag.BirthYearMin))
         {
             Converter = new BirthYearBoundConverter(),
             ConverterParameter = BirthYearBoundConverter.Min
         });
-        ColumnConfigurations.Add(new ColumnConfiguration<AgeGroup>("BirthYearMax", Strings.AgeGroups_Col_BirthYearTo, 150,
+        ColumnConfigurations.Add(new ColumnConfiguration<AgeGroup>("BirthYearMax", Strings.AgeGroups_Col_BirthYearTo, ColumnWidth.Auto,
             ColumnConfiguration<AgeGroup>.SortBy(ag => ag.BirthYearMax))
         {
             Converter = new BirthYearBoundConverter(),
             ConverterParameter = BirthYearBoundConverter.Max
         });
-        ColumnConfigurations.Add(new ColumnConfiguration<AgeGroup>("ParticipantCount", Strings.AgeGroups_Col_Participants, 120,
+        ColumnConfigurations.Add(new ColumnConfiguration<AgeGroup>("ParticipantCount", Strings.AgeGroups_Col_Participants, ColumnWidth.Auto,
             ColumnConfiguration<AgeGroup>.SortBy(ag => ag.Id)));
     }
 

@@ -34,7 +34,10 @@ public static class EntityDisplay
                 club.Relays.Count(r => r.Entry is { Scoring: false }));
 
     public static int FormatClubPointCount(Club? club) =>
-        club?.Athletes.Sum(a => ScoringPointsCalculator.CalculateAthleteScoringPoints(a.Entries)) ?? 0;
+        club is null
+            ? 0
+            : club.Athletes.Sum(a => ScoringPointsCalculator.CalculateAthleteScoringPoints(a.Entries))
+              + ScoringPointsCalculator.CalculateRelayScoringPoints(club.Relays);
 
     public static string FormatRelayName(Relay? relay, IEntityDisplayTexts texts)
     {

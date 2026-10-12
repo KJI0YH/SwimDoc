@@ -35,7 +35,7 @@ public static class ScoringPointCountQueries
         if (clubIds.Count == 0)
             return [];
 
-        var entries = await dbContext.Entries
+        var athleteEntries = await dbContext.Entries
             .AsNoTracking()
             .Where(e => e.AthleteId != null && e.Scoring)
             .Include(e => e.Athlete)
@@ -43,12 +43,23 @@ public static class ScoringPointCountQueries
             .Where(e => e.Athlete!.ClubId != null && clubIds.Contains(e.Athlete.ClubId.Value))
             .ToListAsync(cancellationToken);
 
-        return entries
-            .GroupBy(e => e.Athlete!.ClubId!.Value)
+        var relays = await dbContext.Relays
+            .AsNoTracking()
+            .Where(r => clubIds.Contains(r.ClubId) && r.Entry != null && r.Entry.Scoring)
+            .Include(r => r.Entry)
+            .ThenInclude(e => e.SwimEvent)
+            .ToListAsync(cancellationToken);
+
+        var athleteEntriesByClub = athleteEntries.ToLookup(e => e.Athlete!.ClubId!.Value);
+        var relaysByClub = relays.ToLookup(r => r.ClubId);
+
+        return athleteEntriesByClub.Select(g => g.Key)
+            .Union(relaysByClub.Select(g => g.Key))
             .ToDictionary(
-                clubGroup => clubGroup.Key,
-                clubGroup => clubGroup
-                    .GroupBy(e => e.AthleteId!.Value)
-                    .Sum(athleteGroup => ScoringPointsCalculator.CalculateAthleteScoringPoints(athleteGroup)));
+                clubId => clubId,
+                clubId => athleteEntriesByClub[clubId]
+                              .GroupBy(e => e.AthleteId!.Value)
+                              .Sum(ScoringPointsCalculator.CalculateAthleteScoringPoints)
+                          + ScoringPointsCalculator.CalculateRelayScoringPoints(relaysByClub[clubId]));
     }
 }

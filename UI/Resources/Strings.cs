@@ -281,6 +281,7 @@ public static class Strings
     public static string Events_Col_Distance => Get(nameof(Events_Col_Distance));
     public static string Events_Col_AgeGroup => Get(nameof(Events_Col_AgeGroup));
     public static string Events_Col_Lanes => Get(nameof(Events_Col_Lanes));
+    public static string Events_Col_PointsMultiplier => Get(nameof(Events_Col_PointsMultiplier));
     public static string Events_Col_EntryCount => Get(nameof(Events_Col_EntryCount));
     public static string Events_Col_HeatCount => Get(nameof(Events_Col_HeatCount));
     public static string Events_Col_Status => Get(nameof(Events_Col_Status));
@@ -409,6 +410,7 @@ public static class Strings
     public static string Event_Field_Round => Get(nameof(Event_Field_Round));
     public static string Event_Field_PreviousEvent => Get(nameof(Event_Field_PreviousEvent));
     public static string Event_Field_RoundParticipantsCount => Get(nameof(Event_Field_RoundParticipantsCount));
+    public static string Event_Field_PointsMultiplier => Get(nameof(Event_Field_PointsMultiplier));
     public static string Event_Field_AvailableLanes => Get(nameof(Event_Field_AvailableLanes));
     public static string Event_Lanes_Tab_Range => Get(nameof(Event_Lanes_Tab_Range));
     public static string Event_Lanes_Tab_Custom => Get(nameof(Event_Lanes_Tab_Custom));

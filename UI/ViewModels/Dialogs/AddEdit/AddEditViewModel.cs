@@ -56,6 +56,7 @@ public partial class AddEditViewModel<TEntity, TKey> : ViewModelBase, IWindowRes
     }
 
     protected virtual bool ValidateBeforeSave() => true;
+    protected virtual Task OnSavedAsync() => Task.CompletedTask;
 
     [RelayCommand]
     private async Task SaveAsync()
@@ -81,6 +82,7 @@ public partial class AddEditViewModel<TEntity, TKey> : ViewModelBase, IWindowRes
             foreach (var error in errors) ValidationErrors.Add(error.ErrorMessage ?? Strings.Validation_ErrorFallback);
             return;
         }
+        await OnSavedAsync();
         CloseRequested?.Invoke(this, new DialogCloseEventArgs(true));
     }
 

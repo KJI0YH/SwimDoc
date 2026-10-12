@@ -27,21 +27,25 @@ public class ClubsViewModel : DataViewModel<Club, ClubRowView, int?>
     {
         AutoGenerateColumns = false;
         ColumnConfigurations.Clear();
-        ColumnConfigurations.Add(new ColumnConfiguration<Club>("Name", Strings.Clubs_Col_Name, 300,
-            ColumnConfiguration<Club>.SortBy(club => club.Name)));
-        ColumnConfigurations.Add(new ColumnConfiguration<Club>("AthleteCount", Strings.Clubs_Col_Athletes, 150,
+        ColumnConfigurations.Add(new ColumnConfiguration<Club>("Name", Strings.Clubs_Col_Name, ColumnWidth.Auto,
+            ColumnConfiguration<Club>.SortBy(club => club.Name))
+        {
+            MinWidth = 250
+        });
+        ColumnConfigurations.Add(new ColumnConfiguration<Club>("AthleteCount", Strings.Clubs_Col_Athletes, ColumnWidth.Auto,
             ColumnConfiguration<Club>.SortBy(club => club.Athletes.Count)));
-        ColumnConfigurations.Add(new ColumnConfiguration<Club>("EntryCount", Strings.Clubs_Col_Entries, 200,
+        ColumnConfigurations.Add(new ColumnConfiguration<Club>("EntryCount", Strings.Clubs_Col_Entries, ColumnWidth.Auto,
             ColumnConfiguration<Club>.SortBy(club =>
                 club.Athletes.Sum(athlete => athlete.Entries.Count(e => e.Scoring)),
                 club => club.Athletes.Sum(athlete => athlete.Entries.Count(e => !e.Scoring)))));
-        ColumnConfigurations.Add(new ColumnConfiguration<Club>("RelayCount", Strings.Clubs_Col_Relays, 200,
+        ColumnConfigurations.Add(new ColumnConfiguration<Club>("RelayCount", Strings.Clubs_Col_Relays, ColumnWidth.Auto,
             ColumnConfiguration<Club>.SortBy(club =>
                 club.Relays.Count(r => r.Entry != null && r.Entry.Scoring),
                 club => club.Relays.Count(r => r.Entry != null && !r.Entry.Scoring))));
-        ColumnConfigurations.Add(new ColumnConfiguration<Club>("PointCount", Strings.Clubs_Col_Points, 150,
+        ColumnConfigurations.Add(new ColumnConfiguration<Club>("PointCount", Strings.Clubs_Col_Points, ColumnWidth.Auto,
             ColumnConfiguration<Club>.SortBy(club => club.Athletes.Sum(athlete =>
-                athlete.Entries.Where(entry => entry.Scoring).Sum(entry => entry.Points ?? 0)))));
+                    athlete.Entries.Where(entry => entry.Scoring).Sum(entry => entry.Points ?? 0))
+                + club.Relays.Where(r => r.Entry != null && r.Entry.Scoring).Sum(r => r.Entry.Points ?? 0))));
     }
 
     protected override async Task<List<ClubRowView>> LoadPageRowsAsync(

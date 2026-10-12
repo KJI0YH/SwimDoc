@@ -192,6 +192,43 @@ public sealed class PointScoreProviderTest
         Assert.That(entry.Points, Is.EqualTo(125));
     }
 
+    [Test]
+    public void ApplyEventPoints_PlaceTable_AppliesPointsMultiplier()
+    {
+        var settings = new FakeScoringSettings(new ActiveScoringSettings
+        {
+            Mode = ScoringMode.PlaceTable,
+            PlacePoints = [9, 7, 6]
+        });
+        var provider = new PointScoreProvider(new FakeBaseTimeRepository(1000), settings, CreateRankProvider());
+        var swimEvent = CreateSwimEvent();
+        swimEvent.PointsMultiplier = 2;
+        var first = CreateEntry(1, EntryStatus.FINISH, 1900);
+        var second = CreateEntry(2, EntryStatus.FINISH, 2000);
+        var dns = CreateEntry(3, EntryStatus.DNS, null);
+
+        provider.ApplyEventPoints(swimEvent, [first, second, dns]);
+        provider.ApplyEventPoints(swimEvent, [first, second, dns]);
+
+        Assert.That(first.Points, Is.EqualTo(18));
+        Assert.That(second.Points, Is.EqualTo(14));
+        Assert.That(dns.Points, Is.EqualTo(0));
+    }
+
+    [Test]
+    public void ApplyEventPoints_WorldAquatics_AppliesFractionalPointsMultiplier()
+    {
+        var settings = new FakeScoringSettings(new ActiveScoringSettings { Mode = ScoringMode.WorldAquatics });
+        var provider = new PointScoreProvider(new FakeBaseTimeRepository(1000), settings, CreateRankProvider());
+        var swimEvent = CreateSwimEvent();
+        swimEvent.PointsMultiplier = 1.5;
+        var entry = CreateEntry(1, EntryStatus.FINISH, 2000);
+
+        provider.ApplyEventPoints(swimEvent, [entry]);
+
+        Assert.That(entry.Points, Is.EqualTo(188));
+    }
+
     private static AchievedRankProvider CreateRankProvider() =>
         new(new FakeRankTimeRepository(new Dictionary<Category, int>()));
 

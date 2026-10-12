@@ -31,8 +31,6 @@
                          SelectionMode="Extended"
                          RowStyle="{StaticResource DataGridRowLightBlueWhenSelectedStyle}"
                          HorizontalAlignment="Stretch"
-                         ColumnWidth="*"
-                         MinColumnWidth="80"
                          ScrollViewer.HorizontalScrollBarVisibility="Auto">
                 <ui:DataGrid.GroupStyle>
                     <GroupStyle>
@@ -68,19 +66,19 @@
                     </GroupStyle>
                 </ui:DataGrid.GroupStyle>
                 <ui:DataGrid.Columns>
-                    <DataGridTextColumn Header="{loc:Localizastion Heats_Col_Lane}" Binding="{Binding DisplayLane}" IsReadOnly="True" Width="90" MinWidth="80" />
+                    <DataGridTextColumn Header="{loc:Localizastion Heats_Col_Lane}" Binding="{Binding DisplayLane}" IsReadOnly="True" Width="Auto" />
                     <DataGridTextColumn Header="{loc:Localizastion Heats_Col_Participant}" Binding="{Binding Participant}" IsReadOnly="True"
-                                        Width="*" MinWidth="220" />
+                                        Width="*" MinWidth="200" />
                     <DataGridTextColumn Header="{loc:Localizastion Heats_Col_BirthYear}" Binding="{Binding YearOfBirth}" IsReadOnly="True"
-                                        Width="140" MinWidth="120" />
+                                        Width="Auto" />
                     <DataGridTextColumn Header="{loc:Localizastion Athletes_Col_Category}" Binding="{Binding Category}" IsReadOnly="True"
-                                        Width="100" MinWidth="80" />
-                    <DataGridTextColumn Header="{loc:Localizastion Heats_Col_Team}" Binding="{Binding Club}" IsReadOnly="True" Width="*"
-                                        MinWidth="220" />
+                                        Width="Auto" />
+                    <DataGridTextColumn Header="{loc:Localizastion Heats_Col_Team}" Binding="{Binding Club}" IsReadOnly="True"
+                                        Width="*" MinWidth="180" />
                     <DataGridTextColumn Header="{loc:Localizastion Heats_Col_EntryTime}" Binding="{Binding EntryTime}" IsReadOnly="True"
-                                        Width="160" MinWidth="140" />
+                                        Width="Auto" />
                     <DataGridTextColumn Header="{loc:Localizastion Heats_Col_Result}" Binding="{Binding FinishTime}" IsReadOnly="True"
-                                        Width="160" MinWidth="140" />
+                                        Width="Auto" />
                 </ui:DataGrid.Columns>
             </ui:DataGrid>
         </dataView:DefaultDataView.MainContent>

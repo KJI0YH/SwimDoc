@@ -103,6 +103,7 @@ public partial class AthleteAddViewModel(int? id, IAthleteService athleteService
                 SelectedClub = _contextClubId.HasValue
                     ? SearchableItemCollectionHelper.FindClub(Clubs, _contextClubId.Value)
                     : SearchableItemCollectionHelper.FindClub(Clubs, null);
+                Entity.ClubId = (SelectedClub?.Value as Club)?.Id;
             }
         }
         finally

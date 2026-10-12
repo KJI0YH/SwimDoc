@@ -87,20 +87,24 @@ public partial class CombinedResultsView : UserControl
         _eventColumnSwimStyleIds.Clear();
         if (DataContext is not CombinedResultsViewModel viewModel)
             return;
-        var placeColumn = CreateTextColumn(Strings.Results_Col_Place, nameof(CombinedResultRow.PlaceDisplay), 80);
+        var placeColumn = CreateTextColumn(Strings.Results_Col_Place, nameof(CombinedResultRow.PlaceDisplay), ColumnWidth.Auto);
         placeColumn.SortMemberPath = nameof(CombinedResultRow.Place);
         _grid.Columns.Add(placeColumn);
-        _grid.Columns.Add(CreateTextColumn(Strings.Results_Col_Participant, nameof(CombinedResultRow.ParticipantName), 220));
-        _grid.Columns.Add(CreateTextColumn(Strings.Fixation_Col_BirthYear, nameof(CombinedResultRow.YearOfBirth), 120));
-        _grid.Columns.Add(CreateTextColumn(Strings.Athletes_Col_Category, nameof(CombinedResultRow.Category), 100));
-        _grid.Columns.Add(CreateTextColumn(Strings.Results_Col_Team, nameof(CombinedResultRow.ClubName), 180));
-        _grid.Columns.Add(CreateTextColumn(Strings.Results_Col_Total, nameof(CombinedResultRow.TotalPoints), 90));
+        var participantColumn = CreateTextColumn(Strings.Results_Col_Participant, nameof(CombinedResultRow.ParticipantName), ColumnWidth.Fill);
+        participantColumn.MinWidth = 200;
+        _grid.Columns.Add(participantColumn);
+        _grid.Columns.Add(CreateTextColumn(Strings.Fixation_Col_BirthYear, nameof(CombinedResultRow.YearOfBirth), ColumnWidth.Auto));
+        _grid.Columns.Add(CreateTextColumn(Strings.Athletes_Col_Category, nameof(CombinedResultRow.Category), ColumnWidth.Auto));
+        var clubColumn = CreateTextColumn(Strings.Results_Col_Team, nameof(CombinedResultRow.ClubName), ColumnWidth.Fill);
+        clubColumn.MinWidth = 180;
+        _grid.Columns.Add(clubColumn);
+        _grid.Columns.Add(CreateTextColumn(Strings.Results_Col_Total, nameof(CombinedResultRow.TotalPoints), ColumnWidth.Auto));
         foreach (var column in viewModel.EventColumns)
         {
             var eventColumn = new DataGridTextColumn
             {
                 Header = column.Header,
-                Width = 110,
+                Width = ColumnWidth.Auto,
                 Binding = new Binding($"[{column.SwimStyleId}]")
                 {
                     TargetNullValue = string.Empty
@@ -139,7 +143,7 @@ public partial class CombinedResultsView : UserControl
         return style;
     }
 
-    private static DataGridTextColumn CreateTextColumn(string header, string bindingPath, double width) =>
+    private static DataGridTextColumn CreateTextColumn(string header, string bindingPath, DataGridLength width) =>
         new()
         {
             Header = header,

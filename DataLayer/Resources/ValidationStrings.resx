@@ -18,6 +18,7 @@
   <data name="SwimEvent_SwimStyleNotSelected" xml:space="preserve"><value>Swim style is not selected.</value></data>
   <data name="SwimEvent_AgeGroupNotSelected" xml:space="preserve"><value>Age group is not selected.</value></data>
   <data name="SwimEvent_RoundParticipantsCountMustBeGreaterThanZero" xml:space="preserve"><value>Round participants count must be greater than zero.</value></data>
+  <data name="SwimEvent_PointsMultiplierMustBeGreaterThanZero" xml:space="preserve"><value>Points multiplier must be greater than zero.</value></data>
   <data name="SwimEvent_CustomLaneNamesMustBeUnique" xml:space="preserve"><value>Custom lane names must be unique.</value></data>
   <data name="SwimEvent_InvalidLaneRange" xml:space="preserve"><value>Invalid lane range.</value></data>
   <data name="SwimEvent_InvalidRoundOrder" xml:space="preserve"><value>Invalid round order.</value></data>

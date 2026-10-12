@@ -174,6 +174,8 @@ public partial class DataGridView : UserControl
                 column.Width = config.WidthUnitType.HasValue
                     ? new DataGridLength(config.Width.Value, config.WidthUnitType.Value)
                     : new DataGridLength(config.Width.Value);
+            if (config.MinWidth.HasValue)
+                column.MinWidth = config.MinWidth.Value;
             DgTableView.Columns.Add(column);
         }
         DataGridHeaderFitHelper.FitHeaders(DgTableView);

@@ -21,6 +21,12 @@ public static class ScoringPointsCalculator
         return fromGrouped + fromStandalone;
     }
 
+    public static int CalculateRelayScoringPoints(IEnumerable<Relay> relays) =>
+        relays
+            .Where(r => r.Entry is not null)
+            .GroupBy(r => r.Number)
+            .Sum(team => CalculateAthleteScoringPoints(team.Select(r => r.Entry)));
+
     public static Entry GetHighestRoundEntry(IEnumerable<Entry> entries)
     {
         Entry? highestRoundEntry = null;

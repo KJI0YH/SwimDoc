@@ -1,3 +1,4 @@
+using System.Globalization;
 using DataLayer.EfClasses;
 using UI.Helpers.Display;
 using UI.Models.Rows.Projections;
@@ -19,6 +20,7 @@ public sealed class SwimEventRowView : IEntityRowView<SwimEvent>
     public string Lanes => EntityDisplayFormatter.FormatSwimEventLanes(Entity);
     public string RoundParticipantsCount =>
         Entity.RoundParticipantsCount?.ToString() ?? Strings.Common_All;
+    public string PointsMultiplier => $"x{Entity.PointsMultiplier.ToString(CultureInfo.CurrentCulture)}";
     public SwimEventStatus Status => Entity.Status;
     public int EntryCount { get; }
     public int HeatCount { get; }

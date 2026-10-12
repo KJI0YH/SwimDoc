@@ -11,6 +11,7 @@
                   IsEditable="True"
                   IsTextSearchEnabled="False"
                   StaysOpenOnEdit="True"
+                  InputMethod.IsInputMethodEnabled="False"
                   MaxDropDownHeight="320"
                   VirtualizingPanel.IsVirtualizing="True"
                   VirtualizingPanel.VirtualizationMode="Recycling"

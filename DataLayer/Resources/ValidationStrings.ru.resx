@@ -18,6 +18,7 @@
   <data name="SwimEvent_SwimStyleNotSelected" xml:space="preserve"><value>Не выбрана дистанция.</value></data>
   <data name="SwimEvent_AgeGroupNotSelected" xml:space="preserve"><value>Не выбрана возрастная группа.</value></data>
   <data name="SwimEvent_RoundParticipantsCountMustBeGreaterThanZero" xml:space="preserve"><value>Количество участников раунда должно быть больше нуля.</value></data>
+  <data name="SwimEvent_PointsMultiplierMustBeGreaterThanZero" xml:space="preserve"><value>Коэффициент очков должен быть больше нуля.</value></data>
   <data name="SwimEvent_CustomLaneNamesMustBeUnique" xml:space="preserve"><value>Названия дорожек должны быть уникальными.</value></data>
   <data name="SwimEvent_InvalidLaneRange" xml:space="preserve"><value>Некорректный диапазон дорожек.</value></data>
   <data name="SwimEvent_InvalidRoundOrder" xml:space="preserve"><value>Некорректный порядок раундов.</value></data>

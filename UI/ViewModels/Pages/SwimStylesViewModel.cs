@@ -25,11 +25,14 @@ public class SwimStylesViewModel : DataViewModel<SwimStyle, SwimStyleRowView, in
         base.InitializeColumns();
         AutoGenerateColumns = false;
         ColumnConfigurations.Clear();
-        ColumnConfigurations.Add(new ColumnConfiguration<SwimStyle>("DisplayName", Strings.SwimStyles_Col_Name, 300,
+        ColumnConfigurations.Add(new ColumnConfiguration<SwimStyle>("DisplayName", Strings.SwimStyles_Col_Name, ColumnWidth.Auto,
+            ColumnConfiguration<SwimStyle>.SortBy(e => e.Distance, e => e.Stroke, e => e.RelayCount))
+        {
+            MinWidth = 250
+        });
+        ColumnConfigurations.Add(new ColumnConfiguration<SwimStyle>("Distance", Strings.SwimStyles_Col_Distance, ColumnWidth.Auto,
             ColumnConfiguration<SwimStyle>.SortBy(e => e.Distance, e => e.Stroke, e => e.RelayCount)));
-        ColumnConfigurations.Add(new ColumnConfiguration<SwimStyle>("Distance", Strings.SwimStyles_Col_Distance, 150,
-            ColumnConfiguration<SwimStyle>.SortBy(e => e.Distance, e => e.Stroke, e => e.RelayCount)));
-        ColumnConfigurations.Add(new ColumnConfiguration<SwimStyle>("Stroke", Strings.SwimStyles_Col_Stroke, 200,
+        ColumnConfigurations.Add(new ColumnConfiguration<SwimStyle>("Stroke", Strings.SwimStyles_Col_Stroke, ColumnWidth.Auto,
             ColumnConfiguration<SwimStyle>.SortBy(e => e.Stroke, e => e.Distance, e => e.RelayCount)));
     }
 

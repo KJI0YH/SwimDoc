@@ -292,6 +292,7 @@
   <data name="Events_Col_Distance" xml:space="preserve"><value>Distance</value></data>
   <data name="Events_Col_AgeGroup" xml:space="preserve"><value>Age group</value></data>
   <data name="Events_Col_Lanes" xml:space="preserve"><value>Lanes</value></data>
+  <data name="Events_Col_PointsMultiplier" xml:space="preserve"><value>Mult.</value></data>
   <data name="Events_Col_EntryCount" xml:space="preserve"><value>Entries</value></data>
   <data name="Events_Col_HeatCount" xml:space="preserve"><value>Heats</value></data>
   <data name="Events_Col_Status" xml:space="preserve"><value>Status</value></data>
@@ -420,6 +421,7 @@
   <data name="Event_Field_Round" xml:space="preserve"><value>Round</value></data>
   <data name="Event_Field_PreviousEvent" xml:space="preserve"><value>Previous event</value></data>
   <data name="Event_Field_RoundParticipantsCount" xml:space="preserve"><value>Participants</value></data>
+  <data name="Event_Field_PointsMultiplier" xml:space="preserve"><value>Points multiplier</value></data>
   <data name="Event_Field_AvailableLanes" xml:space="preserve"><value>Available lanes</value></data>
   <data name="Event_Lanes_Tab_Range" xml:space="preserve"><value>Lane range</value></data>
   <data name="Event_Lanes_Tab_Custom" xml:space="preserve"><value>Custom names</value></data>

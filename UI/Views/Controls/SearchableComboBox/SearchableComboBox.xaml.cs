@@ -433,6 +433,7 @@ public partial class SearchableComboBox : UserControl
         EditableComboBoxBehavior.SetIsEnabled(ComboBoxControl, true);
         if (GetEditableTextBox() is not { } textBox)
             return;
+        InputMethod.SetIsInputMethodEnabled(textBox, false);
         textBox.GotFocus += (_, _) =>
         {
             if (_isSearchActive)

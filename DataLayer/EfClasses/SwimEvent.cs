@@ -18,6 +18,7 @@ public class SwimEvent : IValidatableObject
     public SwimEventStatus Status { get; set; } = SwimEventStatus.EMPTY;
     public Course Course { get; set; } = Course.LCM;
     public int? RoundParticipantsCount { get; set; }
+    public double PointsMultiplier { get; set; } = 1;
     public required int LaneMin { get; set; }
     public required int LaneMax { get; set; }
     public string? CustomLaneNames { get; set; }
@@ -67,6 +68,10 @@ public class SwimEvent : IValidatableObject
             yield return new ValidationResult(
                 ValidationStrings.SwimEvent_RoundParticipantsCountMustBeGreaterThanZero,
                 [nameof(RoundParticipantsCount)]);
+        if (PointsMultiplier <= 0)
+            yield return new ValidationResult(
+                ValidationStrings.SwimEvent_PointsMultiplierMustBeGreaterThanZero,
+                [nameof(PointsMultiplier)]);
         var customLanes = SwimEventLaneNames.Parse(CustomLaneNames);
         if (customLanes.Count > 0)
         {

@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Windows.Controls;
 using Expression = System.Linq.Expressions.Expression;
 
 namespace UI.Models.Grid;
@@ -38,6 +39,13 @@ public class ColumnConfiguration<TEntity> : ColumnConfiguration where TEntity : 
         Header = header;
         Width = width;
         SortQuery = sortQuery;
+    }
+
+    public ColumnConfiguration(string propertyPath, string? header, DataGridLength width,
+        ColumnSortQuery<TEntity> sortQuery, string? sortMemberPath = null)
+        : this(propertyPath, header, width.Value, sortQuery, sortMemberPath)
+    {
+        WidthUnitType = width.UnitType;
     }
 
     public ColumnSortQuery<TEntity> SortQuery { get; set; }

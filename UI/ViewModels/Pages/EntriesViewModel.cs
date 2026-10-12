@@ -152,49 +152,64 @@ public partial class EntriesViewModel(
     {
         AutoGenerateColumns = false;
         ColumnConfigurations.Clear();
-        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("SwimName", Strings.Entries_Col_Distance, 380,
-            ColumnConfiguration<Entry>.SortBy(e => e.SwimEvent != null ? e.SwimEvent.Order : int.MaxValue)));
-        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("ParticipantName", Strings.Entries_Col_Participant, 180,
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("SwimName", Strings.Entries_Col_Distance, ColumnWidth.Fill,
+            ColumnConfiguration<Entry>.SortBy(e => e.SwimEvent != null ? e.SwimEvent.Order : int.MaxValue))
+        {
+            MinWidth = 250
+        });
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("ParticipantName", Strings.Entries_Col_Participant, ColumnWidth.Fill,
             ColumnConfiguration<Entry>.SortBy(
                 e => e.Athlete != null ? e.Athlete.LastName : e.Relay != null ? e.Relay.Club!.Name : null,
                 e => e.Athlete != null ? e.Athlete.FirstName : null,
-                e => e.Id)));
-        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("ParticipantBirthYear", Strings.Athletes_Col_BirthYear, 120,
+                e => e.Id))
+        {
+            MinWidth = 180
+        });
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("ParticipantBirthYear", Strings.Athletes_Col_BirthYear, ColumnWidth.Auto,
             ColumnConfiguration<Entry>.SortByDirection(
                 q => q.OrderBy(e => e.Athlete != null ? e.Athlete.YearOfBirth : int.MaxValue).ThenBy(e => e.Id),
                 q => q.OrderByDescending(e => e.Athlete != null ? e.Athlete.YearOfBirth : int.MinValue)
                     .ThenByDescending(e => e.Id))));
-        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("ParticipantCategory", Strings.Athletes_Col_Category, 70,
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("ParticipantCategory", Strings.Athletes_Col_Category, ColumnWidth.Auto,
             ColumnConfiguration<Entry>.SortByDirection(
                 q => q.OrderBy(e => e.Athlete != null ? (int)e.Athlete.Category : int.MaxValue).ThenBy(e => e.Id),
                 q => q.OrderByDescending(e => e.Athlete != null ? (int)e.Athlete.Category : int.MinValue)
                     .ThenByDescending(e => e.Id))));
-        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("ParticipantClubName", Strings.Entries_Col_Team, 180,
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("ParticipantClubName", Strings.Entries_Col_Team, ColumnWidth.Fill,
             ColumnConfiguration<Entry>.SortBy(
                 e => e.Athlete != null ? e.Athlete.Club!.Name : e.Relay != null ? e.Relay.Club!.Name : null,
-                e => e.Id)));
-        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("Status", Strings.Entries_Col_Status, 170,
-            ColumnConfiguration<Entry>.SortBy(e => e.Status)));
-        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("EntryTime", Strings.Entries_Col_EntryTime, 95,
+                e => e.Id))
+        {
+            MinWidth = 180
+        });
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("Status", Strings.Entries_Col_Status, ColumnWidth.Fill,
+            ColumnConfiguration<Entry>.SortBy(e => e.Status))
+        {
+            MinWidth = 140
+        });
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("EntryTime", Strings.Entries_Col_EntryTime, ColumnWidth.Auto,
             ColumnConfiguration<Entry>.SortBy(e => e.EntryTime ?? SlowestTimeRank, e => e.Id),
             nameof(Entry.EntryTime)));
-        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("FinishTime", Strings.Entries_Col_FinishTime, 95,
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("FinishTime", Strings.Entries_Col_FinishTime, ColumnWidth.Auto,
             ColumnConfiguration<Entry>.SortBy(
                 e => e.Status == EntryStatus.FINISH && e.FinishTime.HasValue
                     ? e.FinishTime!.Value
                     : SlowestTimeRank,
                 e => e.Id),
             nameof(Entry.FinishTime)));
-        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("RankDisplay", Strings.Results_Col_Rank, 70,
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("RankDisplay", Strings.Results_Col_Rank, ColumnWidth.Auto,
             ColumnConfiguration<Entry>.SortBy(
                 e => e.Status == EntryStatus.FINISH && e.FinishTime.HasValue
                     ? e.FinishTime!.Value
                     : SlowestTimeRank,
                 e => e.Id)));
-        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("Points", Strings.Entries_Col_Points, 50,
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("Points", Strings.Entries_Col_Points, ColumnWidth.Auto,
             ColumnConfiguration<Entry>.SortBy(e => e.Points ?? 0)));
-        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("Comment", Strings.Entries_Col_Comment, 250,
-            ColumnConfiguration<Entry>.SortBy(e => e.Comment)));
+        ColumnConfigurations.Add(new ColumnConfiguration<Entry>("Comment", Strings.Entries_Col_Comment, ColumnWidth.Fill,
+            ColumnConfiguration<Entry>.SortBy(e => e.Comment))
+        {
+            MinWidth = 150
+        });
     }
 
     protected override async Task<List<EntryRowView>> LoadPageRowsAsync(

@@ -17,14 +17,14 @@
                       RowStyle="{StaticResource DataGridRowResultsPlaceStyle}"
                       MouseDoubleClick="DataGrid_MouseDoubleClick">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="{loc:Localizastion Results_Col_Event}" Binding="{Binding EventName}" Width="*" />
-                    <DataGridTextColumn Header="{loc:Localizastion Results_Col_Participant}" Binding="{Binding ParticipantName}" Width="*" />
-                    <DataGridTextColumn Header="{loc:Localizastion Fixation_Col_BirthYear}" Binding="{Binding ParticipantYearOfBirth}" Width="120" />
-                    <DataGridTextColumn Header="{loc:Localizastion Results_Col_Team}" Binding="{Binding ClubName}" Width="*" />
-                    <DataGridTextColumn Header="{loc:Localizastion Results_Col_Place}" Binding="{Binding PlaceDisplay}" Width="80" />
-                    <DataGridTextColumn Header="{loc:Localizastion Results_Col_Result}" Binding="{Binding ResultText}" Width="150" />
-                    <DataGridTextColumn Header="{loc:Localizastion Results_Col_Rank}" Binding="{Binding RankDisplay}" Width="90" />
-                    <DataGridTextColumn Header="{loc:Localizastion Results_Col_Points}" Binding="{Binding Points}" SortMemberPath="Entry.Points" Width="150" />
+                    <DataGridTextColumn Header="{loc:Localizastion Results_Col_Event}" Binding="{Binding EventName}" Width="*" MinWidth="250" />
+                    <DataGridTextColumn Header="{loc:Localizastion Results_Col_Participant}" Binding="{Binding ParticipantName}" Width="*" MinWidth="200" />
+                    <DataGridTextColumn Header="{loc:Localizastion Fixation_Col_BirthYear}" Binding="{Binding ParticipantYearOfBirth}" Width="Auto" />
+                    <DataGridTextColumn Header="{loc:Localizastion Results_Col_Team}" Binding="{Binding ClubName}" Width="*" MinWidth="180" />
+                    <DataGridTextColumn Header="{loc:Localizastion Results_Col_Place}" Binding="{Binding PlaceDisplay}" Width="Auto" />
+                    <DataGridTextColumn Header="{loc:Localizastion Results_Col_Result}" Binding="{Binding ResultText}" Width="Auto" />
+                    <DataGridTextColumn Header="{loc:Localizastion Results_Col_Rank}" Binding="{Binding RankDisplay}" Width="Auto" />
+                    <DataGridTextColumn Header="{loc:Localizastion Results_Col_Points}" Binding="{Binding Points}" SortMemberPath="Entry.Points" Width="Auto" />
                 </DataGrid.Columns>
             </ui:DataGrid>
         </dataView:DefaultDataView.MainContent>

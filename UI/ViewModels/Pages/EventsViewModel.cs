@@ -135,41 +135,48 @@ public partial class EventsViewModel : DataViewModel<SwimEvent, SwimEventRowView
     {
         AutoGenerateColumns = false;
         ColumnConfigurations.Clear();
-        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Order", Strings.Events_Col_Order, 80,
+        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Order", Strings.Events_Col_Order, ColumnWidth.Auto,
             ColumnConfiguration<SwimEvent>.SortBy(e => e.Order)));
-        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Date", Strings.Events_Col_Date, 85,
+        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Date", Strings.Events_Col_Date, ColumnWidth.Auto,
             ColumnConfiguration<SwimEvent>.SortBy(e => e.Date)));
-        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Time", Strings.Events_Col_Time, 57,
+        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Time", Strings.Events_Col_Time, ColumnWidth.Auto,
             ColumnConfiguration<SwimEvent>.SortBy(e => e.Time)));
-        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Course", Strings.Event_Field_Course, 80,
+        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Course", Strings.Event_Field_Course, ColumnWidth.Auto,
             ColumnConfiguration<SwimEvent>.SortBy(e => e.Course)));
-        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Round", Strings.Events_Col_Round, 150,
+        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Round", Strings.Events_Col_Round, ColumnWidth.Auto,
             ColumnConfiguration<SwimEvent>.SortBy(e => e.Round)));
-        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("SwimStyle", Strings.Events_Col_Distance, 300,
+        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("SwimStyle", Strings.Events_Col_Distance, ColumnWidth.Fill,
             ColumnConfiguration<SwimEvent>.SortBy(
                 e => e.SwimStyle.Distance,
                 e => e.SwimStyle.Stroke,
                 e => e.SwimStyle.RelayCount))
         {
+            MinWidth = 200,
             Converter = EntityDisplayConverter.Instance,
             ConverterParameter = EntityDisplayConverter.SwimStyleKind
         });
-        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("AgeGroup", Strings.Events_Col_AgeGroup, 300,
+        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("AgeGroup", Strings.Events_Col_AgeGroup, ColumnWidth.Fill,
             ColumnConfiguration<SwimEvent>.SortBy(e => e.AgeGroup!.Name))
         {
+            MinWidth = 200,
             Converter = EntityDisplayConverter.Instance,
             ConverterParameter = EntityDisplayConverter.AgeGroupKind
         });
-        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("RoundParticipantsCount", Strings.Event_Field_RoundParticipantsCount, 100,
+        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("RoundParticipantsCount", Strings.Event_Field_RoundParticipantsCount, ColumnWidth.Auto,
             ColumnConfiguration<SwimEvent>.SortBy(e => e.RoundParticipantsCount)));
-        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Lanes", Strings.Events_Col_Lanes, 80,
+        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("PointsMultiplier", Strings.Events_Col_PointsMultiplier, ColumnWidth.Auto,
+            ColumnConfiguration<SwimEvent>.SortBy(e => e.PointsMultiplier)));
+        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Lanes", Strings.Events_Col_Lanes, ColumnWidth.Auto,
             ColumnConfiguration<SwimEvent>.SortBy(e => e.LaneMin, e => e.LaneMax)));
-        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("EntryCount", Strings.Events_Col_EntryCount, 70,
+        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("EntryCount", Strings.Events_Col_EntryCount, ColumnWidth.Auto,
             ColumnConfiguration<SwimEvent>.SortBy(e => e.Entries.Count)));
-        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("HeatCount", Strings.Events_Col_HeatCount, 80,
+        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("HeatCount", Strings.Events_Col_HeatCount, ColumnWidth.Auto,
             ColumnConfiguration<SwimEvent>.SortBy(e => e.Heats.Count)));
-        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Status", Strings.Events_Col_Status, 210,
-            ColumnConfiguration<SwimEvent>.SortBy(e => e.Status)));
+        ColumnConfigurations.Add(new ColumnConfiguration<SwimEvent>("Status", Strings.Events_Col_Status, ColumnWidth.Fill,
+            ColumnConfiguration<SwimEvent>.SortBy(e => e.Status))
+        {
+            MinWidth = 180
+        });
     }
 
     protected override IQueryable<SwimEvent> ApplyQuery(IQueryable<SwimEvent> query) =>

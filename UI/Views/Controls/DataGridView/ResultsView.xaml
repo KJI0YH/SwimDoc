@@ -41,19 +41,20 @@
                       IsReadOnly="True"
                       RowStyle="{StaticResource DataGridRowResultsPlaceStyle}">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="{loc:Localizastion Results_Col_Place}" Binding="{Binding PlaceDisplay}" IsReadOnly="True" Width="80" />
+                    <DataGridTextColumn Header="{loc:Localizastion Results_Col_Place}" Binding="{Binding PlaceDisplay}" IsReadOnly="True" Width="Auto" />
                     <DataGridTextColumn Header="{loc:Localizastion Results_Col_Participant}" Binding="{Binding ParticipantName}" IsReadOnly="True"
-                                        Width="*" />
+                                        Width="*" MinWidth="200" />
                     <DataGridTextColumn Header="{loc:Localizastion Fixation_Col_BirthYear}" Binding="{Binding ParticipantYearOfBirth}"
-                                        IsReadOnly="True" Width="120" />
+                                        IsReadOnly="True" Width="Auto" />
                     <DataGridTextColumn Header="{loc:Localizastion Athletes_Col_Category}" Binding="{Binding ParticipantCategory}"
-                                        IsReadOnly="True" Width="100" />
-                    <DataGridTextColumn Header="{loc:Localizastion Results_Col_Team}" Binding="{Binding ClubName}" IsReadOnly="True" Width="*" />
+                                        IsReadOnly="True" Width="Auto" />
+                    <DataGridTextColumn Header="{loc:Localizastion Results_Col_Team}" Binding="{Binding ClubName}" IsReadOnly="True"
+                                        Width="*" MinWidth="180" />
                     <DataGridTextColumn Header="{loc:Localizastion Results_Col_Result}" Binding="{Binding ResultText}" IsReadOnly="True"
-                                        Width="150" />
+                                        Width="Auto" />
                     <DataGridTextColumn Header="{loc:Localizastion Results_Col_Rank}" Binding="{Binding RankDisplay}" IsReadOnly="True"
-                                        Width="90" />
-                    <DataGridTextColumn Header="{loc:Localizastion Results_Col_Points}" Binding="{Binding Points}" SortMemberPath="Entry.Points" IsReadOnly="True" Width="150" />
+                                        Width="Auto" />
+                    <DataGridTextColumn Header="{loc:Localizastion Results_Col_Points}" Binding="{Binding Points}" SortMemberPath="Entry.Points" IsReadOnly="True" Width="Auto" />
                 </DataGrid.Columns>
             </ui:DataGrid>
         </dataView:DefaultDataView.MainContent>

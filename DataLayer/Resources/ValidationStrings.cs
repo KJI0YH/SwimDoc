@@ -17,6 +17,7 @@ public static class ValidationStrings
     public static string SwimEvent_SwimStyleNotSelected => Get(nameof(SwimEvent_SwimStyleNotSelected));
     public static string SwimEvent_AgeGroupNotSelected => Get(nameof(SwimEvent_AgeGroupNotSelected));
     public static string SwimEvent_RoundParticipantsCountMustBeGreaterThanZero => Get(nameof(SwimEvent_RoundParticipantsCountMustBeGreaterThanZero));
+    public static string SwimEvent_PointsMultiplierMustBeGreaterThanZero => Get(nameof(SwimEvent_PointsMultiplierMustBeGreaterThanZero));
     public static string SwimEvent_CustomLaneNamesMustBeUnique => Get(nameof(SwimEvent_CustomLaneNamesMustBeUnique));
     public static string SwimEvent_InvalidLaneRange => Get(nameof(SwimEvent_InvalidLaneRange));
     public static string SwimEvent_InvalidRoundOrder => Get(nameof(SwimEvent_InvalidRoundOrder));

@@ -54,9 +54,25 @@ public sealed class EfCoreContext : DbContext
         {
             if (connectionString == _triggersInitializedForConnection)
                 return;
+            UpgradeSchema();
             CreateTriggers();
             _triggersInitializedForConnection = connectionString;
         }
+    }
+
+    private void UpgradeSchema()
+    {
+        AddColumnIfMissing("SwimEvents", "PointsMultiplier", "REAL NOT NULL DEFAULT 1");
+    }
+
+    private void AddColumnIfMissing(string table, string column, string definition)
+    {
+        var exists = Database
+            .SqlQueryRaw<int>($"SELECT COUNT(*) AS Value FROM pragma_table_info('{table}') WHERE name = '{column}'")
+            .AsEnumerable()
+            .Single() > 0;
+        if (!exists)
+            Database.ExecuteSqlRaw($"ALTER TABLE \"{table}\" ADD COLUMN \"{column}\" {definition};");
     }
 
     private void CreateTriggers()

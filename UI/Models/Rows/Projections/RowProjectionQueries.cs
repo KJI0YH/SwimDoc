@@ -73,6 +73,7 @@ public static class RowProjectionQueries
             AgeGroupBirthYearMin = se.AgeGroup.BirthYearMin,
             AgeGroupBirthYearMax = se.AgeGroup.BirthYearMax,
             RoundParticipantsCount = se.RoundParticipantsCount,
+            PointsMultiplier = se.PointsMultiplier,
             EntryCount = se.Entries.Count,
             HeatCount = se.Heats.Count
         });

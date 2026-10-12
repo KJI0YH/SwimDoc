@@ -48,6 +48,7 @@ public sealed class PointScoreProvider(
                 : entries;
             ApplyPlaceTablePoints(forRanking, settings.PlacePoints);
             ApplyMinimumCategory(swimEvent, forRanking, settings.MinimumCategory);
+            ApplyPointsMultiplier(swimEvent, forRanking);
             return;
         }
 
@@ -71,6 +72,18 @@ public sealed class PointScoreProvider(
         }
 
         ApplyMinimumCategory(swimEvent, entries, settings.MinimumCategory);
+        ApplyPointsMultiplier(swimEvent, entries);
+    }
+
+    private static void ApplyPointsMultiplier(SwimEvent swimEvent, IReadOnlyList<Entry> entries)
+    {
+        if (swimEvent.PointsMultiplier == 1)
+            return;
+        foreach (var entry in entries)
+        {
+            if (entry.Points is int points and > 0)
+                entry.Points = (int)Math.Round(points * swimEvent.PointsMultiplier, MidpointRounding.AwayFromZero);
+        }
     }
 
     private void ApplyMinimumCategory(SwimEvent swimEvent, IReadOnlyList<Entry> entries, Category? minimum)

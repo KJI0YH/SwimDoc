@@ -57,19 +57,28 @@ public partial class AthletesViewModel : DataViewModel<Athlete, AthleteRowView, 
     {
         AutoGenerateColumns = false;
         ColumnConfigurations.Clear();
-        ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("LastName", Strings.Athletes_Col_LastName, 200,
-            ColumnConfiguration<Athlete>.SortBy(e => e.LastName)));
-        ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("FirstName", Strings.Athletes_Col_FirstName, 200,
-            ColumnConfiguration<Athlete>.SortBy(e => e.FirstName)));
-        ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("Gender", Strings.Athletes_Col_Gender, 90,
+        ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("LastName", Strings.Athletes_Col_LastName, ColumnWidth.Auto,
+            ColumnConfiguration<Athlete>.SortBy(e => e.LastName))
+        {
+            MinWidth = 150
+        });
+        ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("FirstName", Strings.Athletes_Col_FirstName, ColumnWidth.Auto,
+            ColumnConfiguration<Athlete>.SortBy(e => e.FirstName))
+        {
+            MinWidth = 150
+        });
+        ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("Gender", Strings.Athletes_Col_Gender, ColumnWidth.Auto,
             ColumnConfiguration<Athlete>.SortBy(e => e.Gender)));
-        ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("YearOfBirth", Strings.Athletes_Col_BirthYear, 120,
+        ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("YearOfBirth", Strings.Athletes_Col_BirthYear, ColumnWidth.Auto,
             ColumnConfiguration<Athlete>.SortBy(e => e.YearOfBirth)));
-        ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("Category", Strings.Athletes_Col_Category, 100,
+        ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("Category", Strings.Athletes_Col_Category, ColumnWidth.Auto,
             ColumnConfiguration<Athlete>.SortBy(e => e.Category)));
-        ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("ClubName", Strings.Athletes_Col_Team, 300,
-            ColumnConfiguration<Athlete>.SortBy(e => e.Club!.Name)));
-        ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("PointCount", Strings.Athletes_Col_Points, 80,
+        ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("ClubName", Strings.Athletes_Col_Team, ColumnWidth.Auto,
+            ColumnConfiguration<Athlete>.SortBy(e => e.Club!.Name))
+        {
+            MinWidth = 200
+        });
+        ColumnConfigurations.Add(new ColumnConfiguration<Athlete>("PointCount", Strings.Athletes_Col_Points, ColumnWidth.Auto,
             ColumnConfiguration<Athlete>.SortBy(e =>
                 e.Entries.Where(entry => entry.Scoring).Sum(entry => entry.Points ?? 0))));
     }

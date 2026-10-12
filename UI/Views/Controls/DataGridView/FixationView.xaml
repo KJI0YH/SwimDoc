@@ -79,14 +79,15 @@
                           IsReadOnly="False"
                           RowStyle="{StaticResource DataGridRowLightBlueWhenSelectedStyle}">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="{loc:Localizastion Fixation_Col_Lane}" Binding="{Binding DisplayLane}" IsReadOnly="True" Width="80" />
+                        <DataGridTextColumn Header="{loc:Localizastion Fixation_Col_Lane}" Binding="{Binding DisplayLane}" IsReadOnly="True" Width="Auto" />
                         <DataGridTextColumn Header="{loc:Localizastion Fixation_Col_Participant}" Binding="{Binding ParticipantName}" IsReadOnly="True"
-                                            Width="*" />
-                        <DataGridTextColumn Header="{loc:Localizastion Fixation_Col_BirthYear}" Binding="{Binding YearOfBirth}" IsReadOnly="True" Width="120"/>
-                        <DataGridTextColumn Header="{loc:Localizastion Athletes_Col_Category}" Binding="{Binding Category}" IsReadOnly="True" Width="100"/>
-                        <DataGridTextColumn Header="{loc:Localizastion Fixation_Col_Club}" Binding="{Binding Club}" IsReadOnly="True" Width="*" />
+                                            Width="*" MinWidth="200" />
+                        <DataGridTextColumn Header="{loc:Localizastion Fixation_Col_BirthYear}" Binding="{Binding YearOfBirth}" IsReadOnly="True" Width="Auto"/>
+                        <DataGridTextColumn Header="{loc:Localizastion Athletes_Col_Category}" Binding="{Binding Category}" IsReadOnly="True" Width="Auto"/>
+                        <DataGridTextColumn Header="{loc:Localizastion Fixation_Col_Club}" Binding="{Binding Club}" IsReadOnly="True"
+                                            Width="*" MinWidth="180" />
                         <DataGridTextColumn Header="{loc:Localizastion Fixation_Col_EntryTime}" Binding="{Binding EntryTimeDisplay}" IsReadOnly="True"
-                                            Width="100" />
+                                            Width="Auto" />
 
                         <DataGridTemplateColumn Header="{loc:Localizastion Fixation_Col_Status}" Width="110">
                             <DataGridTemplateColumn.CellTemplate>
@@ -122,11 +123,11 @@
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
 
-                        <DataGridTextColumn Header="{loc:Localizastion Fixation_Col_Rank}" Binding="{Binding RankDisplay}" IsReadOnly="True" Width="90"/>
+                        <DataGridTextColumn Header="{loc:Localizastion Fixation_Col_Rank}" Binding="{Binding RankDisplay}" IsReadOnly="True" Width="Auto"/>
                         
-                        <DataGridTextColumn Header="{loc:Localizastion Fixation_Col_Points}" Binding="{Binding Points}" IsReadOnly="True" Width="100"/>
+                        <DataGridTextColumn Header="{loc:Localizastion Fixation_Col_Points}" Binding="{Binding Points}" IsReadOnly="True" Width="Auto"/>
 
-                        <DataGridTemplateColumn Header="{loc:Localizastion Fixation_Col_Comment}" Width="*">
+                        <DataGridTemplateColumn Header="{loc:Localizastion Fixation_Col_Comment}" Width="*" MinWidth="150">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <Grid>
